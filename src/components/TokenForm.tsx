@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { createTokenOnChain, connectWallet } from '../utils/web3';
-import { TokenMetadata } from '../utils/types';
+import { TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 
 interface TokenFormProps {
@@ -241,7 +241,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
 
             <div>
                 <label htmlFor="description" className="block text-sm font-medium mb-1">
-                    Description
+                    Description(Optional)
                 </label>
                 <textarea
                     id="description"

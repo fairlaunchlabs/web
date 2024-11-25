@@ -7,10 +7,10 @@ import {
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER } from '../config/common';
-import { FairMintToken } from './fair_mint_token';
-import { InitializeTokenAccounts, InitializeTokenConfig, TokenMetadata } from './types';
+import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER } from '../config/constants';
+import { InitializeTokenAccounts, InitializeTokenConfig, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
+import { FairMintToken } from '../types/fair_mint_token';
 
 // Solana 网络连接配置
 const SOLANA_NETWORK = process.env.REACT_APP_SOLANA_NETWORK || 'devnet';

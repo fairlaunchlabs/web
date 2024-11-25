@@ -11,22 +11,20 @@ import {
 } from '@solana/wallet-adapter-wallets';
 import {
     WalletModalProvider,
-    WalletDisconnectButton,
-    WalletMultiButton
 } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
-import { Balance } from './components/Balance';
-import { TransactionHistory } from './components/TransactionHistory';
-import { TokenAccounts } from './components/TokenAccounts';
+import { Balance } from './pages/Balance';
+import { TransactionHistory } from './pages/TransactionHistory';
+import { TokenAccounts } from './pages/TokenAccounts';
 import { LaunchToken } from './pages/LaunchToken';
-import { MintTokens } from './components/MintTokens';
+import { MintTokens } from './pages/MintTokens';
 import { 
     CreateMarketId, 
     CreateLiquidityPool, 
     AddLiquidity, 
     RemoveLiquidity, 
     BurnLPTokens 
-} from './components/TokenManagement';
+} from './pages/TokenManagement';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Sidebar } from './components/Sidebar';
