@@ -69,7 +69,11 @@ export const disconnectWallet = async () => {
 };
 
 // 创建代币
-export const createTokenOnChain = async (metadata: TokenMetadata, wallet: AnchorWallet) => {
+export const createTokenOnChain = async (
+    metadata: TokenMetadata, 
+    wallet: AnchorWallet,
+    config: InitializeTokenConfig
+) => {
     try {
         if (!wallet) {
             throw new Error('Please connect your wallet first');
@@ -132,17 +136,6 @@ export const createTokenOnChain = async (metadata: TokenMetadata, wallet: Anchor
             TOKEN_METADATA_PROGRAM_ID,
           );
         
-        const initConfigData: InitializeTokenConfig = {
-            epochesPerEra: new BN(10), // 10,
-            targetEras: new BN(1),
-            targetSecondsPerEpoch: new BN(100),
-            reduceRatio: new BN(75),
-            initialMintSize: new BN(10_000_000_000_000),
-            initialTargetMintSizePerEpoch: new BN(100_000_000_000_000),
-            feeRate: new BN(100_000_000),
-            liquidityTokensRatio: new BN(10),
-        }
-
         const initializeTokenAccounts: InitializeTokenAccounts = {
             mint: mintPda,
             metadata: metadataPda,
@@ -156,8 +149,8 @@ export const createTokenOnChain = async (metadata: TokenMetadata, wallet: Anchor
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
         
-        console.log(metadata);
-        console.log({
+        console.table(metadata);
+        console.table({
             mintPda: mintPda.toString(),
             configPda: configPda.toString(),
             mintStatePda: mintStatePda.toString(),
@@ -169,9 +162,20 @@ export const createTokenOnChain = async (metadata: TokenMetadata, wallet: Anchor
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID.toString(),
         });
 
+        console.table({
+            targetEras: config.targetEras.toString(),
+            epochesPerEra: config.epochesPerEra.toString(),
+            targetSecondsPerEpoch: config.targetSecondsPerEpoch.toString(),
+            reduceRatio: config.reduceRatio.toString(),
+            initialMintSize: config.initialMintSize.toString(),
+            initialTargetMintSizePerEpoch: config.initialTargetMintSizePerEpoch.toString(),
+            feeRate: config.feeRate.toString(),
+            liquidityTokensRatio: config.liquidityTokensRatio.toString(),
+        })
+
         try {
             const tx = await program.methods
-                .initializeToken(metadata, initConfigData as any)
+                .initializeToken(metadata, config as any)
                 .accounts(initializeTokenAccounts)
                 .signers([])  // 使用钱包的 payer
                 .rpc();

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { createTokenOnChain, connectWallet } from '../utils/web3';
 import { TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
+import { BN } from '@coral-xyz/anchor';
 
 interface TokenFormProps {
     onSubmit?: (data: TokenFormData) => void;
@@ -32,6 +33,21 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [decimals, setDecimals] = useState(9);
+
+    // 高级设置状态
+    const [targetEras, setTargetEras] = useState('1');
+    const [epochesPerEra, setEpochesPerEra] = useState('10');
+    const [targetSecondsPerEpoch, setTargetSecondsPerEpoch] = useState('100');
+    const [reduceRatio, setReduceRatio] = useState('75');
+    const [displayInitialMintSize, setDisplayInitialMintSize] = useState('10');
+    const [initialMintSize, setInitialMintSize] = useState('10000000000');
+    const [displayInitialTargetMintSizePerEpoch, setDisplayInitialTargetMintSizePerEpoch] = useState('100');
+    const [initialTargetMintSizePerEpoch, setInitialTargetMintSizePerEpoch] = useState('100000000000');
+    const [displayFeeRate, setDisplayFeeRate] = useState('0.01');
+    const [feeRate, setFeeRate] = useState('10000000');
+    const [liquidityTokensRatio, setLiquidityTokensRatio] = useState('10');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -181,7 +197,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
             const tokenMetadata: TokenMetadata = {
                 name,
                 symbol,
-                decimals: 9, // 使用默认的 9 位小数
+                decimals,
                 uri: `https://gateway.pinata.cloud/ipfs/${metadataResponse.data.IpfsHash}`,
             };
 
@@ -189,7 +205,19 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
             if (!wallet) {
                 throw new Error('Please connect your wallet first');
             }
-            const result = await createTokenOnChain(tokenMetadata, wallet);
+
+            const initConfigData = {
+                targetEras: new BN(targetEras),
+                epochesPerEra: new BN(epochesPerEra),
+                targetSecondsPerEpoch: new BN(targetSecondsPerEpoch),
+                reduceRatio: new BN(reduceRatio),
+                initialMintSize: new BN(initialMintSize),
+                initialTargetMintSizePerEpoch: new BN(initialTargetMintSizePerEpoch),
+                feeRate: new BN(feeRate),
+                liquidityTokensRatio: new BN(liquidityTokensRatio),
+            };
+
+            const result = await createTokenOnChain(tokenMetadata, wallet, initConfigData);
             console.log('Token created:', result);
 
             if (onSubmit) {
@@ -205,7 +233,62 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
         }
     };
 
+    const validateFormData = (): { isValid: boolean; error: string } => {
+        // 转换为数字进行比较
+        const liquidityRatio = parseFloat(liquidityTokensRatio);
+        const reduceRatioNum = parseFloat(reduceRatio);
+        const epochesPerEraNum = parseFloat(epochesPerEra);
+        const targetErasNum = parseFloat(targetEras);
+        const targetSecondsPerEpochNum = parseFloat(targetSecondsPerEpoch);
+        const initialMintSizeNum = parseFloat(displayInitialMintSize);
+        const initialTargetMintSizePerEpochNum = parseFloat(displayInitialTargetMintSizePerEpoch);
+
+        if (liquidityRatio <= 0 || liquidityRatio > 50) {
+            return { isValid: false, error: 'Liquidity tokens ratio must be between 0 and 50' };
+        }
+
+        if (reduceRatioNum < 50 || reduceRatioNum >= 100) {
+            return { isValid: false, error: 'Reduce ratio must be between 50 and 100' };
+        }
+
+        if (epochesPerEraNum <= 0) {
+            return { isValid: false, error: 'Epoches per era must be greater than 0' };
+        }
+
+        if (targetErasNum <= 0) {
+            return { isValid: false, error: 'Target eras must be greater than 0' };
+        }
+
+        if (targetSecondsPerEpochNum <= 0) {
+            return { isValid: false, error: 'Target seconds per epoch must be greater than 0' };
+        }
+
+        if (initialMintSizeNum <= 0) {
+            return { isValid: false, error: 'Initial mint size must be greater than 0' };
+        }
+
+        if (initialTargetMintSizePerEpochNum <= 0) {
+            return { isValid: false, error: 'Initial target mint size per epoch must be greater than 0' };
+        }
+
+        if (initialTargetMintSizePerEpochNum < initialMintSizeNum * 10) {
+            return { isValid: false, error: 'Initial target mint size per epoch must be at least 10 times the initial mint size' };
+        }
+
+        return { isValid: true, error: '' };
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // 验证表单数据
+        const validation = validateFormData();
+        if (!validation.isValid) {
+            setError(validation.error);
+            return;
+        }
+        setError('');
+
         await createToken(e);
     };
 
@@ -220,7 +303,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
             </div>
@@ -234,7 +317,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                     type="text"
                     value={symbol}
                     onChange={(e) => setSymbol(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
             </div>
@@ -247,10 +330,184 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    required
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
                 />
             </div>
+
+            {/* 高级设置按钮 */}
+            <div className="mt-6">
+                <button
+                    type="button"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="flex items-center text-sm font-medium focus:outline-none"
+                >
+                    <svg
+                        className={`w-4 h-4 mr-2 transition-transform duration-200 ${showAdvanced ? 'rotate-90' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                        />
+                    </svg>
+                    Advanced Settings(If you are not sure, leave it default)
+                </button>
+            </div>
+
+            {/* 高级设置区域 */}
+            {showAdvanced && (
+                <div className="space-y-6 mt-4">
+                    {/* <div>
+                        <label htmlFor="decimals" className="block text-sm font-medium mb-1">
+                            Decimals
+                        </label>
+                        <input
+                            type="number"
+                            id="decimals"
+                            value={decimals}
+                            onChange={(e) => setDecimals(Math.max(0, Math.min(9, parseInt(e.target.value) || 0)))}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            min="0"
+                            max="9"
+                        />
+                    </div> */}
+
+                    <div>
+                        <label htmlFor="targetEras" className="block text-sm font-medium mb-1">
+                            Target Eras
+                        </label>
+                        <input
+                            type="text"
+                            id="targetEras"
+                            value={targetEras}
+                            onChange={(e) => setTargetEras(e.target.value.replace(/[^0-9]/g, ''))}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter target eras"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="epochesPerEra" className="block text-sm font-medium mb-1">
+                            Epoches Per Era
+                        </label>
+                        <input
+                            type="text"
+                            id="epochesPerEra"
+                            value={epochesPerEra}
+                            onChange={(e) => setEpochesPerEra(e.target.value.replace(/[^0-9]/g, ''))}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter epochs per era"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="targetSecondsPerEpoch" className="block text-sm font-medium mb-1">
+                            Target Seconds Per Epoch
+                        </label>
+                        <input
+                            type="text"
+                            id="targetSecondsPerEpoch"
+                            value={targetSecondsPerEpoch}
+                            onChange={(e) => setTargetSecondsPerEpoch(e.target.value.replace(/[^0-9]/g, ''))}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter target seconds"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="reduceRatio" className="block text-sm font-medium mb-1">
+                            Reduce Ratio
+                        </label>
+                        <input
+                            type="text"
+                            id="reduceRatio"
+                            value={reduceRatio}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/[^0-9]/g, '');
+                                const num = parseInt(value);
+                                if (!isNaN(num) && num <= 100) {
+                                    setReduceRatio(value);
+                                }
+                            }}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter reduce ratio (0-100)"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="initialMintSize" className="block text-sm font-medium mb-1">
+                            Initial Mint Size
+                        </label>
+                        <input
+                            type="text"
+                            id="initialMintSize"
+                            value={displayInitialMintSize}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/[^0-9.]/g, '');
+                                setDisplayInitialMintSize(value);
+                                setInitialMintSize((parseFloat(value) * 1000000000).toString());
+                            }}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter initial mint size"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="initialTargetMintSizePerEpoch" className="block text-sm font-medium mb-1">
+                            Initial Target Mint Size Per Epoch
+                        </label>
+                        <input
+                            type="text"
+                            id="initialTargetMintSizePerEpoch"
+                            value={displayInitialTargetMintSizePerEpoch}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/[^0-9.]/g, '');
+                                setDisplayInitialTargetMintSizePerEpoch(value);
+                                setInitialTargetMintSizePerEpoch((parseFloat(value) * 1000000000).toString());
+                            }}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter target mint size per epoch"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="feeRate" className="block text-sm font-medium mb-1">
+                            Fee Rate(SOL)
+                        </label>
+                        <input
+                            type="text"
+                            id="feeRate"
+                            value={displayFeeRate}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/[^0-9.]/g, '');
+                                setDisplayFeeRate(value);
+                                setFeeRate((parseFloat(value) * 1000000000).toString());
+                            }}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter fee rate"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="liquidityTokensRatio" className="block text-sm font-medium mb-1">
+                            Liquidity Tokens Ratio(%)
+                        </label>
+                        <input
+                            type="text"
+                            id="liquidityTokensRatio"
+                            value={liquidityTokensRatio}
+                            onChange={(e) => setLiquidityTokensRatio(e.target.value.replace(/[^0-9]/g, ''))}
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter liquidity tokens ratio"
+                        />
+                    </div>
+                </div>
+            )}
 
             <div>
                 <label className="block text-sm font-medium mb-1">
