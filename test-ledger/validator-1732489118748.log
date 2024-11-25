@@ -1,0 +1,37 @@
+[0m[38;5;8m[[0m2024-11-24T22:58:38.748616000Z [0m[32mINFO [0m solana_test_validator[0m[38;5;8m][0m agave-validator 2.0.0 (src:16de8b75; feat:4288794394, client:Agave)
+[0m[38;5;8m[[0m2024-11-24T22:58:38.748781000Z [0m[32mINFO [0m solana_test_validator[0m[38;5;8m][0m Starting validator with: ArgsOs {
+        inner: [
+            "solana-test-validator",
+            "--reset",
+            "--bpf-program",
+            "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+            "token_program.so",
+            "--bpf-program",
+            "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+            "token_extensions.so",
+            "--bpf-program",
+            "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+            "token_metadata.so",
+            "--bpf-program",
+            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+            "token_ata.so",
+            "--bpf-program",
+            "devi51mZmdwUJGU9hjN27vEz64Gps7uUefqxg27EAtH",
+            "raydium_clmm.so",
+            "--bpf-program",
+            "CPMDWBwJDtYax9qW7AyRuVC19Cc4L4Vcy4n2BHAbHkCW",
+            "raydium_amm.so",
+            "--bpf-program",
+            "DDg4VmQaJV9ogWce7LpcjBA9bv22wRp5uaTPa5pGjijF",
+            "raydium_stable_swap.so",
+            "--bpf-program",
+            "BVChZ3XFEwTMUk1o9i3HAf91H6mFxSwa5X2wFAWhYPhU",
+            "raydium_amm_route.so",
+            "--bpf-program",
+            "HWy1jotHpo6UqeQxx49dpYYdQB8wj9Qk9MdxwjLvDHB8",
+            "openbook_amm.so",
+        ],
+    }
+[0m[38;5;8m[[0m2024-11-24T22:58:38.748891000Z [0m[33mWARN [0m solana_perf[0m[38;5;8m][0m CUDA is disabled
+[0m[38;5;8m[[0m2024-11-24T22:58:38.754323000Z [0m[32mINFO [0m solana_perf[0m[38;5;8m][0m AVX detected
+[0m[38;5;8m[[0m2024-11-24T22:58:38.754339000Z [0m[32mINFO [0m solana_perf[0m[38;5;8m][0m AVX2 detected
