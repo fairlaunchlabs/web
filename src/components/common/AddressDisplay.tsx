@@ -1,7 +1,7 @@
 import React from 'react';
-import { formatAddress } from '../utils/format';
-import { AddressDisplayProps } from '../types/types';
-import { NETWORK, SCANURL } from '../config/constants';
+import { formatAddress } from '../../utils/format';
+import { AddressDisplayProps } from '../../types/types';
+import { NETWORK, SCANURL } from '../../config/constants';
 
 export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address }) => {
     const handleCopy = () => {

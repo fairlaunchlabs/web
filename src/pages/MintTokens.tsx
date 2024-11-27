@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { queryInitializeTokenEvent } from '../utils/graphql';
-import { TokenCard } from '../components/TokenCard';
+import { TokenCard } from '../components/mintTokens/TokenCard';
 import { InitiazlizedTokenData } from '../types/types';
 
 export const MintTokens: React.FC = () => {

@@ -5,9 +5,9 @@ import {
     calculateTargetMintTime,
     calculateMinTotalFee,
     extractIPFSHash
-} from '../utils/format';
-import { TokenCardProps, TokenMetadataIPFS } from '../types/types';
-import { AddressDisplay } from './AddressDisplay';
+} from '../../utils/format';
+import { TokenCardProps, TokenMetadataIPFS } from '../../types/types';
+import { AddressDisplay } from '../common/AddressDisplay';
 import { TokenImage } from './TokenImage';
 import { PinataSDK } from 'pinata-web3';
 import { FaTwitter, FaDiscord, FaGithub, FaMedium, FaTelegram, FaGlobe } from 'react-icons/fa';

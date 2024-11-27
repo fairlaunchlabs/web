@@ -1,5 +1,5 @@
 import React from 'react';
-import { MetricsProps } from '../types/types';
+import { MetricsProps } from '../../types/types';
 
 export const Metrics: React.FC<MetricsProps> = ({
     targetEras,

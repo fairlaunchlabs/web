@@ -1,5 +1,5 @@
 import React from 'react';
-import { LaunchTokenForm } from '../components/LaunchTokenForm';
+import { LaunchTokenForm } from '../components/launchToken/LaunchTokenForm';
 import { TokenFormData } from '../types/types';
 
 export const LaunchToken: React.FC = () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { MenuItem, SidebarProps } from '../types/types';
-import { STORAGE_KEY } from '../config/constants';
+import { MenuItem, SidebarProps } from '../../types/types';
+import { STORAGE_KEY } from '../../config/constants';
 
 export const Sidebar: React.FC<SidebarProps> = ({
     menuItems,
@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return (
             <li key={item.id}>
                 <a 
-                    className={`my-1 py-2
+                    className={`my-1 pt-3 pb-2
                         ${activeMenuItem === item.id ? 'active' : ''} 
                         ${isExpanded ? '' : 'justify-center'}
                         ${isSubItem ? 'pl-3' : ''}
@@ -77,12 +77,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }}
                     title={!isExpanded ? item.label : undefined}
                 >
-                    <div className={isExpanded ? 'w-5 h-5' : 'w-6 h-6'}>
+                    <div className={isExpanded ? 'w-6 h-6' : 'w-6 h-6'}>
                         {item.icon}
                     </div>
-                    {isExpanded && (
+                    {(isExpanded || isMobile) && (
                         <>
-                            <span className="ml-2 flex-1">{item.label}</span>
+                            <span className="ml-1 flex-1">{item.label}</span>
                             {hasSubItems && (
                                 <div className="w-4 h-4">
                                     {isSubMenuExpanded ? <FaChevronUp /> : <FaChevronDown />}
@@ -102,8 +102,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     return (
         <div 
-            className={`sidebar bg-base-200 p-1 transition-all duration-300 ease-in-out fixed inset-y-0 left-0 
-                ${isMobile ? 'w-64' : isExpanded ? 'w-64' : 'w-20'}
+            className={`sidebar bg-base-200 p-1 duration-50 fixed inset-y-0 left-0 
+                ${isMobile ? 'w-72' : isExpanded ? 'w-64' : 'w-20'}
                 ${isMobile && !isMobileOpen ? '-translate-x-full' : 'translate-x-0'}
             `}
         >
@@ -115,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
             </button>
             
-            <div className="h-full overflow-y-auto mt-16">
+            <div className={`h-full overflow-y-auto ${isMobile ? 'mt-16' : 'mt-10'}`}>
                 <ul className="menu bg-base-200 w-full p-2 rounded-box">
                     {menuItems.map(item => renderMenuItem(item))}
                 </ul>

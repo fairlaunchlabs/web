@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { extractIPFSHash } from '../utils/format';
+import { extractIPFSHash } from '../../utils/format';
 import { PinataSDK } from 'pinata-web3';
-import { TokenImageProps, TokenMetadataIPFS } from '../types/types';
+import { TokenImageProps, TokenMetadataIPFS } from '../../types/types';
 
 // Simple in-memory cache for metadata and image URLs
 const metadataCache = new Map<string, { image: string; timestamp: number }>();

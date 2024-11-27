@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { FaSun, FaMoon, FaBars } from 'react-icons/fa';
-import { useTheme } from '../hooks/useTheme';
-import { NavbarProps } from '../types/types';
+import { useTheme } from '../../hooks/useTheme';
+import { NavbarProps } from '../../types/types';
 
 export const Navbar: React.FC<NavbarProps> = ({ 
     title = "Logo",

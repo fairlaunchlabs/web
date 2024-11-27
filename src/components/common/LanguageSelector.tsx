@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaGlobe } from 'react-icons/fa';
-import { Language, LanguageSelectorProps } from '../types/types';
+import { Language, LanguageSelectorProps } from '../../types/types';
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   currentLocale,
