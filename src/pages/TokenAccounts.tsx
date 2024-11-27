@@ -1,12 +1,7 @@
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { useEffect, useState } from 'react';
-
-interface TokenAccount {
-    mint: string;
-    amount: number;
-    decimals: number;
-}
+import { TokenAccount } from '../types/types';
 
 export const TokenAccounts = () => {
     const { connection } = useConnection();

@@ -1,29 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
 import { createTokenOnChain } from '../utils/web3';
-import { TokenMetadata } from '../types/types';
+import { TokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { BN } from '@coral-xyz/anchor';
-// import { subgraphUrl } from '../config/constants';
+import { PinataSDK } from 'pinata-web3';
 // import { queryInitializeTokenEvent } from '../utils/graphql';
 // import { useQuery } from '@apollo/client';
 
-interface TokenFormProps {
-    onSubmit?: (data: TokenFormData) => void;
-}
-
-export interface TokenFormData {
-    name: string;
-    symbol: string;
-    imageUrl: string;
-    imageCid: string;
-    description: string;
-}
-
-// Pinata API configuration
-const PINATA_API_KEY = process.env.REACT_APP_PINATA_API_KEY;
-const PINATA_SECRET_KEY = process.env.REACT_APP_PINATA_API_SECRET;
-const PINATA_API_URL = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
+// Initialize Pinata client
+const pinata = new PinataSDK({
+    pinataJwt: process.env.REACT_APP_PINATA_JWT,
+    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
+});
 
 export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const wallet = useAnchorWallet();
@@ -80,28 +68,9 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     };
 
     const uploadToPinata = async (file: File): Promise<string> => {
-        if (!PINATA_API_KEY || !PINATA_SECRET_KEY) {
-            throw new Error('Pinata API keys are not configured');
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const options = {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                pinata_api_key: PINATA_API_KEY,
-                pinata_secret_api_key: PINATA_SECRET_KEY
-            }
-        };
-
         try {
-            const res = await axios.post(PINATA_API_URL, formData, options);
-            return res.data.IpfsHash;
+            return (await pinata.upload.file(file)).IpfsHash;
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(error.response?.data?.message || 'Failed to upload to Pinata');
-            }
             throw error;
         }
     };
@@ -182,6 +151,11 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
         setSuccess(false);
 
         try {
+            // 调用合约创建代币
+            if (!wallet) {
+                throw new Error('Please connect your wallet first');
+            }
+
             // 准备元数据
             const metadataForIpfs = {
                 name,
@@ -192,30 +166,16 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
             };
 
             // 上传元数据到 IPFS
-            const metadataResponse = await axios.post(
-                'https://api.pinata.cloud/pinning/pinJSONToIPFS',
-                metadataForIpfs,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        pinata_api_key: PINATA_API_KEY,
-                        pinata_secret_api_key: PINATA_SECRET_KEY,
-                    },
-                }
-            );
+            const metadataResponse = await pinata.upload.json(metadataForIpfs);
 
             // 准备创建代币所需的元数据
             const tokenMetadata: TokenMetadata = {
                 name,
                 symbol,
                 decimals,
-                uri: `https://gateway.pinata.cloud/ipfs/${metadataResponse.data.IpfsHash}`,
+                uri: `https://gateway.pinata.cloud/ipfs/${metadataResponse.IpfsHash}`,
             };
-
-            // 调用合约创建代币
-            if (!wallet) {
-                throw new Error('Please connect your wallet first');
-            }
+            console.log('Token metadata:', tokenMetadata);
 
             const initConfigData = {
                 targetEras: new BN(targetEras),
@@ -291,8 +251,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // 验证表单数据
+                // 验证表单数据
         const validation = validateFormData();
         if (!validation.isValid) {
             setError(validation.error);

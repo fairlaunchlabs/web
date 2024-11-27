@@ -13,7 +13,6 @@ import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 
 // Solana 网络连接配置
-const SOLANA_NETWORK = process.env.REACT_APP_SOLANA_NETWORK || 'devnet';
 const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 
 // 程序 ID

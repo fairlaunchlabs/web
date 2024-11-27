@@ -19,6 +19,14 @@ export const queryInitializeTokenEvent = gql`
             tokenName
             tokenSymbol
             tokenUri
+            targetEras
+            epochesPerEra
+            targetSecondsPerEpoch
+            reduceRatio
+            initialMintSize
+            initialTargetMintSizePerEpoch
+            feeRate
+            liquidityTokensRatio
         }
     }`;
 
@@ -42,6 +50,14 @@ export const queryMyInitializedTokenEvent = gql`
             tokenName
             tokenSymbol
             tokenUri
+            targetEras
+            epochesPerEra
+            targetSecondsPerEpoch
+            reduceRatio
+            initialMintSize
+            initialTargetMintSizePerEpoch
+            feeRate
+            liquidityTokensRatio
         }
     }`;
 

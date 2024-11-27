@@ -1,22 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-
-interface MenuItem {
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-    subItems?: MenuItem[];
-}
-
-interface SidebarProps {
-    menuItems: MenuItem[];
-    activeMenuItem: string;
-    onMenuItemClick: (id: string) => void;
-    onExpandedChange?: (expanded: boolean) => void;
-    isMobileOpen?: boolean;
-}
-
-const STORAGE_KEY = 'sidebar_expanded_menus';
+import { MenuItem, SidebarProps } from '../types/types';
+import { STORAGE_KEY } from '../config/constants';
 
 export const Sidebar: React.FC<SidebarProps> = ({
     menuItems,

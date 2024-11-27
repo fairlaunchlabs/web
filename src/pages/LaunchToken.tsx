@@ -1,5 +1,6 @@
 import React from 'react';
-import { TokenForm, TokenFormData } from '../components/TokenForm';
+import { TokenForm } from '../components/TokenForm';
+import { TokenFormData } from '../types/types';
 
 export const LaunchToken: React.FC = () => {
     const handleSubmit = (data: TokenFormData) => {

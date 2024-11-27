@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-
-const THEME_KEY = 'app-theme';
+import { THEME_KEY } from '../config/constants';
 
 export type Theme = 'light' | 'dark';
 

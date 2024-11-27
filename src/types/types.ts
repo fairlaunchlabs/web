@@ -12,6 +12,13 @@ export type TokenMetadata = {
     uses?: null;
 }
 
+export type TokenMetadataIPFS = {
+    name?: string;
+    symbol?: string;
+    image?: string;
+    attributes?: string[];
+}
+
 export type InitializeTokenConfig = {
     targetEras: BN;
     epochesPerEra: BN;
@@ -34,4 +41,88 @@ export type InitializeTokenAccounts = {
     systemConfigAccount: PublicKey;
     tokenProgram: PublicKey;
     tokenMetadataProgram: PublicKey;
+}
+
+export type InitiazlizedTokenData = {
+    id: string;
+    txId: string;
+    admin: string;
+    tokenId: string;
+    mint: string;
+    configAccount: string;
+    metadataAccount: string;
+    mintStateAccount: string;
+    tokenName: string;
+    tokenSymbol: string;
+    tokenUri: string;
+    targetEras: string;
+    epochesPerEra: string;
+    targetSecondsPerEpoch: string;
+    reduceRatio: string;
+    initialMintSize: string;
+    initialTargetMintSizePerEpoch: string;
+    feeRate: string;
+    liquidityTokensRatio: string;
+}
+
+export type TokenImageProps = {
+    uri: string;
+    name: string;
+    size?: number;
+    className?: string;
+}
+
+export type AddressDisplayProps = {
+    address: string;
+    isDevnet?: boolean;
+}
+
+export type Language = 'en-US' | 'zh-CN' | 'ja-JP' | 'ru-RU';
+
+export type LanguageSelectorProps = {
+    currentLocale: Language;
+    onLocaleChange: (locale: Language) => void;
+}
+
+export type NavbarProps = {
+    title?: string;
+    onMenuClick?: () => void;
+    isMenuOpen?: boolean;
+}
+
+export type MenuItem = {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+    subItems?: MenuItem[];
+}
+
+export type SidebarProps = {
+    menuItems: MenuItem[];
+    activeMenuItem: string;
+    onMenuItemClick: (id: string) => void;
+    onExpandedChange?: (expanded: boolean) => void;
+    isMobileOpen?: boolean;
+}
+
+export type TokenCardProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type TokenFormProps = {
+    onSubmit?: (data: TokenFormData) => void;
+}
+
+export type TokenFormData = {
+    name: string;
+    symbol: string;
+    imageUrl: string;
+    imageCid: string;
+    description: string;
+}
+
+export type TokenAccount = {
+    mint: string;
+    amount: number;
+    decimals: number;
 }

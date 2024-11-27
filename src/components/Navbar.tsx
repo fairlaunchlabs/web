@@ -2,12 +2,7 @@ import React, { useEffect } from 'react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { FaSun, FaMoon, FaBars } from 'react-icons/fa';
 import { useTheme } from '../hooks/useTheme';
-
-interface NavbarProps {
-    title?: string;
-    onMenuClick?: () => void;
-    isMenuOpen?: boolean;
-}
+import { NavbarProps } from '../types/types';
 
 export const Navbar: React.FC<NavbarProps> = ({ 
     title = "Logo",
