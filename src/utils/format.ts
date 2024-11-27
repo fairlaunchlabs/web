@@ -117,8 +117,16 @@ export const extractIPFSHash = (url: string): string | null => {
         return url;
     }
 
+    // 处理 ipfs:// 协议的链接
+    if (url.startsWith('ipfs://')) {
+        const hash = url.replace('ipfs://', '');
+        if (hash.startsWith('Qm') || hash.startsWith('baf')) {
+            return hash;
+        }
+    }
+
     try {
-        // 创建 URL 对象
+        // 创建 URL 对象处理 https:// 链接
         const urlObj = new URL(url);
         
         // 从路径中提取 IPFS 哈希

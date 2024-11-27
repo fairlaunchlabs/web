@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
+import { Token } from 'graphql';
 
 export type TokenMetadata = {
     name: string;
@@ -12,10 +13,21 @@ export type TokenMetadata = {
     uses?: null;
 }
 
+export type TokenMetadataExtensions = {
+    twitter?: string;
+    discord?: string;
+    website?: string;
+    github?: string;
+    medium?: string;
+    telegram?: string;
+}
+
 export type TokenMetadataIPFS = {
     name?: string;
     symbol?: string;
     image?: string;
+    description?: string;
+    extensions?: TokenMetadataExtensions;
     attributes?: string[];
 }
 
@@ -137,4 +149,9 @@ export type MetricsProps = {
     feeRate: string;
     liquidityTokensRatio: string;
     symbol: string;
+}
+
+export type TokenImageUploadProps = {
+    onImageChange: (file: File | null) => void;
+    imageFile: File | null;
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getOptimizedImageUrl, preloadOptimizedImage } from '../utils/cloudinary';
 import { extractIPFSHash } from '../utils/format';
 import { PinataSDK } from 'pinata-web3';
-import { TokenImageProps, TokenMetadata, TokenMetadataIPFS } from '../types/types';
+import { TokenImageProps, TokenMetadataIPFS } from '../types/types';
 
 // Simple in-memory cache for metadata and image URLs
 const metadataCache = new Map<string, { image: string; timestamp: number }>();
@@ -43,27 +43,26 @@ export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, cl
                 throw new Error('No image in metadata');
             }
 
-            // // Convert image URI to gateway URL
-            const imageGatewayUrl = data.image;
+            // Get image data from Pinata gateway
+            const imageResponse = await pinata.gateways.get(extractIPFSHash(data.image) as string);
             
-            // Get optimized image URL with specific size
-            const optimizedImageUrl = getOptimizedImageUrl(imageGatewayUrl, {
-                width: size,
-                height: size,
-                quality: 90,
-                format: 'auto'
-            });
+            // Type-safe Blob creation with fallback
+            const blobPart = imageResponse.data instanceof Blob 
+                ? imageResponse.data 
+                : typeof imageResponse.data === 'string' 
+                    ? new Blob([imageResponse.data], { type: imageResponse.contentType as string }) 
+                    : new Blob([JSON.stringify(imageResponse.data)], { type: 'application/json' });
+            
+            const blob = new Blob([blobPart], { type: imageResponse.contentType as string });
+            const objectUrl = URL.createObjectURL(blob);
 
-            // Preload the image
-            await preloadOptimizedImage(optimizedImageUrl);
-
-            // Update cache
+            // Update cache with the object URL
             metadataCache.set(uri, {
-                image: optimizedImageUrl,
+                image: objectUrl,
                 timestamp: Date.now()
             });
 
-            setImageUrl(optimizedImageUrl);
+            setImageUrl(objectUrl);
             setIsLoading(false);
             setRetryCount(0); // Reset retry count on success
         } catch (err) {
@@ -90,46 +89,41 @@ export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, cl
             fetchMetadata(uri);
         }
 
+        // Cleanup function to revoke object URLs when component unmounts
         return () => {
             isMounted = false;
             controller.abort();
+            if (imageUrl) {
+                URL.revokeObjectURL(imageUrl);
+            }
         };
     }, [uri, size, retryCount]);
 
     if (isLoading) {
         return (
-            <div className={`${className} flex items-center justify-center bg-base-300 animate-pulse rounded-full`} style={{ width: size, height: size }}>
-                <svg className="w-6 h-6 text-base-content/30 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </div>
+            <div className={`animate-pulse bg-gray-200 rounded-full ${className}`} style={{ width: size, height: size }} />
         );
     }
 
-    if (error || !imageUrl) {
+    if (error) {
         return (
-            <div className={`${className} flex items-center justify-center bg-base-300 rounded-full`} style={{ width: size, height: size }}>
-                <div className="w-8 h-8 rounded-full bg-base-content/10 flex items-center justify-center">
-                    <span className="text-base-content/50 text-lg font-semibold">
-                        {name.charAt(0).toUpperCase()}
-                    </span>
-                </div>
+            <div 
+                className={`bg-gray-200 rounded-full flex items-center justify-center ${className}`} 
+                style={{ width: size, height: size }}
+                title={error}
+            >
+                <span className="text-red-500">!</span>
             </div>
         );
     }
 
-    return (
+    return imageUrl ? (
         <img
             src={imageUrl}
-            alt={`${name} token`}
-            className={className}
-            style={{ width: size, height: size, objectFit: 'cover' }}
+            alt={name || 'Token'}
+            className={`rounded-full object-cover ${className}`}
+            style={{ width: size, height: size }}
             loading="lazy"
-            onError={(e) => {
-                setError('Image failed to load');
-                setImageUrl(null);
-            }}
         />
-    );
+    ) : null;
 };

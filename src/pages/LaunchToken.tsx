@@ -1,5 +1,5 @@
 import React from 'react';
-import { TokenForm } from '../components/TokenForm';
+import { LaunchTokenForm } from '../components/LaunchTokenForm';
 import { TokenFormData } from '../types/types';
 
 export const LaunchToken: React.FC = () => {
@@ -11,7 +11,7 @@ export const LaunchToken: React.FC = () => {
     return (
         <div className="container mx-auto py-8">
             {/* <h1 className="text-3xl font-bold text-center mb-8">Launch New Token</h1> */}
-            <TokenForm onSubmit={handleSubmit} />
+            <LaunchTokenForm onSubmit={handleSubmit} />
         </div>
     );
 };

@@ -8,8 +8,7 @@ import { Metrics } from './Metrics';
 import { SocialInformation } from './SocialInformation';
 import { AdvancedSettings } from './AdvancedSettings';
 import { ToggleSwitch } from './ToggleSwitch';
-// import { queryInitializeTokenEvent } from '../utils/graphql';
-// import { useQuery } from '@apollo/client';
+import { TokenImageUpload } from './TokenImageUpload';
 
 // Initialize Pinata client
 const pinata = new PinataSDK({
@@ -17,7 +16,7 @@ const pinata = new PinataSDK({
     pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
 });
 
-export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
+export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const wallet = useAnchorWallet();
     const [name, setName] = useState('');
     const [symbol, setSymbol] = useState('');
@@ -52,7 +51,6 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const [displayFeeRate, setDisplayFeeRate] = useState('0.005');
     const [feeRate, setFeeRate] = useState('5000000');
     const [liquidityTokensRatio, setLiquidityTokensRatio] = useState('10');
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     /// TEST 
@@ -88,9 +86,13 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
         }
     };
 
-    const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
+    const handleImageChange = async (file: File | null) => {
+        // If no file, reset image-related states
+        if (!file) {
+            setImageCid('');
+            setImageUrl('');
+            return;
+        }
 
         // Reset error and set uploading state
         setError('');
@@ -102,59 +104,16 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
             return;
         }
 
-        // Check if image is square
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        img.onload = async () => {
-            if (img.width !== img.height) {
-                setError('Image must be square');
-                URL.revokeObjectURL(img.src);
-                setIsUploading(false);
-                return;
-            }
-
-            try {
-                // Upload to Pinata
-                const hash = await uploadToPinata(file);
-                setImageCid(hash);
-                setImageUrl(`ipfs://${hash}`);
-                setImageFile(file);
-            } catch (err) {
-                setError('Failed to upload image: ' + (err instanceof Error ? err.message : String(err)));
-            } finally {
-                setIsUploading(false);
-                URL.revokeObjectURL(img.src);
-            }
-        };
-
-        img.onerror = () => {
-            setError('Invalid image file');
-            URL.revokeObjectURL(img.src);
+        try {
+            // Upload to Pinata
+            const hash = await uploadToPinata(file);
+            setImageCid(hash);
+            setImageUrl(`ipfs://${hash}`);
+        } catch (err) {
+            setError('Failed to upload image: ' + (err instanceof Error ? err.message : String(err)));
+        } finally {
             setIsUploading(false);
-        };
-    };
-
-    const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (!file) return;
-
-        // Reset error
-        setError('');
-
-        // Validate file
-        if (!validateImageFile(file)) {
-            return;
         }
-
-        if (fileInputRef.current) {
-            fileInputRef.current.files = e.dataTransfer.files;
-            handleImageChange({ target: { files: e.dataTransfer.files } } as any);
-        }
-    };
-
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
     };
 
     const createToken = async (e: React.FormEvent) => {
@@ -373,93 +332,10 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                         )}
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Token Image
-                        </label>
-                        <div
-                            className={`border-2 border-dashed rounded-lg p-4 text-center ${
-                                isUploading ? 'opacity-50' : ''
-                            }`}
-                            onDrop={handleDrop}
-                            onDragOver={handleDragOver}
-                        >
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/jpeg,image/jpg,image/png"
-                                onChange={handleImageChange}
-                                className="hidden"
-                                id="image-upload"
-                            />
-                            {imageUrl && !isUploading ? (
-                                <div className="relative">
-                                    <img
-                                        src={imageUrl}
-                                        alt="Token"
-                                        className="mx-auto w-40 h-40 object-cover rounded-lg"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="absolute top-2 right-2 p-1.5 bg-gray-800/50 hover:bg-gray-800/70 text-white rounded-full transition-colors"
-                                        disabled={isUploading}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            ) : isUploading ? (
-                                <div className="relative">
-                                    <div className="w-40 h-40 mx-auto flex items-center justify-center bg-gray-100 rounded-lg">
-                                        <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="mt-2 px-3 py-1 text-sm bg-gray-400 text-white rounded-md cursor-not-allowed"
-                                        disabled
-                                    >
-                                        Uploading...
-                                    </button>
-                                </div>
-                            ) : (
-                                <label
-                                    htmlFor="image-upload"
-                                    className="cursor-pointer flex flex-col items-center justify-center w-48 h-48 mx-auto"
-                                >
-                                    <svg
-                                        className="w-12 h-12 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                        />
-                                    </svg>
-                                    <span className="mt-2 text-sm text-gray-500">
-                                        <div>Click or drag to upload</div>
-                                        <div>Only JPEG, PNG</div>
-                                    </span>
-                                </label>
-                            )}
-                        </div>
-                        {error && (
-                            <p className="text-red-500 text-sm mt-1">{error}</p>
-                        )}
-                        {success && (
-                            <div className="mt-2 text-green-500 text-sm">
-                                Token created successfully!
-                            </div>
-                        )}
-                    </div>
+                    <TokenImageUpload
+                        onImageChange={handleImageChange}
+                        imageFile={imageFile}
+                    />
 
                     <button
                         type="submit"

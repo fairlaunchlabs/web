@@ -5,21 +5,30 @@ import {
     calculateMaxSupply, 
     calculateTotalSupplyToTargetEras,
     calculateTargetMintTime,
-    calculateMinTotalFee
+    calculateMinTotalFee,
+    extractIPFSHash
 } from '../utils/format';
-import { InitiazlizedTokenData, TokenCardProps, TokenMetadata } from '../types/types';
+import { InitiazlizedTokenData, TokenCardProps, TokenMetadata, TokenMetadataIPFS } from '../types/types';
 import { AddressDisplay } from './AddressDisplay';
 import { TokenImage } from './TokenImage';
+import { PinataSDK } from 'pinata-web3';
+import { Token } from 'graphql';
+
+const pinata = new PinataSDK({
+    pinataJwt: process.env.REACT_APP_PINATA_JWT,
+    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
+});
 
 export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
-    const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
+    const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchMetadata = async () => {
             try {
-                const response = await fetch(token.tokenUri);
-                const data = await response.json();
+                const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
+                console.log('Metadata response:', response.data);
+                const data = response.data as TokenMetadataIPFS;
                 setMetadata(data);
             } catch (error) {
                 console.error('Error fetching token metadata:', error);
