@@ -126,3 +126,15 @@ export type TokenAccount = {
     amount: number;
     decimals: number;
 }
+
+export type MetricsProps = {
+    targetEras: string;
+    epochesPerEra: string;
+    targetSecondsPerEpoch: string;
+    reduceRatio: string;
+    displayInitialTargetMintSizePerEpoch: string;
+    initialMintSize: string;
+    feeRate: string;
+    liquidityTokensRatio: string;
+    symbol: string;
+}

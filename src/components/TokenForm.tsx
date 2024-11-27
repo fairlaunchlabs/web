@@ -4,6 +4,10 @@ import { TokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { BN } from '@coral-xyz/anchor';
 import { PinataSDK } from 'pinata-web3';
+import { Metrics } from './Metrics';
+import { SocialInformation } from './SocialInformation';
+import { AdvancedSettings } from './AdvancedSettings';
+import { ToggleSwitch } from './ToggleSwitch';
 // import { queryInitializeTokenEvent } from '../utils/graphql';
 // import { useQuery } from '@apollo/client';
 
@@ -26,6 +30,15 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const [success, setSuccess] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [decimals, setDecimals] = useState(9);
+    
+    // 社交信息状态
+    const [showSocial, setShowSocial] = useState(false);
+    const [website, setWebsite] = useState('');
+    const [twitter, setTwitter] = useState('');
+    const [discord, setDiscord] = useState('');
+    const [telegram, setTelegram] = useState('');
+    const [github, setGithub] = useState('');
+    const [medium, setMedium] = useState('');
 
     // 高级设置状态
     const [targetEras, setTargetEras] = useState('1');
@@ -104,7 +117,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                 // Upload to Pinata
                 const hash = await uploadToPinata(file);
                 setImageCid(hash);
-                setImageUrl(`https://gateway.pinata.cloud/ipfs/${hash}`);
+                setImageUrl(`ipfs://${hash}`);
                 setImageFile(file);
             } catch (err) {
                 setError('Failed to upload image: ' + (err instanceof Error ? err.message : String(err)));
@@ -162,7 +175,14 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                 symbol,
                 description,
                 image: imageUrl,
-                attributes: []
+                extensions: {
+                    website,
+                    twitter,
+                    discord,
+                    telegram,
+                    github,
+                    medium,
+                },
             };
 
             // 上传元数据到 IPFS
@@ -173,7 +193,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                 name,
                 symbol,
                 decimals,
-                uri: `https://gateway.pinata.cloud/ipfs/${metadataResponse.IpfsHash}`,
+                uri: `ipfs://${metadataResponse.IpfsHash}`,
             };
             console.log('Token metadata:', tokenMetadata);
 
@@ -262,68 +282,6 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
         await createToken(e);
     };
 
-    // 添加计算函数
-    const calculateMetrics = () => {
-        const epochesPerEraNum = parseFloat(epochesPerEra) || 0;
-        const initialTargetMintSizePerEpochNum = parseFloat(displayInitialTargetMintSizePerEpoch) || 0;
-        const reduceRatioNum = parseFloat(reduceRatio) || 0;
-        const targetErasNum = parseFloat(targetEras) || 0;
-        const targetSecondsPerEpochNum = parseFloat(targetSecondsPerEpoch) || 0;
-        const initialMintSizeNum = parseFloat(initialMintSize) || 0;
-        const feeRateNum = parseFloat(feeRate) || 0;
-
-        // 计算最大供应量
-        const maxSupply = epochesPerEraNum * initialTargetMintSizePerEpochNum / (1 - reduceRatioNum / 100);
-
-        // 计算预估铸造时间（天）
-        const estimatedDays = (targetErasNum * epochesPerEraNum * targetSecondsPerEpochNum) / 86400;
-
-        // 计算目标时代的最大供应量百分比
-        const f = reduceRatioNum / 100;
-        const percentToTargetEras = 1 - Math.pow(f, targetErasNum);
-
-        const totalsupplyToTargetEras = percentToTargetEras * maxSupply;
-
-        // 计算最小总费用
-        const minTotalFee = initialTargetMintSizePerEpochNum * feeRateNum * (targetErasNum * epochesPerEraNum + 1) / initialMintSizeNum;
-
-        // 计算最大总费用
-        const maxTotalFee = initialTargetMintSizePerEpochNum * feeRateNum / initialMintSizeNum * 100 * 
-            (Math.pow(1.01, targetErasNum * epochesPerEraNum + 1) - 1);
-
-        // 检查是否费用过高（例如超过1000 SOL）
-        const isFeeTooHigh = maxTotalFee > 1000;
-
-        // 计算Initial liquidity to target era
-        const liquidityTokensRatioNum = parseFloat(liquidityTokensRatio) || 0;
-        const initialLiquidityToTargetEra = epochesPerEraNum * initialTargetMintSizePerEpochNum * liquidityTokensRatioNum / 100 * (1 - Math.pow(reduceRatioNum / 100, targetErasNum)) / 
-            (1 - reduceRatioNum / 100) / (1 - liquidityTokensRatioNum / 100);
-
-        const initialLiquidityToTargetEraPercent = (initialLiquidityToTargetEra / maxSupply) * 100;
-
-        // 计算最小和最大启动价格
-        const minLaunchPrice = minTotalFee / initialLiquidityToTargetEra;
-        const maxLaunchPrice = maxTotalFee / initialLiquidityToTargetEra;
-
-        // 检查最大启动价格是否过高（例如超过0.1 SOL/token）
-        const isLaunchPriceTooHigh = maxLaunchPrice > 0.1;
-
-        return {
-            maxSupply: maxSupply.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-            estimatedDays: estimatedDays.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-            percentToTargetEras: (percentToTargetEras * 100).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-            minTotalFee: minTotalFee.toLocaleString(undefined, { maximumFractionDigits: 4 }),
-            maxTotalFee: maxTotalFee.toLocaleString(undefined, { maximumFractionDigits: 4 }),
-            isFeeTooHigh,
-            initialLiquidityToTargetEra: initialLiquidityToTargetEra.toLocaleString(undefined, { maximumFractionDigits: 4 }),
-            totalsupplyToTargetEras: totalsupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-            initialLiquidityToTargetEraPercent: (initialLiquidityToTargetEraPercent).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-            minLaunchPrice: minLaunchPrice.toLocaleString(undefined, { maximumFractionDigits: 6 }),
-            maxLaunchPrice: maxLaunchPrice.toLocaleString(undefined, { maximumFractionDigits: 6 }),
-            isLaunchPriceTooHigh
-        };
-    };
-
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row lg:justify-center lg:items-start lg:gap-8">
@@ -356,192 +314,64 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                         />
                     </div>
 
-                    <div>
-                        <label htmlFor="description" className="block text-sm font-medium mb-1">
-                            Description(Optional)
-                        </label>
-                        <textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            rows={4}
+                    <div className="mb-4">
+                        <ToggleSwitch
+                            id="toggleSocial"
+                            label="Social information(Optional)"
+                            checked={showSocial}
+                            onChange={() => setShowSocial(!showSocial)}
                         />
+                        
+                        {showSocial && (
+                            <SocialInformation
+                                description={description}
+                                onDescriptionChange={setDescription}
+                                website={website}
+                                onWebsiteChange={setWebsite}
+                                twitter={twitter}
+                                onTwitterChange={setTwitter}
+                                discord={discord}
+                                onDiscordChange={setDiscord}
+                                telegram={telegram}
+                                onTelegramChange={setTelegram}
+                                github={github}
+                                onGithubChange={setGithub}
+                                medium={medium}
+                                onMediumChange={setMedium}
+                            />
+                        )}
                     </div>
 
                     {/* 高级设置按钮 */}
                     <div className="mt-6">
-                        <button
-                            type="button"
-                            onClick={() => setShowAdvanced(!showAdvanced)}
-                            className="flex items-center text-sm font-medium focus:outline-none"
-                        >
-                            <svg
-                                className={`w-4 h-4 mr-2 transition-transform duration-200 ${showAdvanced ? 'rotate-90' : ''}`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 5l7 7-7 7"
-                                />
-                            </svg>
-                            Advanced Settings(If you are not sure, leave it default)
-                        </button>
+                        <ToggleSwitch
+                            id="toggleAdvanced"
+                            label="Advanced Settings(Optional)"
+                            checked={showAdvanced}
+                            onChange={() => setShowAdvanced(!showAdvanced)}
+                        />
+
+                        {showAdvanced && (
+                            <AdvancedSettings
+                                targetEras={targetEras}
+                                epochesPerEra={epochesPerEra}
+                                targetSecondsPerEpoch={targetSecondsPerEpoch}
+                                reduceRatio={reduceRatio}
+                                displayInitialMintSize={displayInitialMintSize}
+                                displayInitialTargetMintSizePerEpoch={displayInitialTargetMintSizePerEpoch}
+                                displayFeeRate={displayFeeRate}
+                                liquidityTokensRatio={liquidityTokensRatio}
+                                onTargetErasChange={setTargetEras}
+                                onEpochesPerEraChange={setEpochesPerEra}
+                                onTargetSecondsPerEpochChange={setTargetSecondsPerEpoch}
+                                onReduceRatioChange={setReduceRatio}
+                                onDisplayInitialMintSizeChange={setDisplayInitialMintSize}
+                                onDisplayInitialTargetMintSizePerEpochChange={setDisplayInitialTargetMintSizePerEpoch}
+                                onDisplayFeeRateChange={setDisplayFeeRate}
+                                onLiquidityTokensRatioChange={setLiquidityTokensRatio}
+                            />
+                        )}
                     </div>
-
-                    {/* 高级设置区域 */}
-                    {showAdvanced && (
-                        <div className="space-y-6 mt-4">
-                            {/* <div>
-                                <label htmlFor="decimals" className="block text-sm font-medium mb-1">
-                                    Decimals
-                                </label>
-                                <input
-                                    type="number"
-                                    id="decimals"
-                                    value={decimals}
-                                    onChange={(e) => setDecimals(Math.max(0, Math.min(9, parseInt(e.target.value) || 0)))}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    min="0"
-                                    max="9"
-                                />
-                            </div> */}
-
-                            <div>
-                                <label htmlFor="targetEras" className="block text-sm font-medium mb-1">
-                                    Target Eras
-                                </label>
-                                <input
-                                    type="text"
-                                    id="targetEras"
-                                    value={targetEras}
-                                    onChange={(e) => setTargetEras(e.target.value.replace(/[^0-9]/g, ''))}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter target eras"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="epochesPerEra" className="block text-sm font-medium mb-1">
-                                    Epoches Per Era
-                                </label>
-                                <input
-                                    type="text"
-                                    id="epochesPerEra"
-                                    value={epochesPerEra}
-                                    onChange={(e) => setEpochesPerEra(e.target.value.replace(/[^0-9]/g, ''))}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter epochs per era"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="targetSecondsPerEpoch" className="block text-sm font-medium mb-1">
-                                    Target Seconds Per Epoch
-                                </label>
-                                <input
-                                    type="text"
-                                    id="targetSecondsPerEpoch"
-                                    value={targetSecondsPerEpoch}
-                                    onChange={(e) => setTargetSecondsPerEpoch(e.target.value.replace(/[^0-9]/g, ''))}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter target seconds"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="reduceRatio" className="block text-sm font-medium mb-1">
-                                    Reduce Ratio
-                                </label>
-                                <input
-                                    type="text"
-                                    id="reduceRatio"
-                                    value={reduceRatio}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/[^0-9]/g, '');
-                                        const num = parseInt(value);
-                                        if (!isNaN(num) && num <= 100) {
-                                            setReduceRatio(value);
-                                        }
-                                    }}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter reduce ratio (0-100)"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="initialMintSize" className="block text-sm font-medium mb-1">
-                                    Initial Mint Size
-                                </label>
-                                <input
-                                    type="text"
-                                    id="initialMintSize"
-                                    value={displayInitialMintSize}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/[^0-9.]/g, '');
-                                        setDisplayInitialMintSize(value);
-                                        setInitialMintSize((parseFloat(value) * 1000000000).toString());
-                                    }}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter initial mint size"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="initialTargetMintSizePerEpoch" className="block text-sm font-medium mb-1">
-                                    Initial Target Mint Size Per Epoch
-                                </label>
-                                <input
-                                    type="text"
-                                    id="initialTargetMintSizePerEpoch"
-                                    value={displayInitialTargetMintSizePerEpoch}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/[^0-9.]/g, '');
-                                        setDisplayInitialTargetMintSizePerEpoch(value);
-                                        setInitialTargetMintSizePerEpoch((parseFloat(value) * 1000000000).toString());
-                                    }}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter target mint size per epoch"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="feeRate" className="block text-sm font-medium mb-1">
-                                    Fee Rate(SOL)
-                                </label>
-                                <input
-                                    type="text"
-                                    id="feeRate"
-                                    value={displayFeeRate}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/[^0-9.]/g, '');
-                                        setDisplayFeeRate(value);
-                                        setFeeRate((parseFloat(value) * 1000000000).toString());
-                                    }}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter fee rate"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="liquidityTokensRatio" className="block text-sm font-medium mb-1">
-                                    Liquidity Tokens Ratio(%)
-                                </label>
-                                <input
-                                    type="text"
-                                    id="liquidityTokensRatio"
-                                    value={liquidityTokensRatio}
-                                    onChange={(e) => setLiquidityTokensRatio(e.target.value.replace(/[^0-9]/g, ''))}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter liquidity tokens ratio"
-                                />
-                            </div>
-                        </div>
-                    )}
 
                     <div>
                         <label className="block text-sm font-medium mb-1">
@@ -647,63 +477,17 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
 
                 {/* 计算结果显示框 */}
                 <div className="w-full lg:w-[480px] p-6 border-2 border-dashed rounded-lg mt-4 lg:mt-[40px] lg:sticky lg:top-4">
-                    {/* <h3 className="text-lg font-medium mb-4">Token Metrics</h3> */}
-                    <div className="space-y-4">
-                        <div>
-                            <p className="text-sm mb-1">Max Supply</p>
-                            <p className="font-medium">{calculateMetrics().maxSupply} {symbol}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Total Supply to Target Eras</p>
-                            <p className="font-medium">{calculateMetrics().totalsupplyToTargetEras} {symbol}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Percent of Max Supply to Target Eras</p>
-                            <p className="font-medium">{calculateMetrics().percentToTargetEras}%</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Estimated Minting Time</p>
-                            <p className="font-medium">{calculateMetrics().estimatedDays} days</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Minimum Total Fee</p>
-                            <p className="font-medium">{calculateMetrics().minTotalFee} SOL</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Maximum Total Fee</p>
-                            <div className="flex items-center gap-2">
-                                <p className="font-medium">{calculateMetrics().maxTotalFee} SOL</p>
-                                {calculateMetrics().isFeeTooHigh && (
-                                    <span className="text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                        </svg>
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Initial Liquidity to Target Era</p>
-                            <p className="font-medium">{calculateMetrics().initialLiquidityToTargetEra} {symbol} ({calculateMetrics().initialLiquidityToTargetEraPercent}%)</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Minimum Launch Price</p>
-                            <p className="font-medium">{calculateMetrics().minLaunchPrice} SOL/{symbol}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm mb-1">Maximum Launch Price</p>
-                            <div className="flex items-center gap-2">
-                                <p className="font-medium">{calculateMetrics().maxLaunchPrice} SOL/{symbol}</p>
-                                {calculateMetrics().isLaunchPriceTooHigh && (
-                                    <span className="text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                        </svg>
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <Metrics
+                        targetEras={targetEras}
+                        epochesPerEra={epochesPerEra}
+                        targetSecondsPerEpoch={targetSecondsPerEpoch}
+                        reduceRatio={reduceRatio}
+                        displayInitialTargetMintSizePerEpoch={displayInitialTargetMintSizePerEpoch}
+                        initialMintSize={initialMintSize}
+                        feeRate={feeRate}
+                        liquidityTokensRatio={liquidityTokensRatio}
+                        symbol={symbol}
+                    />
                 </div>
             </div>
         </div>
