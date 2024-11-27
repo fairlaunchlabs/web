@@ -369,7 +369,7 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
 
                     <button
                         type="submit"
-                        className={`w-full py-2 px-4 rounded-lg text-white font-medium ${
+                        className={`w-full py-4 px-4 rounded-lg text-white font-medium ${
                             isCreating || isUploading
                                 ? 'bg-gray-300 cursor-not-allowed'
                                 : 'bg-primary hover:bg-primary'
