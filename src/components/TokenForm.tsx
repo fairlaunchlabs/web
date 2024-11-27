@@ -1,9 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { createTokenOnChain, connectWallet } from '../utils/web3';
+import { createTokenOnChain } from '../utils/web3';
 import { TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { BN } from '@coral-xyz/anchor';
+// import { subgraphUrl } from '../config/constants';
+// import { queryInitializeTokenEvent } from '../utils/graphql';
+// import { useQuery } from '@apollo/client';
 
 interface TokenFormProps {
     onSubmit?: (data: TokenFormData) => void;
@@ -50,6 +53,14 @@ export const TokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const [liquidityTokensRatio, setLiquidityTokensRatio] = useState('10');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
+
+    /// TEST 
+    // const { loading, error: queryError, data } = useQuery(queryInitializeTokenEvent);
+    // useEffect(() => {
+    //     if (loading) console.log('Loading token events...');
+    //     if (queryError) console.error('Error loading token events:', queryError);
+    //     if (data) console.log('Token events data:', data);
+    // }, [loading, queryError, data]);
 
     const validateImageFile = (file: File): boolean => {
         // Check file type

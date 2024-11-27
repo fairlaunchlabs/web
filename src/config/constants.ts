@@ -13,3 +13,5 @@ export const MINT_STATE_SEED = "mint_state";
 export const REFERRAL_SEED = "referral";
 export const REFUND_SEEDS = "refund";
 export const SYSTEM_CONFIG_SEEDS = "system_config";
+
+export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
