@@ -39,6 +39,7 @@ import {
     MdRemoveCircle,
     MdLocalFireDepartment
 } from 'react-icons/md';
+import { Toaster } from 'react-hot-toast';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -165,6 +166,12 @@ function App() {
             >
                 <WalletModalProvider>
                     <div className="min-h-screen bg-base-100 flex flex-col">
+                        <Toaster 
+                            position="bottom-right"
+                            toastOptions={{
+                                duration: 5000,
+                            }}
+                        />
                         <Navbar 
                             onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
                             isMenuOpen={isSidebarOpen}

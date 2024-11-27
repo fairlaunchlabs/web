@@ -1,13 +1,14 @@
 import React from 'react';
 import { formatAddress } from '../utils/format';
 import { AddressDisplayProps } from '../types/types';
+import { NETWORK, SCANURL } from '../config/constants';
 
-export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, isDevnet = true }) => {
+export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(address);
     };
 
-    const explorerUrl = `https://solscan.io/account/${address}${isDevnet ? '?cluster=devnet' : ''}`;
+    const explorerUrl = `${SCANURL}/account/${address}?cluster=${NETWORK}`;
 
     return (
         <div className="flex items-center gap-2">

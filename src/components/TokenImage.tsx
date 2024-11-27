@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getOptimizedImageUrl, preloadOptimizedImage } from '../utils/cloudinary';
 import { extractIPFSHash } from '../utils/format';
 import { PinataSDK } from 'pinata-web3';
 import { TokenImageProps, TokenMetadataIPFS } from '../types/types';
@@ -101,14 +100,14 @@ export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, cl
 
     if (isLoading) {
         return (
-            <div className={`animate-pulse bg-gray-200 rounded-full ${className}`} style={{ width: size, height: size }} />
+            <div className={`animate-pulse bg-base-100 rounded-full ${className}`} style={{ width: size, height: size }} />
         );
     }
 
     if (error) {
         return (
             <div 
-                className={`bg-gray-200 rounded-full flex items-center justify-center ${className}`} 
+                className={`bg-base-100 rounded-full flex items-center justify-center ${className}`} 
                 style={{ width: size, height: size }}
                 title={error}
             >

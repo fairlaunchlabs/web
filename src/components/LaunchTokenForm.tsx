@@ -9,6 +9,8 @@ import { SocialInformation } from './SocialInformation';
 import { AdvancedSettings } from './AdvancedSettings';
 import { ToggleSwitch } from './ToggleSwitch';
 import { TokenImageUpload } from './TokenImageUpload';
+import toast from 'react-hot-toast';
+import { NETWORK, SCANURL } from '../config/constants';
 
 // Initialize Pinata client
 const pinata = new PinataSDK({
@@ -51,7 +53,6 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const [displayFeeRate, setDisplayFeeRate] = useState('0.005');
     const [feeRate, setFeeRate] = useState('5000000');
     const [liquidityTokensRatio, setLiquidityTokensRatio] = useState('10');
-    const [imageFile, setImageFile] = useState<File | null>(null);
 
     /// TEST 
     // const { loading, error: queryError, data } = useQuery(queryInitializeTokenEvent);
@@ -122,6 +123,13 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
         setError('');
         setSuccess(false);
 
+        const toastId = toast.loading('Creating token...', {
+            style: {
+                background: 'var(--fallback-b1,oklch(var(--b1)))',
+                color: 'var(--fallback-bc,oklch(var(--bc)))',
+            },
+        });
+
         try {
             // 调用合约创建代币
             if (!wallet) {
@@ -176,10 +184,33 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
 
             setIsCreating(false);
             setSuccess(true);
+
+            // 显示成功提示，包含交易链接
+            const explorerUrl = `${SCANURL}/tx/${result.signature}?cluster=${NETWORK}`;
+            toast.success(
+                <div>
+                    Token created successfully!
+                    <br />
+                    <a
+                        href={explorerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                    >
+                        View transaction
+                    </a>
+                </div>,
+                {
+                    id: toastId,
+                }
+            );
         } catch (err: any) {
             console.error('Error creating token:', err);
             setError(err.message || 'Failed to create token');
             setIsCreating(false);
+            toast.error(err.message || 'Failed to create token', {
+                id: toastId,
+            });
         }
     };
 
@@ -245,7 +276,7 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row lg:justify-center lg:items-start lg:gap-8">
                 <form onSubmit={handleSubmit} className="w-full lg:w-[480px] space-y-4 p-4">
-                    <div>
+                    <div className="">
                         <label htmlFor="name" className="block text-sm font-medium mb-1">
                             Name
                         </label>
@@ -254,12 +285,12 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${name ? 'border-base-content' : ''}`}
                             required
                         />
                     </div>
 
-                    <div>
+                    <div className="">
                         <label htmlFor="symbol" className="block text-sm font-medium mb-1">
                             Symbol
                         </label>
@@ -268,7 +299,7 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
                             type="text"
                             value={symbol}
                             onChange={(e) => setSymbol(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${symbol ? 'border-base-content' : ''}`}
                             required
                         />
                     </div>
@@ -334,14 +365,13 @@ export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
 
                     <TokenImageUpload
                         onImageChange={handleImageChange}
-                        imageFile={imageFile}
                     />
 
                     <button
                         type="submit"
                         className={`w-full py-2 px-4 rounded-lg text-white font-medium ${
                             isCreating || isUploading
-                                ? 'bg-gray-400 cursor-not-allowed'
+                                ? 'bg-base-400 cursor-not-allowed'
                                 : 'bg-blue-500 hover:bg-blue-600'
                         }`}
                         disabled={isCreating || isUploading || !name || !symbol || !imageCid}

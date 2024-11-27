@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { 
-    formatAddress, 
-    formatSeconds, 
     calculateMaxSupply, 
     calculateTotalSupplyToTargetEras,
     calculateTargetMintTime,
     calculateMinTotalFee,
     extractIPFSHash
 } from '../utils/format';
-import { InitiazlizedTokenData, TokenCardProps, TokenMetadata, TokenMetadataIPFS } from '../types/types';
+import { TokenCardProps, TokenMetadataIPFS } from '../types/types';
 import { AddressDisplay } from './AddressDisplay';
 import { TokenImage } from './TokenImage';
 import { PinataSDK } from 'pinata-web3';
-import { Token } from 'graphql';
+import { FaTwitter, FaDiscord, FaGithub, FaMedium, FaTelegram, FaGlobe } from 'react-icons/fa';
 
 const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
@@ -27,7 +25,6 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
         const fetchMetadata = async () => {
             try {
                 const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
-                console.log('Metadata response:', response.data);
                 const data = response.data as TokenMetadataIPFS;
                 setMetadata(data);
             } catch (error) {
@@ -67,9 +64,41 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
         token.initialMintSize
     );
 
+    const renderSocialIcons = () => {
+        if (!metadata?.extensions) return null;
+
+        const socialLinks = [
+            { icon: FaTwitter, link: metadata.extensions.twitter },
+            { icon: FaDiscord, link: metadata.extensions.discord },
+            { icon: FaGithub, link: metadata.extensions.github },
+            { icon: FaMedium, link: metadata.extensions.medium },
+            { icon: FaTelegram, link: metadata.extensions.telegram },
+            { icon: FaGlobe, link: metadata.extensions.website }
+        ];
+
+        return (
+            <div className="absolute top-2 right-2 flex gap-1.5">
+                {socialLinks.map((social, index) => (
+                    social.link && (
+                        <a
+                            key={index}
+                            href={social.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-6 h-6 flex items-center justify-center rounded-full bg-base-content/10 hover:bg-base-content/20 transition-colors"
+                        >
+                            <social.icon className="w-3 h-3 text-base-content" />
+                        </a>
+                    )
+                ))}
+            </div>
+        );
+    };
+
     return (
         <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow max-w-sm">
             <div className="card-body p-4 relative">
+                {renderSocialIcons()}
                 <div className="absolute -top-6 -left-6 w-16 h-16 border-4 border-base-200 rounded-full shadow-lg overflow-hidden">
                     <TokenImage
                         uri={token.tokenUri}
@@ -77,9 +106,9 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                         className="w-full h-full"
                     />
                 </div>
-                <div className="ml-8 mt-2">
+                <div className="ml-8 mt-5">
                     <h3 className="card-title text-base mb-2">
-                        {token.tokenName} <span className="text-sm opacity-70">({token.tokenSymbol})</span>
+                        {token.tokenSymbol} <span className="text-sm opacity-70">({token.tokenName})</span>
                     </h3>
                     <div className="space-y-1 text-xs">
                         <p className="flex justify-between">

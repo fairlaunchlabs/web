@@ -34,7 +34,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
     onMediumChange,
 }) => {
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 p-4">
             <div>
                 <label htmlFor="description" className="block text-sm font-medium mb-1">
                     Description
@@ -43,7 +43,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="description"
                     value={description}
                     onChange={(e) => onDescriptionChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${description ? 'border-base-content' : ''}`}
                     rows={4}
                 />
             </div>
@@ -56,7 +56,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="website"
                     value={website}
                     onChange={(e) => onWebsiteChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${website ? 'border-base-content' : ''}`}
                     placeholder="https://example.com"
                 />
             </div>
@@ -69,7 +69,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="twitter"
                     value={twitter}
                     onChange={(e) => onTwitterChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${twitter ? 'border-base-content' : ''}`}
                     placeholder="@username"
                 />
             </div>
@@ -82,7 +82,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="discord"
                     value={discord}
                     onChange={(e) => onDiscordChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${discord ? 'border-base-content' : ''}`}
                     placeholder="Discord server invite link"
                 />
             </div>
@@ -95,7 +95,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="telegram"
                     value={telegram}
                     onChange={(e) => onTelegramChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${telegram ? 'border-base-content' : ''}`}
                     placeholder="Telegram group link"
                 />
             </div>
@@ -108,7 +108,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="github"
                     value={github}
                     onChange={(e) => onGithubChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${github ? 'border-base-content' : ''}`}
                     placeholder="GitHub profile or repository"
                 />
             </div>
@@ -121,7 +121,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     id="medium"
                     value={medium}
                     onChange={(e) => onMediumChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${medium ? 'border-base-content' : ''}`}
                     placeholder="Medium profile or publication"
                 />
             </div>
