@@ -21,14 +21,6 @@ import { menuItems } from './config/menu';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
-type MenuItem = {
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-    component: React.ReactNode;
-    subItems?: MenuItem[];
-};
-
 function App() {
     const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
     const endpoint = useMemo(() => clusterApiUrl(network), [network]);
@@ -39,7 +31,7 @@ function App() {
         ],
         [network],
     );
-
+    const [expanded, setExpanded] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
         return localStorage.getItem('selectedMenuItem') || 'balance';
@@ -50,7 +42,7 @@ function App() {
     }, [selectedMenuItem]);
 
     const getActiveComponent = () => {
-        for (const item of menuItems) {
+        for (const item of menuItems(expanded)) {
             if (item.subItems) {
                 const subItem = item.subItems.find(sub => sub.id === selectedMenuItem);
                 if (subItem) return subItem.component;
@@ -99,13 +91,14 @@ function App() {
                                 md:translate-x-0 transition-transform duration-300 ease-in-out
                             `}>
                                 <Sidebar
-                                    menuItems={menuItems}
+                                    menuItems={menuItems(expanded)}
                                     activeMenuItem={selectedMenuItem}
                                     onMenuItemClick={(id: string) => {
                                         setSelectedMenuItem(id);
                                         setIsSidebarOpen(false);
                                     }}
                                     isMobileOpen={isSidebarOpen}
+                                    onExpandedChange={setExpanded}
                                 />
                             </div>
 

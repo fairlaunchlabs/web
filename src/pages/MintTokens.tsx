@@ -4,7 +4,13 @@ import { queryInitializeTokenEvent } from '../utils/graphql';
 import { TokenCard } from '../components/mintTokens/TokenCard';
 import { InitiazlizedTokenData } from '../types/types';
 
-export const MintTokens: React.FC = () => {
+type MintTokensProps = {
+    expanded: boolean;
+};
+
+export const MintTokens: React.FC<MintTokensProps> = ({
+    expanded
+}) => {
     const { loading, error, data } = useQuery(queryInitializeTokenEvent, {
         variables: {
             skip: 0,
@@ -30,7 +36,7 @@ export const MintTokens: React.FC = () => {
     }
 
     return (
-        <div className="ml-64 px-8 py-8">
+        <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:px-8 md:py-8 pl-5 pr-4 py-8`}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {data?.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => (
                     <TokenCard key={token.tokenId} token={token} />

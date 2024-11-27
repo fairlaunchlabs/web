@@ -8,7 +8,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeMenuItem,
     onMenuItemClick,
     onExpandedChange,
-    isMobileOpen
+    isMobileOpen,
 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [expandedSubMenus, setExpandedSubMenus] = useState<string[]>([]);

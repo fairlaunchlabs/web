@@ -1,7 +1,7 @@
 import React from 'react';
-import { Balance } from '../pages/Balance';
-import { TransactionHistory } from '../pages/TransactionHistory';
-import { TokenAccounts } from '../pages/TokenAccounts';
+// import { Balance } from '../pages/Balance';
+// import { TransactionHistory } from '../pages/TransactionHistory';
+// import { TokenAccounts } from '../pages/TokenAccounts';
 import { LaunchToken } from '../pages/LaunchToken';
 import { MintTokens } from '../pages/MintTokens';
 import { 
@@ -11,9 +11,9 @@ import {
     RemoveLiquidity, 
     BurnLPTokens 
 } from '../pages/TokenManagement';
-import { FaWallet, FaRocket, FaCoins, FaUser } from 'react-icons/fa';
-import { BiHistory } from 'react-icons/bi';
-import { AiOutlineKey } from 'react-icons/ai';
+import { FaRocket, FaCoins } from 'react-icons/fa';
+// import { BiHistory } from 'react-icons/bi';
+// import { AiOutlineKey } from 'react-icons/ai';
 import { 
     MdToken, 
     MdOutlineCreateNewFolder,
@@ -31,7 +31,7 @@ export type MenuItem = {
     subItems?: MenuItem[];
 };
 
-export const menuItems: MenuItem[] = [
+export const menuItems = (expended: boolean): MenuItem[] => [
     // {
     //     id: 'my-account',
     //     label: 'My Account',
@@ -68,7 +68,7 @@ export const menuItems: MenuItem[] = [
         id: 'mint-tokens', 
         label: 'Mint Tokens', 
         icon: <FaCoins className="w-5 h-5" />,
-        component: <MintTokens /> 
+        component: <MintTokens expanded={expended} /> 
     },
     {
         id: 'token-management',
