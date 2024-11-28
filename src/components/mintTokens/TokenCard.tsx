@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { 
     calculateMaxSupply, 
-    calculateTotalSupplyToTargetEras,
     calculateTargetMintTime,
     calculateMinTotalFee,
     extractIPFSHash
@@ -11,6 +10,7 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { TokenImage } from './TokenImage';
 import { PinataSDK } from 'pinata-web3';
 import { FaTwitter, FaDiscord, FaGithub, FaMedium, FaTelegram, FaGlobe } from 'react-icons/fa';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
@@ -24,7 +24,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
     useEffect(() => {
         const fetchMetadata = async () => {
             try {
-                const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
+                const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri as string) as string);
                 const data = response.data as TokenMetadataIPFS;
                 setMetadata(data);
             } catch (error) {
@@ -37,18 +37,24 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
         fetchMetadata();
     }, [token.tokenUri]);
 
-    const maxSupply = calculateMaxSupply(
-        token.epochesPerEra,
-        token.initialTargetMintSizePerEpoch,
-        token.reduceRatio
-    );
+    const totalSupplyToTargetEras = useMemo(() => {
+        const percentToTargetEras = 1 - Math.pow(Number(token.reduceRatio) / 100, Number(token.targetEras));
+        const maxSupply = calculateMaxSupply(
+            token.epochesPerEra,
+            token.initialTargetMintSizePerEpoch,
+            token.reduceRatio
+        );
+        return percentToTargetEras * Number(maxSupply);
+    }, [token.targetEras, token.initialTargetMintSizePerEpoch, token.reduceRatio, token.epochesPerEra]);
 
-    const totalSupplyToTargetEras = calculateTotalSupplyToTargetEras(
-        token.epochesPerEra,
-        token.initialTargetMintSizePerEpoch,
-        token.reduceRatio,
-        token.targetEras
-    );
+    const mintedSupply = useMemo(() => {
+        return Number(token.supply) * (1 - Number(token.liquidityTokensRatio) / 100) / LAMPORTS_PER_SOL;
+    }, [token.supply, token.liquidityTokensRatio]);
+
+    const progressPercentage = useMemo(() => {
+        // 注意这个supply包括了TokenVault的数量，需要转成用户铸造数量
+        return (mintedSupply * 100) / totalSupplyToTargetEras;
+    }, [mintedSupply, totalSupplyToTargetEras]);
 
     const targetMintTime = calculateTargetMintTime(
         token.targetSecondsPerEpoch,
@@ -63,6 +69,10 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
         token.epochesPerEra,
         token.initialMintSize
     );
+
+    const feeRateInSol = useMemo(() => {
+        return Number(token.feeRate) / LAMPORTS_PER_SOL;
+    }, [token.feeRate]);
 
     const renderSocialIcons = () => {
         if (!metadata?.extensions) return null;
@@ -106,18 +116,26 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                         className="w-full h-full"
                     />
                 </div>
-                <div className="ml-8 mt-5">
-                    <h3 className="card-title text-base mb-2">
+                <div className="ml-2 mt-5">
+                    <h3 className="card-title text-base mb-2 ml-2">
                         {token.tokenSymbol} <span className="text-sm opacity-70">({token.tokenName})</span>
                     </h3>
                     <div className="space-y-1 text-xs">
+                        <div className="flex justify-between">
+                            <span className="text-base-content/70">Mint Fee: </span>
+                            <span>{feeRateInSol} SOL</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-base-content/70">Current Mint Size: </span>
+                            <span className="text-sm">{(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                        </div>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Max Supply:</span>
-                            <span>{maxSupply}</span>
+                            <span>{calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </p>
                         <p className="flex justify-between">
-                            <span className="text-base-content/70">Target Supply:</span>
-                            <span>{totalSupplyToTargetEras}</span>
+                            <span className="text-base-content/70">Target Supply (Era:{token.targetEras}):</span>
+                            <span>{totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Mint Time:</span>
@@ -127,14 +145,33 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                             <span className="text-base-content/70">Target Minimum Fee:</span>
                             <span>{minTotalFee} SOL</span>
                         </p>
+                        <p className="flex justify-between">
+                            <span className="text-base-content/70">Liquidity Percentage:</span>
+                            <span>{token.liquidityTokensRatio}%</span>
+                        </p>
                         <div className="flex justify-between items-center">
-                            <span className="text-base-content/70">Deployer:</span>
-                            <AddressDisplay address={token.admin} />
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-base-content/70">Token Mint:</span>
+                            <span className="text-base-content/70">Token Address:</span>
                             <AddressDisplay address={token.mint} />
                         </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-base-content/70">Vault#1(SOL):</span>
+                            <AddressDisplay address={token.configAccount} />
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-base-content/70">Vault#2({token.tokenSymbol}):</span>
+                            <AddressDisplay address={token.tokenVault} />
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-4">
+                    <div className="text-sm font-medium mb-1">
+                    {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                            className="bg-blue-600 h-2.5 rounded-full" 
+                            style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                        ></div>
                     </div>
                 </div>
             </div>

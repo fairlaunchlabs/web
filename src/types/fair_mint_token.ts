@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/fair_mint_token.json`.
  */
 export type FairMintToken = {
-  "address": "F2C4EzZHmYDpf58QNDwp3ofkBVYiXdHsLbyVA79Qj3fD",
+  "address": "C8onMNdJfvPTfFSAaYxGkPiQ8HkVa1HsPW584FkdHD2L",
   "metadata": {
     "name": "fairMintToken",
     "version": "0.1.0",
@@ -199,32 +199,6 @@ export type FairMintToken = {
           "writable": true
         },
         {
-          "name": "mintStateAccount",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
           "name": "protocolFeeAccount",
           "docs": [
             "CHECK the protocol fee account"
@@ -390,156 +364,6 @@ export type FairMintToken = {
           }
         },
         {
-          "name": "mintStateAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemConfigAccount",
-          "writable": true
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "rent",
-          "address": "SysvarRent111111111111111111111111111111111"
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "tokenMetadataProgram",
-          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        }
-      ],
-      "args": [
-        {
-          "name": "metadata",
-          "type": {
-            "defined": {
-              "name": "tokenMetadata"
-            }
-          }
-        },
-        {
-          "name": "initConfigData",
-          "type": {
-            "defined": {
-              "name": "initializeTokenConfigData"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "initializeTokenVault",
-      "discriminator": [
-        64,
-        202,
-        113,
-        205,
-        22,
-        210,
-        178,
-        225
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "metadata_params.name"
-              },
-              {
-                "kind": "arg",
-                "path": "metadata_params.symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
-              }
-            ]
-          }
-        },
-        {
-          "name": "configAccount",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
           "name": "tokenVault",
           "writable": true,
           "pda": {
@@ -630,6 +454,10 @@ export type FairMintToken = {
           }
         },
         {
+          "name": "systemConfigAccount",
+          "writable": true
+        },
+        {
           "name": "payer",
           "writable": true,
           "signer": true
@@ -647,6 +475,10 @@ export type FairMintToken = {
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
+          "name": "tokenMetadataProgram",
+          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+        },
+        {
           "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
@@ -657,6 +489,14 @@ export type FairMintToken = {
           "type": {
             "defined": {
               "name": "tokenMetadata"
+            }
+          }
+        },
+        {
+          "name": "initConfigData",
+          "type": {
+            "defined": {
+              "name": "initializeTokenConfigData"
             }
           }
         }
@@ -863,33 +703,6 @@ export type FairMintToken = {
         {
           "name": "tokenVault",
           "writable": true
-        },
-        {
-          "name": "mintStateAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
         },
         {
           "name": "systemConfigAccount"
@@ -1574,33 +1387,6 @@ export type FairMintToken = {
           }
         },
         {
-          "name": "mintStateAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
           "name": "tokenAta",
           "writable": true
         },
@@ -1678,33 +1464,6 @@ export type FairMintToken = {
                   97,
                   116,
                   97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mintStateAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
                 ]
               },
               {
@@ -1914,32 +1673,6 @@ export type FairMintToken = {
                   97,
                   116,
                   97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "mintStateAccount",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
                 ]
               },
               {
@@ -2257,19 +1990,6 @@ export type FairMintToken = {
         176,
         214,
         81
-      ]
-    },
-    {
-      "name": "tokenMintState",
-      "discriminator": [
-        16,
-        55,
-        225,
-        211,
-        214,
-        59,
-        249,
-        5
       ]
     },
     {
@@ -2594,6 +2314,16 @@ export type FairMintToken = {
       "code": 6042,
       "name": "onlySystemAdminAllowed",
       "msg": "Only system admin allowed"
+    },
+    {
+      "code": 6043,
+      "name": "invalidTokenVault",
+      "msg": "Invalid token vault"
+    },
+    {
+      "code": 6044,
+      "name": "invalidTokenVaultOwner",
+      "msg": "Invalid token vault owner"
     }
   ],
   "types": [
@@ -2612,10 +2342,6 @@ export type FairMintToken = {
           },
           {
             "name": "tokenVault",
-            "type": "pubkey"
-          },
-          {
-            "name": "mintStateAccount",
             "type": "pubkey"
           },
           {
@@ -2679,6 +2405,22 @@ export type FairMintToken = {
         "kind": "struct",
         "fields": [
           {
+            "name": "metadata",
+            "type": {
+              "defined": {
+                "name": "tokenMetadata"
+              }
+            }
+          },
+          {
+            "name": "initConfigData",
+            "type": {
+              "defined": {
+                "name": "initializeTokenConfigData"
+              }
+            }
+          },
+          {
             "name": "admin",
             "type": "pubkey"
           },
@@ -2695,12 +2437,24 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "mintStateAccount",
+            "name": "metadataAccount",
             "type": "pubkey"
           },
           {
-            "name": "metadataAccount",
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "tokenVault",
             "type": "pubkey"
+          },
+          {
+            "name": "mintStateData",
+            "type": {
+              "defined": {
+                "name": "tokenMintState"
+              }
+            }
           }
         ]
       }
@@ -2727,10 +2481,6 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "mintStateAccount",
-            "type": "pubkey"
-          },
-          {
             "name": "referralAccount",
             "type": "pubkey"
           },
@@ -2751,36 +2501,12 @@ export type FairMintToken = {
             "type": "i64"
           },
           {
-            "name": "currentEra",
-            "type": "u32"
-          },
-          {
-            "name": "currentEpoch",
-            "type": "u64"
-          },
-          {
-            "name": "elapsedSecondsEpoch",
-            "type": "i64"
-          },
-          {
-            "name": "startTimestampEpoch",
-            "type": "i64"
-          },
-          {
-            "name": "difficultyCoefficientEpoch",
-            "type": "f64"
-          },
-          {
-            "name": "mintSizeEpoch",
-            "type": "f64"
-          },
-          {
-            "name": "quantityMintedEpoch",
-            "type": "f64"
-          },
-          {
-            "name": "targetMintSizeEpoch",
-            "type": "f64"
+            "name": "mintStateData",
+            "type": {
+              "defined": {
+                "name": "tokenMintState"
+              }
+            }
           }
         ]
       }
@@ -2811,10 +2537,6 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "mintStateAccount",
-            "type": "pubkey"
-          },
-          {
             "name": "tokenAta",
             "type": "pubkey"
           },
@@ -2823,11 +2545,23 @@ export type FairMintToken = {
             "type": "i64"
           },
           {
-            "name": "currentEra",
-            "type": "u32"
+            "name": "supply",
+            "type": "f64"
           },
           {
-            "name": "currentEpoch",
+            "name": "totalTokens",
+            "type": "u64"
+          },
+          {
+            "name": "totalMintFee",
+            "type": "u64"
+          },
+          {
+            "name": "refundFee",
+            "type": "u64"
+          },
+          {
+            "name": "refundAmountIncludingFee",
             "type": "u64"
           }
         ]
@@ -2915,10 +2649,6 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "mintStateAccount",
-            "type": "pubkey"
-          },
-          {
             "name": "tokenProgram",
             "type": "pubkey"
           }
@@ -2973,6 +2703,18 @@ export type FairMintToken = {
           {
             "name": "liquidityTokensRatio",
             "type": "f64"
+          },
+          {
+            "name": "tokenVault",
+            "type": "pubkey"
+          },
+          {
+            "name": "mintStateData",
+            "type": {
+              "defined": {
+                "name": "tokenMintState"
+              }
+            }
           }
         ]
       }
@@ -3002,10 +2744,6 @@ export type FairMintToken = {
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "admin",
-            "type": "pubkey"
-          },
           {
             "name": "supply",
             "type": "f64"

@@ -63,10 +63,30 @@ export type InitiazlizedTokenData = {
     mint: string;
     configAccount: string;
     metadataAccount: string;
-    mintStateAccount: string;
+    tokenVault: string;
+    timestamp: string;
+
+    // TokenMetadata
     tokenName: string;
     tokenSymbol: string;
     tokenUri: string;
+
+    // TokenMintState
+    supply: string;
+    currentEra: string;
+    currentEpoch: string;
+    elapsedSecondsEpoch: string;
+    startTimestampEpoch: string;
+    lastDifficultyCoefficientEpoch: string;
+    difficultyCoefficientEpoch: string;
+    mintSizeEpoch: string;
+    quantityMintedEpoch: string;
+    targetMintSizeEpoch: string;
+    totalMintFee: string;
+    totalReferrerFee: string;
+    totalTokens: string;
+
+    // InitializeTokenConfigData
     targetEras: string;
     epochesPerEra: string;
     targetSecondsPerEpoch: string;
@@ -75,6 +95,35 @@ export type InitiazlizedTokenData = {
     initialTargetMintSizePerEpoch: string;
     feeRate: string;
     liquidityTokensRatio: string;
+}
+
+export type MintTokenData = {
+    id: string;
+    txId: string;
+    sender: string;
+    mint: string;
+    configAccount: string;
+    tokenVault: string;
+    referralAccount: string;
+    referrerMain: string;
+    referrerAta: string;
+    refundAccount: string;
+    timestamp: string;
+
+    // TokenMintState
+    supply: string;
+    currentEra: string;
+    currentEpoch: string;
+    elapsedSecondsEpoch: string;
+    startTimestampEpoch: string;
+    lastDifficultyCoefficientEpoch: string;
+    difficultyCoefficientEpoch: string;
+    mintSizeEpoch: string;
+    quantityMintedEpoch: string;
+    targetMintSizeEpoch: string;
+    totalMintFee: string;
+    totalReferrerFee: string;
+    totalTokens: string;
 }
 
 export type TokenImageProps = {

@@ -35,7 +35,7 @@ export const formatDays = (totalSeconds: number): string => {
     return parts.join(' ');
 };
 
-export const calculateMaxSupply = (epochesPerEra: string, initialTargetMintSizePerEpoch: string, reduceRatio: string): string => {
+export const calculateMaxSupply = (epochesPerEra: string, initialTargetMintSizePerEpoch: string, reduceRatio: string) => {
     const epochesPerEraNum = parseFloat(epochesPerEra) || 0;
     const initialTargetMintSizePerEpochNum = parseFloat(initialTargetMintSizePerEpoch) / 1e9 || 0;
     const reduceRatioNum = parseFloat(reduceRatio) || 0;
@@ -45,7 +45,7 @@ export const calculateMaxSupply = (epochesPerEra: string, initialTargetMintSizeP
     }
 
     const maxSupply = epochesPerEraNum * initialTargetMintSizePerEpochNum / (1 - reduceRatioNum / 100);
-    return maxSupply.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return maxSupply;
 };
 
 export const calculateTotalSupplyToTargetEras = (

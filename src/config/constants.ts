@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
-export const FAIR_MINT_PROGRAM_ID = 'F2C4EzZHmYDpf58QNDwp3ofkBVYiXdHsLbyVA79Qj3fD';
+export const FAIR_MINT_PROGRAM_ID = 'C8onMNdJfvPTfFSAaYxGkPiQ8HkVa1HsPW584FkdHD2L';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 
 export const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");

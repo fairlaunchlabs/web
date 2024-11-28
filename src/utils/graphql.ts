@@ -15,10 +15,24 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!) {
         mint
         configAccount
         metadataAccount
-        mintStateAccount
+        tokenVault
+        timestamp
         tokenName
         tokenSymbol
         tokenUri
+        supply
+        currentEra
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
         targetEras
         epochesPerEra
         targetSecondsPerEpoch
@@ -53,10 +67,24 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
         mint
         configAccount
         metadataAccount
-        mintStateAccount
+        tokenVault
+        timestamp
         tokenName
         tokenSymbol
         tokenUri
+        supply
+        currentEra
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
         targetEras
         epochesPerEra
         targetSecondsPerEpoch
@@ -84,10 +112,24 @@ query GetMyInitializedTokens($admin: String!, $skip: Int!, $first: Int!) {
         mint
         configAccount
         metadataAccount
-        mintStateAccount
+        tokenVault
+        timestamp
         tokenName
         tokenSymbol
         tokenUri
+        supply
+        currentEra
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
         targetEras
         epochesPerEra
         targetSecondsPerEpoch
@@ -113,7 +155,6 @@ query GetMintTokenEvents($skip: Int!, $first: Int!) {
         mint
         configAccount
         tokenVault
-        mintStateAccount
         referralAccount
         referrerMain
         referrerAta
@@ -133,5 +174,18 @@ query GetMintTokenEvents($skip: Int!, $first: Int!) {
         totalMintFee
         totalReferrerFee
         totalTokens
+        tokenName
+        tokenSymbol
+        tokenUri
+        targetEras
+        epochesPerEra
+        targetSecondsPerEpoch
+        reduceRatio
+        initialMintSize
+        initialTargetMintSizePerEpoch
+        feeRate
+        liquidityTokensRatio
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
     }
 }`;
