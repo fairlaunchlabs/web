@@ -92,7 +92,7 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     }
 
     return (
-        <div className={`container mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`container mx-auto py-8 mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             <div className="max-w-6xl mx-auto space-y-6">
                 <TokenInfo token={token as InitiazlizedTokenData} />
                 <TokenCharts token={token as InitiazlizedTokenData} />

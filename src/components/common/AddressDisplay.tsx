@@ -3,12 +3,15 @@ import { formatAddress } from '../../utils/format';
 import { AddressDisplayProps } from '../../types/types';
 import { NETWORK, SCANURL } from '../../config/constants';
 
-export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address }) => {
+export const AddressDisplay: React.FC<AddressDisplayProps> = ({
+    address,
+    type = 'account'
+}) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(address);
     };
 
-    const explorerUrl = `${SCANURL}/account/${address}?cluster=${NETWORK}`;
+    const explorerUrl = `${SCANURL}/${type}/${address}?cluster=${NETWORK}`;
 
     return (
         <div className="flex items-center gap-2">

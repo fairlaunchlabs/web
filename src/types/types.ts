@@ -135,6 +135,7 @@ export type TokenImageProps = {
 
 export type AddressDisplayProps = {
     address: string;
+    type?: string;
     isDevnet?: boolean;
 }
 
