@@ -1,4 +1,5 @@
 import React, { FC, useMemo, useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import {
     ConnectionProvider,
@@ -18,19 +19,12 @@ import { Toaster } from 'react-hot-toast';
 import { Sidebar } from './components/common/Sidebar';
 import { Footer } from './components/common/Footer';
 import { menuItems } from './config/menu';
+import { TokenDetail } from './pages/TokenDetail';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
-function App() {
-    const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
-    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-    const wallets = useMemo(
-        () => [
-            new PhantomWalletAdapter(),
-            new SolflareWalletAdapter(),
-        ],
-        [network],
-    );
+const AppContent = () => {
+    const navigate = useNavigate();
     const [expanded, setExpanded] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
@@ -53,65 +47,89 @@ function App() {
     };
 
     return (
-        <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider 
-                wallets={wallets} 
-                autoConnect
-                onError={(error: Error) => {
-                    console.error('Wallet error:', error);
+        <div className="min-h-screen bg-base-100 flex flex-col">
+            <Navbar 
+                onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+                isMenuOpen={isSidebarOpen}
+            />
+            
+            {/* 主要内容区域 */}
+            <div className="flex-1 flex flex-col md:flex-row mt-16">
+                {/* 移动端遮罩层 */}
+                {isSidebarOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
+
+                {/* 侧边栏容器 */}
+                <div className={`
+                    fixed md:top-16 inset-y-0 left-0 z-30
+                    transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    md:translate-x-0 transition-transform duration-300 ease-in-out
+                `}>
+                    <Sidebar
+                        menuItems={menuItems(expanded)}
+                        activeMenuItem={selectedMenuItem}
+                        onMenuItemClick={(id: string) => {
+                            setSelectedMenuItem(id);
+                            setIsSidebarOpen(false);
+                            navigate(`/${id}`);
+                        }}
+                        isMobileOpen={isSidebarOpen}
+                        onExpandedChange={setExpanded}
+                    />
+                </div>
+
+                {/* 内容区域 */}
+                <div className="flex-1 p-4 md:p-8 pb-20">
+                    <Routes>
+                        <Route path="/" element={getActiveComponent()} />
+                        <Route path="/:selectedMenuItem" element={getActiveComponent()} />
+                        <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
+                    </Routes>
+                </div>
+            </div>
+            <Toaster 
+                position="bottom-right"
+                toastOptions={{
+                    duration: 5000,
                 }}
-            >
-                <WalletModalProvider>
-                    <div className="min-h-screen bg-base-100 flex flex-col">
-                        <Toaster 
-                            position="bottom-right"
-                            toastOptions={{
-                                duration: 5000,
-                            }}
-                        />
-                        <Navbar 
-                            onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-                            isMenuOpen={isSidebarOpen}
-                        />
-                        
-                        {/* 主要内容区域 */}
-                        <div className="flex-1 flex flex-col md:flex-row mt-16">
-                            {/* 移动端遮罩层 */}
-                            {isSidebarOpen && (
-                                <div 
-                                    className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
-                                    onClick={() => setIsSidebarOpen(false)}
-                                />
-                            )}
+            />
+            <Footer />
+        </div>
+    );
+};
 
-                            {/* 侧边栏容器 */}
-                            <div className={`
-                                fixed md:relative inset-y-0 left-0 z-30
-                                transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                                md:translate-x-0 transition-transform duration-300 ease-in-out
-                            `}>
-                                <Sidebar
-                                    menuItems={menuItems(expanded)}
-                                    activeMenuItem={selectedMenuItem}
-                                    onMenuItemClick={(id: string) => {
-                                        setSelectedMenuItem(id);
-                                        setIsSidebarOpen(false);
-                                    }}
-                                    isMobileOpen={isSidebarOpen}
-                                    onExpandedChange={setExpanded}
-                                />
-                            </div>
+// 主 App 组件
+function App() {
+    const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
+    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+    const wallets = useMemo(
+        () => [
+            new PhantomWalletAdapter(),
+            new SolflareWalletAdapter(),
+        ],
+        [network],
+    );
 
-                            {/* 内容区域 */}
-                            <div className="flex-1 p-4 md:p-8 pb-20">
-                                {getActiveComponent()}
-                            </div>
-                        </div>
-                        <Footer />
-                    </div>
-                </WalletModalProvider>
-            </WalletProvider>
-        </ConnectionProvider>
+    return (
+        <Router>
+            <ConnectionProvider endpoint={endpoint}>
+                <WalletProvider 
+                    wallets={wallets} 
+                    autoConnect
+                    onError={(error: Error) => {
+                        console.error('Wallet error:', error);
+                    }}
+                >
+                    <WalletModalProvider>
+                        <AppContent />
+                    </WalletModalProvider>
+                </WalletProvider>
+            </ConnectionProvider>
+        </Router>
     );
 }
 

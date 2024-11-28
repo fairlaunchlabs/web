@@ -11,6 +11,7 @@ import { TokenImage } from './TokenImage';
 import { PinataSDK } from 'pinata-web3';
 import { FaTwitter, FaDiscord, FaGithub, FaMedium, FaTelegram, FaGlobe } from 'react-icons/fa';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useNavigate } from 'react-router-dom';
 
 const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
@@ -18,8 +19,13 @@ const pinata = new PinataSDK({
 });
 
 export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
+    const navigate = useNavigate();
     const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    const handleCardClick = () => {
+        navigate(`/token/${token.mint}`);
+    };
 
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -106,10 +112,13 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
     };
 
     return (
-        <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow max-w-sm">
+        <div 
+            className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+            onClick={handleCardClick}
+        >
             <div className="card-body p-4 relative">
                 {renderSocialIcons()}
-                <div className="absolute -top-6 -left-6 w-16 h-16 border-4 border-base-200 rounded-full shadow-lg overflow-hidden">
+                <div className="absolute -top-6 -left-6 w-16 h-16 border-4 border-base-100 rounded-full shadow-lg overflow-hidden bg-white">
                     <TokenImage
                         uri={token.tokenUri}
                         name={token.tokenName}
@@ -127,7 +136,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-base-content/70">Current Mint Size: </span>
-                            <span className="text-sm">{(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                            <span>{(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </div>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Max Supply:</span>
@@ -158,7 +167,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                             <AddressDisplay address={token.configAccount} />
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-base-content/70">Vault#2({token.tokenSymbol}):</span>
+                            <span className="text-base-content/70">Vault#2({token.tokenSymbol.substring(0,3)}):</span>
                             <AddressDisplay address={token.tokenVault} />
                         </div>
                     </div>
@@ -167,9 +176,9 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                     <div className="text-sm font-medium mb-1">
                     {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div className="w-full bg-base-300 rounded-full h-2.5">
                         <div 
-                            className="bg-blue-600 h-2.5 rounded-full" 
+                            className="bg-secondary h-2.5 rounded-full" 
                             style={{ width: `${Math.min(progressPercentage, 100)}%` }}
                         ></div>
                     </div>

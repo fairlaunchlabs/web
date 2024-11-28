@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { MenuItem, SidebarProps } from '../../types/types';
-import { STORAGE_KEY } from '../../config/constants';
+import { LOCAL_STORAGE_KEY_EXPANDED } from '../../config/constants';
 
 export const Sidebar: React.FC<SidebarProps> = ({
     menuItems,
     activeMenuItem,
     onMenuItemClick,
     onExpandedChange,
-    isMobileOpen,
+    isMobileOpen
 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [expandedSubMenus, setExpandedSubMenus] = useState<string[]>([]);
@@ -29,7 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     // 从 localStorage 加载展开状态
     useEffect(() => {
-        const savedExpandedMenus = localStorage.getItem(STORAGE_KEY);
+        const savedExpandedMenus = localStorage.getItem(LOCAL_STORAGE_KEY_EXPANDED);
         if (savedExpandedMenus) {
             try {
                 setExpandedSubMenus(JSON.parse(savedExpandedMenus));
@@ -46,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             : [...expandedSubMenus, id];
         
         setExpandedSubMenus(newExpandedMenus);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newExpandedMenus));
+        localStorage.setItem(LOCAL_STORAGE_KEY_EXPANDED, JSON.stringify(newExpandedMenus));
     };
 
     // 处理展开/收起状态变化
@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <div 
             className={`sidebar bg-base-200 p-1 duration-50 fixed inset-y-0 left-0 
-                ${isMobile ? 'w-72' : isExpanded ? 'w-64' : 'w-20'}
+                ${isMobile ? 'w-64' : isExpanded ? 'w-64' : 'w-20'}
                 ${isMobile && !isMobileOpen ? '-translate-x-full' : 'translate-x-0'}
             `}
         >

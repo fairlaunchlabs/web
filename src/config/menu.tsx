@@ -20,8 +20,10 @@ import {
     MdPool,
     MdAddCircle,
     MdRemoveCircle,
-    MdLocalFireDepartment
+    MdLocalFireDepartment,
+    MdAccountCircle
 } from 'react-icons/md';
+import { MyAccount } from '../pages/MyAccount';
 
 export type MenuItem = {
     id: string;
@@ -62,13 +64,19 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         id: 'launch-token', 
         label: 'Launch Token', 
         icon: <FaRocket className="w-5 h-5" />,
-        component: <LaunchToken /> 
+        component: <LaunchToken expanded={expended} /> 
     },
     { 
         id: 'mint-tokens', 
         label: 'Mint Tokens', 
         icon: <FaCoins className="w-5 h-5" />,
         component: <MintTokens expanded={expended} /> 
+    },
+    { 
+        id: 'my-account', 
+        label: 'My Account', 
+        icon: <MdAccountCircle className="w-5 h-5" />,
+        component: <MyAccount expanded={expended} /> 
     },
     {
         id: 'token-management',

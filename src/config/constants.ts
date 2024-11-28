@@ -15,7 +15,7 @@ export const REFUND_SEEDS = "refund";
 export const SYSTEM_CONFIG_SEEDS = "system_config";
 
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
-export const STORAGE_KEY = 'sidebar_expanded_menus';
-export const THEME_KEY = 'app-theme';
+export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
+export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';
 export const NETWORK = 'devnet';
 export const SCANURL = 'https://solscan.io';
