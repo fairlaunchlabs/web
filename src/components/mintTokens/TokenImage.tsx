@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { extractIPFSHash } from '../../utils/format';
 import { PinataSDK } from 'pinata-web3';
-import { TokenImageProps, TokenMetadataIPFS } from '../../types/types';
+import { TokenImageProps } from '../../types/types';
 
 // Simple in-memory cache for metadata and image URLs
 const metadataCache = new Map<string, { image: string; timestamp: number }>();
@@ -13,37 +13,27 @@ const pinata = new PinataSDK({
     pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
 });
 
-export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, className = '' }) => {
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+export const TokenImage: React.FC<TokenImageProps> = ({ 
+    imageUrl, 
+    name,
+    size = 64, 
+    className = ''
+}) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
-    
-    const fetchMetadata = async (uri: string) => {
+    const [imageData, setImageData] = useState("");
+    const fetchImage = async () => {
         try {
-            if (!uri) {
-                throw new Error('No URI provided');
-            }
-            
-            // Check cache first
-            const cached = metadataCache.get(uri);
-            if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-                setImageUrl(cached.image);
-                setIsLoading(false);
-                return;
-            }
-
             setIsLoading(true);
             setError(null);
 
-            // Convert URI to gateway URL with proper headers
-            const data: TokenMetadataIPFS = (await pinata.gateways.get(extractIPFSHash(uri) as string)).data as TokenMetadataIPFS;
-            if (!data.image) {
-                throw new Error('No image in metadata');
-            }
-
             // Get image data from Pinata gateway
-            const imageResponse = await pinata.gateways.get(extractIPFSHash(data.image) as string);
+            const cid = extractIPFSHash(imageUrl as string);
+            if (!cid) {
+                throw new Error('Invalid IPFS hash');
+            }
+            const imageResponse = await pinata.gateways.get(cid);
             
             // Type-safe Blob creation with fallback
             const blobPart = imageResponse.data instanceof Blob 
@@ -54,14 +44,7 @@ export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, cl
             
             const blob = new Blob([blobPart], { type: imageResponse.contentType as string });
             const objectUrl = URL.createObjectURL(blob);
-
-            // Update cache with the object URL
-            metadataCache.set(uri, {
-                image: objectUrl,
-                timestamp: Date.now()
-            });
-
-            setImageUrl(objectUrl);
+            setImageData(objectUrl);
             setIsLoading(false);
             setRetryCount(0); // Reset retry count on success
         } catch (err) {
@@ -84,19 +67,19 @@ export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, cl
         let isMounted = true;
         const controller = new AbortController();
 
-        if (uri) {
-            fetchMetadata(uri);
+        if (imageUrl) {
+            fetchImage();
         }
 
         // Cleanup function to revoke object URLs when component unmounts
         return () => {
             isMounted = false;
             controller.abort();
-            if (imageUrl) {
-                URL.revokeObjectURL(imageUrl);
+            if (imageData) {
+                URL.revokeObjectURL(imageData);
             }
         };
-    }, [uri, size, retryCount]);
+    }, [imageUrl, size, retryCount]);
 
     if (isLoading) {
         return (
@@ -116,11 +99,11 @@ export const TokenImage: React.FC<TokenImageProps> = ({ uri, name, size = 64, cl
         );
     }
 
-    return imageUrl ? (
+    return imageData !== "" ? (
         <img
-            src={imageUrl}
+            src={imageData}
             alt={name || 'Token'}
-            className={`rounded-full object-cover ${className}`}
+            className={`object-cover ${className}`}
             style={{ width: size, height: size }}
             loading="lazy"
         />

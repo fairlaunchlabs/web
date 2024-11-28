@@ -3,18 +3,20 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { queryInitializeTokenEventBySearch } from '../utils/graphql';
 import { InitiazlizedTokenData } from '../types/types';
+import { TokenInfo } from '../components/tokenDetails/TokenInfo';
+import { TokenCharts } from '../components/tokenDetails/TokenCharts';
+import { TokenTransactions } from '../components/tokenDetails/TokenTransactions';
 
 type TokenDetailProps = {
     expanded: boolean;
 };
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
-    const { tokenMintAddress } = useParams<{ tokenMintAddress: string }>();
-
+    const { tokenMintAddress } = useParams();
     const { loading, error, data } = useQuery(queryInitializeTokenEventBySearch, {
         variables: {
             skip: 0,
-            first: 10,
+            first: 1,
             searchQuery: tokenMintAddress
         },
         fetchPolicy: 'network-only'
@@ -22,40 +24,79 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
 
     if (loading) {
         return (
-            <div className={`flex justify-center items-center min-h-[200px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <span className="loading loading-spinner loading-lg"></span>
+            <div className={`container mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+                <div className="max-w-6xl mx-auto">
+                    <div className="animate-pulse space-y-4">
+                        <div className="h-32 bg-gray-200 rounded"></div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="h-64 bg-gray-200 rounded"></div>
+                            <div className="h-64 bg-gray-200 rounded"></div>
+                            <div className="h-64 bg-gray-200 rounded"></div>
+                            <div className="h-64 bg-gray-200 rounded"></div>
+                        </div>
+                        <div className="h-96 bg-gray-200 rounded"></div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className={`alert alert-error m-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Error loading token details. Please try again later.</span>
+            <div className={`container mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+                <div className="max-w-6xl mx-auto">
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-red-800">Error loading token details</h3>
+                                <div className="mt-2 text-sm text-red-700">
+                                    {error.message}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
-    const token = data?.initializeTokenEventEntities[0];
+    const token = data?.initializeTokenEventEntities?.[0];
 
     if (!token) {
         return (
-            <div className={`alert alert-warning m-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>Token not found.</span>
+            <div className={`container mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+                <div className="max-w-6xl mx-auto">
+                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-yellow-800">Token not found</h3>
+                                <div className="mt-2 text-sm text-yellow-700">
+                                    No token found with address: {tokenMintAddress}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
         <div className={`container mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="max-w-6xl mx-auto">
-                {JSON.stringify(token, null, 2) || token}
+            <div className="max-w-6xl mx-auto space-y-6">
+                <TokenInfo token={token as InitiazlizedTokenData} />
+                <TokenCharts token={token as InitiazlizedTokenData} />
+                <TokenTransactions token={token as InitiazlizedTokenData} />
             </div>
         </div>
     );

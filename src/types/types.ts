@@ -127,7 +127,7 @@ export type MintTokenData = {
 }
 
 export type TokenImageProps = {
-    uri: string;
+    imageUrl: string | null;
     name: string;
     size?: number;
     className?: string;

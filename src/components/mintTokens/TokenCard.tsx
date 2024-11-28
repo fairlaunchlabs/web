@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, FC } from 'react';
 import { 
     calculateMaxSupply, 
     calculateTargetMintTime,
@@ -9,9 +9,9 @@ import { TokenCardProps, TokenMetadataIPFS } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { TokenImage } from './TokenImage';
 import { PinataSDK } from 'pinata-web3';
-import { FaTwitter, FaDiscord, FaGithub, FaMedium, FaTelegram, FaGlobe } from 'react-icons/fa';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useNavigate } from 'react-router-dom';
+import { RenderSocialIcons } from './RenderSocialIcons';
 
 const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
@@ -80,83 +80,54 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
         return Number(token.feeRate) / LAMPORTS_PER_SOL;
     }, [token.feeRate]);
 
-    const renderSocialIcons = () => {
-        if (!metadata?.extensions) return null;
-
-        const socialLinks = [
-            { icon: FaTwitter, link: metadata.extensions.twitter },
-            { icon: FaDiscord, link: metadata.extensions.discord },
-            { icon: FaGithub, link: metadata.extensions.github },
-            { icon: FaMedium, link: metadata.extensions.medium },
-            { icon: FaTelegram, link: metadata.extensions.telegram },
-            { icon: FaGlobe, link: metadata.extensions.website }
-        ];
-
-        return (
-            <div className="absolute top-2 right-2 flex gap-1.5">
-                {socialLinks.map((social, index) => (
-                    social.link && (
-                        <a
-                            key={index}
-                            href={social.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-base-content/10 hover:bg-base-content/20 transition-colors"
-                        >
-                            <social.icon className="w-3 h-3 text-base-content" />
-                        </a>
-                    )
-                ))}
-            </div>
-        );
-    };
-
     return (
         <div 
-            className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+            className="bg-base-200 rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
             onClick={handleCardClick}
         >
             <div className="card-body p-4 relative">
-                {renderSocialIcons()}
-                <div className="absolute -top-6 -left-6 w-16 h-16 border-4 border-base-100 rounded-full shadow-lg overflow-hidden bg-white">
+                <div className='absolute top-2 right-2 flex gap-1.5'>
+                    <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
+                </div>
+                <div className="absolute -top-6 -left-6 w-16 h-16 border-4 border-base-100 rounded-full shadow-lg overflow-hidden bg-base-200">
                     <TokenImage
-                        uri={token.tokenUri}
+                        imageUrl={metadata?.image as string}
                         name={token.tokenName}
-                        className="w-full h-full"
+                        className="w-full h-full rounded-full"
                     />
                 </div>
                 <div className="ml-2 mt-5">
-                    <h3 className="card-title text-base mb-2 ml-2">
-                        {token.tokenSymbol} <span className="text-sm opacity-70">({token.tokenName})</span>
+                    <h3 className="card-title text-base mb-2 ml-2 text-base-content">
+                        {token.tokenSymbol} <span className="text-sm opacity-70 text-base-content">({token.tokenName})</span>
                     </h3>
                     <div className="space-y-1 text-xs">
                         <div className="flex justify-between">
                             <span className="text-base-content/70">Mint Fee: </span>
-                            <span>{feeRateInSol} SOL</span>
+                            <span className="text-base-content">{feeRateInSol} SOL</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-base-content/70">Current Mint Size: </span>
-                            <span>{(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                            <span className="text-base-content">{(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </div>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Max Supply:</span>
-                            <span>{calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                            <span className="text-base-content">{calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Supply (Era:{token.targetEras}):</span>
-                            <span>{totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                            <span className="text-base-content">{totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Mint Time:</span>
-                            <span>{targetMintTime}</span>
+                            <span className="text-base-content">{targetMintTime}</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Minimum Fee:</span>
-                            <span>{minTotalFee} SOL</span>
+                            <span className="text-base-content">{minTotalFee} SOL</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Liquidity Percentage:</span>
-                            <span>{token.liquidityTokensRatio}%</span>
+                            <span className="text-base-content">{token.liquidityTokensRatio}%</span>
                         </p>
                         <div className="flex justify-between items-center">
                             <span className="text-base-content/70">Token Address:</span>
@@ -173,7 +144,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                     </div>
                 </div>
                 <div className="mt-4">
-                    <div className="text-sm font-medium mb-1">
+                    <div className="text-sm font-medium mb-1 text-base-content">
                     {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
                     </div>
                     <div className="w-full bg-base-300 rounded-full h-2.5">
