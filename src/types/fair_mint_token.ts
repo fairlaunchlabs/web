@@ -2563,6 +2563,14 @@ export type FairMintToken = {
           {
             "name": "refundAmountIncludingFee",
             "type": "u64"
+          },
+          {
+            "name": "burnAmountFromVault",
+            "type": "u64"
+          },
+          {
+            "name": "burnAmountFromUser",
+            "type": "u64"
           }
         ]
       }

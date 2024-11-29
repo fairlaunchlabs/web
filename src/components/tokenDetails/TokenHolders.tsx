@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { queryTokenTransactions } from '../../utils/graphql';
-import { AddressDisplay } from '../common/AddressDisplay';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { InitiazlizedTokenData } from '../../types/types';
+import { AddressDisplay } from '../common/AddressDisplay';
 import { Pagination } from '../common/Pagination';
+import { queryHolders } from '../../utils/graphql';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-interface TokenTransactionsProps {
+interface TokenHoldersProps {
     token: InitiazlizedTokenData;
 }
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
-export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) => {
+export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
 
-    const { data, loading, error } = useQuery(queryTokenTransactions, {
+    const { data, loading, error } = useQuery(queryHolders, {
         variables: {
             mint: token.mint,
             skip: (currentPage - 1) * pageSize,
@@ -25,7 +25,7 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
         },
         onCompleted: (data) => {
             // Note: This is a temporary solution. In production, you should get the total count from the API
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + data.mintTokenEntities.length));
+            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + data.tokenAccountEntities.length));
         }
     });
 
@@ -34,13 +34,13 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newPageSize = Number(event.target.value);
         setPageSize(newPageSize);
-        setCurrentPage(1); // Reset to first page when changing page size
+        setCurrentPage(1);
     };
 
     if (loading && currentPage === 1) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Transactions</h3>
+                <h3 className="text-xl font-semibold mb-4 text-base-content">Token Holders</h3>
                 <div className="animate-pulse">
                     <div className="h-8 bg-base-300 rounded mb-4"></div>
                     <div className="h-8 bg-base-300 rounded mb-4"></div>
@@ -53,16 +53,18 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
     if (error) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Transactions</h3>
-                <p className="text-error">Error loading transactions</p>
+                <h3 className="text-xl font-semibold mb-4 text-base-content">Token Holders</h3>
+                <p className="text-error">Error loading token holders</p>
             </div>
         );
     }
 
+    const totalSupply = Number(token.supply) / LAMPORTS_PER_SOL;
+
     return (
         <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-base-content">Recent Transactions</h3>
+                <h3 className="text-xl font-semibold text-base-content">Token Holders</h3>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-base-content">Rows per page:</span>
                     <select 
@@ -80,23 +82,25 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
                 <table className="table w-full">
                     <thead>
                         <tr>
-                            <th>Minter</th>
-                            <th>Transaction</th>
-                            <th>Time</th>
-                            <th>Era (Epoch)</th>
-                            <th>Mint Size</th>
+                            <th>Rank</th>
+                            <th>Holder</th>
+                            <th>Balance</th>
+                            <th>Percentage</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.mintTokenEntities.map((tx: any) => (
-                            <tr key={tx.id}>
-                                <td><AddressDisplay address={tx.sender} /></td>
-                                <td><AddressDisplay address={tx.txId} type="tx" /></td>
-                                <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
-                                <td>{tx.currentEra} ({tx.currentEpoch})</td>
-                                <td>{(Number(tx.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</td>
-                            </tr>
-                        ))}
+                        {data?.holdersEntities.map((holder: any, index: number) => {
+                            const balance = Number(holder.amount) / LAMPORTS_PER_SOL;
+                            const percentage = (balance / totalSupply * 100).toFixed(2);
+                            return (
+                                <tr key={holder.mint + index}>
+                                    <td>{(currentPage - 1) * pageSize + index + 1}</td>
+                                    <td><AddressDisplay address={holder.owner} /></td>
+                                    <td>{balance.toLocaleString()} {token.tokenSymbol}</td>
+                                    <td>{percentage}%</td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

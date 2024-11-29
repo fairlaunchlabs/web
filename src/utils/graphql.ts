@@ -189,3 +189,38 @@ query GetMintTokenEvents($skip: Int!, $first: Int!) {
         difficultyCoefficientEpoch
     }
 }`;
+
+export const queryTokenTransactions = gql`
+query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
+    mintTokenEntities(
+        where: { mint: $mint }
+        skip: $skip
+        first: $first
+        orderBy: timestamp
+        orderDirection: desc
+    ) {
+        id
+        txId
+        sender
+        timestamp
+        currentEra
+        currentEpoch
+        mintSizeEpoch
+    }
+}
+`;
+
+export const queryHolders = gql`
+query GetHolders($mint: String!, $skip: Int!, $first: Int!) {
+    holdersEntities(
+        where: { mint: $mint }
+        skip: $skip
+        first: $first
+        orderBy: amount
+        orderDirection: desc
+    ) {
+        owner
+        amount
+    }
+}
+`;

@@ -2557,6 +2557,14 @@
           {
             "name": "refund_amount_including_fee",
             "type": "u64"
+          },
+          {
+            "name": "burn_amount_from_vault",
+            "type": "u64"
+          },
+          {
+            "name": "burn_amount_from_user",
+            "type": "u64"
           }
         ]
       }

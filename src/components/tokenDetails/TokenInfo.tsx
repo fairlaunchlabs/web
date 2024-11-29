@@ -2,7 +2,6 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import { InitiazlizedTokenData, TokenMetadataIPFS } from '../../types/types';
 import { 
     calculateMaxSupply, 
-    calculateTargetMintTime,
     calculateMinTotalFee,
     extractIPFSHash,
     formatDays
@@ -21,6 +20,33 @@ const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
     pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
 });
+
+const tooltip = {
+    currentEra: "The current era number in the token's lifecycle",
+    currentEpoch: "The current epoch number within the current era",
+    mintFee: "Fee required to mint tokens",
+    currentMintSize: "Current amount of tokens that can be minted in this epoch",
+    currentMinted: "Total amount of tokens that have been minted so far",
+    targetSupply: "Target token supply to be reached by the specified era",
+    deployAt: "Timestamp when the token was deployed",
+    deployingTx: "Transaction hash of the deployment transaction",
+    deployer: "Address of the token deployer",
+    tokenAddress: "The token's contract address on Solana",
+    liquidityVaultSOL: "Vault address holding SOL liquidity",
+    liquidityVaultToken: "Vault address holding token liquidity",
+    targetEras: "Number of eras to reach the target supply",
+    startTimeOfCurrentEpoch: "When the current epoch started",
+    liquidityTokensRatio: "Percentage of tokens allocated for liquidity",
+    maxSupply: "Maximum possible token supply",
+    targetMintTime: "Target time duration for minting tokens",
+    reduceRatioPerEra: "Percentage by which the mint size reduces each era",
+    targetMinimumFee: "Minimum total fee required to reach target supply",
+    epochesPerEra: "Number of epochs in each era",
+    currentMintFee: "Current mint fee",
+    currentReferralFee: "Current referral fee",
+    difficultyOfCurrentEpoch: "Difficulty of current epoch",
+    difficultyOfLastEpoch: "Difficulty of last epoch"
+}
 
 export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
     const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
@@ -79,36 +105,132 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                     
                     {/* 显示详细内容 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                        <DataBlock label="Current Era" value={token.currentEra} />
-                        <DataBlock label="Current Epoch" value={token.currentEpoch} />
-                        <DataBlock label="Mint Fee" value={(Number(token.feeRate) / LAMPORTS_PER_SOL) + " SOL/Mint"} />
-                        <DataBlock label="Current Mint Size" value={(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol} />
-                        <DataBlock label="Current minted" value={(mintedSupply).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol} />
-                        <DataBlock label={`Target Supply (Era:${token.targetEras})`} value={totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol} />
-                        <DataBlock label="Deploy at" value={new Date(Number(token.timestamp) * 1000).toLocaleString()} />
-                        <DataBlock label='Deploying Tx' value={<AddressDisplay address={token.txId} type='tx' />} />
-                        <DataBlock label="Start time of current epoch" value={new Date(Number(token.startTimestampEpoch) * 1000).toLocaleString()} />
-                        <DataBlock label="Token Address" value={<AddressDisplay address={token.mint} />} />
-                        <DataBlock label="Liquidity Vault (SOL)" value={<AddressDisplay address={token.configAccount} />} />
-                        <DataBlock label={`Liquidity Vault (${token.tokenSymbol})`} value={<AddressDisplay address={token.tokenVault} />} />
-                        <DataBlock label="Taget Eras" value={token.targetEras} />
-                        <DataBlock label="Deployer" value={<AddressDisplay address={token.admin} />} />
-                        <DataBlock label="Liquidity Tokens Ratio" value={token.liquidityTokensRatio + "%"} />
-                        <DataBlock label="Max Supply" value={calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol} />
-                        <DataBlock label="Target Mint Time" value={formatDays(Number(token.targetSecondsPerEpoch) * Number(token.epochesPerEra))} />
-                        <DataBlock label="Reduce Ratio per Era" value={token.reduceRatio + "%"} />
-                        <DataBlock label="Target Minimum Fee" value={calculateMinTotalFee(
-                            token.initialTargetMintSizePerEpoch,
-                            token.feeRate,
-                            token.targetEras,
-                            token.epochesPerEra,
-                            token.initialMintSize
-                        ) + " SOL"} />
-                        <DataBlock label="Epoches per Era" value={token.epochesPerEra} />
-                        <DataBlock label="Current mint fee" value={(Number(token.totalMintFee) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL"} />
-                        <DataBlock label="Current referral fee" value={(Number(token.totalReferrerFee) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL"} />
-                        <DataBlock label="Difficulty of current epoch" value={token.difficultyCoefficientEpoch} />
-                        <DataBlock label="Difficulty of Last epoch" value={token.lastDifficultyCoefficientEpoch} />
+                        <DataBlock 
+                            label="Current Era" 
+                            value={token.currentEra} 
+                            tooltip={tooltip.currentEra}
+                        />
+                        <DataBlock 
+                            label="Current Epoch" 
+                            value={token.currentEpoch}
+                            tooltip={tooltip.currentEpoch}
+                        />
+                        <DataBlock 
+                            label="Mint Fee" 
+                            value={(Number(token.feeRate) / LAMPORTS_PER_SOL) + " SOL/Mint"}
+                            tooltip={tooltip.mintFee}
+                        />
+                        <DataBlock 
+                            label="Current Mint Size" 
+                            value={(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            tooltip={tooltip.currentMintSize}
+                        />
+                        <DataBlock 
+                            label="Current minted" 
+                            value={(mintedSupply).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            tooltip={tooltip.currentMinted}
+                        />
+                        <DataBlock 
+                            label={`Target Supply (Era:${token.targetEras})`} 
+                            value={totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            tooltip={tooltip.targetSupply}
+                        />
+                        <DataBlock 
+                            label="Deploy at" 
+                            value={new Date(Number(token.timestamp) * 1000).toLocaleString()}
+                            tooltip={tooltip.deployAt}
+                        />
+                        <DataBlock 
+                            label='Deploying Tx' 
+                            value={<AddressDisplay address={token.txId} type='tx' />}
+                            tooltip={tooltip.deployingTx}
+                        />
+                        <DataBlock 
+                            label="Deployer" 
+                            value={<AddressDisplay address={token.admin} />}
+                            tooltip={tooltip.deployer}
+                        />
+                        <DataBlock 
+                            label="Token Address" 
+                            value={<AddressDisplay address={token.mint} />}
+                            tooltip={tooltip.tokenAddress}
+                        />
+                        <DataBlock 
+                            label="Liquidity Vault (SOL)" 
+                            value={<AddressDisplay address={token.configAccount} />}
+                            tooltip={tooltip.liquidityVaultSOL}
+                        />
+                        <DataBlock 
+                            label={`Liquidity Vault (${token.tokenSymbol})`} 
+                            value={<AddressDisplay address={token.tokenVault} />}
+                            tooltip={tooltip.liquidityVaultToken}
+                        />
+                        <DataBlock 
+                            label="Taget Eras" 
+                            value={token.targetEras}
+                            tooltip={tooltip.targetEras}
+                        />
+                        <DataBlock 
+                            label="Start time of current epoch" 
+                            value={new Date(Number(token.startTimestampEpoch) * 1000).toLocaleString()}
+                            tooltip={tooltip.startTimeOfCurrentEpoch}
+                        />
+                        <DataBlock 
+                            label="Liquidity Tokens Ratio" 
+                            value={token.liquidityTokensRatio + "%"}
+                            tooltip={tooltip.liquidityTokensRatio}
+                        />
+                        <DataBlock 
+                            label="Max Supply" 
+                            value={calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            tooltip={tooltip.maxSupply}
+                        />
+                        <DataBlock 
+                            label="Target Mint Time" 
+                            value={formatDays(Number(token.targetSecondsPerEpoch) * Number(token.epochesPerEra))}
+                            tooltip={tooltip.targetMintTime}
+                        />
+                        <DataBlock 
+                            label="Reduce Ratio per Era" 
+                            value={token.reduceRatio + "%"}
+                            tooltip={tooltip.reduceRatioPerEra}
+                        />
+                        <DataBlock 
+                            label="Target Minimum Fee" 
+                            value={calculateMinTotalFee(
+                                token.initialTargetMintSizePerEpoch,
+                                token.feeRate,
+                                token.targetEras,
+                                token.epochesPerEra,
+                                token.initialMintSize
+                            ) + " SOL"}
+                            tooltip={tooltip.targetMinimumFee}
+                        />
+                        <DataBlock 
+                            label="Epoches per Era" 
+                            value={token.epochesPerEra}
+                            tooltip={tooltip.epochesPerEra}
+                        />
+                        <DataBlock 
+                            label="Current mint fee" 
+                            value={(Number(token.totalMintFee) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL"}
+                            tooltip={tooltip.currentMintFee}
+                        />
+                        <DataBlock 
+                            label="Current referral fee" 
+                            value={(Number(token.totalReferrerFee) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL"}
+                            tooltip={tooltip.currentReferralFee}
+                        />
+                        <DataBlock 
+                            label="Difficulty of current epoch" 
+                            value={token.difficultyCoefficientEpoch}
+                            tooltip={tooltip.difficultyOfCurrentEpoch}
+                        />
+                        <DataBlock 
+                            label="Difficulty of Last epoch" 
+                            value={token.lastDifficultyCoefficientEpoch}
+                            tooltip={tooltip.difficultyOfLastEpoch}
+                        />
                     </div>
                     <div className="mt-8">
                         <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target supply</h3>
@@ -144,12 +266,33 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
 type DataBlockProps = {
     label: string;
     value: any;
+    tooltip?: string;
 }
-export const DataBlock:FC<DataBlockProps> = ({label, value}) => {
+
+export const DataBlock:FC<DataBlockProps> = ({label, value, tooltip}) => {
     return (
         <div className="space-y-2">
-        <h3 className="font-semibold text-base-content">{label}</h3>
-        {value}
-    </div>
+            <div className="relative group">
+                <h3 className="font-semibold text-base-content inline-flex items-center gap-1">
+                    {label}
+                    {tooltip && (
+                        <>
+                            <span className="cursor-help">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </span>
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-base-300 text-base-content text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-10">
+                                {tooltip}
+                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                                    <div className="border-8 border-transparent border-t-base-300"></div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </h3>
+            </div>
+            <div className="text-base-content">
+                {value}
+            </div>
+        </div>
     )
 }

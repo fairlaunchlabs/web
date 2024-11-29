@@ -6,6 +6,7 @@ import { InitiazlizedTokenData } from '../types/types';
 import { TokenInfo } from '../components/tokenDetails/TokenInfo';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
 import { TokenTransactions } from '../components/tokenDetails/TokenTransactions';
+import { TokenHolders } from '../components/tokenDetails/TokenHolders';
 
 type TokenDetailProps = {
     expanded: boolean;
@@ -27,14 +28,14 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
             <div className={`container mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
                 <div className="max-w-6xl mx-auto">
                     <div className="animate-pulse space-y-4">
-                        <div className="h-32 bg-gray-200 rounded"></div>
+                        <div className="h-32 bg-base-200 rounded"></div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="h-64 bg-gray-200 rounded"></div>
-                            <div className="h-64 bg-gray-200 rounded"></div>
-                            <div className="h-64 bg-gray-200 rounded"></div>
-                            <div className="h-64 bg-gray-200 rounded"></div>
+                            <div className="h-64 bg-base-200 rounded"></div>
+                            <div className="h-64 bg-base-200 rounded"></div>
+                            <div className="h-64 bg-base-200 rounded"></div>
+                            <div className="h-64 bg-base-200 rounded"></div>
                         </div>
-                        <div className="h-96 bg-gray-200 rounded"></div>
+                        <div className="h-96 bg-base-200 rounded"></div>
                     </div>
                 </div>
             </div>
@@ -96,6 +97,7 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
             <div className="max-w-6xl mx-auto space-y-6">
                 <TokenInfo token={token as InitiazlizedTokenData} />
                 <TokenCharts token={token as InitiazlizedTokenData} />
+                <TokenHolders token={token as InitiazlizedTokenData} />
                 <TokenTransactions token={token as InitiazlizedTokenData} />
             </div>
         </div>

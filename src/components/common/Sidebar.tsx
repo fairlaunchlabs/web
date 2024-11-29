@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         ${activeMenuItem === item.id ? 'active' : ''} 
                         ${isExpanded ? '' : 'justify-center'}
                         ${isSubItem ? 'pl-3' : ''}
-                        flex items-center
+                        flex items-center cursor-pointer
                     `}
                     onClick={() => {
                         if (hasSubItems) {
