@@ -154,11 +154,10 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                         <div className="space-y-2">
                             <p>Generate a referral code for {token.tokenData?.tokenSymbol} token.</p>
                             <button
-                                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                                className={`btn btn-primary w-full`}
                                 onClick={handleGetCode}
-                                disabled={loading || !wallet}
                             >
-                                {loading ? 'Generating...' : 'Get Code'}
+                                Generate URC
                             </button>
                         </div>
                     )}
