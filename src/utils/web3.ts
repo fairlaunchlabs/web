@@ -7,11 +7,12 @@ import {
 import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED } from '../config/constants';
-import { InitializeTokenAccounts, InitializeTokenConfig, TokenMetadata } from '../types/types';
+import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS } from '../config/constants';
+import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
+import { token } from '@coral-xyz/anchor/dist/cjs/utils';
 
 // Solana 网络连接配置
 const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || `https://api.${NETWORK}.solana.com`;
@@ -259,7 +260,7 @@ export const setReferrerCode = async (
         return {
             success: true,
             data: {
-                tx: tx,
+                tx,
                 referralAccount: referralAccount.toBase58(),
             }
         };
@@ -350,54 +351,59 @@ export const getSystemConfig = async (wallet: AnchorWallet | undefined, connecti
     }
 }
 
-export const refund = async (wallet: AnchorWallet | undefined, connection: Connection, mint: PublicKey) => {
+export const refund = async (
+    wallet: AnchorWallet | undefined, 
+    connection: Connection,
+    token: InitiazlizedTokenData,
+    protocolFeeAccount: PublicKey,
+) => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
-    const [configAccount] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from(CONFIG_DATA_SEED),
-            mint.toBuffer()
-        ],
-        program.programId
-    );
-    const [mintStateAccount] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from(MINT_STATE_SEED),
-            mint.toBuffer()
-        ],
-        program.programId
-    );
     const [systemConfigAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
     );
+    const [refundAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
+        program.programId,
+    );
+    const tokenAta = await getAssociatedTokenAddress(
+        new PublicKey(token.mint),
+        wallet.publicKey,
+        false,
+    )
+
     const refundAccounts = {
-        mint,
-        configAccount,
-        mintStateAccount,
+        mint: new PublicKey(token.mint),
+        refundAccount,
+        configAccount: new PublicKey(token.configAccount),
+        tokenVault: new PublicKey(token.tokenVault),
+        protocolFeeAccount,
+        tokenAta,
         systemConfigAccount,
         payer: wallet.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
     };
-    // try {
-    //     const tx = await program.methods
-    //         .refund()
-    //         .accounts(refundAccounts)
-    //         .signers([])  // 使用钱包的 payer
-    //         .rpc();
-    //     return {    
-    //         success: true,
-    //         data: {
-    //             signature: tx,
-    //         }
-    //     };
-    // } catch (error) {
-    //     return {
-    //         success: false,
-    //         message: 'Error refunding'
-    //     }
-    // }
+    try {
+        const tx = await program.methods
+            .refund(token.tokenName, token.tokenSymbol)
+            .accounts(refundAccounts)
+            .signers([])
+            .rpc();
+        return {    
+            success: true,
+            data: {
+                tx,
+            }
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Error refunding'
+        }
+    }
 }

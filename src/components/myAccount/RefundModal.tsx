@@ -1,8 +1,11 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import toast from 'react-hot-toast';
-import { TokenListItem } from '../../types/types';
+import { InitiazlizedTokenData, TokenListItem } from '../../types/types';
+import { getSystemConfig, refund } from '../../utils/web3';
+import { ToastBox } from '../common/ToastBox';
+import { NETWORK, SCANURL } from '../../config/constants';
 
 interface RefundModalProps {
     isOpen: boolean;
@@ -19,6 +22,18 @@ export const RefundModal: FC<RefundModalProps> = ({
     const wallet = useAnchorWallet();
     const [loading, setLoading] = useState(false);
     const [confirmed, setConfirmed] = useState(false);
+    const [protocolFeeAccount, setProtocolFeeAccount] = useState<PublicKey>(PublicKey.default);
+
+    useEffect(() => {
+        if (wallet) {
+            getSystemConfig(wallet, connection).then((data) => {
+                if (data?.success && data.data) {
+                    setProtocolFeeAccount(data.data.protocolFeeAccount);
+                }
+                else toast.error(data.message as string);
+            });
+        }
+    }, []);
 
     const handleRefund = async () => {
         if (!wallet) {
@@ -26,10 +41,32 @@ export const RefundModal: FC<RefundModalProps> = ({
             return;
         }
         setLoading(true);
+        const toastId = toast.loading('Refunding...', {
+            style: {
+                background: 'var(--fallback-b1,oklch(var(--b1)))',
+                color: 'var(--fallback-bc,oklch(var(--bc)))',
+            },
+        });
         try {
-            // TODO: 实现退款逻辑
-            toast.success('Refund successful');
-            onClose();
+            refund(wallet, connection, token.tokenData as InitiazlizedTokenData, protocolFeeAccount).then((data) => {
+                if (!data.success) {
+                    toast.error(data.message as string);
+                } else {
+                    const explorerUrl = `${SCANURL}/tx/${data.data?.tx}?cluster=${NETWORK}`;
+                    toast.success(
+                        <ToastBox 
+                            title="Refund successful"
+                            url={explorerUrl}
+                            urlText="View transaction"
+                        />,
+                        {
+                            id: toastId
+                        }
+                    );
+                    setLoading(false);
+                    onClose();
+                }
+            });
         } catch (error: any) {
             toast.error(error.message || 'Failed to refund');
         } finally {
