@@ -259,11 +259,12 @@ export const setReferrerCode = async (
         return {
             success: true,
             data: {
-                signature: tx,
+                tx: tx,
                 referralAccount: referralAccount.toBase58(),
             }
         };
     } catch (error) {
+        console.log("setReferrerCode", error);
         return {
             success: false,
             message: 'Error setting referrer code'

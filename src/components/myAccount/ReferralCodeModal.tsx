@@ -5,6 +5,8 @@ import { getMyReferrerData, getReferrerDataByReferralAccount, getSystemConfig, s
 import toast from 'react-hot-toast';
 import { TokenListItem } from '../../types/types';
 import { BN } from '@coral-xyz/anchor';
+import { NETWORK, SCANURL } from '../../config/constants';
+import { ToastBox } from '../common/ToastBox';
 
 interface ReferralCodeModalProps {
     isOpen: boolean;
@@ -51,6 +53,13 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     const handleGetCode = async () => {
         setLoading(true);
         try {
+            const toastId = toast.loading('Geting URC...', {
+                style: {
+                    background: 'var(--fallback-b1,oklch(var(--b1)))',
+                    color: 'var(--fallback-bc,oklch(var(--bc)))',
+                },
+            });
+    
             const result = await setReferrerCode(
                 wallet,
                 connection,
@@ -62,7 +71,15 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
             if (!result.success) {
                 throw new Error(result.message);
             }
-            toast.success('Referral code generated successfully!');
+            const explorerUrl = `${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`;
+            toast.success(
+                <ToastBox url={explorerUrl} urlText="View transaction" title="Got URC successfully!" />,
+                {
+                    id: toastId
+                }
+            );
+
+
             const referralAccount = result.data?.referralAccount as string
             getReferrerDataByReferralAccount(wallet, connection, new PublicKey(referralAccount)).then((data) => {
                 if (data?.success) setReferralData(data.data);

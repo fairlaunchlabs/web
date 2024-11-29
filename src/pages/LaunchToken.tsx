@@ -10,6 +10,7 @@ import { ToggleSwitch } from '../components/common/ToggleSwitch';
 import { TokenImageUpload } from '../components/launchToken/TokenImageUpload';
 import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../config/constants';
+import { ToastBox } from '../components/common/ToastBox';
 
 interface LaunchTokenFormProps {
     expanded: boolean;
@@ -180,18 +181,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
             // 显示成功提示，包含交易链接
             const explorerUrl = `${SCANURL}/tx/${result.signature}?cluster=${NETWORK}`;
             toast.success(
-                <div>
-                    Token created successfully!
-                    <br />
-                    <a
-                        href={explorerUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                    >
-                        View transaction
-                    </a>
-                </div>,
+                <ToastBox url={explorerUrl} urlText="View transaction" title="Token created successfully!" />,
                 {
                     id: toastId,
                 }
