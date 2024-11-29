@@ -14,7 +14,8 @@ type TokenDetailProps = {
 };
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
-    const { tokenMintAddress } = useParams();
+    const { tokenMintAddress, referrerCode } = useParams();
+    console.log('referrerCode', referrerCode);
     const { loading, error, data } = useQuery(queryInitializeTokenEventBySearch, {
         variables: {
             skip: 0,

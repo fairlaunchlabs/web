@@ -3,30 +3,13 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { FC, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { queryMyTokenList, queryTokensByMints } from '../utils/graphql';
-import { InitiazlizedTokenData } from '../types/types';
+import { InitiazlizedTokenData, MyAccountProps, TokenListItem } from '../types/types';
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
 import { pinata } from '../utils/web3';
 import { extractIPFSHash } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
-
-type MyAccountProps = {
-    expanded: boolean;
-}
-
-type TokenListItem = {
-    mint: string;
-    amount: string;
-    tokenData?: InitiazlizedTokenData;
-    imageUrl?: string;
-}
-
-interface TokenMetadataIPFS {
-    image: string;
-    name: string;
-    symbol: string;
-    description: string;
-}
+import { ReferralCodeModal } from '../components/referral/ReferralCodeModal';
 
 export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const { connection } = useConnection();
@@ -35,6 +18,8 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const [balance, setBalance] = useState(0);
     const [tokenList, setTokenList] = useState<TokenListItem[]>([]);
     const [searchMints, setSearchMints] = useState<string[]>([]);
+    const [selectedToken, setSelectedToken] = useState<TokenListItem | null>(null);
+    const [isReferralCodeModalOpen, setIsReferralCodeModalOpen] = useState(false);
 
     const { data: myTokensData, loading: loadingTokens } = useQuery(queryMyTokenList, {
         variables: {
@@ -151,7 +136,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {tokenList.map((token) => (
+                                {tokenList.map((token: TokenListItem) => (
                                     <tr key={token.mint} className="hover">
                                         <td className="">
                                             {token.imageUrl && (
@@ -177,6 +162,12 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                             <div className="flex gap-2 justify-end">
                                                 <button 
                                                     className="btn btn-sm btn-primary"
+                                                    onClick={() => navigate(`/token/${token.mint}`)}
+                                                >
+                                                    Get more
+                                                </button>
+                                                <button 
+                                                    className="btn btn-sm btn-secondary"
                                                     onClick={() => {
                                                         // TODO: Implement refund functionality
                                                     }}
@@ -184,26 +175,21 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                                     Refund
                                                 </button>
                                                 <button 
-                                                    className="btn btn-sm btn-secondary"
-                                                    onClick={() => {
-                                                        // TODO: Implement thaw functionality
-                                                    }}
-                                                >
-                                                    Thaw
-                                                </button>
-                                                <button 
                                                     className="btn btn-sm btn-accent"
                                                     onClick={() => {
-                                                        // TODO: Implement code functionality
+                                                        setSelectedToken(token);
+                                                        setIsReferralCodeModalOpen(true);
                                                     }}
                                                 >
                                                     Code
                                                 </button>
                                                 <button 
                                                     className="btn btn-sm btn-info"
-                                                    onClick={() => navigate(`/token/${token.mint}`)}
+                                                    onClick={() => {
+                                                        // TODO: Implement thaw functionality
+                                                    }}
                                                 >
-                                                    Details
+                                                    Thaw
                                                 </button>
                                             </div>
                                         </td>
@@ -214,6 +200,16 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                     </div>
                 )}
             </div>
+            {selectedToken && (
+                <ReferralCodeModal
+                    isOpen={isReferralCodeModalOpen}
+                    onClose={() => {
+                        setIsReferralCodeModalOpen(false);
+                        setSelectedToken(null);
+                    }}
+                    token={selectedToken}
+                />
+            )}
         </div>
     );
 };

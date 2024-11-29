@@ -90,6 +90,7 @@ const AppContent = () => {
                         <Route path="/" element={getActiveComponent()} />
                         <Route path="/:selectedMenuItem" element={getActiveComponent()} />
                         <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
+                        <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />
                     </Routes>
                 </div>
             </div>

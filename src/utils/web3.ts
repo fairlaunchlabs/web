@@ -4,10 +4,10 @@ import {
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
 } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK } from '../config/constants';
+import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED } from '../config/constants';
 import { InitializeTokenAccounts, InitializeTokenConfig, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
@@ -148,30 +148,6 @@ export const createTokenOnChain = async (
             tokenProgram: TOKEN_PROGRAM_ID,
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
-        
-        console.table(metadata);
-        console.table({
-            mintPda: mintPda.toString(),
-            configPda: configPda.toString(),
-            mintStatePda: mintStatePda.toString(),
-            rent: SYSVAR_RENT_PUBKEY.toString(),
-            systemProgram: SystemProgram.programId.toString(),
-            systemConfigAccount: systemConfigAccount.toString(),
-            metadataPda: metadataPda.toString(),
-            tokenProgram: TOKEN_PROGRAM_ID.toString(),
-            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID.toString(),
-        });
-
-        console.table({
-            targetEras: config.targetEras.toString(),
-            epochesPerEra: config.epochesPerEra.toString(),
-            targetSecondsPerEpoch: config.targetSecondsPerEpoch.toString(),
-            reduceRatio: config.reduceRatio.toString(),
-            initialMintSize: config.initialMintSize.toString(),
-            initialTargetMintSizePerEpoch: config.initialTargetMintSizePerEpoch.toString(),
-            feeRate: config.feeRate.toString(),
-            liquidityTokensRatio: config.liquidityTokensRatio.toString(),
-        })
 
         try {
             const tx = await program.methods
@@ -179,9 +155,6 @@ export const createTokenOnChain = async (
                 .accounts(initializeTokenAccounts)
                 .signers([])  // 使用钱包的 payer
                 .rpc();
-
-            console.log('Token created successfully:', tx);
-            console.log('Mint address:', mintPda.toString());
 
             return {
                 signature: tx,
@@ -212,3 +185,166 @@ export const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
     pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
 });
+
+export const setReferrerCode = async (
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
+    tokenName: string,
+    tokenSymbol: string,
+    mint: PublicKey,
+    renewCode: boolean = false
+) => {
+    if (!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const [configAccount] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(CONFIG_DATA_SEED),
+            mint.toBuffer()
+        ],
+        program.programId
+    );
+
+    const referrerAta = await getAssociatedTokenAddress(
+        mint,
+        wallet.publicKey, // 需要查询账户的公钥
+        false,
+    )
+    console.log('referrerAta', referrerAta.toBase58())
+    // 确认referrerAta是否存在
+    const referrerAtaAccountInfo = await connection.getAccountInfo(referrerAta);
+    if (!referrerAtaAccountInfo) {
+        return {
+            success: false,
+            message: 'You have not minted this token'
+        };
+    }
+
+    console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
+    const [referralAccount] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(REFERRAL_SEED),
+            mint.toBuffer(),
+            referrerAta.toBuffer()
+        ],
+        PROGRAM_ID
+    );
+    console.log('referralAccount', referralAccount.toBase58());
+
+    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+        program.programId,
+    );
+
+    const setReferrerCodeAccounts = {
+        mint,
+        referralAccount,
+        configAccount,
+        systemConfigAccount,
+        payer: wallet.publicKey,
+        referrerAta,
+        systemProgram: SystemProgram.programId,
+    };
+
+    try {
+        const tx = await program.methods
+            .setReferrerCode(tokenName, tokenSymbol, renewCode)
+            .accounts(setReferrerCodeAccounts)
+            .signers([])  // 使用钱包的 payer
+            .rpc();
+
+        return {
+            success: true,
+            data: {
+                signature: tx,
+                referralAccount: referralAccount.toBase58(),
+            }
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Error setting referrer code'
+        }
+    }
+};
+
+export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connection: Connection, mint: PublicKey) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+
+    const referrerAta = await getAssociatedTokenAddress(
+        mint,
+        wallet.publicKey, // 需要查询账户的公钥
+        false,
+    )
+    console.log('referrerAta', referrerAta.toBase58())
+    // 确认referrerAta是否存在
+    const referrerAtaAccountInfo = await connection.getAccountInfo(referrerAta);
+    if (!referrerAtaAccountInfo) {
+        return {
+            success: false,
+            message: 'You have not minted this token'
+        };
+    }
+
+    console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
+    const [referralAccount] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(REFERRAL_SEED),
+            mint.toBuffer(),
+            referrerAta.toBuffer()
+        ],
+        PROGRAM_ID
+    );
+    console.log('referralAccount', referralAccount.toBase58());
+    const referralAccountInfo = await connection.getAccountInfo(referralAccount);
+    if (!referralAccountInfo) {
+        return {
+            success: false,
+            message: 'You have not set a referrer code for this token before.'
+        }
+    }
+
+    console.log('referralAccountInfo', referralAccountInfo);
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const referrerData = await program.account.tokenReferralData.fetch(referralAccount);
+    return {
+        success: true,
+        data: referrerData
+    }
+}
+
+export const getReferrerDataByReferralAccount = async (wallet: AnchorWallet | undefined, connection: Connection, referralAccount: PublicKey) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const referrerData = await program.account.tokenReferralData.fetch(referralAccount);
+    return {
+        success: true,
+        data: referrerData
+    }
+}
+
+export const getSystemConfig = async (wallet: AnchorWallet | undefined, connection: Connection) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+        program.programId,
+    );
+    const config = await program.account.systemConfigData.fetch(systemConfigAccount);
+    return {
+        success: true,
+        data: config
+    }
+}

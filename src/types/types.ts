@@ -205,3 +205,15 @@ export type TokenImageUploadProps = {
     onImageChange: (file: File | null) => void;
     imageFile: File | null;
 }
+
+export type MyAccountProps = {
+    expanded: boolean;
+}
+
+export type TokenListItem = {
+    mint: string;
+    amount: string;
+    tokenData?: InitiazlizedTokenData;
+    imageUrl?: string;
+}
+
