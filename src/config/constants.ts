@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
+export const APP_NAME = 'meme.fun';
 export const FAIR_MINT_PROGRAM_ID = 'C8onMNdJfvPTfFSAaYxGkPiQ8HkVa1HsPW584FkdHD2L';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 

@@ -89,7 +89,7 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
                     </thead>
                     <tbody>
                         {data?.mintTokenEntities.map((tx: any) => (
-                            <tr key={tx.id}>
+                            <tr key={tx.txId}>
                                 <td><AddressDisplay address={tx.sender} /></td>
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
                                 <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>

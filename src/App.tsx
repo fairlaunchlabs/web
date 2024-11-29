@@ -20,6 +20,7 @@ import { Sidebar } from './components/common/Sidebar';
 import { Footer } from './components/common/Footer';
 import { menuItems } from './config/menu';
 import { TokenDetail } from './pages/TokenDetail';
+import { APP_NAME } from './config/constants';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -49,6 +50,7 @@ const AppContent = () => {
     return (
         <div className="min-h-screen bg-base-100 flex flex-col">
             <Navbar 
+                title={APP_NAME}
                 onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
                 isMenuOpen={isSidebarOpen}
             />

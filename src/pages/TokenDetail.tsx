@@ -7,6 +7,7 @@ import { TokenInfo } from '../components/tokenDetails/TokenInfo';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
 import { TokenTransactions } from '../components/tokenDetails/TokenTransactions';
 import { TokenHolders } from '../components/tokenDetails/TokenHolders';
+import { ShareButton } from '../components/common/ShareButton';
 
 type TokenDetailProps = {
     expanded: boolean;
@@ -95,6 +96,10 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     return (
         <div className={`container mx-auto py-8 mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             <div className="max-w-6xl mx-auto space-y-6">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-base-content">Token Details</h1>
+                    <ShareButton token={token as InitiazlizedTokenData} />
+                </div>
                 <TokenInfo token={token as InitiazlizedTokenData} />
                 <TokenCharts token={token as InitiazlizedTokenData} />
                 <TokenHolders token={token as InitiazlizedTokenData} />

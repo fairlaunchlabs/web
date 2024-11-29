@@ -93,7 +93,7 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
                             const balance = Number(holder.amount) / LAMPORTS_PER_SOL;
                             const percentage = (balance / totalSupply * 100).toFixed(2);
                             return (
-                                <tr key={holder.mint + index}>
+                                <tr key={holder.owner + index}>
                                     <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                     <td><AddressDisplay address={holder.owner} /></td>
                                     <td>{balance.toLocaleString()} {token.tokenSymbol}</td>

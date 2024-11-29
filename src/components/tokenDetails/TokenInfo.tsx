@@ -91,7 +91,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
         <div className="bg-base-200 rounded-lg shadow-lg p-6">
             <div className="flex items-start gap-6">
                 <div className="w-24 h-24 overflow-hidden">
-                    <TokenImage imageUrl={metadata?.image as string} name={token.tokenName} size={84} className='rounded-2xl' />
+                    <TokenImage imageUrl={metadata?.image as string} name={token.tokenName} size={84} className='rounded-full' />
                 </div>
                 <div className="flex-1">
                     <div className="flex justify-between items-start">
