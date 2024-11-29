@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { extractIPFSHash } from '../../utils/format';
-import { PinataSDK } from 'pinata-web3';
 import { TokenImageProps } from '../../types/types';
+import { pinata } from '../../utils/web3';
 
 // Simple in-memory cache for metadata and image URLs
 const metadataCache = new Map<string, { image: string; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-// Initialize Pinata client
-const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
 
 export const TokenImage: React.FC<TokenImageProps> = ({ 
     imageUrl, 

@@ -8,15 +8,10 @@ import {
 import { TokenCardProps, TokenMetadataIPFS } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { TokenImage } from './TokenImage';
-import { PinataSDK } from 'pinata-web3';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useNavigate } from 'react-router-dom';
 import { RenderSocialIcons } from './RenderSocialIcons';
-
-const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
+import { pinata } from '../../utils/web3';
 
 export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
     const navigate = useNavigate();

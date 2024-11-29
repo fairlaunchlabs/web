@@ -1,15 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { PinataSDK } from 'pinata-web3';
 
 interface TokenImageUploadProps {
     onImageChange: (file: File | null) => void;
 }
-
-// Initialize Pinata client
-const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_FILE_TYPES = ['image/png', 'image/jpeg', 'image/gif'];

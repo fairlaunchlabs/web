@@ -9,17 +9,12 @@ import {
 import { AddressDisplay } from '../common/AddressDisplay';
 import { TokenImage } from '../mintTokens/TokenImage';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { PinataSDK } from 'pinata-web3';
 import { RenderSocialIcons } from '../mintTokens/RenderSocialIcons';
+import { pinata } from '../../utils/web3';
 
 interface TokenInfoProps {
     token: InitiazlizedTokenData;
 }
-
-const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
 
 const tooltip = {
     currentEra: "The current era number in the token's lifecycle",

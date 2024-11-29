@@ -34,32 +34,6 @@ export type MenuItem = {
 };
 
 export const menuItems = (expended: boolean): MenuItem[] => [
-    // {
-    //     id: 'my-account',
-    //     label: 'My Account',
-    //     icon: <FaUser className="w-5 h-5" />,
-    //     component: null,
-    //     subItems: [
-    //         { 
-    //             id: 'balance', 
-    //             label: 'Wallet Balance', 
-    //             icon: <FaWallet className="w-5 h-5" />,
-    //             component: <Balance /> 
-    //         },
-    //         { 
-    //             id: 'transactions', 
-    //             label: 'Transactions', 
-    //             icon: <BiHistory className="w-5 h-5" />,
-    //             component: <TransactionHistory /> 
-    //         },
-    //         { 
-    //             id: 'tokens', 
-    //             label: 'Token Accounts', 
-    //             icon: <AiOutlineKey className="w-5 h-5" />,
-    //             component: <TokenAccounts /> 
-    //         },
-    //     ]
-    // },
     { 
         id: 'launch-token', 
         label: 'Launch Token', 
@@ -74,7 +48,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
     },
     { 
         id: 'my-account', 
-        label: 'My Account', 
+        label: 'My Tokens', 
         icon: <MdAccountCircle className="w-5 h-5" />,
         component: <MyAccount expanded={expended} /> 
     },

@@ -11,6 +11,7 @@ import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED,
 import { InitializeTokenAccounts, InitializeTokenConfig, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
+import { PinataSDK } from 'pinata-web3';
 
 // Solana 网络连接配置
 const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || `https://api.${NETWORK}.solana.com`;
@@ -206,3 +207,8 @@ export const getBalance = async (publicKey: string) => {
         throw error;
     }
 };
+
+export const pinata = new PinataSDK({
+    pinataJwt: process.env.REACT_APP_PINATA_JWT,
+    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
+});

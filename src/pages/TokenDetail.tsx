@@ -97,7 +97,7 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
         <div className={`container mx-auto py-8 mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             <div className="max-w-6xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-base-content">Token Details</h1>
+                    <h1 className="text-2xl font-bold text-base-content">{token.tokenSymbol} Details</h1>
                     <ShareButton token={token as InitiazlizedTokenData} />
                 </div>
                 <TokenInfo token={token as InitiazlizedTokenData} />

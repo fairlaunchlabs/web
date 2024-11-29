@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { createTokenOnChain } from '../../utils/web3';
+import { createTokenOnChain, pinata } from '../../utils/web3';
 import { TokenFormProps, TokenMetadata } from '../../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { BN } from '@coral-xyz/anchor';
-import { PinataSDK } from 'pinata-web3';
 import { Metrics } from './Metrics';
 import { SocialInformation } from './SocialInformation';
 import { AdvancedSettings } from './AdvancedSettings';
@@ -11,12 +10,6 @@ import { ToggleSwitch } from '../common/ToggleSwitch';
 import { TokenImageUpload } from './TokenImageUpload';
 import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../../config/constants';
-
-// Initialize Pinata client
-const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
 
 export const LaunchTokenForm: React.FC<TokenFormProps> = ({ onSubmit }) => {
     const wallet = useAnchorWallet();

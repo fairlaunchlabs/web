@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { TwitterShareButton } from 'react-share';
 import { QRCodeSVG } from 'qrcode.react';
-import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
 import ReactDOM from 'react-dom';
 import { InitiazlizedTokenData } from '../../types/types';
@@ -27,36 +26,35 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token }) => {
         }
     };
 
+    // TODO: 以后完善分享图片
     const handleDownloadImage = async () => {
         if (isGenerating) return;
         setIsGenerating(true);
         setIsOpen(false);
 
         try {
-            // Create container
-            const container = document.createElement('div');
-            container.style.position = 'fixed';
-            container.style.left = '-9999px';
-            container.style.width = '600px';
-            container.style.padding = '20px';
-            container.style.backgroundColor = '#ffffff';
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d')!;
+            
+            // Set canvas size
+            canvas.width = 600;
+            canvas.height = 400;
+            
+            // Fill background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw token name
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#000000';
+            ctx.fillText(token.tokenName, 20, 40);
+            
+            // Draw token symbol
+            ctx.font = '18px Arial';
+            ctx.fillText(token.tokenSymbol, 20, 70);
 
-            // Add token name
-            const nameElement = document.createElement('h1');
-            nameElement.textContent = token.tokenName;
-            nameElement.style.fontSize = '24px';
-            nameElement.style.marginBottom = '10px';
-            container.appendChild(nameElement);
-
-            // Add token symbol
-            const symbolElement = document.createElement('div');
-            symbolElement.textContent = token.tokenSymbol;
-            symbolElement.style.fontSize = '18px';
-            symbolElement.style.marginBottom = '20px';
-            container.appendChild(symbolElement);
-
-            // Add QR code
-            const qrContainer = document.createElement('div');
+            // Generate QR code in a temporary element
             const qrWrapper = document.createElement('div');
             ReactDOM.render(
                 React.createElement(QRCodeSVG, {
@@ -66,18 +64,22 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token }) => {
                 }),
                 qrWrapper
             );
-            qrContainer.appendChild(qrWrapper.firstChild!);
-            container.appendChild(qrContainer);
 
-            // Add to document temporarily
-            document.body.appendChild(container);
+            // Convert QR code SVG to image
+            const qrSvg = qrWrapper.querySelector('svg');
+            if (qrSvg) {
+                const svgData = new XMLSerializer().serializeToString(qrSvg);
+                const img = new Image();
+                img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+                
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
 
-            // Generate image
-            const canvas = await html2canvas(container, {
-                width: 600,
-                scale: 2,
-                backgroundColor: '#ffffff'
-            });
+                // Draw QR code
+                ctx.drawImage(img, 20, 100, 150, 150);
+            }
 
             // Download image
             const link = document.createElement('a');
@@ -85,9 +87,8 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token }) => {
             link.href = canvas.toDataURL('image/png');
             link.click();
 
-            // Cleanup
-            document.body.removeChild(container);
             setIsGenerating(false);
+            toast.success('Image downloaded successfully!');
         } catch (error) {
             console.error('Failed to generate image:', error);
             toast.error('Failed to generate image');
@@ -99,9 +100,14 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token }) => {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm flex items-center gap-2"
                 disabled={isGenerating}
             >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
                 Share
             </button>
 

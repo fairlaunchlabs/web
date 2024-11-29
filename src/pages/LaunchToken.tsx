@@ -12,8 +12,8 @@ export const LaunchToken: React.FC<LaunchTokenProps> = ({ expanded }) => {
     };
 
     return (
-        <div className={`mx-auto py-8 ${expanded ? 'md:ml-40' : 'md:ml-20'}`}>
-            {/* <h1 className="text-3xl font-bold text-center mb-8">Launch New Token</h1> */}
+        <div className={`mx-auto py-8 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            {/* <h2 className="text-3xl font-bold text-center mb-8">Launch New Token</h2> */}
             <LaunchTokenForm onSubmit={handleSubmit} />
         </div>
     );

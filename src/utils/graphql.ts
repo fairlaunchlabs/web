@@ -224,3 +224,63 @@ query GetHolders($mint: String!, $skip: Int!, $first: Int!) {
     }
 }
 `;
+
+export const queryMyTokenList = gql`
+query GetHolders($owner: String!, $skip: Int!, $first: Int!) {
+    holdersEntities(
+        where: { owner: $owner }
+        skip: $skip
+        first: $first
+        orderBy: amount
+        orderDirection: desc
+    ) {
+        mint
+        amount
+    }
+}
+`;
+
+export const queryTokensByMints = gql`
+query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
+    initializeTokenEventEntities(
+        skip: $skip
+        first: $first
+        where: { mint_in: $mints }
+        orderBy: tokenId
+        orderDirection: desc
+    ) {
+        id
+        txId
+        admin
+        tokenId
+        mint
+        configAccount
+        metadataAccount
+        tokenVault
+        timestamp
+        tokenName
+        tokenSymbol
+        tokenUri
+        supply
+        currentEra
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
+        targetEras
+        epochesPerEra
+        targetSecondsPerEpoch
+        reduceRatio
+        initialMintSize
+        initialTargetMintSizePerEpoch
+        feeRate
+        liquidityTokensRatio
+    }
+}`;
