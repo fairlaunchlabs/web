@@ -9,7 +9,8 @@ import { TokenImage } from '../components/mintTokens/TokenImage';
 import { pinata } from '../utils/web3';
 import { extractIPFSHash } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
-import { ReferralCodeModal } from '../components/referral/ReferralCodeModal';
+import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
+import { RefundModal } from '../components/myAccount/RefundModal';
 
 export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const { connection } = useConnection();
@@ -18,8 +19,10 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const [balance, setBalance] = useState(0);
     const [tokenList, setTokenList] = useState<TokenListItem[]>([]);
     const [searchMints, setSearchMints] = useState<string[]>([]);
-    const [selectedToken, setSelectedToken] = useState<TokenListItem | null>(null);
-    const [isReferralCodeModalOpen, setIsReferralCodeModalOpen] = useState(false);
+    const [selectedTokenForReferral, setSelectedTokenForReferral] = useState<TokenListItem | null>(null);
+    const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+    const [selectedTokenForRefund, setSelectedTokenForRefund] = useState<TokenListItem | null>(null);
+    const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
 
     const { data: myTokensData, loading: loadingTokens } = useQuery(queryMyTokenList, {
         variables: {
@@ -100,6 +103,11 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
         }
     }, [tokenDetailsData]);
 
+    const handleRefund = (token: TokenListItem) => {
+        setSelectedTokenForRefund(token);
+        setIsRefundModalOpen(true);
+    };
+
     if (!publicKey) {
         return (
             <div className='flex justify-center items-center'>
@@ -167,18 +175,16 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                                     Get more
                                                 </button>
                                                 <button 
-                                                    className="btn btn-sm btn-secondary"
-                                                    onClick={() => {
-                                                        // TODO: Implement refund functionality
-                                                    }}
+                                                    className="btn btn-sm btn-error"
+                                                    onClick={() => handleRefund(token)}
                                                 >
                                                     Refund
                                                 </button>
                                                 <button 
                                                     className="btn btn-sm btn-accent"
                                                     onClick={() => {
-                                                        setSelectedToken(token);
-                                                        setIsReferralCodeModalOpen(true);
+                                                        setSelectedTokenForReferral(token);
+                                                        setIsReferralModalOpen(true);
                                                     }}
                                                 >
                                                     Code
@@ -200,14 +206,24 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                     </div>
                 )}
             </div>
-            {selectedToken && (
+            {selectedTokenForReferral && (
                 <ReferralCodeModal
-                    isOpen={isReferralCodeModalOpen}
+                    isOpen={isReferralModalOpen}
                     onClose={() => {
-                        setIsReferralCodeModalOpen(false);
-                        setSelectedToken(null);
+                        setIsReferralModalOpen(false);
+                        setSelectedTokenForReferral(null);
                     }}
-                    token={selectedToken}
+                    token={selectedTokenForReferral}
+                />
+            )}
+            {selectedTokenForRefund && (
+                <RefundModal
+                    isOpen={isRefundModalOpen}
+                    onClose={() => {
+                        setIsRefundModalOpen(false);
+                        setSelectedTokenForRefund(null);
+                    }}
+                    token={selectedTokenForRefund}
                 />
             )}
         </div>

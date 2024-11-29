@@ -100,7 +100,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 <div className="space-y-4">
                     {referralData ? (
                         <div className="space-y-2">
-                            <p className="font-semibold">Your URC</p>
+                            <p className="font-semibold">Your URC for {token.tokenData?.tokenSymbol}</p>
                             <div className="bg-base-200 p-2 rounded-lg break-all">
                                 {referralData.code.toString()}
                             </div>

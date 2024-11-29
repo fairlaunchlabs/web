@@ -348,3 +348,55 @@ export const getSystemConfig = async (wallet: AnchorWallet | undefined, connecti
         data: config
     }
 }
+
+export const refund = async (wallet: AnchorWallet | undefined, connection: Connection, mint: PublicKey) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const [configAccount] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(CONFIG_DATA_SEED),
+            mint.toBuffer()
+        ],
+        program.programId
+    );
+    const [mintStateAccount] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(MINT_STATE_SEED),
+            mint.toBuffer()
+        ],
+        program.programId
+    );
+    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+        program.programId,
+    );
+    const refundAccounts = {
+        mint,
+        configAccount,
+        mintStateAccount,
+        systemConfigAccount,
+        payer: wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+    };
+    // try {
+    //     const tx = await program.methods
+    //         .refund()
+    //         .accounts(refundAccounts)
+    //         .signers([])  // 使用钱包的 payer
+    //         .rpc();
+    //     return {    
+    //         success: true,
+    //         data: {
+    //             signature: tx,
+    //         }
+    //     };
+    // } catch (error) {
+    //     return {
+    //         success: false,
+    //         message: 'Error refunding'
+    //     }
+    // }
+}

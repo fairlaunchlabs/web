@@ -171,10 +171,6 @@ export type TokenCardProps = {
     token: InitiazlizedTokenData;
 }
 
-export type TokenFormProps = {
-    onSubmit?: (data: TokenFormData) => void;
-}
-
 export type TokenFormData = {
     name: string;
     symbol: string;

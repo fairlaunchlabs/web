@@ -2,7 +2,6 @@ import React from 'react';
 // import { Balance } from '../pages/Balance';
 // import { TransactionHistory } from '../pages/TransactionHistory';
 // import { TokenAccounts } from '../pages/TokenAccounts';
-import { LaunchToken } from '../pages/LaunchToken';
 import { MintTokens } from '../pages/MintTokens';
 import { 
     CreateMarketId, 
@@ -24,6 +23,7 @@ import {
     MdAccountCircle
 } from 'react-icons/md';
 import { MyAccount } from '../pages/MyAccount';
+import { LaunchTokenForm } from '../pages/LaunchToken';
 
 export type MenuItem = {
     id: string;
@@ -38,7 +38,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         id: 'launch-token', 
         label: 'Launch Token', 
         icon: <FaRocket className="w-5 h-5" />,
-        component: <LaunchToken expanded={expended} /> 
+        component: <LaunchTokenForm expanded={expended} /> 
     },
     { 
         id: 'mint-tokens', 
