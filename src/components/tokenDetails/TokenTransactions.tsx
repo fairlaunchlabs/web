@@ -20,8 +20,7 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
             first: pageSize
         },
         onCompleted: (data) => {
-            // Note: This is a temporary solution. In production, you should get the total count from the API
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + data.mintTokenEntities.length));
+            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.mintTokenEntities?.length ?? 0)));
         }
     });
 
