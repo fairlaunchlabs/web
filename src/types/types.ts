@@ -1,6 +1,9 @@
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
 
+export type Language = 'en-US' | 'zh-CN' | 'ja-JP' | 'ru-RU';
+export type Theme = 'light' | 'dark';
+
 export type TokenMetadata = {
     name: string;
     symbol: string;
@@ -138,9 +141,6 @@ export type AddressDisplayProps = {
     isDevnet?: boolean;
 }
 
-export type Language = 'en-US' | 'zh-CN' | 'ja-JP' | 'ru-RU';
-export type Theme = 'light' | 'dark';
-
 export type MintTokensProps = {
     expanded: boolean;
 };
@@ -167,7 +167,6 @@ export type MenuItem = {
     component?: React.ReactNode;
     subItems?: MenuItem[];
 };
-
 
 export type SidebarProps = {
     menuItems: MenuItem[];

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LOCAL_STORAGE_KEY_THEME  } from '../config/constants';
+import { Theme } from '../types/types';
 
 export const useTheme = () => {
     const [theme, setTheme] = useState<Theme>(() => {

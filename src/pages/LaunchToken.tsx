@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, FC } from 'react';
+import React, { useState, FC } from 'react';
 import { createTokenOnChain, pinata } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
