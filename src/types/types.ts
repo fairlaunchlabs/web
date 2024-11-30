@@ -227,7 +227,7 @@ export type HolderData = {
     amount: string;
 }
 
-export type TransactionData = {
+export type MintTransactionData = {
     id: string;
     txId: string;
     sender: string;
@@ -235,6 +235,17 @@ export type TransactionData = {
     currentEra: string;
     currentEpoch: string;
     mintSizeEpoch: string;
+}
+
+export type RefundTransactionData = {
+    id: string;
+    txId: string;
+    sender: string;
+    timestamp: string;
+    burnAmountFromUser: string;
+    burnAmountFromVault: string;
+    refundFee: string;
+    refundAmountIncludingFee: string;
 }
 
 export type ReferralCodeModalProps = {
@@ -322,9 +333,14 @@ export type TokenHoldersProps = {
 
 export type TokenInfoProps = {
     token: InitiazlizedTokenData;
+    referrerCode: string | undefined;
 }
 
-export type TokenTransactionsProps = {
+export type TokenMintTransactionsProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type TokenRefundTransactionsProps = {
     token: InitiazlizedTokenData;
 }
 

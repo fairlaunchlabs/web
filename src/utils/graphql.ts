@@ -190,7 +190,7 @@ query GetMintTokenEvents($skip: Int!, $first: Int!) {
     }
 }`;
 
-export const queryTokenTransactions = gql`
+export const queryTokenMintTransactions = gql`
 query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
     mintTokenEntities(
         where: { mint: $mint }
@@ -206,6 +206,27 @@ query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
         currentEra
         currentEpoch
         mintSizeEpoch
+    }
+}
+`;
+
+export const queryTokenRefundTransactions = gql`
+query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
+    refundEventEntities(
+        where: { mint: $mint }
+        skip: $skip
+        first: $first
+        orderBy: timestamp
+        orderDirection: desc
+    ) {
+        id
+        txId
+        sender
+        timestamp
+        burnAmountFromUser
+        burnAmountFromVault
+        refundFee
+        refundAmountIncludingFee
     }
 }
 `;

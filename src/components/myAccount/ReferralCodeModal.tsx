@@ -104,8 +104,22 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                     {referralData ? (
                         <div className="space-y-2">
                             <p className="font-semibold">Your URC for {token.tokenData?.tokenSymbol}</p>
-                            <div className="bg-base-200 p-2 rounded-lg break-all">
-                                {referralData.code.toString()}
+                            <div className="flex justify-between items-center">
+                                <div className="bg-base-200 p-2 w-full rounded-lg break-all">
+                                    {referralData.code.toString()}
+                                </div>
+                                <button
+                                    className="btn btn-circle btn-sm btn-ghost"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(referralData.code.toString());
+                                        toast.success('URC copied to clipboard!');
+                                    }}
+                                    disabled={loading}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                </button>
                             </div>
                             <p className="font-semibold">Current used count (Max: {referralUsageMaxCount})</p>
                             <div className="bg-base-200 p-2 rounded-lg break-all">
@@ -119,7 +133,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             <div className="bg-base-200 p-2 rounded-lg break-all">
                                 {new Date(Number(referralData.activeTimestamp) * 1000 + referrerResetIntervalSeconds * 1000).toLocaleString()}
                             </div>
-                            <p className="font-semibold">Your personal link</p>
+                            <p className="font-semibold text-primary">Your personal link</p>
                             <div className="flex gap-2">
                                 <div className="bg-base-200 p-2 rounded-lg break-all flex-1">
                                     {window.location.origin}/token/{token.tokenData?.mint}/{referralData.code.toString()}

@@ -12,7 +12,7 @@ import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount } from '@solana/spl-token';
 
 // Solana 网络连接配置
 const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || `https://api.${NETWORK}.solana.com`;
@@ -209,31 +209,20 @@ export const setReferrerCode = async (
         program.programId
     );
 
-    const referrerAta = await getAssociatedTokenAddress(
+    let referrerAta = await getAssociatedTokenAddress(
         mint,
         wallet.publicKey, // 需要查询账户的公钥
         false,
     )
-    console.log('referrerAta', referrerAta.toBase58())
-    // 确认referrerAta是否存在
-    const referrerAtaAccountInfo = await connection.getAccountInfo(referrerAta);
-    if (!referrerAtaAccountInfo) {
-        return {
-            success: false,
-            message: 'You have not minted this token'
-        };
-    }
 
-    console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
     const [referralAccount] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
-            referrerAta.toBuffer()
+            wallet.publicKey.toBuffer()
         ],
         PROGRAM_ID
     );
-    console.log('referralAccount', referralAccount.toBase58());
 
     const [systemConfigAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
@@ -243,10 +232,10 @@ export const setReferrerCode = async (
     const setReferrerCodeAccounts = {
         mint,
         referralAccount,
+        referrerAta,
         configAccount,
         systemConfigAccount,
         payer: wallet.publicKey,
-        referrerAta,
         systemProgram: SystemProgram.programId,
     };
 
@@ -299,7 +288,7 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
-            referrerAta.toBuffer()
+            wallet.publicKey.toBuffer()
         ],
         PROGRAM_ID
     );
@@ -412,24 +401,6 @@ export const getReferralAccountByCode = async (connection: Connection, mint: str
 
 }
 
-/**
-pub struct MintTokens<'info> {
-  pub mint: Box<Account<'info, Mint>>,
-  pub destination: Box<Account<'info, TokenAccount>>, // ata account
-  pub refund_account: Box<Account<'info, TokenRefundData>>,
-  pub user: Signer<'info>,
-  pub config_account: Box<Account<'info, TokenConfigData>>, // immutable when mint_tokens
-  pub token_vault: Box<Account<'info, TokenAccount>>,
-  pub system_config_account: Box<Account<'info, SystemConfigData>>,
-  pub referral_account: Box<Account<'info, TokenReferralData>>,
-  pub referrer_ata: Box<Account<'info, TokenAccount>>,
-  pub referrer_main: AccountInfo<'info>,
-  pub rent: Sysvar<'info, Rent>,
-  pub token_program: Program<'info, Token>,
-  pub system_program: Program<'info, System>,
-  pub associated_token_program: Program<'info, AssociatedToken>,
-}
- */
 export const mintToken = async (
     wallet: AnchorWallet | undefined, 
     connection: Connection,
@@ -468,7 +439,6 @@ export const mintToken = async (
         }
     }
     // TODO: check if referrer code is exceed max usage
-
 
     const destination = await getAssociatedTokenAddress(
         new PublicKey(token.mint),

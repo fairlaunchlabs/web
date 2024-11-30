@@ -16,6 +16,7 @@ import { RenderSocialIcons } from '../mintTokens/RenderSocialIcons';
 import { pinata } from '../../utils/web3';
 import { TokenImage } from '../mintTokens/TokenImage';
 import MintModal from '../mintTokens/MintModal';
+import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
 
 const tooltip = {
     currentEra: "The current era number in the token's lifecycle",
@@ -44,10 +45,11 @@ const tooltip = {
     difficultyOfLastEpoch: "Difficulty of last epoch"
 }
 
-export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
+export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => {
     const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -258,10 +260,17 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                         </div>
                     </div>
 
-                    <div className="mt-8">
-                        <button className="btn w-full btn-primary" onClick={() => setIsModalOpen(true)}>
-                            Mint
-                        </button>
+                    <div className="flex justify-between mt-8">
+                        <div className='w-1/2 px-3'>
+                            <button className="btn w-full btn-primary" onClick={() => setIsModalOpen(true)}>
+                                Mint
+                            </button>
+                        </div>
+                        <div className='w-1/2 px-3'>
+                            <button className="btn w-full btn-secondary" onClick={() => setIsReferralModalOpen(true)}>
+                                Unique Referral Code
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -269,6 +278,18 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 token={token}
+                referrerCode={referrerCode}
+            />
+            <ReferralCodeModal
+                isOpen={isReferralModalOpen}
+                onClose={() => {
+                    setIsReferralModalOpen(false);
+                }}
+                token={{
+                    mint: token.mint,
+                    amount: '',
+                    tokenData: token
+                }}
             />
         </div>
     );

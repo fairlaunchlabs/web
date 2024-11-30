@@ -42,7 +42,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
     },
     { 
         id: 'my-account', 
-        label: 'My Tokens', 
+        label: 'My Mints', 
         icon: <MdAccountCircle className="w-5 h-5" />,
         component: <MyAccount expanded={expended} /> 
     },

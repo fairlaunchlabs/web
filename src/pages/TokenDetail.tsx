@@ -98,7 +98,7 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
                     <h1 className="text-2xl font-bold text-base-content">{token.tokenSymbol} Details</h1>
                     <ShareButton token={token as InitiazlizedTokenData} />
                 </div>
-                <TokenInfo token={token as InitiazlizedTokenData} />
+                <TokenInfo token={token as InitiazlizedTokenData} referrerCode={referrerCode} />
                 <TokenCharts token={token as InitiazlizedTokenData} />
                 <TokenHolders token={token as InitiazlizedTokenData} />
                 <TokenMintTransactions token={token as InitiazlizedTokenData} />

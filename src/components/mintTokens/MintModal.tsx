@@ -14,12 +14,13 @@ interface MintModalProps {
     isOpen: boolean;
     onClose: () => void;
     token: InitiazlizedTokenData;
+    referrerCode: string | undefined;
 }
 
-const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token }) => {
+const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode }) => {
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
-    const [code, setCode] = useState('');
+    const [code, setCode] = useState(referrerCode || '');
     const [loading, setLoading] = useState(false);
 
     const [getRefererCode] = useLazyQuery(querySetRefererCodeEntityById);

@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { queryTokenTransactions } from '../../utils/graphql';
+import { queryTokenRefundTransactions } from '../../utils/graphql';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { TokenTransactionsProps, TransactionData } from '../../types/types';
+import { RefundTransactionData, TokenRefundTransactionsProps } from '../../types/types';
 import { Pagination } from '../common/Pagination';
 import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
-export const TokenRefundTransactions: React.FC<TokenTransactionsProps> = ({ token }) => {
+export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
 
-    const { data, loading, error } = useQuery(queryTokenTransactions, {
+    const { data, loading, error } = useQuery(queryTokenRefundTransactions, {
         variables: {
             mint: token.mint,
             skip: (currentPage - 1) * pageSize,
             first: pageSize
         },
         onCompleted: (data) => {
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.mintTokenEntities?.length ?? 0)));
+            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.refundEventEntities?.length ?? 0)));
         }
     });
 
@@ -75,21 +76,21 @@ export const TokenRefundTransactions: React.FC<TokenTransactionsProps> = ({ toke
                 <table className="table w-full">
                     <thead>
                         <tr>
-                            <th>Minter</th>
+                            <th>Refunder</th>
                             <th>Transaction</th>
                             <th>Time</th>
-                            <th>Era (Epoch)</th>
-                            <th>Mint Size</th>
+                            <th>Refund SOL</th>
+                            <th>Burned (User+Vault)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.mintTokenEntities.map((tx: TransactionData) => (
+                        {data?.refundEventEntities.map((tx: RefundTransactionData) => (
                             <tr key={tx.txId}>
                                 <td><AddressDisplay address={tx.sender} /></td>
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
                                 <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
-                                <td>{tx.currentEra} ({tx.currentEpoch})</td>
-                                <td>{numberStringToBN(tx.mintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {token.tokenSymbol}</td>
+                                <td>{Number(tx.refundAmountIncludingFee) / LAMPORTS_PER_SOL}</td>
+                                <td>{numberStringToBN(tx.burnAmountFromUser).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()} + {numberStringToBN(tx.burnAmountFromVault).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>

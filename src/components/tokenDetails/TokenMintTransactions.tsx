@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { queryTokenTransactions } from '../../utils/graphql';
+import { queryTokenMintTransactions } from '../../utils/graphql';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { TokenTransactionsProps, TransactionData } from '../../types/types';
+import { MintTransactionData, TokenMintTransactionsProps } from '../../types/types';
 import { Pagination } from '../common/Pagination';
 import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
-export const TokenMintTransactions: React.FC<TokenTransactionsProps> = ({ token }) => {
+export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
 
-    const { data, loading, error } = useQuery(queryTokenTransactions, {
+    const { data, loading, error } = useQuery(queryTokenMintTransactions, {
         variables: {
             mint: token.mint,
             skip: (currentPage - 1) * pageSize,
@@ -83,7 +83,7 @@ export const TokenMintTransactions: React.FC<TokenTransactionsProps> = ({ token 
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.mintTokenEntities.map((tx: TransactionData) => (
+                        {data?.mintTokenEntities.map((tx: MintTransactionData) => (
                             <tr key={tx.txId}>
                                 <td><AddressDisplay address={tx.sender} /></td>
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
