@@ -4,7 +4,6 @@ import {
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
 } from '@solana/web3.js';
-import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
 import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS } from '../config/constants';
@@ -12,7 +11,8 @@ import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, 
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
-import { token } from '@coral-xyz/anchor/dist/cjs/utils';
+import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 
 // Solana 网络连接配置
 const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || `https://api.${NETWORK}.solana.com`;
@@ -406,4 +406,125 @@ export const refund = async (
             message: 'Error refunding'
         }
     }
+}
+
+export const getReferralAccountByCode = async (connection: Connection, mint: string, code: BN) => {
+
+}
+
+/**
+pub struct MintTokens<'info> {
+  pub mint: Box<Account<'info, Mint>>,
+  pub destination: Box<Account<'info, TokenAccount>>, // ata account
+  pub refund_account: Box<Account<'info, TokenRefundData>>,
+  pub user: Signer<'info>,
+  pub config_account: Box<Account<'info, TokenConfigData>>, // immutable when mint_tokens
+  pub token_vault: Box<Account<'info, TokenAccount>>,
+  pub system_config_account: Box<Account<'info, SystemConfigData>>,
+  pub referral_account: Box<Account<'info, TokenReferralData>>,
+  pub referrer_ata: Box<Account<'info, TokenAccount>>,
+  pub referrer_main: AccountInfo<'info>,
+  pub rent: Sysvar<'info, Rent>,
+  pub token_program: Program<'info, Token>,
+  pub system_program: Program<'info, System>,
+  pub associated_token_program: Program<'info, AssociatedToken>,
+}
+ */
+export const mintToken = async (
+    wallet: AnchorWallet | undefined, 
+    connection: Connection,
+    token: InitiazlizedTokenData,
+    referralAccount: PublicKey,
+    referrerMain: PublicKey,
+    referrerAta: PublicKey,
+    code: BN,
+) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    // Check referrer account
+    const referralAccountInfo = await connection.getAccountInfo(referralAccount);
+    if (!referralAccountInfo) {
+        return {
+            success: false,
+            message: 'Referrer account does not exist'
+        }
+    }
+    // get data from referral account, and check if it is correct
+    const referrerData = await program.account.tokenReferralData.fetch(referralAccount);
+    console.log(referrerMain.toBase58(), referrerData.referrerMain.toBase58())
+    if(referrerMain.toBase58() !== referrerData.referrerMain.toBase58()) {
+        return {
+            success: false,
+            message: 'Wrong referrer account'
+        }
+    }
+    if(!code.eq(referrerData.code)) {
+        return {
+            success: false,
+            message: 'Wrong referrer code'
+        }
+    }
+    // TODO: check if referrer code is exceed max usage
+
+
+    const destination = await getAssociatedTokenAddress(
+        new PublicKey(token.mint),
+        wallet.publicKey,
+        false,
+    )
+    const [refundAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
+        program.programId,
+    );
+    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+        program.programId,
+    );
+
+    const mintAccounts = {
+        mint: new PublicKey(token.mint),
+        destination,
+        refundAccount,
+        user: wallet.publicKey,
+        configAccount: new PublicKey(token.configAccount),
+        tokenVault: new PublicKey(token.tokenVault),
+        systemConfigAccount,
+        referralAccount,
+        referrerAta,
+        referrerMain,
+        rent: SYSVAR_RENT_PUBKEY,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+        associatedAddressProgram: ASSOCIATED_PROGRAM_ID,
+    };
+    try {
+        const tx = await program.methods
+            .mintTokens(token.tokenName, token.tokenSymbol, code)
+            .accounts(mintAccounts)
+            .signers([])
+            .rpc();
+        return {    
+            success: true,
+            data: {
+                tx,
+            }
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Error minting'
+        }
+    }
+}
+
+export const getSolanaBalance = async (ata: PublicKey, connection: Connection): Promise<number> => {
+    return await connection.getBalance(ata);
+}
+
+export const getTokenBalance = async (ata: PublicKey, connection: Connection): Promise<number | null> => {
+    const account = await connection.getTokenAccountBalance(ata);
+    return account.value.uiAmount;
 }

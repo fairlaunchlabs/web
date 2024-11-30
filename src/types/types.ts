@@ -139,6 +139,7 @@ export type AddressDisplayProps = {
     address: string;
     type?: string;
     isDevnet?: boolean;
+    showCharacters?: number;
 }
 
 export type MintTokensProps = {

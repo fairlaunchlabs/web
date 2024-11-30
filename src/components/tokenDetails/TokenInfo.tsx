@@ -11,10 +11,11 @@ import {
     numberStringToBN
 } from '../../utils/format';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { TokenImage } from '../mintTokens/TokenImage';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { RenderSocialIcons } from '../mintTokens/RenderSocialIcons';
 import { pinata } from '../../utils/web3';
+import { TokenImage } from '../mintTokens/TokenImage';
+import MintModal from '../mintTokens/MintModal';
 
 const tooltip = {
     currentEra: "The current era number in the token's lifecycle",
@@ -46,6 +47,7 @@ const tooltip = {
 export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
     const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -255,8 +257,19 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                             ></div>
                         </div>
                     </div>
+
+                    <div className="mt-8">
+                        <button className="btn w-full btn-primary" onClick={() => setIsModalOpen(true)}>
+                            Mint
+                        </button>
+                    </div>
                 </div>
             </div>
+            <MintModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                token={token}
+            />
         </div>
     );
 };

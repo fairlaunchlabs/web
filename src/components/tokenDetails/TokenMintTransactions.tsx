@@ -8,7 +8,7 @@ import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
-export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) => {
+export const TokenMintTransactions: React.FC<TokenTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
@@ -35,7 +35,7 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
     if (loading && currentPage === 1) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Transactions</h3>
+                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Mint</h3>
                 <div className="animate-pulse">
                     <div className="h-8 bg-base-300 rounded mb-4"></div>
                     <div className="h-8 bg-base-300 rounded mb-4"></div>
@@ -48,7 +48,7 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
     if (error) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Transactions</h3>
+                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Mint</h3>
                 <p className="text-error">Error loading transactions</p>
             </div>
         );
@@ -57,7 +57,7 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
     return (
         <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-base-content">Recent Transactions</h3>
+                <h3 className="text-xl font-semibold text-base-content">Recent Mint</h3>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-base-content">Rows per page:</span>
                     <select 

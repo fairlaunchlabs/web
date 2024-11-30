@@ -128,6 +128,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             <button
                                 className="btn btn-primary w-full text-primary-content"
                                 onClick={handleCopyLink}
+                                disabled={loading}
                             >
                                 Copy the link and share to your friends
                             </button>
@@ -148,6 +149,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                 <button
                                     className={`btn btn-outline btn-primary w-full`}
                                     onClick={handleGetCode}
+                                    disabled={loading}
                                 >
                                     Reactive URC
                                 </button>

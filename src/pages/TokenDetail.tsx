@@ -5,9 +5,10 @@ import { queryInitializeTokenEventBySearch } from '../utils/graphql';
 import { InitiazlizedTokenData, TokenDetailProps } from '../types/types';
 import { TokenInfo } from '../components/tokenDetails/TokenInfo';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
-import { TokenTransactions } from '../components/tokenDetails/TokenTransactions';
+import { TokenMintTransactions } from '../components/tokenDetails/TokenMintTransactions';
 import { TokenHolders } from '../components/tokenDetails/TokenHolders';
 import { ShareButton } from '../components/common/ShareButton';
+import { TokenRefundTransactions } from '../components/tokenDetails/TokenRefundTransactions';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     const { tokenMintAddress, referrerCode } = useParams();
@@ -100,7 +101,8 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
                 <TokenInfo token={token as InitiazlizedTokenData} />
                 <TokenCharts token={token as InitiazlizedTokenData} />
                 <TokenHolders token={token as InitiazlizedTokenData} />
-                <TokenTransactions token={token as InitiazlizedTokenData} />
+                <TokenMintTransactions token={token as InitiazlizedTokenData} />
+                <TokenRefundTransactions token={token as InitiazlizedTokenData} />
             </div>
         </div>
     );

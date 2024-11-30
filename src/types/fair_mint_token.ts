@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/fair_mint_token.json`.
  */
 export type FairMintToken = {
-  "address": "C8onMNdJfvPTfFSAaYxGkPiQ8HkVa1HsPW584FkdHD2L",
+  "address": "EVsMFUMpdi9LUCkFm4GCEoMFg2RWnHhjDegpeAyD8ZAp",
   "metadata": {
     "name": "fairMintToken",
     "version": "0.1.0",
@@ -2599,6 +2599,14 @@ export type FairMintToken = {
           {
             "name": "tokenProgram",
             "type": "pubkey"
+          },
+          {
+            "name": "oldCode",
+            "type": "u64"
+          },
+          {
+            "name": "newCode",
+            "type": "u64"
           }
         ]
       }

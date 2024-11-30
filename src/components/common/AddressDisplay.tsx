@@ -2,20 +2,23 @@ import React from 'react';
 import { formatAddress } from '../../utils/format';
 import { AddressDisplayProps } from '../../types/types';
 import { NETWORK, SCANURL } from '../../config/constants';
+import toast from 'react-hot-toast';
 
 export const AddressDisplay: React.FC<AddressDisplayProps> = ({
     address,
-    type = 'account'
+    type = 'account',
+    showCharacters = 4,
 }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(address);
+        toast.success('Copied');
     };
 
     const explorerUrl = `${SCANURL}/${type}/${address}?cluster=${NETWORK}`;
 
     return (
         <div className="flex items-center gap-2">
-            <span className="font-mono">{formatAddress(address)}</span>
+            <span className="font-mono">{formatAddress(address, showCharacters)}</span>
             <button
                 onClick={handleCopy}
                 className="btn btn-ghost btn-xs p-0 min-h-0 h-auto"

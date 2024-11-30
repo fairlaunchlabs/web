@@ -1,8 +1,8 @@
 import { BN } from "@coral-xyz/anchor";
 
-export const formatAddress = (address: string): string => {
+export const formatAddress = (address: string, showCharacters = 4): string => {
     if (!address) return '';
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+    return `${address.slice(0, showCharacters)}...${address.slice(-showCharacters)}`;
 };
 
 export const BN_LAMPORTS_PER_SOL = new BN(1000000000);

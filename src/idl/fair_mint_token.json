@@ -1,5 +1,5 @@
 {
-  "address": "C8onMNdJfvPTfFSAaYxGkPiQ8HkVa1HsPW584FkdHD2L",
+  "address": "EVsMFUMpdi9LUCkFm4GCEoMFg2RWnHhjDegpeAyD8ZAp",
   "metadata": {
     "name": "fair_mint_token",
     "version": "0.1.0",
@@ -2593,6 +2593,14 @@
           {
             "name": "token_program",
             "type": "pubkey"
+          },
+          {
+            "name": "old_code",
+            "type": "u64"
+          },
+          {
+            "name": "new_code",
+            "type": "u64"
           }
         ]
       }

@@ -284,3 +284,14 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
         liquidityTokensRatio
     }
 }`;
+
+export const querySetRefererCodeEntityById = gql`
+query GetSetRefererCodeEntity($id: ID!) {
+    setRefererCodeEntity(id: $id) {
+        id
+        mint
+        referralAccount
+        referrerAta
+        referrerMain
+    }
+}`;
