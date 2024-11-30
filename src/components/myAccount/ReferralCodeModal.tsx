@@ -3,24 +3,10 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getMyReferrerData, getReferrerDataByReferralAccount, getSystemConfig, setReferrerCode } from '../../utils/web3';
 import toast from 'react-hot-toast';
-import { TokenListItem } from '../../types/types';
-import { BN } from '@coral-xyz/anchor';
+import { ReferralCodeModalProps, ReferrerData } from '../../types/types';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
 
-interface ReferralCodeModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    token: TokenListItem
-}
-
-type ReferrerData = {
-    code: BN;
-    referrerMain: PublicKey;
-    referrerAta: PublicKey;
-    usageCount: number;
-    activeTimestamp: BN;
-}
 export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     isOpen,
     onClose,

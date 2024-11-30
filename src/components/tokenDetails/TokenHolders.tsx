@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { InitiazlizedTokenData } from '../../types/types';
+import { HolderData, TokenHoldersProps } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { Pagination } from '../common/Pagination';
 import { queryHolders } from '../../utils/graphql';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-
-interface TokenHoldersProps {
-    token: InitiazlizedTokenData;
-}
+import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, BN_ZERO, numberStringToBN } from '../../utils/format';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
@@ -59,8 +55,6 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
         );
     }
 
-    const totalSupply = Number(token.supply) / LAMPORTS_PER_SOL;
-
     return (
         <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
@@ -89,15 +83,18 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.holdersEntities.map((holder: any, index: number) => {
-                            const balance = Number(holder.amount) / LAMPORTS_PER_SOL;
-                            const percentage = (balance / totalSupply * 100).toFixed(2);
+                        {data?.holdersEntities
+                            .filter((holder: HolderData) => numberStringToBN(holder.amount).gt(BN_ZERO))
+                            .map((holder: HolderData, index: number) => {
+                            const totalSupply = numberStringToBN(token.supply).div(BN_LAMPORTS_PER_SOL);
+                            const balance = numberStringToBN(holder.amount).div(BN_LAMPORTS_PER_SOL);
+                            const percentage = balance.div(totalSupply).mul(BN_HUNDRED);
                             return (
                                 <tr key={holder.owner + index}>
                                     <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                     <td><AddressDisplay address={holder.owner} /></td>
                                     <td>{balance.toLocaleString()} {token.tokenSymbol}</td>
-                                    <td>{percentage}%</td>
+                                    <td>{percentage.toNumber().toFixed(2)}%</td>
                                 </tr>
                             );
                         })}

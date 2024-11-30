@@ -1,21 +1,5 @@
 import React from 'react';
-
-interface SocialInformationProps {
-    description: string;
-    website: string;
-    twitter: string;
-    discord: string;
-    telegram: string;
-    github: string;
-    medium: string;
-    onDescriptionChange: (value: string) => void;
-    onWebsiteChange: (value: string) => void;
-    onTwitterChange: (value: string) => void;
-    onDiscordChange: (value: string) => void;
-    onTelegramChange: (value: string) => void;
-    onGithubChange: (value: string) => void;
-    onMediumChange: (value: string) => void;
-}
+import { SocialInformationProps } from '../../types/types';
 
 export const SocialInformation: React.FC<SocialInformationProps> = ({
     description,

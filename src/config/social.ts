@@ -1,7 +1,4 @@
-interface SocialLink {
-    name: string;
-    url: string;
-}
+import { SocialLink } from "../types/types";
 
 export const socialLinks: Record<string, SocialLink> = {
     twitter: {

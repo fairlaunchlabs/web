@@ -1,8 +1,5 @@
 import React, { useRef, useState } from 'react';
-
-interface TokenImageUploadProps {
-    onImageChange: (file: File | null) => void;
-}
+import { TokenImageUploadProps } from '../../types/types';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_FILE_TYPES = ['image/png', 'image/jpeg', 'image/gif'];

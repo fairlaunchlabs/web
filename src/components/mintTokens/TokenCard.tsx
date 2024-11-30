@@ -3,7 +3,8 @@ import {
     calculateMaxSupply, 
     calculateTargetMintTime,
     calculateMinTotalFee,
-    extractIPFSHash
+    extractIPFSHash,
+    formatDays
 } from '../../utils/format';
 import { TokenCardProps, TokenMetadataIPFS } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -114,11 +115,11 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Mint Time:</span>
-                            <span className="text-base-content">{targetMintTime}</span>
+                            <span className="text-base-content">{formatDays(targetMintTime)}</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Minimum Fee:</span>
-                            <span className="text-base-content">{minTotalFee} SOL</span>
+                            <span className="text-base-content">{minTotalFee.toLocaleString(undefined, { maximumFractionDigits: 2 })} SOL</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Liquidity Percentage:</span>

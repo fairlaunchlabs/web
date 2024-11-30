@@ -1,11 +1,5 @@
 import React from 'react';
-
-interface ToggleSwitchProps {
-    id: string;
-    label: string;
-    checked: boolean;
-    onChange: () => void;
-}
+import { ToggleSwitchProps } from '../../types/types';
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
     id,

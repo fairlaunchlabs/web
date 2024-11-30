@@ -24,14 +24,7 @@ import {
 } from 'react-icons/md';
 import { MyAccount } from '../pages/MyAccount';
 import { LaunchTokenForm } from '../pages/LaunchToken';
-
-export type MenuItem = {
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-    component: React.ReactNode;
-    subItems?: MenuItem[];
-};
+import { MenuItem } from '../types/types';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 

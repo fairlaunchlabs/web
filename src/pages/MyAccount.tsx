@@ -7,7 +7,7 @@ import { InitiazlizedTokenData, MyAccountProps, TokenListItem } from '../types/t
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
 import { pinata } from '../utils/web3';
-import { extractIPFSHash } from '../utils/format';
+import { BN_LAMPORTS_PER_SOL, BN_ZERO, extractIPFSHash, numberStringToBN } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
 import { RefundModal } from '../components/myAccount/RefundModal';
@@ -129,7 +129,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                     <div className="flex justify-center">
                         <span className="loading loading-spinner loading-lg"></span>
                     </div>
-                ) : tokenList.length === 0 ? (
+                ) : tokenList.filter(token => numberStringToBN(token.amount).gt(BN_ZERO)).length === 0 ? (
                     <p>No tokens found</p>
                 ) : (
                     <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
@@ -144,7 +144,9 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {tokenList.map((token: TokenListItem) => (
+                                {tokenList
+                                    .filter(token => numberStringToBN(token.amount).gt(BN_ZERO))
+                                    .map((token: TokenListItem) => (
                                     <tr key={token.mint} className="hover">
                                         <td className="">
                                             {token.imageUrl && (
@@ -164,7 +166,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                             <AddressDisplay address={token.mint} />
                                         </td>
                                         <td className="text-right">
-                                            {(Number(token.amount) / LAMPORTS_PER_SOL).toLocaleString()}
+                                            {(numberStringToBN(token.amount).div(BN_LAMPORTS_PER_SOL)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </td>
                                         <td>
                                             <div className="flex gap-2 justify-end">

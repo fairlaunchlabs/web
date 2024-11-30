@@ -1,6 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
-import { Token } from 'graphql';
 
 export type TokenMetadata = {
     name: string;
@@ -140,6 +139,15 @@ export type AddressDisplayProps = {
 }
 
 export type Language = 'en-US' | 'zh-CN' | 'ja-JP' | 'ru-RU';
+export type Theme = 'light' | 'dark';
+
+export type MintTokensProps = {
+    expanded: boolean;
+};
+
+export type TokenDetailProps = {
+    expanded: boolean;
+};
 
 export type LanguageSelectorProps = {
     currentLocale: Language;
@@ -156,8 +164,10 @@ export type MenuItem = {
     id: string;
     label: string;
     icon: React.ReactNode;
+    component?: React.ReactNode;
     subItems?: MenuItem[];
-}
+};
+
 
 export type SidebarProps = {
     menuItems: MenuItem[];
@@ -199,7 +209,6 @@ export type MetricsProps = {
 
 export type TokenImageUploadProps = {
     onImageChange: (file: File | null) => void;
-    imageFile: File | null;
 }
 
 export type MyAccountProps = {
@@ -213,3 +222,133 @@ export type TokenListItem = {
     imageUrl?: string;
 }
 
+export type HolderData = {
+    owner: string;
+    amount: string;
+}
+
+export type TransactionData = {
+    id: string;
+    txId: string;
+    sender: string;
+    timestamp: string;
+    currentEra: string;
+    currentEpoch: string;
+    mintSizeEpoch: string;
+}
+
+export type ReferralCodeModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    token: TokenListItem
+}
+
+export type ReferrerData = {
+    code: BN;
+    referrerMain: PublicKey;
+    referrerAta: PublicKey;
+    usageCount: number;
+    activeTimestamp: BN;
+}
+
+export type PaginationProps = {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    pageSize: number;
+    onPageChange: (page: number) => void;
+}
+
+export type ShareButtonProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type ToggleSwitchProps = {
+    id: string;
+    label: string;
+    checked: boolean;
+    onChange: () => void;
+}
+
+export type AdvancedSettingsProps = {
+    targetEras: string;
+    epochesPerEra: string;
+    targetSecondsPerEpoch: string;
+    reduceRatio: string;
+    displayInitialMintSize: string;
+    displayInitialTargetMintSizePerEpoch: string;
+    displayFeeRate: string;
+    liquidityTokensRatio: string;
+    onTargetErasChange: (value: string) => void;
+    onEpochesPerEraChange: (value: string) => void;
+    onTargetSecondsPerEpochChange: (value: string) => void;
+    onReduceRatioChange: (value: string) => void;
+    onDisplayInitialMintSizeChange: (value: string, mintSize: string) => void;
+    onDisplayInitialTargetMintSizePerEpochChange: (value: string, targetMintSize: string) => void;
+    onDisplayFeeRateChange: (value: string, feeRate: string) => void;
+    onLiquidityTokensRatioChange: (value: string) => void;
+}
+
+export type SocialInformationProps = {
+    description: string;
+    website: string;
+    twitter: string;
+    discord: string;
+    telegram: string;
+    github: string;
+    medium: string;
+    onDescriptionChange: (value: string) => void;
+    onWebsiteChange: (value: string) => void;
+    onTwitterChange: (value: string) => void;
+    onDiscordChange: (value: string) => void;
+    onTelegramChange: (value: string) => void;
+    onGithubChange: (value: string) => void;
+    onMediumChange: (value: string) => void;
+}
+
+export type RefundModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    token: TokenListItem;
+}
+
+export type TokenChartsProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type TokenHoldersProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type TokenInfoProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type TokenTransactionsProps = {
+    token: InitiazlizedTokenData;
+}
+
+export type SocialLink = {
+    name: string;
+    url: string;
+}
+
+export type LaunchTokenFormProps = {
+    expanded: boolean;
+}
+
+export type ToastBoxProps = {
+    title: string
+    url: string
+    urlText: string
+}
+
+export type RenderSocialIconsProps = {
+    metadata: TokenMetadataIPFS;
+}
+
+export type DataBlockProps = {
+    label: string;
+    value: any;
+    tooltip?: string;
+}

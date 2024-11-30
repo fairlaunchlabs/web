@@ -1,20 +1,20 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { InitiazlizedTokenData, TokenMetadataIPFS } from '../../types/types';
+import { DataBlockProps, TokenInfoProps, TokenMetadataIPFS } from '../../types/types';
 import { 
+    BN_HUNDRED,
+    BN_LAMPORTS_PER_SOL,
     calculateMaxSupply, 
     calculateMinTotalFee,
+    calculateTotalSupplyToTargetEras,
     extractIPFSHash,
-    formatDays
+    formatDays,
+    numberStringToBN
 } from '../../utils/format';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { TokenImage } from '../mintTokens/TokenImage';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { RenderSocialIcons } from '../mintTokens/RenderSocialIcons';
 import { pinata } from '../../utils/web3';
-
-interface TokenInfoProps {
-    token: InitiazlizedTokenData;
-}
 
 const tooltip = {
     currentEra: "The current era number in the token's lifecycle",
@@ -64,23 +64,26 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
     }, [token.tokenUri]);
     
     const totalSupplyToTargetEras = useMemo(() => {
-        const percentToTargetEras = 1 - Math.pow(Number(token.reduceRatio) / 100, Number(token.targetEras));
-        const maxSupply = calculateMaxSupply(
-            token.epochesPerEra,
+        return calculateTotalSupplyToTargetEras(
+            token.targetEras,
             token.initialTargetMintSizePerEpoch,
-            token.reduceRatio
+            token.reduceRatio,
+            token.epochesPerEra
         );
-        return percentToTargetEras * Number(maxSupply);
     }, [token.targetEras, token.initialTargetMintSizePerEpoch, token.reduceRatio, token.epochesPerEra]);
 
     const mintedSupply = useMemo(() => {
-        return Number(token.supply) * (1 - Number(token.liquidityTokensRatio) / 100) / LAMPORTS_PER_SOL;
+        return numberStringToBN(token.supply).sub(numberStringToBN(token.supply).mul(numberStringToBN(token.liquidityTokensRatio)).div(BN_HUNDRED)).div(BN_LAMPORTS_PER_SOL).toNumber();
     }, [token.supply, token.liquidityTokensRatio]);
 
     const progressPercentage = useMemo(() => {
         // 注意这个supply包括了TokenVault的数量，需要转成用户铸造数量
         return (mintedSupply * 100) / totalSupplyToTargetEras;
     }, [mintedSupply, totalSupplyToTargetEras]);
+
+    const progressPercentageOfEpoch = useMemo(() => {
+        return (Number(token.quantityMintedEpoch) * 100) / Number(token.targetMintSizeEpoch);
+    }, [token.quantityMintedEpoch, token.targetMintSizeEpoch]);
 
     return (
         <div className="bg-base-200 rounded-lg shadow-lg p-6">
@@ -116,8 +119,8 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                             tooltip={tooltip.mintFee}
                         />
                         <DataBlock 
-                            label="Current Mint Size" 
-                            value={(Number(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            label="Current Mint Size"
+                            value={numberStringToBN(token.mintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
                             tooltip={tooltip.currentMintSize}
                         />
                         <DataBlock 
@@ -192,13 +195,13 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                         />
                         <DataBlock 
                             label="Target Minimum Fee" 
-                            value={calculateMinTotalFee(
+                            value={(calculateMinTotalFee(
                                 token.initialTargetMintSizePerEpoch,
                                 token.feeRate,
                                 token.targetEras,
                                 token.epochesPerEra,
                                 token.initialMintSize
-                            ) + " SOL"}
+                            )).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL"}
                             tooltip={tooltip.targetMinimumFee}
                         />
                         <DataBlock 
@@ -243,12 +246,12 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
                     <div className="mt-8">
                         <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current epoch</h3>
                         <div className="text-sm font-medium mb-1 text-base-content">
-                        {(Number(token.quantityMintedEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(Number(token.targetMintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
+                        {numberStringToBN(token.quantityMintedEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} / {numberStringToBN(token.targetMintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                         </div>
                         <div className="w-full bg-base-300 rounded-full h-2.5">
                             <div 
                                 className="bg-secondary h-2.5 rounded-full" 
-                                style={{ width: `${Math.min(Number(token.quantityMintedEpoch) * 100 / Number(token.targetMintSizeEpoch), 100)}%` }}
+                                style={{ width: `${Math.min(progressPercentageOfEpoch, 100)}%` }}
                             ></div>
                         </div>
                     </div>
@@ -257,12 +260,6 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token }) => {
         </div>
     );
 };
-
-type DataBlockProps = {
-    label: string;
-    value: any;
-    tooltip?: string;
-}
 
 export const DataBlock:FC<DataBlockProps> = ({label, value, tooltip}) => {
     return (

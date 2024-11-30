@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LOCAL_STORAGE_KEY_THEME  } from '../config/constants';
 
-export type Theme = 'light' | 'dark';
-
 export const useTheme = () => {
     const [theme, setTheme] = useState<Theme>(() => {
         // 从 localStorage 获取保存的主题，如果没有则使用 light

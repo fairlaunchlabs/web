@@ -1,23 +1,5 @@
 import React from 'react';
-
-interface AdvancedSettingsProps {
-    targetEras: string;
-    epochesPerEra: string;
-    targetSecondsPerEpoch: string;
-    reduceRatio: string;
-    displayInitialMintSize: string;
-    displayInitialTargetMintSizePerEpoch: string;
-    displayFeeRate: string;
-    liquidityTokensRatio: string;
-    onTargetErasChange: (value: string) => void;
-    onEpochesPerEraChange: (value: string) => void;
-    onTargetSecondsPerEpochChange: (value: string) => void;
-    onReduceRatioChange: (value: string) => void;
-    onDisplayInitialMintSizeChange: (value: string, mintSize: string) => void;
-    onDisplayInitialTargetMintSizePerEpochChange: (value: string, targetMintSize: string) => void;
-    onDisplayFeeRateChange: (value: string, feeRate: string) => void;
-    onLiquidityTokensRatioChange: (value: string) => void;
-}
+import { AdvancedSettingsProps } from '../../types/types';
 
 export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
     targetEras,

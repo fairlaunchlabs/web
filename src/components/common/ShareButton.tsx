@@ -3,12 +3,8 @@ import { TwitterShareButton } from 'react-share';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import ReactDOM from 'react-dom';
-import { InitiazlizedTokenData } from '../../types/types';
+import { ShareButtonProps } from '../../types/types';
 import { APP_NAME } from '../../config/constants';
-
-interface ShareButtonProps {
-    token: InitiazlizedTokenData;
-}
 
 export const ShareButton: React.FC<ShareButtonProps> = ({ token }) => {
     const [isOpen, setIsOpen] = useState(false);

@@ -2,16 +2,10 @@ import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import toast from 'react-hot-toast';
-import { InitiazlizedTokenData, TokenListItem } from '../../types/types';
+import { InitiazlizedTokenData, RefundModalProps, TokenListItem } from '../../types/types';
 import { getSystemConfig, refund } from '../../utils/web3';
 import { ToastBox } from '../common/ToastBox';
 import { NETWORK, SCANURL } from '../../config/constants';
-
-interface RefundModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    token: TokenListItem;
-}
 
 export const RefundModal: FC<RefundModalProps> = ({
     isOpen,

@@ -2,13 +2,9 @@ import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { queryTokenTransactions } from '../../utils/graphql';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { InitiazlizedTokenData } from '../../types/types';
+import { TokenTransactionsProps, TransactionData } from '../../types/types';
 import { Pagination } from '../common/Pagination';
-
-interface TokenTransactionsProps {
-    token: InitiazlizedTokenData;
-}
+import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
@@ -88,13 +84,13 @@ export const TokenTransactions: React.FC<TokenTransactionsProps> = ({ token }) =
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.mintTokenEntities.map((tx: any) => (
+                        {data?.mintTokenEntities.map((tx: TransactionData) => (
                             <tr key={tx.txId}>
                                 <td><AddressDisplay address={tx.sender} /></td>
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
                                 <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
                                 <td>{tx.currentEra} ({tx.currentEpoch})</td>
-                                <td>{(Number(tx.mintSizeEpoch) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</td>
+                                <td>{numberStringToBN(tx.mintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {token.tokenSymbol}</td>
                             </tr>
                         ))}
                     </tbody>

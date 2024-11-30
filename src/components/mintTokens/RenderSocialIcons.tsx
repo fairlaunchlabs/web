@@ -1,10 +1,7 @@
 import { FC } from "react";
-import { TokenMetadataIPFS } from "../../types/types";
+import { RenderSocialIconsProps } from "../../types/types";
 import { FaTwitter, FaDiscord, FaGithub, FaMedium, FaTelegram, FaGlobe } from 'react-icons/fa';
 
-type RenderSocialIconsProps = {
-    metadata: TokenMetadataIPFS;
-}
 export const RenderSocialIcons:FC<RenderSocialIconsProps> = ({ metadata }) => {
     if (!metadata?.extensions) return null;
 

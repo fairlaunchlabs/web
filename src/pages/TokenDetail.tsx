@@ -2,16 +2,12 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { queryInitializeTokenEventBySearch } from '../utils/graphql';
-import { InitiazlizedTokenData } from '../types/types';
+import { InitiazlizedTokenData, TokenDetailProps } from '../types/types';
 import { TokenInfo } from '../components/tokenDetails/TokenInfo';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
 import { TokenTransactions } from '../components/tokenDetails/TokenTransactions';
 import { TokenHolders } from '../components/tokenDetails/TokenHolders';
 import { ShareButton } from '../components/common/ShareButton';
-
-type TokenDetailProps = {
-    expanded: boolean;
-};
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     const { tokenMintAddress, referrerCode } = useParams();

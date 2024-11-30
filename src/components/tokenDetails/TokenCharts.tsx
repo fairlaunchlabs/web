@@ -1,9 +1,5 @@
 import React from 'react';
-import { InitiazlizedTokenData } from '../../types/types';
-
-interface TokenChartsProps {
-    token: InitiazlizedTokenData;
-}
+import { TokenChartsProps } from '../../types/types';
 
 export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     return (

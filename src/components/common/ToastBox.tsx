@@ -1,10 +1,6 @@
 import { FC } from "react"
+import { ToastBoxProps } from "../../types/types"
 
-type ToastBoxProps = {
-    title: string
-    url: string
-    urlText: string
-}
 export const ToastBox:FC<ToastBoxProps> = ({title, url, urlText}) => {
     return (
     <div>

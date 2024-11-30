@@ -2,12 +2,8 @@ import React, { useState, KeyboardEvent } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '../utils/graphql';
 import { TokenCard } from '../components/mintTokens/TokenCard';
-import { InitiazlizedTokenData } from '../types/types';
+import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
-
-type MintTokensProps = {
-    expanded: boolean;
-};
 
 export const MintTokens: React.FC<MintTokensProps> = ({
     expanded

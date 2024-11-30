@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect, FC } from 'react';
 import { createTokenOnChain, pinata } from '../utils/web3';
-import { TokenMetadata } from '../types/types';
+import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
-import { BN } from '@coral-xyz/anchor';
 import { Metrics } from '../components/launchToken/Metrics';
 import { SocialInformation } from '../components/launchToken/SocialInformation';
 import { AdvancedSettings } from '../components/launchToken/AdvancedSettings';
@@ -11,10 +10,8 @@ import { TokenImageUpload } from '../components/launchToken/TokenImageUpload';
 import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
+import { numberStringToBN } from '../utils/format';
 
-interface LaunchTokenFormProps {
-    expanded: boolean;
-}
 export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const wallet = useAnchorWallet();
     const [name, setName] = useState('');
@@ -162,14 +159,14 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
             console.log('Token metadata:', tokenMetadata);
 
             const initConfigData = {
-                targetEras: new BN(targetEras),
-                epochesPerEra: new BN(epochesPerEra),
-                targetSecondsPerEpoch: new BN(targetSecondsPerEpoch),
-                reduceRatio: new BN(reduceRatio),
-                initialMintSize: new BN(initialMintSize),
-                initialTargetMintSizePerEpoch: new BN(initialTargetMintSizePerEpoch),
-                feeRate: new BN(feeRate),
-                liquidityTokensRatio: new BN(liquidityTokensRatio),
+                targetEras: numberStringToBN(targetEras),
+                epochesPerEra: numberStringToBN(epochesPerEra),
+                targetSecondsPerEpoch: numberStringToBN(targetSecondsPerEpoch),
+                reduceRatio: numberStringToBN(reduceRatio),
+                initialMintSize: numberStringToBN(initialMintSize),
+                initialTargetMintSizePerEpoch: numberStringToBN(initialTargetMintSizePerEpoch),
+                feeRate: numberStringToBN(feeRate),
+                liquidityTokensRatio: numberStringToBN(liquidityTokensRatio),
             };
 
             const result = await createTokenOnChain(tokenMetadata, wallet, initConfigData);
