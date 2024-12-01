@@ -70,7 +70,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     }
 
     return (
-        <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:px-8 md:py-6 pl-5 pr-4 py-6`}>
+        <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:px-8 md:py-6 pl-5 pr-4 py-6 mb-20`}>
             {/* Search Bar */}
             <div className="mb-12">
                 <div className="join w-full">

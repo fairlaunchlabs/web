@@ -1,4 +1,4 @@
-import React, { useState, FC } from 'react';
+import React, { useState, FC, useEffect } from 'react';
 import { createTokenOnChain, pinata } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
@@ -47,6 +47,15 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const [displayFeeRate, setDisplayFeeRate] = useState('0.005');
     const [feeRate, setFeeRate] = useState('5000000');
     const [liquidityTokensRatio, setLiquidityTokensRatio] = useState('10');
+
+    const [startImmediately, setStartImmediately] = useState(true);
+    const [startTime, setStartTime] = useState<string>('');
+
+    useEffect(() => {
+        if (startImmediately) {
+            setStartTime('');
+        }
+    }, [startImmediately]);
 
     /// TEST 
     // const { loading, error: queryError, data } = useQuery(queryInitializeTokenEvent);
@@ -156,7 +165,10 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                 decimals,
                 uri: `ipfs://${metadataResponse.IpfsHash}`,
             };
-            console.log('Token metadata:', tokenMetadata);
+
+            const startTimestamp = startImmediately 
+                ? Math.floor(Date.now() / 1000)
+                : Math.floor(new Date(startTime).getTime() / 1000);
 
             const initConfigData = {
                 targetEras: numberStringToBN(targetEras),
@@ -167,6 +179,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                 initialTargetMintSizePerEpoch: numberStringToBN(initialTargetMintSizePerEpoch),
                 feeRate: numberStringToBN(feeRate),
                 liquidityTokensRatio: numberStringToBN(liquidityTokensRatio),
+                startTimestamp: numberStringToBN(startTimestamp.toString()),
             };
 
             const result = await createTokenOnChain(tokenMetadata, wallet, initConfigData);
@@ -175,7 +188,6 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
             setIsCreating(false);
             setSuccess(true);
 
-            // 显示成功提示，包含交易链接
             const explorerUrl = `${SCANURL}/tx/${result.signature}?cluster=${NETWORK}`;
             toast.success(
                 <ToastBox url={explorerUrl} urlText="View transaction" title="Token created successfully!" />,
@@ -286,6 +298,31 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                     <TokenImageUpload
                         onImageChange={handleImageChange}
                     />
+
+                    {/* 启动时间选择 */}
+                    <div className="">
+                        <ToggleSwitch
+                            id="toggleStartTime"
+                            label="Start mint immediately"
+                            checked={startImmediately}
+                            onChange={() => setStartImmediately(!startImmediately)}
+                        />
+                    </div>
+
+                    {!startImmediately && (
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Start Time</span>
+                            </label>
+                            <input 
+                                type="datetime-local" 
+                                className="input input-bordered" 
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                                min={new Date().toISOString().slice(0, 16)}
+                            />
+                        </div>
+                    )}
 
                     <div className="mb-4">
                         <ToggleSwitch
