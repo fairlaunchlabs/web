@@ -26,6 +26,7 @@ import { MyAccount } from '../pages/MyAccount';
 import { LaunchTokenForm } from '../pages/LaunchToken';
 import { MenuItem } from '../types/types';
 import { CheckURC } from '../components/tools/CheckURC';
+import { MyUniqueReferralCode } from '../components/tools/MyUniqueReferralCode';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
@@ -57,6 +58,12 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 label: 'Check URC',
                 icon: <MdAccountCircle className="w-5 h-5" />,
                 component: <CheckURC expanded={expended} />
+            },
+            {
+                id: 'tools-my-urc',
+                label: 'My URC',
+                icon: <MdAccountCircle className="w-5 h-5" />,
+                component: <MyUniqueReferralCode expanded={expended} />
             }
         ]
     },

@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
 export const APP_NAME = 'Logo';
-export const FAIR_MINT_PROGRAM_ID = 'EVsMFUMpdi9LUCkFm4GCEoMFg2RWnHhjDegpeAyD8ZAp';
+export const FAIR_MINT_PROGRAM_ID = '8wgp8fB3y3vAqu9xKCTN6V6UXksTuq89YdJmMrUyG6mr';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 
 export const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");

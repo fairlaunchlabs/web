@@ -33,6 +33,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                 },
             });
 
+            console.log("=====", data?.setRefererCodeEntity);
             if (data?.setRefererCodeEntity) {
                 if (data.setRefererCodeEntity.mint !== token.mint) {
                     throw new Error('Referral code not for this token');

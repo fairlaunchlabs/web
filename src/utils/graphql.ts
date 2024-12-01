@@ -41,6 +41,7 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!) {
         initialTargetMintSizePerEpoch
         feeRate
         liquidityTokensRatio
+        startTimestamp
     }
 }`;
 
@@ -93,100 +94,7 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
         initialTargetMintSizePerEpoch
         feeRate
         liquidityTokensRatio
-    }
-}`;
-
-export const queryMyInitializedTokenEvent = gql`
-query GetMyInitializedTokens($admin: String!, $skip: Int!, $first: Int!) {
-    initializeTokenEventEntities(
-        where: { admin: $admin }
-        skip: $skip
-        first: $first
-        orderBy: tokenId
-        orderDirection: desc
-    ) {
-        id
-        txId
-        admin
-        tokenId
-        mint
-        configAccount
-        metadataAccount
-        tokenVault
-        timestamp
-        tokenName
-        tokenSymbol
-        tokenUri
-        supply
-        currentEra
-        currentEpoch
-        elapsedSecondsEpoch
-        startTimestampEpoch
-        lastDifficultyCoefficientEpoch
-        difficultyCoefficientEpoch
-        mintSizeEpoch
-        quantityMintedEpoch
-        targetMintSizeEpoch
-        totalMintFee
-        totalReferrerFee
-        totalTokens
-        targetEras
-        epochesPerEra
-        targetSecondsPerEpoch
-        reduceRatio
-        initialMintSize
-        initialTargetMintSizePerEpoch
-        feeRate
-        liquidityTokensRatio
-    }
-}`;
-
-export const queryMintTokenEvent = gql`
-query GetMintTokenEvents($skip: Int!, $first: Int!) {
-    mintTokenEntities(
-        skip: $skip
-        first: $first
-        orderBy: timestamp
-        orderDirection: desc
-    ) {
-        id
-        txId
-        sender
-        mint
-        configAccount
-        tokenVault
-        referralAccount
-        referrerMain
-        referrerAta
-        refundAccount
-        timestamp
-        admin
-        supply
-        currentEra
-        currentEpoch
-        elapsedSecondsEpoch
-        startTimestampEpoch
-        lastDifficultyCoefficient
-        difficultyCoefficient
-        mintSizeEpoch
-        quantityMintedEpoch
-        targetMintSizeEpoch
-        totalMintFee
-        totalReferrerFee
-        totalTokens
-        tokenName
-        tokenSymbol
-        tokenUri
-        targetEras
-        epochesPerEra
-        targetSecondsPerEpoch
-        reduceRatio
-        initialMintSize
-        initialTargetMintSizePerEpoch
-        feeRate
-        liquidityTokensRatio
-        lastDifficultyCoefficientEpoch
-        difficultyCoefficientEpoch
+        startTimestamp
     }
 }`;
 
@@ -303,6 +211,7 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
         initialTargetMintSizePerEpoch
         feeRate
         liquidityTokensRatio
+        startTimestamp
     }
 }`;
 
@@ -314,5 +223,24 @@ query GetSetRefererCodeEntity($id: ID!) {
         referralAccount
         referrerAta
         referrerMain
+        activeTimestamp
+    }
+}`;
+
+export const querySetRefererCodeEntitiesByOwner = gql`
+query GetSetRefererCodeEntity($owner: String!, $skip: Int!, $first: Int!) {
+    setRefererCodeEntities(
+        where: { referrerMain: $owner }
+        skip: $skip
+        first: $first
+        orderBy: id
+        orderDirection: desc
+    ) {
+        id
+        mint
+        referralAccount
+        referrerAta
+        referrerMain
+        activeTimestamp
     }
 }`;

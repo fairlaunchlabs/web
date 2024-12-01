@@ -3,7 +3,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { FC, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { queryMyTokenList, queryTokensByMints } from '../utils/graphql';
-import { InitiazlizedTokenData, MyAccountProps, TokenListItem } from '../types/types';
+import { InitiazlizedTokenData, MyAccountProps, TokenListItem, TokenMetadataIPFS } from '../types/types';
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
 import { pinata } from '../utils/web3';
@@ -87,7 +87,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                 if (token.tokenData?.tokenUri) {
                     try {
                         const response = await pinata.gateways.get(extractIPFSHash(token.tokenData.tokenUri) as string);
-                        const data = response.data as any;
+                        const data = response.data as TokenMetadataIPFS;
                         setTokenList(currentList => 
                             currentList.map(t => 
                                 t.mint === token.mint 

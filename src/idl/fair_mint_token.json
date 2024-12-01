@@ -1,5 +1,5 @@
 {
-  "address": "EVsMFUMpdi9LUCkFm4GCEoMFg2RWnHhjDegpeAyD8ZAp",
+  "address": "8wgp8fB3y3vAqu9xKCTN6V6UXksTuq89YdJmMrUyG6mr",
   "metadata": {
     "name": "fair_mint_token",
     "version": "0.1.0",
@@ -2413,6 +2413,11 @@
       "code": 6044,
       "name": "InvalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
+    },
+    {
+      "code": 6045,
+      "name": "MintNotStarted",
+      "msg": "Mint has not started"
     }
   ],
   "types": [
@@ -2484,6 +2489,10 @@
           {
             "name": "liquidity_tokens_ratio",
             "type": "f64"
+          },
+          {
+            "name": "start_timestamp",
+            "type": "u64"
           }
         ]
       }
@@ -2686,16 +2695,16 @@
             "type": "pubkey"
           },
           {
-            "name": "token_program",
-            "type": "pubkey"
-          },
-          {
             "name": "old_code",
             "type": "u64"
           },
           {
             "name": "new_code",
             "type": "u64"
+          },
+          {
+            "name": "active_timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -2820,6 +2829,10 @@
                 "name": "TokenMintState"
               }
             }
+          },
+          {
+            "name": "start_timestamp",
+            "type": "u64"
           }
         ]
       }

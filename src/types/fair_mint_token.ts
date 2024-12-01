@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/fair_mint_token.json`.
  */
 export type FairMintToken = {
-  "address": "EVsMFUMpdi9LUCkFm4GCEoMFg2RWnHhjDegpeAyD8ZAp",
+  "address": "8wgp8fB3y3vAqu9xKCTN6V6UXksTuq89YdJmMrUyG6mr",
   "metadata": {
     "name": "fairMintToken",
     "version": "0.1.0",
@@ -2419,6 +2419,11 @@ export type FairMintToken = {
       "code": 6044,
       "name": "invalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
+    },
+    {
+      "code": 6045,
+      "name": "mintNotStarted",
+      "msg": "Mint has not started"
     }
   ],
   "types": [
@@ -2490,6 +2495,10 @@ export type FairMintToken = {
           {
             "name": "liquidityTokensRatio",
             "type": "f64"
+          },
+          {
+            "name": "startTimestamp",
+            "type": "u64"
           }
         ]
       }
@@ -2692,16 +2701,16 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "tokenProgram",
-            "type": "pubkey"
-          },
-          {
             "name": "oldCode",
             "type": "u64"
           },
           {
             "name": "newCode",
             "type": "u64"
+          },
+          {
+            "name": "activeTimestamp",
+            "type": "i64"
           }
         ]
       }
@@ -2826,6 +2835,10 @@ export type FairMintToken = {
                 "name": "tokenMintState"
               }
             }
+          },
+          {
+            "name": "startTimestamp",
+            "type": "u64"
           }
         ]
       }
