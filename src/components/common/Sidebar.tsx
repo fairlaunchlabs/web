@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return (
             <li key={item.id}>
                 <a 
-                    className={`my-1 pt-3 pb-2
+                    className={`mt-1 pt-3 pb-2
                         ${activeMenuItem === item.id ? 'active' : ''} 
                         ${isExpanded ? '' : 'justify-center'}
                         ${isSubItem ? 'pl-3' : ''}
@@ -115,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
             </button>
             
-            <div className={`h-full overflow-y-auto ${isMobile ? 'mt-16' : 'mt-10'}`}>
+            <div className={`h-full overflow-y-auto ${isMobile ? 'mt-16' : 'mt-6'}`}>
                 <ul className="menu bg-base-200 w-full p-2 rounded-box">
                     {menuItems.map(item => renderMenuItem(item))}
                 </ul>

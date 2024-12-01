@@ -16,6 +16,9 @@ import { LaunchTokenForm } from '../pages/LaunchToken';
 import { MenuItem } from '../types/types';
 import { CheckURC } from '../components/tools/CheckURC';
 import { MyUniqueReferralCode } from '../components/tools/MyUniqueReferralCode';
+import { AskAI } from '../pages/AskAI';
+import { SocialDeployer } from '../pages/SocialDeployer';
+import { SocialURCProvider } from '../pages/SocialURCProvider';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
@@ -44,7 +47,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         subItems: [
             {
                 id: 'tools-check-urc',
-                label: 'Check URC',
+                label: 'Validate URC',
                 icon: <MdVerified className="w-5 h-5" />,
                 component: <CheckURC expanded={expended} />
             },
@@ -66,13 +69,13 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 id: 'social-deployer',
                 label: 'Deployer',
                 icon: <MdSupervisorAccount className="w-5 h-5" />,
-                component: <CheckURC expanded={expended} />
+                component: <SocialDeployer expanded={expended} />
             },
             {
                 id: 'social-urc_provider',
                 label: 'URC provider',
                 icon: <MdPerson className="w-5 h-5" />,
-                component: <MyUniqueReferralCode expanded={expended} />
+                component: <SocialURCProvider expanded={expended} />
             }
         ]
     },
@@ -113,5 +116,11 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 component: <BurnLPTokens />
             }
         ]
+    },
+    {
+        id: 'gpt',
+        label: 'Ask AI',
+        icon: <MdHome className="w-5 h-5" />,
+        component: <AskAI expanded={expended} />
     }
 ];

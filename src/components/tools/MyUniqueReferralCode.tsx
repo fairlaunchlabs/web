@@ -158,7 +158,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                             <tr>
                                 <th>Token</th>
                                 <th>Mint Address</th>
-                                <th>Active time</th>
+                                <th>Deployer</th>
                                 <th className='text-right'>Actions</th>
                             </tr>
                         </thead>
@@ -169,7 +169,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                     <tr key={item.id} className="hover">
                                         <td className="cursor-pointer" onClick={() => handleTokenClick(item)}>
                                             <div className="flex items-center space-x-2">
-                                                <div className=''>
+                                                <div className='mr-2'>
                                                     {metadata?.tokenMetadata?.image && <TokenImage imageUrl={metadata?.tokenMetadata.image as string} name={metadata.tokenName} size={40} className='rounded-full' />}
                                                 </div>
                                                 <div>
@@ -179,7 +179,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                             </div>
                                         </td>
                                         <td><AddressDisplay address={item.mint} /></td>
-                                        <td>{new Date(item.activeTimestamp * 1000).toLocaleString()}</td>
+                                        <td><AddressDisplay address={item.admin} /></td>
                                         <td className='text-right'>
                                             <div className="flex gap-2 justify-end">
                                                 <button
