@@ -6,8 +6,7 @@ import { RefundTransactionData, TokenRefundTransactionsProps } from '../../types
 import { Pagination } from '../common/Pagination';
 import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
 export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);

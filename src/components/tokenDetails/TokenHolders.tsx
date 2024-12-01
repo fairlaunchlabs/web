@@ -5,8 +5,7 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { Pagination } from '../common/Pagination';
 import { queryHolders } from '../../utils/graphql';
 import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, BN_ZERO, numberStringToBN } from '../../utils/format';
-
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
 export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);

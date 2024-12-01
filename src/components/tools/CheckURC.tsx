@@ -88,8 +88,9 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     };
 
     return (
-        <div className={`flex flex-col gap-4 p-4 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
-            <div className="max-w-3xl mx-auto w-full flex flex-col gap-4">
+        <div className={`space-y-6 p-6 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
+            <h2 className="text-2xl text-center font-bold">Validate URC</h2>
+            <div className="max-w-5xl mx-auto w-full flex flex-col gap-4">
                 <div className="flex gap-2">
                     <input
                         type="text"

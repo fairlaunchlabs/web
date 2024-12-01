@@ -20,6 +20,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     const [referrerResetIntervalSeconds, setReferrerResetIntervalSeconds] = useState(0);
     const [referralUsageMaxCount, setReferralUsageMaxCount] = useState(0);
 
+    console.log("token", token)
     useEffect(() => {
         if (wallet) {
             getMyReferrerData(wallet, connection, new PublicKey(token.mint)).then((data) => {

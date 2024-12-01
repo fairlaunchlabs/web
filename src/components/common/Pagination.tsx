@@ -10,8 +10,8 @@ export const Pagination: React.FC<PaginationProps> = ({
 }) => {
     return (
         <div className="flex justify-between items-center mt-4">
-            <div className="text-sm text-base-content">
-                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries
+            <div className="text-sm text-base-content mr-4">
+                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} 
             </div>
             <div className="join">
                 <button 

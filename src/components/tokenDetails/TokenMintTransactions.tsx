@@ -5,8 +5,7 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { MintTransactionData, TokenMintTransactionsProps } from '../../types/types';
 import { Pagination } from '../common/Pagination';
 import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
-
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
 export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);

@@ -368,3 +368,7 @@ export type DataBlockProps = {
     value: any;
     tooltip?: string;
 }
+
+export type MyUniqueReferralCodeProps = {
+    expanded: boolean;
+}

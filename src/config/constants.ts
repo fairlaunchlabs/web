@@ -20,3 +20,5 @@ export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
 export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';
 export const NETWORK = 'devnet';
 export const SCANURL = 'https://solscan.io';
+
+export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
