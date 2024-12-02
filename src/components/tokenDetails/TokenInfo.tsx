@@ -249,7 +249,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         />
                     </div>
                     
-                    {hasStarted &&
+                    {hasStarted ?
                     (
                     <div>
                         {/* 进度条 */}
@@ -293,7 +293,12 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                             </div>
                         </div>
                     </div>
-                    )}
+                    ):(
+                    <div className="mt-8">
+                        <button className="btn w-full btn-secondary" onClick={() => setIsReferralModalOpen(true)}>
+                            Unique Referral Code
+                        </button>
+                    </div>)}
                 </div>
             </div>
             <MintModal 
