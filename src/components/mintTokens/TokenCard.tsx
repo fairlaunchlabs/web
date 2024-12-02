@@ -4,7 +4,8 @@ import {
     calculateTargetMintTime,
     calculateMinTotalFee,
     extractIPFSHash,
-    formatDays
+    formatDays,
+    getTimeRemaining
 } from '../../utils/format';
 import { TokenCardProps, TokenMetadataIPFS } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -76,6 +77,8 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
         return Number(token.feeRate) / LAMPORTS_PER_SOL;
     }, [token.feeRate]);
 
+    const hasStarted = !token.startTimestamp || Number(token.startTimestamp) <= Math.floor(Date.now() / 1000);
+
     return (
         <div 
             className="bg-base-200 rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
@@ -139,17 +142,29 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                         </div>
                     </div>
                 </div>
-                <div className="mt-4">
-                    <div className="text-sm font-medium mb-1 text-base-content">
-                    {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
+                {hasStarted ? (
+                    <div className="mt-4">
+                        <div className="text-sm font-medium mb-1 text-base-content">
+                        {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
+                        </div>
+                        <div className="w-full bg-base-300 rounded-full h-2.5">
+                            <div 
+                                className="bg-secondary h-2.5 rounded-full" 
+                                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                            ></div>
+                        </div>
                     </div>
-                    <div className="w-full bg-base-300 rounded-full h-2.5">
-                        <div 
-                            className="bg-secondary h-2.5 rounded-full" 
-                            style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                        ></div>
+                ): (
+                    <div className="mt-4">
+                        <div className="badge badge-secondary gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-4 h-4 stroke-current">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2"></path>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            </svg>
+                            {getTimeRemaining(token.startTimestamp)}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

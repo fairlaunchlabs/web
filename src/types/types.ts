@@ -97,6 +97,7 @@ export type InitiazlizedTokenData = {
     initialTargetMintSizePerEpoch: string;
     feeRate: string;
     liquidityTokensRatio: string;
+    startTimestamp: string;
 }
 
 export type MintTokenData = {

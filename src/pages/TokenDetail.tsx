@@ -66,6 +66,7 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     }
 
     const token = data?.initializeTokenEventEntities?.[0];
+    const hasStarted = !token.startTimestamp || Number(token.startTimestamp) <= Math.floor(Date.now() / 1000);
 
     if (!token) {
         return (
@@ -99,10 +100,13 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
                     <ShareButton token={token as InitiazlizedTokenData} />
                 </div>
                 <TokenInfo token={token as InitiazlizedTokenData} referrerCode={referrerCode} />
-                <TokenCharts token={token as InitiazlizedTokenData} />
-                <TokenHolders token={token as InitiazlizedTokenData} />
-                <TokenMintTransactions token={token as InitiazlizedTokenData} />
-                <TokenRefundTransactions token={token as InitiazlizedTokenData} />
+                {hasStarted && (
+                <div>
+                    <TokenCharts token={token as InitiazlizedTokenData} />
+                    <TokenHolders token={token as InitiazlizedTokenData} />
+                    <TokenMintTransactions token={token as InitiazlizedTokenData} />
+                    <TokenRefundTransactions token={token as InitiazlizedTokenData} />
+                </div>)}
             </div>
         </div>
     );

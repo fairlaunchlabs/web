@@ -10,36 +10,29 @@ export const BN_ZERO = new BN(0);
 export const BN_HUNDRED = new BN(100);
 export const BN_MILLION = new BN(1000000);
 
-const formatSeconds = (seconds: string | number): string => {
-    const totalSeconds = Number(seconds);
-    
-    if (isNaN(totalSeconds)) return '0s';
-    
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const remainingSeconds = totalSeconds % 60;
-    
-    const parts = [];
-    
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}m`);
-    if (remainingSeconds > 0 || parts.length === 0) parts.push(`${remainingSeconds}s`);
-    
-    return parts.join(' ');
-};
-
 export const formatDays = (totalSeconds: number): string => {
-    if (isNaN(totalSeconds) || totalSeconds <= 0) return formatSeconds(totalSeconds);
+    if (isNaN(totalSeconds) || totalSeconds <= 0) return 'arrived';
 
     const days = Math.floor(totalSeconds / 86400);
     const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+
+    if (days > 0) {
+        return `${days}d ${hours}h`;
+    }
     
-    const parts = [];
+    if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+    }
     
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0 || (days === 0 && parts.length === 0)) parts.push(`${hours}h`);
-    
-    return parts.join(' ');
+    return `${minutes}m ${seconds}s`;
+};
+
+export const getTimeRemaining = (startTimestamp: string) => {
+    const diff = Number(startTimestamp) - Math.floor(Date.now() / 1000);
+    if (diff <= 0) return 'arrived';
+    return `Start in ${formatDays(diff)}`;        
 };
 
 export const calculateMaxSupply = (epochesPerEra: string, initialTargetMintSizePerEpoch: string, reduceRatio: string): number => {

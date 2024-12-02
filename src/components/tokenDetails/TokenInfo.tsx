@@ -8,6 +8,7 @@ import {
     calculateTotalSupplyToTargetEras,
     extractIPFSHash,
     formatDays,
+    getTimeRemaining,
     numberStringToBN
 } from '../../utils/format';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -89,6 +90,8 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
         return (Number(token.quantityMintedEpoch) * 100) / Number(token.targetMintSizeEpoch);
     }, [token.quantityMintedEpoch, token.targetMintSizeEpoch]);
 
+    const hasStarted = !token.startTimestamp || Number(token.startTimestamp) <= Math.floor(Date.now() / 1000);
+
     return (
         <div className="bg-base-200 rounded-lg shadow-lg p-6">
             <div className="flex items-start gap-6">
@@ -104,7 +107,18 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                     </div>
                     <div className='mt-2'><RenderSocialIcons metadata={metadata as TokenMetadataIPFS} /></div>
                     <p className="mt-4 text-base-content">{metadata?.description}</p>
-                    
+
+                    {!hasStarted && (
+                    <div className="mt-8">
+                        <div className="badge badge-secondary badge-lg gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-4 h-4 stroke-current">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2"></path>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                            </svg>
+                            {getTimeRemaining(token.startTimestamp)}
+                        </div>
+                    </div>)}
+
                     {/* 显示详细内容 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                         <DataBlock 
@@ -234,44 +248,52 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                             tooltip={tooltip.difficultyOfLastEpoch}
                         />
                     </div>
-                    <div className="mt-8">
-                        <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target supply</h3>
-                        <div className="text-sm font-medium mb-1 text-base-content">
-                        {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
+                    
+                    {hasStarted &&
+                    (
+                    <div>
+                        {/* 进度条 */}
+                        <div className="mt-8">
+                            <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target supply</h3>
+                            <div className="text-sm font-medium mb-1 text-base-content">
+                            {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
+                            </div>
+                            <div className="w-full bg-base-300 rounded-full h-2.5">
+                                <div 
+                                    className="bg-secondary h-2.5 rounded-full" 
+                                    style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                                ></div>
+                            </div>
                         </div>
-                        <div className="w-full bg-base-300 rounded-full h-2.5">
-                            <div 
-                                className="bg-secondary h-2.5 rounded-full" 
-                                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                            ></div>
-                        </div>
-                    </div>
 
-                    <div className="mt-8">
-                        <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current epoch</h3>
-                        <div className="text-sm font-medium mb-1 text-base-content">
-                        {numberStringToBN(token.quantityMintedEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} / {numberStringToBN(token.targetMintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
+                        <div className="mt-8">
+                            <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current epoch</h3>
+                            <div className="text-sm font-medium mb-1 text-base-content">
+                            {numberStringToBN(token.quantityMintedEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} / {numberStringToBN(token.targetMintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
+                            </div>
+                            <div className="w-full bg-base-300 rounded-full h-2.5">
+                                <div 
+                                    className="bg-secondary h-2.5 rounded-full" 
+                                    style={{ width: `${Math.min(progressPercentageOfEpoch, 100)}%` }}
+                                ></div>
+                            </div>
                         </div>
-                        <div className="w-full bg-base-300 rounded-full h-2.5">
-                            <div 
-                                className="bg-secondary h-2.5 rounded-full" 
-                                style={{ width: `${Math.min(progressPercentageOfEpoch, 100)}%` }}
-                            ></div>
-                        </div>
-                    </div>
 
-                    <div className="flex justify-between mt-8">
-                        <div className='w-1/2 px-3'>
-                            <button className="btn w-full btn-primary" onClick={() => setIsModalOpen(true)}>
-                                Mint
-                            </button>
-                        </div>
-                        <div className='w-1/2 px-3'>
-                            <button className="btn w-full btn-secondary" onClick={() => setIsReferralModalOpen(true)}>
-                                Unique Referral Code
-                            </button>
+                        {/* 铸造于获取URC按钮 */}
+                        <div className="flex justify-between mt-8">
+                            <div className='w-1/2 px-3'>
+                                <button className="btn w-full btn-primary" onClick={() => setIsModalOpen(true)}>
+                                    Mint
+                                </button>
+                            </div>
+                            <div className='w-1/2 px-3'>
+                                <button className="btn w-full btn-secondary" onClick={() => setIsReferralModalOpen(true)}>
+                                    Unique Referral Code
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    )}
                 </div>
             </div>
             <MintModal 
