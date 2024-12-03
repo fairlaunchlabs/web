@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 import { getMyReferrerData, getReferrerDataByReferralAccount, getSystemConfig, setReferrerCode } from '../../utils/web3';
 import toast from 'react-hot-toast';
 import { ReferralCodeModalProps, ReferrerData } from '../../types/types';
-import { NETWORK, SCANURL } from '../../config/constants';
+import { LOCAL_STORAGE_MY_REFERRAL_CODE, NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
 
 export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
@@ -16,17 +16,18 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     const wallet = useAnchorWallet();
     const [loading, setLoading] = useState(false);
     const [referralData, setReferralData] = useState<ReferrerData>();
-    const [renewCode, setRenewCode] = useState(false);
     const [referrerResetIntervalSeconds, setReferrerResetIntervalSeconds] = useState(0);
     const [referralUsageMaxCount, setReferralUsageMaxCount] = useState(0);
+    const [myReferrerCode, setMyReferrerCode] =  useState<string>(localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint) !== null ? localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint) as string : "");
 
-    console.log("token", token)
     useEffect(() => {
         if (wallet) {
-            getMyReferrerData(wallet, connection, new PublicKey(token.mint)).then((data) => {
-                if (data?.success) setReferralData(data.data);
-                else toast.error(data.message as string);
-            });
+            if(myReferrerCode !== "" && myReferrerCode !== null) {
+                getMyReferrerData(wallet, connection, new PublicKey(token.mint), myReferrerCode).then((data) => {
+                    if (data?.success) setReferralData(data.data);
+                    else toast.error(data.message as string);
+                });    
+            }
             getSystemConfig(wallet, connection).then((data) => {
                 if (data?.success && data.data) {
                     setReferrerResetIntervalSeconds(data.data.referrerResetIntervalSeconds.toNumber());
@@ -53,7 +54,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 token.tokenData?.tokenName as string,
                 token.tokenData?.tokenSymbol as string,
                 new PublicKey(token.mint),
-                renewCode
+                myReferrerCode,
             );
             if (!result.success) {
                 throw new Error(result.message);
@@ -66,12 +67,12 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 }
             );
 
-
             const referralAccount = result.data?.referralAccount as string
             getReferrerDataByReferralAccount(wallet, connection, new PublicKey(referralAccount)).then((data) => {
                 if (data?.success) setReferralData(data.data);
                 else toast.error(data.message as string);
             });
+            localStorage.setItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint, myReferrerCode);
         } catch (error: any) {
             toast.error(error.message || 'Failed to generate referral code');
         } finally {
@@ -80,7 +81,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     };
 
     const handleCopyLink = async () => {
-        const link = `${window.location.origin}/token/${token.tokenData?.mint}/${referralData?.code.toString()}`;
+        const link = `${window.location.origin}/token/${token.tokenData?.mint}/${myReferrerCode}`;
         try {
             await navigator.clipboard.writeText(link);
             toast.success('Link copied to clipboard!');
@@ -106,13 +107,17 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                         <div className="space-y-2">
                             <p className="font-semibold">Your URC for {token.tokenData?.tokenSymbol}</p>
                             <div className="flex justify-between items-center">
-                                <div className="bg-base-200 p-2 w-full rounded-lg break-all">
-                                    {referralData.code.toString()}
-                                </div>
+                                <input
+                                    type="text"
+                                    value={myReferrerCode}
+                                    onChange={(e) => setMyReferrerCode(e.target.value)}
+                                    className={`w-full px-3 py-2 bg-base-300 border-2 border-base-200 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                    placeholder="Enter your favourite name as URC"
+                                />
                                 <button
-                                    className="btn btn-circle btn-sm btn-ghost"
+                                    className="btn btn-circle btn-sm btn-ghost ml-2"
                                     onClick={() => {
-                                        navigator.clipboard.writeText(referralData.code.toString());
+                                        navigator.clipboard.writeText(myReferrerCode);
                                         toast.success('URC copied to clipboard!');
                                     }}
                                     disabled={loading}
@@ -122,6 +127,8 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                     </svg>
                                 </button>
                             </div>
+                            <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
+
                             <p className="font-semibold">Current used count (Max: {referralUsageMaxCount})</p>
                             <div className="bg-base-200 p-2 rounded-lg break-all">
                                 {referralData.usageCount}
@@ -134,12 +141,16 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             <div className="bg-base-200 p-2 rounded-lg break-all">
                                 {new Date(Number(referralData.activeTimestamp) * 1000 + referrerResetIntervalSeconds * 1000).toLocaleString()}
                             </div>
-                            <p className="font-semibold text-primary">Your personal link</p>
-                            <div className="flex gap-2">
-                                <div className="bg-base-200 p-2 rounded-lg break-all flex-1">
-                                    {window.location.origin}/token/{token.tokenData?.mint}/{referralData.code.toString()}
+
+                            {myReferrerCode && 
+                            <div>
+                                <p className="font-semibold text-primary">Your personal link</p>
+                                <div className="flex gap-2">
+                                    <div className="bg-base-200 p-2 rounded-lg break-all flex-1">
+                                        {window.location.origin}/token/{token.tokenData?.mint}/{myReferrerCode}
+                                    </div>
                                 </div>
-                            </div>
+                            </div>}
                             <button
                                 className="btn btn-primary w-full text-primary-content"
                                 onClick={handleCopyLink}
@@ -149,20 +160,9 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             </button>
 
                             {(new Date()).getTime() - Number(referralData.activeTimestamp) * 1000 > referrerResetIntervalSeconds * 1000 && <div className="space-y-2">
-                                <div className="divider"></div>
-                                <div className="form-control">
-                                    <label className="label cursor-pointer">
-                                        <span className="label-text">Generate new code and invalidate the old one</span>
-                                        <input 
-                                            type="checkbox" 
-                                            className="checkbox checkbox-primary" 
-                                            checked={renewCode}
-                                            onChange={(e) => setRenewCode(e.target.checked)}
-                                        />
-                                    </label>
-                                </div>
+                                {/* <div className="divider"></div> */}
                                 <button
-                                    className={`btn btn-outline btn-primary w-full`}
+                                    className={`btn btn-outline btn-primary w-full mt-3`}
                                     onClick={handleGetCode}
                                     disabled={loading}
                                 >
@@ -172,9 +172,17 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                         </div>
                     ) : (
                         <div className="space-y-2">
-                            <p>Generate a referral code for {token.tokenData?.tokenSymbol} token.</p>
+                            <p>Enter your favourite name as a Unique Referral Code(URC) for {token.tokenData?.tokenSymbol}</p>
+                            <input
+                                type="text"
+                                value={myReferrerCode}
+                                onChange={(e) => setMyReferrerCode(e.target.value)}
+                                className={`w-full px-3 py-2 bg-base-300 border-2 border-base-200 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                placeholder="Enter your favourite name as URC"
+                            />
+                            <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
                             <button
-                                className={`btn btn-primary w-full`}
+                                className={`btn btn-primary w-full mt-3`}
                                 onClick={handleGetCode}
                             >
                                 Generate URC

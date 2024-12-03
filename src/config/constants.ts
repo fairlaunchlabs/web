@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
 export const APP_NAME = 'Logo';
-export const FAIR_MINT_PROGRAM_ID = '8wgp8fB3y3vAqu9xKCTN6V6UXksTuq89YdJmMrUyG6mr';
+export const FAIR_MINT_PROGRAM_ID = 'CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 
 export const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
@@ -14,10 +14,12 @@ export const MINT_STATE_SEED = "mint_state";
 export const REFERRAL_SEED = "referral";
 export const REFUND_SEEDS = "refund";
 export const SYSTEM_CONFIG_SEEDS = "system_config";
+export const REFERRAL_CODE_SEED = "referral_code";
 
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
 export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
 export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';
+export const LOCAL_STORAGE_MY_REFERRAL_CODE = 'my_referral_code';
 export const NETWORK = 'devnet';
 export const SCANURL = 'https://solscan.io';
 

@@ -4,7 +4,7 @@ import { useLazyQuery } from '@apollo/client';
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { InitiazlizedTokenData } from '../../types/types';
-import { mintToken } from '../../utils/web3';
+import { getReferrerCodeHash, mintToken } from '../../utils/web3';
 import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
@@ -27,21 +27,25 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
 
     const fetchReferralData = async () => {
         try {
+            const codeHash = getReferrerCodeHash(wallet, code);
+            if (!codeHash.success) {
+                throw new Error(codeHash.message);
+            }
+
             const { data } = await getRefererCode({
                 variables: {
-                    id: code,
+                    id: codeHash.data?.toString().toLowerCase(),
                 },
             });
 
-            console.log("=====", data?.setRefererCodeEntity);
-            if (data?.setRefererCodeEntity) {
-                if (data.setRefererCodeEntity.mint !== token.mint) {
+            if (data?.setRefererCodeEventEntity) {
+                if (data.setRefererCodeEventEntity.mint !== token.mint) {
                     throw new Error('Referral code not for this token');
                 }
                 return {
-                    referralAccount: new PublicKey(data.setRefererCodeEntity.referralAccount),
-                    referrerMain: new PublicKey(data.setRefererCodeEntity.referrerMain),
-                    referrerAta: new PublicKey(data.setRefererCodeEntity.referrerAta),
+                    referralAccount: new PublicKey(data.setRefererCodeEventEntity.referralAccount),
+                    referrerMain: new PublicKey(data.setRefererCodeEventEntity.referrerMain),
+                    referrerAta: new PublicKey(data.setRefererCodeEventEntity.referrerAta),
                 };
             } else {
                 throw new Error('Referral code not found');
@@ -79,7 +83,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                 referralData.referralAccount,
                 referralData.referrerMain,
                 referralData.referrerAta,
-                new BN(code)
+                code,
             );
 
             if (result.success) {

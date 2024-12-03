@@ -1,5 +1,5 @@
 {
-  "address": "8wgp8fB3y3vAqu9xKCTN6V6UXksTuq89YdJmMrUyG6mr",
+  "address": "CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4",
   "metadata": {
     "name": "fair_mint_token",
     "version": "0.1.0",
@@ -726,6 +726,10 @@
               {
                 "kind": "account",
                 "path": "referrer_main"
+              },
+              {
+                "kind": "arg",
+                "path": "referral_code"
               }
             ]
           }
@@ -765,7 +769,7 @@
         },
         {
           "name": "referral_code",
-          "type": "u64"
+          "type": "pubkey"
         }
       ]
     },
@@ -1559,6 +1563,10 @@
               {
                 "kind": "account",
                 "path": "payer"
+              },
+              {
+                "kind": "arg",
+                "path": "code_hash"
               }
             ]
           }
@@ -1687,8 +1695,8 @@
           "type": "string"
         },
         {
-          "name": "renew_code",
-          "type": "bool"
+          "name": "code_hash",
+          "type": "pubkey"
         }
       ]
     },
@@ -2052,6 +2060,112 @@
           "type": "i64"
         }
       ]
+    },
+    {
+      "name": "update_token_metadata",
+      "discriminator": [
+        243,
+        6,
+        8,
+        23,
+        126,
+        181,
+        251,
+        158
+      ],
+      "accounts": [
+        {
+          "name": "metadata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "metadata_params.name"
+              },
+              {
+                "kind": "arg",
+                "path": "metadata_params.symbol"
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "token_metadata_program",
+          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+        }
+      ],
+      "args": [
+        {
+          "name": "metadata",
+          "type": {
+            "defined": {
+              "name": "TokenMetadata"
+            }
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -2185,6 +2299,19 @@
         39,
         154,
         13
+      ]
+    },
+    {
+      "name": "UpdateTokenMetadataEvent",
+      "discriminator": [
+        203,
+        161,
+        251,
+        30,
+        78,
+        127,
+        196,
+        227
       ]
     }
   ],
@@ -2695,12 +2822,8 @@
             "type": "pubkey"
           },
           {
-            "name": "old_code",
-            "type": "u64"
-          },
-          {
-            "name": "new_code",
-            "type": "u64"
+            "name": "code_hash",
+            "type": "pubkey"
           },
           {
             "name": "active_timestamp",
@@ -2931,12 +3054,12 @@
             "type": "pubkey"
           },
           {
-            "name": "code",
-            "type": "u64"
-          },
-          {
             "name": "usage_count",
             "type": "u32"
+          },
+          {
+            "name": "code_hash",
+            "type": "pubkey"
           },
           {
             "name": "active_timestamp",
@@ -2965,6 +3088,42 @@
           {
             "name": "total_referrer_fee",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateTokenMetadataEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "metadata",
+            "type": {
+              "defined": {
+                "name": "TokenMetadata"
+              }
+            }
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "config_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "metadata_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }

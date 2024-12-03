@@ -256,7 +256,7 @@ export type ReferralCodeModalProps = {
 }
 
 export type ReferrerData = {
-    code: BN;
+    codeHash: PublicKey;
     referrerMain: PublicKey;
     referrerAta: PublicKey;
     usageCount: number;

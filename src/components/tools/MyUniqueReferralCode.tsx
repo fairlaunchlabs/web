@@ -29,11 +29,11 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         },
         skip: !wallet,
         onCompleted: (data) => {
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.setRefererCodeEntities?.length ?? 0)));
+            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.setRefererCodeEventEntities?.length ?? 0)));
         }
     });
 
-    const mints = urcData?.setRefererCodeEntities?.map((token:any) => token.mint);
+    const mints = urcData?.setRefererCodeEventEntities?.map((token:any) => token.mint);
     const { loading: tokenLoading, error: tokenError, data: tokenData } = useQuery(queryTokensByMints, {
         variables: {
             mints: mints,
@@ -197,7 +197,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                     </table>
                 </div>
 
-                {urcData?.setRefererCodeEntities?.length === 0 && (
+                {urcData?.setRefererCodeEventEntities?.length === 0 && (
                     <div className="text-center py-10">
                         <p className="text-gray-500">No URCs found</p>
                     </div>

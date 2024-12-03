@@ -6,13 +6,14 @@ import {
 } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS } from '../config/constants';
+import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED } from '../config/constants';
 import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount } from '@solana/spl-token';
+import { get } from 'lodash';
 
 // Solana 网络连接配置
 const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || `https://api.${NETWORK}.solana.com`;
@@ -171,6 +172,24 @@ export const createTokenOnChain = async (
     }
 };
 
+export const getReferrerCodeHash = (wallet: AnchorWallet | undefined, code: string) => {
+    if (!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const [codeHash] = PublicKey.findProgramAddressSync(
+        [Buffer.from(REFERRAL_CODE_SEED), Buffer.from(code)],
+        program.programId,
+      );
+
+    return {
+        success: true,
+        data: codeHash
+    };
+}
+
 // 获取钱包余额
 export const getBalance = async (publicKey: string) => {
     try {
@@ -193,7 +212,7 @@ export const setReferrerCode = async (
     tokenName: string,
     tokenSymbol: string,
     mint: PublicKey,
-    renewCode: boolean = false
+    code: string,
 ) => {
     if (!wallet) return {
         success: false,
@@ -215,11 +234,20 @@ export const setReferrerCode = async (
         false,
     )
 
+    const codeHash = getReferrerCodeHash(wallet, code);
+    if (!codeHash.success) {
+        return {
+            success: false,
+            message: codeHash.message
+        }
+    }
+
     const [referralAccount] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
-            wallet.publicKey.toBuffer()
+            wallet.publicKey.toBuffer(),
+            (codeHash.data as PublicKey).toBuffer(),
         ],
         PROGRAM_ID
     );
@@ -241,7 +269,7 @@ export const setReferrerCode = async (
 
     try {
         const tx = await program.methods
-            .setReferrerCode(tokenName, tokenSymbol, renewCode)
+            .setReferrerCode(tokenName, tokenSymbol, codeHash.data as PublicKey)
             .accounts(setReferrerCodeAccounts)
             .signers([])  // 使用钱包的 payer
             .rpc();
@@ -262,7 +290,7 @@ export const setReferrerCode = async (
     }
 };
 
-export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connection: Connection, mint: PublicKey) => {
+export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connection: Connection, mint: PublicKey, referrerCode: string) => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
@@ -273,7 +301,7 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         wallet.publicKey, // 需要查询账户的公钥
         false,
     )
-    console.log('referrerAta', referrerAta.toBase58())
+    // console.log('referrerAta', referrerAta.toBase58())
     // 确认referrerAta是否存在
     const referrerAtaAccountInfo = await connection.getAccountInfo(referrerAta);
     if (!referrerAtaAccountInfo) {
@@ -283,12 +311,20 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         };
     }
 
-    console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
+    const codeHash = getReferrerCodeHash(wallet, referrerCode);
+    if (!codeHash.success) {
+        return {
+            success: false,
+            message: codeHash.message
+        }
+    }
+    // console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
     const [referralAccount] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
-            wallet.publicKey.toBuffer()
+            wallet.publicKey.toBuffer(),
+            (codeHash.data as PublicKey).toBuffer(),
         ],
         PROGRAM_ID
     );
@@ -408,12 +444,13 @@ export const mintToken = async (
     referralAccount: PublicKey,
     referrerMain: PublicKey,
     referrerAta: PublicKey,
-    code: BN,
+    code: string,
 ) => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
+    console.log("code", code);
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
     // Check referrer account
     const referralAccountInfo = await connection.getAccountInfo(referralAccount);
@@ -432,7 +469,14 @@ export const mintToken = async (
             message: 'Wrong referrer account'
         }
     }
-    if(!code.eq(referrerData.code)) {
+    const codeHash = getReferrerCodeHash(wallet, code);
+    if(!codeHash.success) {
+        return {
+            success: false,
+            message: codeHash.message
+        }
+    }
+    if(codeHash.data?.toBase58() !== referrerData.codeHash.toBase58()) {
         return {
             success: false,
             message: 'Wrong referrer code'
@@ -472,7 +516,7 @@ export const mintToken = async (
     };
     try {
         const tx = await program.methods
-            .mintTokens(token.tokenName, token.tokenSymbol, code)
+            .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data as PublicKey)
             .accounts(mintAccounts)
             .signers([])
             .rpc();

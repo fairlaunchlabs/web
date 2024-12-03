@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/fair_mint_token.json`.
  */
 export type FairMintToken = {
-  "address": "8wgp8fB3y3vAqu9xKCTN6V6UXksTuq89YdJmMrUyG6mr",
+  "address": "CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4",
   "metadata": {
     "name": "fairMintToken",
     "version": "0.1.0",
@@ -732,6 +732,10 @@ export type FairMintToken = {
               {
                 "kind": "account",
                 "path": "referrerMain"
+              },
+              {
+                "kind": "arg",
+                "path": "referralCode"
               }
             ]
           }
@@ -771,7 +775,7 @@ export type FairMintToken = {
         },
         {
           "name": "referralCode",
-          "type": "u64"
+          "type": "pubkey"
         }
       ]
     },
@@ -1565,6 +1569,10 @@ export type FairMintToken = {
               {
                 "kind": "account",
                 "path": "payer"
+              },
+              {
+                "kind": "arg",
+                "path": "codeHash"
               }
             ]
           }
@@ -1693,8 +1701,8 @@ export type FairMintToken = {
           "type": "string"
         },
         {
-          "name": "renewCode",
-          "type": "bool"
+          "name": "codeHash",
+          "type": "pubkey"
         }
       ]
     },
@@ -2058,6 +2066,112 @@ export type FairMintToken = {
           "type": "i64"
         }
       ]
+    },
+    {
+      "name": "updateTokenMetadata",
+      "discriminator": [
+        243,
+        6,
+        8,
+        23,
+        126,
+        181,
+        251,
+        158
+      ],
+      "accounts": [
+        {
+          "name": "metadata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "metadata_params.name"
+              },
+              {
+                "kind": "arg",
+                "path": "metadata_params.symbol"
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "configAccount",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+        }
+      ],
+      "args": [
+        {
+          "name": "metadata",
+          "type": {
+            "defined": {
+              "name": "tokenMetadata"
+            }
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -2191,6 +2305,19 @@ export type FairMintToken = {
         39,
         154,
         13
+      ]
+    },
+    {
+      "name": "updateTokenMetadataEvent",
+      "discriminator": [
+        203,
+        161,
+        251,
+        30,
+        78,
+        127,
+        196,
+        227
       ]
     }
   ],
@@ -2701,12 +2828,8 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "oldCode",
-            "type": "u64"
-          },
-          {
-            "name": "newCode",
-            "type": "u64"
+            "name": "codeHash",
+            "type": "pubkey"
           },
           {
             "name": "activeTimestamp",
@@ -2937,12 +3060,12 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "code",
-            "type": "u64"
-          },
-          {
             "name": "usageCount",
             "type": "u32"
+          },
+          {
+            "name": "codeHash",
+            "type": "pubkey"
           },
           {
             "name": "activeTimestamp",
@@ -2971,6 +3094,42 @@ export type FairMintToken = {
           {
             "name": "totalReferrerFee",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updateTokenMetadataEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "metadata",
+            "type": {
+              "defined": {
+                "name": "tokenMetadata"
+              }
+            }
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "configAccount",
+            "type": "pubkey"
+          },
+          {
+            "name": "metadataAccount",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }

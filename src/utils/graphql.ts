@@ -217,7 +217,7 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
 
 export const querySetRefererCodeEntityById = gql`
 query GetSetRefererCodeEntity($id: ID!) {
-    setRefererCodeEntity(id: $id) {
+    setRefererCodeEventEntity(id: $id) {
         id
         mint
         referralAccount
@@ -229,7 +229,7 @@ query GetSetRefererCodeEntity($id: ID!) {
 
 export const querySetRefererCodeEntitiesByOwner = gql`
 query GetSetRefererCodeEntity($owner: String!, $skip: Int!, $first: Int!) {
-    setRefererCodeEntities(
+    setRefererCodeEventEntities(
         where: { referrerMain: $owner }
         skip: $skip
         first: $first
