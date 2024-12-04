@@ -4,7 +4,7 @@ import {
     calculateTargetMintTime,
     calculateMinTotalFee,
     extractIPFSHash,
-    formatDays,
+    formatSeconds,
     getTimeRemaining
 } from '../../utils/format';
 import { TokenCardProps, TokenMetadataIPFS } from '../../types/types';
@@ -118,7 +118,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Mint Time:</span>
-                            <span className="text-base-content">{formatDays(targetMintTime)}</span>
+                            <span className="text-base-content">{formatSeconds(targetMintTime)}</span>
                         </p>
                         <p className="flex justify-between">
                             <span className="text-base-content/70">Target Minimum Fee:</span>

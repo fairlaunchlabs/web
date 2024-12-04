@@ -7,7 +7,7 @@ import {
     calculateMinTotalFee,
     calculateTotalSupplyToTargetEras,
     extractIPFSHash,
-    formatDays,
+    formatSeconds,
     getTimeRemaining,
     numberStringToBN
 } from '../../utils/format';
@@ -26,6 +26,7 @@ const tooltip = {
     currentMintSize: "Current amount of tokens that can be minted in this epoch",
     currentMinted: "Total amount of tokens that have been minted so far",
     targetSupply: "Target token supply to be reached by the specified era",
+    mintSpeed: "Rate at which tokens are minted per epoch",
     deployAt: "Timestamp when the token was deployed",
     deployingTx: "Transaction hash of the deployment transaction",
     deployer: "Address of the token deployer",
@@ -70,12 +71,16 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     
     const totalSupplyToTargetEras = useMemo(() => {
         return calculateTotalSupplyToTargetEras(
-            token.targetEras,
+            token.epochesPerEra,
             token.initialTargetMintSizePerEpoch,
             token.reduceRatio,
-            token.epochesPerEra
+            token.targetEras
         );
     }, [token.targetEras, token.initialTargetMintSizePerEpoch, token.reduceRatio, token.epochesPerEra]);
+
+    const mintSpeed = useMemo(() => {
+        return Number(token.targetSecondsPerEpoch) / Number(token.initialTargetMintSizePerEpoch) * Number(token.initialMintSize);
+    }, [token.targetSecondsPerEpoch, token.initialTargetMintSizePerEpoch, token.initialMintSize]);
 
     const mintedSupply = useMemo(() => {
         return numberStringToBN(token.supply).sub(numberStringToBN(token.supply).mul(numberStringToBN(token.liquidityTokensRatio)).div(BN_HUNDRED)).div(BN_LAMPORTS_PER_SOL).toNumber();
@@ -138,7 +143,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         />
                         <DataBlock 
                             label="Current Mint Size"
-                            value={numberStringToBN(token.mintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            value={(numberStringToBN(token.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
                             tooltip={tooltip.currentMintSize}
                         />
                         <DataBlock 
@@ -150,6 +155,11 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                             label={`Target Supply (Era:${token.targetEras})`} 
                             value={totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
                             tooltip={tooltip.targetSupply}
+                        />
+                        <DataBlock 
+                            label="Target speed" 
+                            value={formatSeconds(mintSpeed) + "/mint"}
+                            tooltip={tooltip.mintSpeed}
                         />
                         <DataBlock 
                             label="Deploy at" 
@@ -203,7 +213,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         />
                         <DataBlock 
                             label="Target Mint Time" 
-                            value={formatDays(Number(token.targetSecondsPerEpoch) * Number(token.epochesPerEra))}
+                            value={formatSeconds(Number(token.targetSecondsPerEpoch) * Number(token.epochesPerEra))}
                             tooltip={tooltip.targetMintTime}
                         />
                         <DataBlock 
@@ -239,12 +249,12 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         />
                         <DataBlock 
                             label="Difficulty of current epoch" 
-                            value={token.difficultyCoefficientEpoch}
+                            value={parseFloat(token.difficultyCoefficientEpoch).toFixed(4)}
                             tooltip={tooltip.difficultyOfCurrentEpoch}
                         />
                         <DataBlock 
                             label="Difficulty of Last epoch" 
-                            value={token.lastDifficultyCoefficientEpoch}
+                            value={parseFloat(token.lastDifficultyCoefficientEpoch).toFixed(4)}
                             tooltip={tooltip.difficultyOfLastEpoch}
                         />
                     </div>
@@ -269,7 +279,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         <div className="mt-8">
                             <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current epoch</h3>
                             <div className="text-sm font-medium mb-1 text-base-content">
-                            {numberStringToBN(token.quantityMintedEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} / {numberStringToBN(token.targetMintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
+                            {(numberStringToBN(token.quantityMintedEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(numberStringToBN(token.targetMintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                             </div>
                             <div className="w-full bg-base-300 rounded-full h-2.5">
                                 <div 

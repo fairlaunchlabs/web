@@ -4,7 +4,7 @@ import { queryTokenMintTransactions } from '../../utils/graphql';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { MintTransactionData, TokenMintTransactionsProps } from '../../types/types';
 import { Pagination } from '../common/Pagination';
-import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
+import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
 export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ token }) => {
@@ -88,7 +88,7 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
                                 <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
                                 <td>{tx.currentEra} ({tx.currentEpoch})</td>
-                                <td>{numberStringToBN(tx.mintSizeEpoch).div(BN_LAMPORTS_PER_SOL).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {token.tokenSymbol}</td>
+                                <td>{(numberStringToBN(tx.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</td>
                             </tr>
                         ))}
                     </tbody>

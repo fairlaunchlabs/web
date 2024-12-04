@@ -10,7 +10,7 @@ export const BN_ZERO = new BN(0);
 export const BN_HUNDRED = new BN(100);
 export const BN_MILLION = new BN(1000000);
 
-export const formatDays = (totalSeconds: number): string => {
+export const formatSeconds = (totalSeconds: number): string => {
     if (isNaN(totalSeconds) || totalSeconds <= 0) return 'arrived';
 
     const days = Math.floor(totalSeconds / 86400);
@@ -25,14 +25,18 @@ export const formatDays = (totalSeconds: number): string => {
     if (hours > 0) {
         return `${hours}h ${minutes}m`;
     }
+
+    if (minutes > 0) {
+        return `${minutes}m ${seconds}s`;
+    }
     
-    return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
 };
 
 export const getTimeRemaining = (startTimestamp: string) => {
     const diff = Number(startTimestamp) - Math.floor(Date.now() / 1000);
     if (diff <= 0) return 'arrived';
-    return `Start in ${formatDays(diff)}`;        
+    return `Start in ${formatSeconds(diff)}`;        
 };
 
 export const calculateMaxSupply = (epochesPerEra: string, initialTargetMintSizePerEpoch: string, reduceRatio: string): number => {
