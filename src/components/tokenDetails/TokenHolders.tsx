@@ -4,7 +4,7 @@ import { HolderData, TokenHoldersProps } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { Pagination } from '../common/Pagination';
 import { queryHolders } from '../../utils/graphql';
-import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, BN_MILLION, BN_ZERO, numberStringToBN } from '../../utils/format';
+import { BN_LAMPORTS_PER_SOL, BN_MILLION, BN_ZERO, numberStringToBN } from '../../utils/format';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
 export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {

@@ -1,12 +1,10 @@
 import { FC, useState } from 'react';
-import { useLazyQuery } from '@apollo/client';
-import { querySetRefererCodeEntityById } from '../../utils/graphql';
 import toast from 'react-hot-toast';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getReferralDataByCodeHash, getReferrerCodeHash, getReferrerDataByReferralAccount, getTokenBalance } from '../../utils/web3';
+import { getReferralDataByCodeHash, getReferrerCodeHash, getTokenBalance } from '../../utils/web3';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { CheckURCProps, SetRefererCodeEntity, OnChainReferralData } from '../../types/types';
+import { CheckURCProps, SetRefererCodeEntity } from '../../types/types';
 
 export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     const { connection } = useConnection();

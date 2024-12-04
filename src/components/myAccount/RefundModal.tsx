@@ -58,7 +58,9 @@ export const RefundModal: FC<RefundModalProps> = ({
                         }
                     );
                     setLoading(false);
-                    onClose();
+                    setTimeout(() => {
+                        onClose();
+                    }, 3000);
                 }
             });
         } catch (error: any) {

@@ -45,7 +45,6 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
 
     const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, any>>({});
 
-    // 使用useEffect处理异步操作
     useEffect(() => {
         const fetchTokenMetadata = async () => {
             if (!tokenData?.initializeTokenEventEntities) return;

@@ -603,11 +603,11 @@ export const mintToken = async (
                 tx,
             }
         };
-    } catch (error) {
+    } catch (error: any) {
         return {
             success: false,
-            message: 'Error minting'
-        }
+            message: 'Error: ' + error.message,
+        };
     }
 }
 
