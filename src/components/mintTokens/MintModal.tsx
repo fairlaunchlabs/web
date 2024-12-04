@@ -4,7 +4,7 @@ import { useLazyQuery } from '@apollo/client';
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { InitiazlizedTokenData } from '../../types/types';
-import { getReferrerCodeHash, mintToken } from '../../utils/web3';
+import { getReferralDataByCodeHash, getReferrerCodeHash, mintToken } from '../../utils/web3';
 import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
@@ -23,7 +23,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
     const [code, setCode] = useState(referrerCode || '');
     const [loading, setLoading] = useState(false);
 
-    const [getRefererCode] = useLazyQuery(querySetRefererCodeEntityById);
+    // const [getRefererCode] = useLazyQuery(querySetRefererCodeEntityById);
 
     const fetchReferralData = async () => {
         try {
@@ -31,25 +31,29 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
             if (!codeHash.success) {
                 throw new Error(codeHash.message);
             }
-
-            const { data } = await getRefererCode({
-                variables: {
-                    id: codeHash.data?.toString().toLowerCase(),
-                },
-            });
-
-            if (data?.setRefererCodeEventEntity) {
-                if (data.setRefererCodeEventEntity.mint !== token.mint) {
-                    throw new Error('Referral code not for this token');
-                }
-                return {
-                    referralAccount: new PublicKey(data.setRefererCodeEventEntity.referralAccount),
-                    referrerMain: new PublicKey(data.setRefererCodeEventEntity.referrerMain),
-                    referrerAta: new PublicKey(data.setRefererCodeEventEntity.referrerAta),
-                };
-            } else {
-                throw new Error('Referral code not found');
+            const result = await getReferralDataByCodeHash(wallet, connection, codeHash.data as PublicKey);
+            if (!result.success) {
+                throw new Error(result.message);
             }
+            return result.data;
+            // const { data } = await getRefererCode({
+            //     variables: {
+            //         id: codeHash.data?.toString().toLowerCase(),
+            //     },
+            // });
+
+            // if (data?.setRefererCodeEventEntity) {
+            //     if (data.setRefererCodeEventEntity.mint !== token.mint) {
+            //         throw new Error('Referral code not for this token');
+            //     }
+            //     return {
+            //         referralAccount: new PublicKey(data.setRefererCodeEventEntity.referralAccount),
+            //         referrerMain: new PublicKey(data.setRefererCodeEventEntity.referrerMain),
+            //         referrerAta: new PublicKey(data.setRefererCodeEventEntity.referrerAta),
+            //     };
+            // } else {
+            //     throw new Error('Referral code not found');
+            // }
         } catch (error: any) {
             console.error('Error fetching referral data:', error);
             throw new Error(error.message || 'Error fetching referral data');
@@ -70,6 +74,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
         try {
             setLoading(true);
             const referralData = await fetchReferralData();
+            if(referralData === undefined) return;
             const toastId = toast.loading('Minting token...', {
                 style: {
                     background: 'var(--fallback-b1,oklch(var(--b1)))',

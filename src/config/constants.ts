@@ -15,6 +15,7 @@ export const REFERRAL_SEED = "referral";
 export const REFUND_SEEDS = "refund";
 export const SYSTEM_CONFIG_SEEDS = "system_config";
 export const REFERRAL_CODE_SEED = "referral_code";
+export const CODE_ACCOUNT_SEEDS = "code_account";
 
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
 export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';

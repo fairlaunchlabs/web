@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getMyReferrerData, getReferrerDataByReferralAccount, getSystemConfig, setReferrerCode } from '../../utils/web3';
+import { getMyReferrerData, getReferrerDataByReferralAccount, getSystemConfig, reactiveReferrerCode, setReferrerCode } from '../../utils/web3';
 import toast from 'react-hot-toast';
 import { ReferralCodeModalProps, ReferrerData } from '../../types/types';
 import { LOCAL_STORAGE_MY_REFERRAL_CODE, NETWORK, SCANURL } from '../../config/constants';
@@ -38,17 +38,10 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
         }
     }, []);
 
-    const handleGetCode = async () => {
+    const handleReactiveCode = async () => {
         setLoading(true);
         try {
-            const toastId = toast.loading('Geting URC...', {
-                style: {
-                    background: 'var(--fallback-b1,oklch(var(--b1)))',
-                    color: 'var(--fallback-bc,oklch(var(--bc)))',
-                },
-            });
-    
-            const result = await setReferrerCode(
+            const result = await reactiveReferrerCode(
                 wallet,
                 connection,
                 token.tokenData?.tokenName as string,
@@ -62,10 +55,43 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
             const explorerUrl = `${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`;
             toast.success(
                 <ToastBox url={explorerUrl} urlText="View transaction" title="Got URC successfully!" />,
-                {
-                    id: toastId
-                }
+            );    
+
+            const referralAccount = result.data?.referralAccount as string
+            getReferrerDataByReferralAccount(wallet, connection, new PublicKey(referralAccount)).then((data) => {
+                if (data?.success) setReferralData(data.data);
+                else toast.error(data.message as string);
+            });
+            localStorage.setItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint, myReferrerCode);
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to generate referral code');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleGetCode = async () => {
+        setLoading(true);
+        try {
+            const result = await setReferrerCode(
+                wallet,
+                connection,
+                token.tokenData?.tokenName as string,
+                token.tokenData?.tokenSymbol as string,
+                new PublicKey(token.mint),
+                myReferrerCode,
             );
+            if (!result.success) {
+                throw new Error(result.message);
+            }
+            if(result.data?.tx === "mine") {
+                // code is exists
+            } else {
+                const explorerUrl = `${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`;
+                toast.success(
+                    <ToastBox url={explorerUrl} urlText="View transaction" title="Got URC successfully!" />,
+                );    
+            }
 
             const referralAccount = result.data?.referralAccount as string
             getReferrerDataByReferralAccount(wallet, connection, new PublicKey(referralAccount)).then((data) => {
@@ -111,7 +137,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                     type="text"
                                     value={myReferrerCode}
                                     onChange={(e) => setMyReferrerCode(e.target.value)}
-                                    className={`w-full px-3 py-2 bg-base-300 border-2 border-base-200 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                    className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
                                     placeholder="Enter your favourite name as URC"
                                 />
                                 <button
@@ -163,7 +189,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                 {/* <div className="divider"></div> */}
                                 <button
                                     className={`btn btn-outline btn-primary w-full mt-3`}
-                                    onClick={handleGetCode}
+                                    onClick={handleReactiveCode}
                                     disabled={loading}
                                 >
                                     Reactive URC
@@ -177,7 +203,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                 type="text"
                                 value={myReferrerCode}
                                 onChange={(e) => setMyReferrerCode(e.target.value)}
-                                className={`w-full px-3 py-2 bg-base-300 border-2 border-base-200 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
                                 placeholder="Enter your favourite name as URC"
                             />
                             <p className='text-error'>This code is stored locally, please remember it when you change device!</p>

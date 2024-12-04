@@ -732,10 +732,6 @@ export type FairMintToken = {
               {
                 "kind": "account",
                 "path": "referrerMain"
-              },
-              {
-                "kind": "arg",
-                "path": "referralCode"
               }
             ]
           }
@@ -1569,10 +1565,6 @@ export type FairMintToken = {
               {
                 "kind": "account",
                 "path": "payer"
-              },
-              {
-                "kind": "arg",
-                "path": "codeHash"
               }
             ]
           }
@@ -1676,6 +1668,35 @@ export type FairMintToken = {
                 89
               ]
             }
+          }
+        },
+        {
+          "name": "codeAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  100,
+                  101,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "codeHash"
+              }
+            ]
           }
         },
         {
@@ -2176,6 +2197,19 @@ export type FairMintToken = {
   ],
   "accounts": [
     {
+      "name": "codeAccountData",
+      "discriminator": [
+        223,
+        104,
+        233,
+        118,
+        230,
+        133,
+        135,
+        33
+      ]
+    },
+    {
       "name": "systemConfigData",
       "discriminator": [
         192,
@@ -2551,9 +2585,31 @@ export type FairMintToken = {
       "code": 6045,
       "name": "mintNotStarted",
       "msg": "Mint has not started"
+    },
+    {
+      "code": 6046,
+      "name": "wrongReferrerCode",
+      "msg": "Wrong referrer account"
+    },
+    {
+      "code": 6047,
+      "name": "wrongCodeHash",
+      "msg": "Wrong code hash"
     }
   ],
   "types": [
+    {
+      "name": "codeAccountData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referralAccount",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
     {
       "name": "initializeLiquidityPoolEvent",
       "type": {
@@ -3065,6 +3121,10 @@ export type FairMintToken = {
           },
           {
             "name": "codeHash",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
             "type": "pubkey"
           },
           {

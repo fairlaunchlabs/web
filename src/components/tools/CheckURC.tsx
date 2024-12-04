@@ -4,79 +4,61 @@ import { querySetRefererCodeEntityById } from '../../utils/graphql';
 import toast from 'react-hot-toast';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { getReferrerCodeHash, getReferrerDataByReferralAccount, getTokenBalance } from '../../utils/web3';
+import { getReferralDataByCodeHash, getReferrerCodeHash, getReferrerDataByReferralAccount, getTokenBalance } from '../../utils/web3';
 import { AddressDisplay } from '../common/AddressDisplay';
-
-interface CheckURCProps {
-    expanded: boolean;
-}
-
-interface SetRefererCodeEntity {
-    id: string;
-    mint: string;
-    referralAccount: string;
-    referrerAta: string;
-    referrerMain: string;
-}
-
-interface OnChainReferralData {
-    codeHash: string;
-    usageCount: number;
-    activeTimestamp: number;
-    tokenBalance: number | null;
-}
+import { CheckURCProps, SetRefererCodeEntity, OnChainReferralData } from '../../types/types';
 
 export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
     const [searchId, setSearchId] = useState('');
     const [searchResult, setSearchResult] = useState<SetRefererCodeEntity | null>(null);
-    const [onChainData, setOnChainData] = useState<OnChainReferralData | null>(null);
+    // const [onChainData, setOnChainData] = useState<OnChainReferralData | null>(null);
     const [loading, setLoading] = useState(false);
     const [referralLink, setReferralLink] = useState('');
 
-    const [getRefererCode] = useLazyQuery(querySetRefererCodeEntityById, {
-        onCompleted: async (data) => {
-            if (data.setRefererCodeEventEntity) {
-                setSearchResult(data.setRefererCodeEventEntity);
-                try {
-                    const result = await getReferrerDataByReferralAccount(
-                        wallet,
-                        connection,
-                        new PublicKey(data.setRefererCodeEventEntity.referralAccount)
-                    );
-                    if (result?.success && result.data) {
-                        setOnChainData({
-                            codeHash: result.data.codeHash.toString(),
-                            usageCount: result.data.usageCount,
-                            activeTimestamp: result.data.activeTimestamp.toNumber(),
-                            tokenBalance: await getTokenBalance(result.data.referrerAta, connection),
-                        });
-                        setReferralLink(
-                            `${window.location.origin}/token/${data.setRefererCodeEventEntity.mint}/${searchId.trim()}`
-                        );
-                        // TODO: 根据mint获取token metadata以及当前价格，然后计算该code的打折信息
+    // const [getRefererCode] = useLazyQuery(querySetRefererCodeEntityById, {
+    //     onCompleted: async (data) => {
+    //         if (data.setRefererCodeEventEntity) {
+    //             setSearchResult(data.setRefererCodeEventEntity);
+    //             try {
+    //                 const result = await getReferrerDataByReferralAccount(
+    //                     wallet,
+    //                     connection,
+    //                     new PublicKey(data.setRefererCodeEventEntity.referralAccount)
+    //                 );
+    //                 if (result?.success && result.data) {
+    //                     setOnChainData({
+    //                         codeHash: result.data.codeHash.toString(),
+    //                         usageCount: result.data.usageCount,
+    //                         activeTimestamp: result.data.activeTimestamp.toNumber(),
+    //                         tokenBalance: await getTokenBalance(result.data.referrerAta, connection),
+    //                     });
+    //                     setReferralLink(
+    //                         `${window.location.origin}/token/${data.setRefererCodeEventEntity.mint}/${searchId.trim()}`
+    //                     );
+    //                     // TODO: 根据mint获取token metadata以及当前价格，然后计算该code的打折信息
 
-                    } else {
-                        toast.error('Failed to fetch on-chain data');
-                    }
-                } catch (error) {
-                    console.error('Error fetching on-chain data:', error);
-                    toast.error('Error fetching on-chain data');
-                }
-            } else {
-                toast.error('No data found for this URC');
-                setSearchResult(null);
-                setOnChainData(null);
-            }
-        },
-        onError: (error) => {
-            console.error('GraphQL error:', error);
-            toast.error('Error searching for URC');
-            setSearchResult(null);
-            setOnChainData(null);
-        }
-    });
+    //                 } else {
+    //                     toast.error('Failed to fetch on-chain data');
+    //                 }
+    //             } catch (error) {
+    //                 console.error('Error fetching on-chain data:', error);
+    //                 toast.error('Error fetching on-chain data');
+    //             }
+    //         } else {
+    //             toast.error('No data found for this URC');
+    //             setSearchResult(null);
+    //             setOnChainData(null);
+    //         }
+    //     },
+    //     onError: (error) => {
+    //         console.error('GraphQL error:', error);
+    //         toast.error('Error searching for URC');
+    //         setSearchResult(null);
+    //         setOnChainData(null);
+    //     }
+    // });
 
     const handleSearch = () => {
         if (!searchId.trim()) {
@@ -85,16 +67,33 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
         }
         setLoading(true);
       
-        const result = getReferrerCodeHash(wallet, searchId.trim());
-        console.log("==>>", result.data?.toString().toLowerCase());
-        if (result.success) {
-            getRefererCode({ 
-                variables: { id: result.data?.toString().toLowerCase() } 
-            }).finally(() => setLoading(false));
+        const codeHashData = getReferrerCodeHash(wallet, searchId.trim());
+        if (codeHashData.success) {
+            getReferralDataByCodeHash(wallet, connection, codeHashData.data as PublicKey).then(async (result) => {
+                if (result?.success && result.data) {
+                    setSearchResult({
+                        mint: result.data.mint.toBase58(),
+                        referrerMain: result.data.referrerMain.toBase58(),
+                        referrerAta: result.data.referrerAta.toBase58(),
+                        referralAccount: result.data.referralAccount.toBase58(),
+                        usageCount: result.data.usageCount,
+                        activeTimestamp: result.data.activeTimestamp.toNumber(),
+                        codeHash: result.data.codeHash.toString(),
+                        tokenBalance: await getTokenBalance(result.data.referrerAta, connection),
+                    } as SetRefererCodeEntity);
+                    setReferralLink(
+                        `${window.location.origin}/token/${result.data.mint.toBase58()}/${searchId.trim()}`
+                    );
+                    setLoading(false);
+                } else {
+                    toast.error(result.message as string);
+                    setSearchResult(null);
+                    setLoading(false);
+                }
+            });
         } else {
-            toast.error(result.message as string);
+            toast.error(codeHashData.message as string);
             setSearchResult(null);
-            setOnChainData(null);
             setLoading(false);
         }
     };
@@ -121,24 +120,20 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
                     </button>
                 </div>
 
-                {searchResult && (
+                {searchResult && searchResult.codeHash === getReferrerCodeHash(wallet, searchId.trim()).data?.toString() && searchId ? (
                     <div className="card bg-base-200 shadow-xl">
                         <div className="card-body">
                             <h2 className="card-title">URC Details</h2>
                             <div className="overflow-x-auto">
                                 <table className="table w-full">
                                     <tbody>
-                                        {onChainData && (
+                                        {searchResult && (
                                             <>
                                                 <tr>
                                                     <td className="font-bold w-1/3">Code Hash</td>
                                                     <td className="flex items-center gap-2 w-2/3">
-                                                        {onChainData.codeHash}
-                                                        {onChainData.codeHash === getReferrerCodeHash(wallet, searchId.trim()).data?.toString() && searchId ? (
-                                                            <span className="badge badge-success">Verified</span>
-                                                        ) : (
-                                                            <span className="badge badge-error">Not Verified</span>
-                                                        )}
+                                                        {searchResult.codeHash}
+                                                        <span className="badge badge-success">Verified</span>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -165,15 +160,15 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
                                                 </tr>
                                                 <tr>
                                                     <td className="font-bold">Usage Count</td>
-                                                    <td>{onChainData.usageCount}</td>
+                                                    <td>{searchResult.usageCount}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="font-bold">Active Time</td>
-                                                    <td>{new Date(onChainData.activeTimestamp * 1000).toLocaleString()}</td>
+                                                    <td>{new Date(searchResult.activeTimestamp * 1000).toLocaleString()}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="font-bold">Referrer's token balance</td>
-                                                    <td>{onChainData.tokenBalance?.toLocaleString()}</td>
+                                                    <td>{searchResult.tokenBalance?.toLocaleString()}</td>
                                                 </tr>
                                             </>
                                         )}
@@ -205,6 +200,10 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
                                 </table>
                             </div>
                         </div>
+                    </div>
+                ): searchId && (
+                    <div className='text-red-500'>
+                        Invalid URC
                     </div>
                 )}
             </div>

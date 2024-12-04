@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED } from '../config/constants';
+import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS } from '../config/constants';
 import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
@@ -124,7 +124,7 @@ export const createTokenOnChain = async (
             program.programId
         );
 
-        const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+        const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
             [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
             program.programId,
           );
@@ -146,7 +146,7 @@ export const createTokenOnChain = async (
             mintStateAccount: mintStatePda,
             rent: SYSVAR_RENT_PUBKEY,
             systemProgram: SystemProgram.programId,
-            systemConfigAccount: systemConfigAccount,
+            systemConfigAccount: systemConfigAccountPda,
             tokenProgram: TOKEN_PROGRAM_ID,
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
@@ -206,7 +206,7 @@ export const pinata = new PinataSDK({
     pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
 });
 
-export const setReferrerCode = async (
+export const reactiveReferrerCode = async (
     wallet: AnchorWallet | undefined,
     connection: Connection,
     tokenName: string,
@@ -220,7 +220,38 @@ export const setReferrerCode = async (
     }
 
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
-    const [configAccount] = PublicKey.findProgramAddressSync(
+
+    const codeHash = getReferrerCodeHash(wallet, code);
+    if (!codeHash.success) {
+        return {
+            success: false,
+            message: codeHash.message
+        }
+    }
+
+    const [codeAccountPda] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(CODE_ACCOUNT_SEEDS),
+            (codeHash.data as PublicKey).toBuffer(),
+        ],
+        program.programId,
+    );
+    const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
+    if (codeAccountInfo) {
+        // 如果codeAccountInfo存在，说明code已经被使用
+        // 检查该code的所有者是不是自己，以及mint是不是相符，如果不是的话，则返回错误
+        const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
+        const referralAccountPda = codeAccountData.referralAccount;
+        const referralAccountData = await program.account.tokenReferralData.fetch(referralAccountPda);
+        if (referralAccountData.referrerMain.toBase58() !== wallet.publicKey.toBase58() || referralAccountData.mint.toBase58() !== mint.toBase58()) {
+            return {
+                success: false,
+                message: 'Code already exists but the owner is not you',
+            }
+        }
+    }
+
+    const [configAccountPda] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(CONFIG_DATA_SEED),
             mint.toBuffer()
@@ -234,35 +265,26 @@ export const setReferrerCode = async (
         false,
     )
 
-    const codeHash = getReferrerCodeHash(wallet, code);
-    if (!codeHash.success) {
-        return {
-            success: false,
-            message: codeHash.message
-        }
-    }
-
-    const [referralAccount] = PublicKey.findProgramAddressSync(
+    const [referralAccountPda] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
             wallet.publicKey.toBuffer(),
-            (codeHash.data as PublicKey).toBuffer(),
         ],
         PROGRAM_ID
     );
 
-    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+    const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
     );
 
     const setReferrerCodeAccounts = {
         mint,
-        referralAccount,
+        referralAccount: referralAccountPda,
         referrerAta,
-        configAccount,
-        systemConfigAccount,
+        configAccount: configAccountPda,
+        systemConfigAccount: systemConfigAccountPda,
         payer: wallet.publicKey,
         systemProgram: SystemProgram.programId,
     };
@@ -278,7 +300,121 @@ export const setReferrerCode = async (
             success: true,
             data: {
                 tx,
-                referralAccount: referralAccount.toBase58(),
+                referralAccount: referralAccountPda.toBase58(),
+            }
+        };
+    } catch (error) {
+        console.log("setReferrerCode", error);
+        return {
+            success: false,
+            message: 'Error setting referrer code'
+        }
+    }
+}
+
+export const setReferrerCode = async (
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
+    tokenName: string,
+    tokenSymbol: string,
+    mint: PublicKey,
+    code: string,
+) => {
+    if (!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+
+    const codeHash = getReferrerCodeHash(wallet, code);
+    if (!codeHash.success) {
+        return {
+            success: false,
+            message: codeHash.message
+        }
+    }
+
+    const [codeAccountPda] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(CODE_ACCOUNT_SEEDS),
+            (codeHash.data as PublicKey).toBuffer(),
+        ],
+        program.programId,
+    );
+    const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
+    if (codeAccountInfo) {
+        // 如果codeAccountInfo存在，说明code已经被使用
+        // 检查该code的所有者是不是自己，以及mint是不是相符，如果是的话，则显示referral的数据，否则提示code已经存在，重新输入
+        const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
+        const referralAccountPda = codeAccountData.referralAccount;
+        const referralAccountData = await program.account.tokenReferralData.fetch(referralAccountPda);
+        if (referralAccountData.referrerMain.toBase58() !== wallet.publicKey.toBase58() || referralAccountData.mint.toBase58() !== mint.toBase58()) {
+            return {
+                success: false,
+                message: 'Code already exists'
+            }
+        } else {
+            return {
+                success: true,
+                data: {
+                    tx: "mine",
+                    referralAccount: codeAccountData.referralAccount.toBase58(),
+                }
+            };    
+        }
+    }
+
+    const [configAccountPda] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(CONFIG_DATA_SEED),
+            mint.toBuffer()
+        ],
+        program.programId
+    );
+
+    let referrerAta = await getAssociatedTokenAddress(
+        mint,
+        wallet.publicKey, // 需要查询账户的公钥
+        false,
+    )
+
+    const [referralAccountPda] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from(REFERRAL_SEED),
+            mint.toBuffer(),
+            wallet.publicKey.toBuffer(),
+        ],
+        PROGRAM_ID
+    );
+
+    const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+        program.programId,
+    );
+
+    const setReferrerCodeAccounts = {
+        mint,
+        referralAccount: referralAccountPda,
+        referrerAta,
+        configAccount: configAccountPda,
+        systemConfigAccount: systemConfigAccountPda,
+        payer: wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+    };
+
+    try {
+        const tx = await program.methods
+            .setReferrerCode(tokenName, tokenSymbol, codeHash.data as PublicKey)
+            .accounts(setReferrerCodeAccounts)
+            .signers([])  // 使用钱包的 payer
+            .rpc();
+
+        return {
+            success: true,
+            data: {
+                tx,
+                referralAccount: referralAccountPda.toBase58(),
             }
         };
     } catch (error) {
@@ -319,17 +455,16 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         }
     }
     // console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
-    const [referralAccount] = PublicKey.findProgramAddressSync(
+    const [referralAccountPda] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
             wallet.publicKey.toBuffer(),
-            (codeHash.data as PublicKey).toBuffer(),
         ],
         PROGRAM_ID
     );
-    console.log('referralAccount', referralAccount.toBase58());
-    const referralAccountInfo = await connection.getAccountInfo(referralAccount);
+    console.log('referralAccount', referralAccountPda.toBase58());
+    const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
     if (!referralAccountInfo) {
         return {
             success: false,
@@ -339,20 +474,7 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
 
     console.log('referralAccountInfo', referralAccountInfo);
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
-    const referrerData = await program.account.tokenReferralData.fetch(referralAccount);
-    return {
-        success: true,
-        data: referrerData
-    }
-}
-
-export const getReferrerDataByReferralAccount = async (wallet: AnchorWallet | undefined, connection: Connection, referralAccount: PublicKey) => {
-    if(!wallet) return {
-        success: false,
-        message: 'Please connect wallet'
-    }
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
-    const referrerData = await program.account.tokenReferralData.fetch(referralAccount);
+    const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     return {
         success: true,
         data: referrerData
@@ -365,14 +487,14 @@ export const getSystemConfig = async (wallet: AnchorWallet | undefined, connecti
         message: 'Please connect wallet'
     }
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
-    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+    const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
     );
-    const config = await program.account.systemConfigData.fetch(systemConfigAccount);
+    const systemConfigData = await program.account.systemConfigData.fetch(systemConfigAccountPda);
     return {
         success: true,
-        data: config
+        data: systemConfigData
     }
 }
 
@@ -387,11 +509,11 @@ export const refund = async (
         message: 'Please connect wallet'
     }
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
-    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+    const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
     );
-    const [refundAccount] = PublicKey.findProgramAddressSync(
+    const [refundAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
         program.programId,
     );
@@ -403,12 +525,12 @@ export const refund = async (
 
     const refundAccounts = {
         mint: new PublicKey(token.mint),
-        refundAccount,
+        refundAccount: refundAccountPda,
         configAccount: new PublicKey(token.configAccount),
         tokenVault: new PublicKey(token.tokenVault),
         protocolFeeAccount,
         tokenAta,
-        systemConfigAccount,
+        systemConfigAccount: systemConfigAccountPda,
         payer: wallet.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
@@ -433,15 +555,11 @@ export const refund = async (
     }
 }
 
-export const getReferralAccountByCode = async (connection: Connection, mint: string, code: BN) => {
-
-}
-
 export const mintToken = async (
     wallet: AnchorWallet | undefined, 
     connection: Connection,
     token: InitiazlizedTokenData,
-    referralAccount: PublicKey,
+    referralAccountPda: PublicKey,
     referrerMain: PublicKey,
     referrerAta: PublicKey,
     code: string,
@@ -453,7 +571,7 @@ export const mintToken = async (
     console.log("code", code);
     const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
     // Check referrer account
-    const referralAccountInfo = await connection.getAccountInfo(referralAccount);
+    const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
     if (!referralAccountInfo) {
         return {
             success: false,
@@ -461,7 +579,7 @@ export const mintToken = async (
         }
     }
     // get data from referral account, and check if it is correct
-    const referrerData = await program.account.tokenReferralData.fetch(referralAccount);
+    const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     console.log(referrerMain.toBase58(), referrerData.referrerMain.toBase58())
     if(referrerMain.toBase58() !== referrerData.referrerMain.toBase58()) {
         return {
@@ -484,30 +602,30 @@ export const mintToken = async (
     }
     // TODO: check if referrer code is exceed max usage
 
-    const destination = await getAssociatedTokenAddress(
+    const destinationAta = await getAssociatedTokenAddress(
         new PublicKey(token.mint),
         wallet.publicKey,
         false,
     )
-    const [refundAccount] = PublicKey.findProgramAddressSync(
+    const [refundAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
         program.programId,
     );
-    const [systemConfigAccount] = PublicKey.findProgramAddressSync(
+    const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
     );
 
     const mintAccounts = {
         mint: new PublicKey(token.mint),
-        destination,
-        refundAccount,
+        destination: destinationAta,
+        refundAccount: refundAccountPda,
         user: wallet.publicKey,
         configAccount: new PublicKey(token.configAccount),
         tokenVault: new PublicKey(token.tokenVault),
-        systemConfigAccount,
-        referralAccount,
-        referrerAta,
+        systemConfigAccount: systemConfigAccountPda,
+        referralAccount: referralAccountPda,
+        referrerAta: referrerAta,
         referrerMain,
         rent: SYSVAR_RENT_PUBKEY,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -541,4 +659,58 @@ export const getSolanaBalance = async (ata: PublicKey, connection: Connection): 
 export const getTokenBalance = async (ata: PublicKey, connection: Connection): Promise<number | null> => {
     const account = await connection.getTokenAccountBalance(ata);
     return account.value.uiAmount;
+}
+
+export const getReferralDataByCodeHash = async (wallet: AnchorWallet | undefined, connection: Connection, codeHash: PublicKey) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+
+    const [codeAccountPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(CODE_ACCOUNT_SEEDS), codeHash.toBuffer()],
+        program.programId,
+    );
+
+    console.log('codeAccountPda', codeAccountPda.toBase58());
+    const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
+    if(!codeAccountInfo) {
+        return {
+            success: false,
+            message: 'Code account does not exist'
+        }
+    }
+    const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
+    const referralAccountPda = codeAccountData.referralAccount;
+    console.log('referralAccountPda', referralAccountPda.toBase58());
+    const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
+    if(!referralAccountInfo) {
+        return {
+            success: false,
+            message: 'Referral account does not exist'
+        }
+    }
+    const referralAccountData = await program.account.tokenReferralData.fetch(referralAccountPda);
+    return {
+        success: true,
+        data: {
+            ...referralAccountData,
+            referralAccount: referralAccountPda,
+        }
+    }
+}
+
+export const getReferrerDataByReferralAccount = async (wallet: AnchorWallet | undefined, connection: Connection, referralAccountPda: PublicKey) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
+    return {
+        success: true,
+        data: referrerData
+    }
 }

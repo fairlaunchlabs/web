@@ -373,3 +373,27 @@ export type DataBlockProps = {
 export type MyUniqueReferralCodeProps = {
     expanded: boolean;
 }
+
+
+export type CheckURCProps = {
+    expanded: boolean;
+}
+
+export type SetRefererCodeEntity = {
+    id?: string;
+    mint: string;
+    referralAccount: string;
+    referrerAta: string;
+    referrerMain: string;
+    usageCount: number;
+    activeTimestamp: number;
+    codeHash: string;
+    tokenBalance: number | null;
+}
+
+export type OnChainReferralData = {
+    codeHash: string;
+    usageCount: number;
+    activeTimestamp: number;
+    tokenBalance: number | null;
+}

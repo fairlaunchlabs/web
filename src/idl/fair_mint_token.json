@@ -726,10 +726,6 @@
               {
                 "kind": "account",
                 "path": "referrer_main"
-              },
-              {
-                "kind": "arg",
-                "path": "referral_code"
               }
             ]
           }
@@ -1563,10 +1559,6 @@
               {
                 "kind": "account",
                 "path": "payer"
-              },
-              {
-                "kind": "arg",
-                "path": "code_hash"
               }
             ]
           }
@@ -1670,6 +1662,35 @@
                 89
               ]
             }
+          }
+        },
+        {
+          "name": "code_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  100,
+                  101,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "code_hash"
+              }
+            ]
           }
         },
         {
@@ -2170,6 +2191,19 @@
   ],
   "accounts": [
     {
+      "name": "CodeAccountData",
+      "discriminator": [
+        223,
+        104,
+        233,
+        118,
+        230,
+        133,
+        135,
+        33
+      ]
+    },
+    {
       "name": "SystemConfigData",
       "discriminator": [
         192,
@@ -2545,9 +2579,31 @@
       "code": 6045,
       "name": "MintNotStarted",
       "msg": "Mint has not started"
+    },
+    {
+      "code": 6046,
+      "name": "WrongReferrerCode",
+      "msg": "Wrong referrer account"
+    },
+    {
+      "code": 6047,
+      "name": "WrongCodeHash",
+      "msg": "Wrong code hash"
     }
   ],
   "types": [
+    {
+      "name": "CodeAccountData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "referral_account",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
     {
       "name": "InitializeLiquidityPoolEvent",
       "type": {
@@ -3059,6 +3115,10 @@
           },
           {
             "name": "code_hash",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
             "type": "pubkey"
           },
           {
