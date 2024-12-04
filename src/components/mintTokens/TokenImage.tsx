@@ -3,9 +3,89 @@ import { extractIPFSHash } from '../../utils/format';
 import { TokenImageProps } from '../../types/types';
 import { pinata } from '../../utils/web3';
 
-// Simple in-memory cache for metadata and image URLs
-const metadataCache = new Map<string, { image: string; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Cache configuration
+const DB_NAME = 'token_image_cache';
+const STORE_NAME = 'images';
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+// IndexedDB helper functions
+const openDB = (): Promise<IDBDatabase> => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        
+        request.onupgradeneeded = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                const store = db.createObjectStore(STORE_NAME, { keyPath: 'url' });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+        };
+    });
+};
+
+const getCachedImage = async (url: string): Promise<string | null> => {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(STORE_NAME, 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get(url);
+
+            request.onerror = () => {
+                db.close();
+                reject(request.error);
+            };
+
+            request.onsuccess = () => {
+                db.close();
+                if (request.result && Date.now() - request.result.timestamp < CACHE_DURATION) {
+                    resolve(request.result.data);
+                } else if (request.result) {
+                    // Remove expired cache
+                    const deleteTransaction = db.transaction(STORE_NAME, 'readwrite');
+                    const deleteStore = deleteTransaction.objectStore(STORE_NAME);
+                    deleteStore.delete(url);
+                    resolve(null);
+                } else {
+                    resolve(null);
+                }
+            };
+        });
+    } catch (error) {
+        console.error('Error reading from cache:', error);
+        return null;
+    }
+};
+
+const setCachedImage = async (url: string, data: string): Promise<void> => {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.put({
+                url,
+                data,
+                timestamp: Date.now()
+            });
+
+            request.onerror = () => {
+                db.close();
+                reject(request.error);
+            };
+
+            request.onsuccess = () => {
+                db.close();
+                resolve();
+            };
+        });
+    } catch (error) {
+        console.error('Error writing to cache:', error);
+    }
+};
 
 export const TokenImage: React.FC<TokenImageProps> = ({ 
     imageUrl, 
@@ -17,19 +97,28 @@ export const TokenImage: React.FC<TokenImageProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
     const [imageData, setImageData] = useState("");
+
     const fetchImage = async () => {
         try {
             setIsLoading(true);
             setError(null);
 
-            // Get image data from Pinata gateway
+            // Try to get from cache first
             const cid = extractIPFSHash(imageUrl as string);
+            const cachedImage = await getCachedImage(cid as string);
+            if (cachedImage) {
+                setImageData(cachedImage);
+                setIsLoading(false);
+                return;
+            }
+
+            // If not in cache, fetch from network
             if (!cid) {
                 throw new Error('Invalid IPFS hash');
             }
+
             const imageResponse = await pinata.gateways.get(cid);
             
-            // Type-safe Blob creation with fallback
             const blobPart = imageResponse.data instanceof Blob 
                 ? imageResponse.data 
                 : typeof imageResponse.data === 'string' 
@@ -38,15 +127,18 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             
             const blob = new Blob([blobPart], { type: imageResponse.contentType as string });
             const objectUrl = URL.createObjectURL(blob);
+            
+            // Cache the image
+            await setCachedImage(cid as string, objectUrl);
+            
             setImageData(objectUrl);
             setIsLoading(false);
-            setRetryCount(0); // Reset retry count on success
+            setRetryCount(0);
         } catch (err) {
             console.error('Error loading token image:', err);
             setError(err instanceof Error ? err.message : 'Unknown error');
             setIsLoading(false);
 
-            // Retry logic with exponential backoff
             if (retryCount < 3) {
                 const backoffTime = Math.pow(2, retryCount) * 1000;
                 setTimeout(() => {
@@ -65,7 +157,6 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             fetchImage();
         }
 
-        // Cleanup function to revoke object URLs when component unmounts
         return () => {
             isMounted = false;
             controller.abort();
