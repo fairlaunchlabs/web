@@ -162,7 +162,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                             tooltip={tooltip.deployingTx}
                         />
                         <DataBlock 
-                            label="Deployer" 
+                            label="Developer" 
                             value={<AddressDisplay address={token.admin} />}
                             tooltip={tooltip.deployer}
                         />

@@ -4,7 +4,7 @@ import { HolderData, TokenHoldersProps } from '../../types/types';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { Pagination } from '../common/Pagination';
 import { queryHolders } from '../../utils/graphql';
-import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, BN_ZERO, numberStringToBN } from '../../utils/format';
+import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, BN_MILLION, BN_ZERO, numberStringToBN } from '../../utils/format';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
 export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
@@ -86,13 +86,13 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
                             .map((holder: HolderData, index: number) => {
                             const totalSupply = numberStringToBN(token.supply).div(BN_LAMPORTS_PER_SOL);
                             const balance = numberStringToBN(holder.amount).div(BN_LAMPORTS_PER_SOL);
-                            const percentage = balance.div(totalSupply).mul(BN_HUNDRED);
+                            const percentage = balance.mul(BN_MILLION).div(totalSupply);
                             return (
                                 <tr key={holder.owner + index}>
                                     <td>{(currentPage - 1) * pageSize + index + 1}</td>
                                     <td><AddressDisplay address={holder.owner} /></td>
                                     <td>{balance.toLocaleString()} {token.tokenSymbol}</td>
-                                    <td>{percentage.toNumber().toFixed(2)}%</td>
+                                    <td>{(percentage.toNumber()/10000).toFixed(2)}%</td>
                                 </tr>
                             );
                         })}

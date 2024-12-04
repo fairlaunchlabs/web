@@ -158,7 +158,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                             <tr>
                                 <th>Token</th>
                                 <th>Mint Address</th>
-                                <th>Deployer</th>
+                                <th>Developer</th>
                                 <th className='text-right'>Actions</th>
                             </tr>
                         </thead>

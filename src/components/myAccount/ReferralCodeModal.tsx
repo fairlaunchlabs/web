@@ -39,6 +39,15 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     }, []);
 
     const handleReactiveCode = async () => {
+        if(myReferrerCode === "" || myReferrerCode === null) {
+            toast.error("Referrer code is empty");
+            return;
+        }
+        // Check if the code contains only letters, numbers and underscore
+        if (!/^[a-zA-Z0-9_]+$/.test(myReferrerCode)) {
+            toast.error("Referrer code can only contain letters, numbers and underscore");
+            return;
+        }
         setLoading(true);
         try {
             const result = await reactiveReferrerCode(
@@ -71,6 +80,15 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     }
 
     const handleGetCode = async () => {
+        if(myReferrerCode === "" || myReferrerCode === null) {
+            toast.error("Referrer code is empty");
+            return;
+        }
+        // Check if the code contains only letters, numbers and underscore
+        if (!/^[a-zA-Z0-9_]+$/.test(myReferrerCode)) {
+            toast.error("Referrer code can only contain letters, numbers and underscore");
+            return;
+        }
         setLoading(true);
         try {
             const result = await setReferrerCode(

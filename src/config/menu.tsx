@@ -17,8 +17,9 @@ import { MenuItem } from '../types/types';
 import { CheckURC } from '../components/tools/CheckURC';
 import { MyUniqueReferralCode } from '../components/tools/MyUniqueReferralCode';
 import { AskAI } from '../pages/AskAI';
-import { SocialDeployer } from '../pages/SocialDeployer';
+import { SocialDeveloper } from '../pages/SocialDeveloper';
 import { SocialURCProvider } from '../pages/SocialURCProvider';
+import { SocialValueManager } from '../pages/SocialValueManager';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
@@ -66,16 +67,22 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         component: null,
         subItems: [
             {
-                id: 'social-deployer',
-                label: 'Deployer',
+                id: 'social-developer',
+                label: 'Developer',
                 icon: <MdSupervisorAccount className="w-5 h-5" />,
-                component: <SocialDeployer expanded={expended} />
+                component: <SocialDeveloper expanded={expended} />
             },
             {
-                id: 'social-urc_provider',
+                id: 'social-urc-provider',
                 label: 'URC provider',
                 icon: <MdPerson className="w-5 h-5" />,
                 component: <SocialURCProvider expanded={expended} />
+            },
+            {
+                id: 'social-value-manager',
+                label: 'Value Manager',
+                icon: <MdAccountCircle className="w-5 h-5" />,
+                component: <SocialValueManager expanded={expended} />
             }
         ]
     },

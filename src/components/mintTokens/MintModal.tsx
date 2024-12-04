@@ -27,7 +27,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
 
     const fetchReferralData = async () => {
         try {
-            const codeHash = getReferrerCodeHash(wallet, code);
+            const codeHash = getReferrerCodeHash(wallet, connection, code);
             if (!codeHash.success) {
                 throw new Error(codeHash.message);
             }

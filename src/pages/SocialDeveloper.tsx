@@ -2,7 +2,7 @@
 export type SocialDeployerProps = {
     expanded: boolean;
 }
-export const SocialDeployer: React.FC<SocialDeployerProps> = ({ expanded }) => {
+export const SocialDeveloper: React.FC<SocialDeployerProps> = ({ expanded }) => {
     return (
         <div className={`card bg-base-200 shadow-xl ${expanded ? 'ml-64' : 'ml-20'}`}>
             <div className="card-body">

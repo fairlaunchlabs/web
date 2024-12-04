@@ -13,52 +13,8 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
     const [searchId, setSearchId] = useState('');
     const [searchResult, setSearchResult] = useState<SetRefererCodeEntity | null>(null);
-    // const [onChainData, setOnChainData] = useState<OnChainReferralData | null>(null);
     const [loading, setLoading] = useState(false);
     const [referralLink, setReferralLink] = useState('');
-
-    // const [getRefererCode] = useLazyQuery(querySetRefererCodeEntityById, {
-    //     onCompleted: async (data) => {
-    //         if (data.setRefererCodeEventEntity) {
-    //             setSearchResult(data.setRefererCodeEventEntity);
-    //             try {
-    //                 const result = await getReferrerDataByReferralAccount(
-    //                     wallet,
-    //                     connection,
-    //                     new PublicKey(data.setRefererCodeEventEntity.referralAccount)
-    //                 );
-    //                 if (result?.success && result.data) {
-    //                     setOnChainData({
-    //                         codeHash: result.data.codeHash.toString(),
-    //                         usageCount: result.data.usageCount,
-    //                         activeTimestamp: result.data.activeTimestamp.toNumber(),
-    //                         tokenBalance: await getTokenBalance(result.data.referrerAta, connection),
-    //                     });
-    //                     setReferralLink(
-    //                         `${window.location.origin}/token/${data.setRefererCodeEventEntity.mint}/${searchId.trim()}`
-    //                     );
-    //                     // TODO: 根据mint获取token metadata以及当前价格，然后计算该code的打折信息
-
-    //                 } else {
-    //                     toast.error('Failed to fetch on-chain data');
-    //                 }
-    //             } catch (error) {
-    //                 console.error('Error fetching on-chain data:', error);
-    //                 toast.error('Error fetching on-chain data');
-    //             }
-    //         } else {
-    //             toast.error('No data found for this URC');
-    //             setSearchResult(null);
-    //             setOnChainData(null);
-    //         }
-    //     },
-    //     onError: (error) => {
-    //         console.error('GraphQL error:', error);
-    //         toast.error('Error searching for URC');
-    //         setSearchResult(null);
-    //         setOnChainData(null);
-    //     }
-    // });
 
     const handleSearch = () => {
         if (!searchId.trim()) {
@@ -67,7 +23,7 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
         }
         setLoading(true);
       
-        const codeHashData = getReferrerCodeHash(wallet, searchId.trim());
+        const codeHashData = getReferrerCodeHash(wallet, connection, searchId.trim());
         if (codeHashData.success) {
             getReferralDataByCodeHash(wallet, connection, codeHashData.data as PublicKey).then(async (result) => {
                 if (result?.success && result.data) {
@@ -120,7 +76,7 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
                     </button>
                 </div>
 
-                {searchResult && searchResult.codeHash === getReferrerCodeHash(wallet, searchId.trim()).data?.toString() && searchId ? (
+                {searchResult && searchResult.codeHash === getReferrerCodeHash(wallet, connection, searchId.trim()).data?.toString() && searchId ? (
                     <div className="card bg-base-200 shadow-xl">
                         <div className="card-body">
                             <h2 className="card-title">URC Details</h2>

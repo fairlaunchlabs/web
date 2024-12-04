@@ -1,7 +1,7 @@
 import React, { useState, FC, useEffect } from 'react';
 import { createTokenOnChain, pinata } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
-import { useAnchorWallet } from '@solana/wallet-adapter-react';
+import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Metrics } from '../components/launchToken/Metrics';
 import { SocialInformation } from '../components/launchToken/SocialInformation';
 import { AdvancedSettings } from '../components/launchToken/AdvancedSettings';
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
 import { numberStringToBN } from '../utils/format';
+import { connect } from 'http2';
 
 export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const wallet = useAnchorWallet();
@@ -51,6 +52,8 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const [startImmediately, setStartImmediately] = useState(true);
     const [startTime, setStartTime] = useState<string>('');
 
+    const { connection } = useConnection();
+    
     useEffect(() => {
         if (startImmediately) {
             setStartTime('');
@@ -182,7 +185,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                 startTimestamp: numberStringToBN(startTimestamp.toString()),
             };
 
-            const result = await createTokenOnChain(tokenMetadata, wallet, initConfigData);
+            const result = await createTokenOnChain(tokenMetadata, wallet, connection, initConfigData);
             console.log('Token created:', result);
 
             setIsCreating(false);

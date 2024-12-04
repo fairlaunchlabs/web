@@ -397,3 +397,9 @@ export type OnChainReferralData = {
     activeTimestamp: number;
     tokenBalance: number | null;
 }
+
+export type ResponseData = {
+    success: boolean;
+    message?: string;
+    data?: any;
+}

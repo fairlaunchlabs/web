@@ -4,98 +4,49 @@ import {
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
 } from '@solana/web3.js';
-import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
+import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { FAIR_MINT_PROGRAM_ID, METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS } from '../config/constants';
-import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, TokenMetadata } from '../types/types';
+import { METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS } from '../config/constants';
+import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, ResponseData, TokenMetadata } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount } from '@solana/spl-token';
-import { get } from 'lodash';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 
-// Solana 网络连接配置
-const SOLANA_RPC_URL = process.env.REACT_APP_SOLANA_RPC_URL || `https://api.${NETWORK}.solana.com`;
+export const pinata = new PinataSDK({
+    pinataJwt: process.env.REACT_APP_PINATA_JWT,
+    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
+});
 
-// 程序 ID
-const PROGRAM_ID = new PublicKey(FAIR_MINT_PROGRAM_ID);
+export const getProgram = (wallet: AnchorWallet, connection: Connection) => {
+    const provider = new AnchorProvider(
+        connection,
+        {
+            ...wallet,
+            signTransaction: wallet.signTransaction.bind(wallet),
+            signAllTransactions: wallet.signAllTransactions.bind(wallet),
+            publicKey: wallet.publicKey,
+        },
+        { commitment: 'confirmed' }
+    );
+    
+    return new Program(fairMintTokenIdl as FairMintToken, provider);
+}
 
-// 创建 Solana 连接
-export const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
-
-// 连接钱包
-export const connectWallet = async () => {
-    try {
-        // 检查 Solflare 钱包
-        const solflare = (window as any).solflare;
-        if (solflare?.isSolflare) {
-            const response = await solflare.connect();
-            return response;
-        }
-
-        // 检查 Phantom 钱包
-        const phantom = (window as any).phantom?.solana;
-        if (phantom?.isPhantom) {
-            const response = await phantom.connect();
-            return response;
-        }
-
-        throw new Error('Please install Phantom or Solflare wallet');
-    } catch (error) {
-        console.error('Error connecting wallet:', error);
-        throw error;
-    }
-};
-
-// 断开钱包连接
-export const disconnectWallet = async () => {
-    try {
-        // 检查 Solflare 钱包
-        const solflare = (window as any).solflare;
-        if (solflare?.isSolflare && solflare.isConnected) {
-            await solflare.disconnect();
-            return;
-        }
-
-        // 检查 Phantom 钱包
-        const phantom = (window as any).phantom?.solana;
-        if (phantom?.isPhantom && phantom.isConnected) {
-            await phantom.disconnect();
-            return;
-        }
-    } catch (error) {
-        console.error('Error disconnecting wallet:', error);
-        throw error;
-    }
-};
-
-// 创建代币
 export const createTokenOnChain = async (
     metadata: TokenMetadata, 
     wallet: AnchorWallet,
+    connection: Connection,
     config: InitializeTokenConfig
 ) => {
     try {
         if (!wallet) {
             throw new Error('Please connect your wallet first');
         }        
-        // 创建 Provider
-        const provider = new AnchorProvider(
-            connection,
-            {
-                ...wallet,
-                signTransaction: wallet.signTransaction.bind(wallet),
-                signAllTransactions: wallet.signAllTransactions.bind(wallet),
-                publicKey: wallet.publicKey,
-            },
-            { commitment: 'confirmed' }
-        );
 
-        // 创建 Program
-        const program = new Program(fairMintTokenIdl as FairMintToken, provider);
+        const program = getProgram(wallet, connection);
 
-        // 计算 mint PDA
         const [mintPda] = PublicKey.findProgramAddressSync(
             [
                 Buffer.from(MINT_SEED),
@@ -106,7 +57,6 @@ export const createTokenOnChain = async (
             program.programId
         );
 
-        // 计算 config PDA
         const [configPda] = PublicKey.findProgramAddressSync(
             [
                 Buffer.from(CONFIG_DATA_SEED),
@@ -115,7 +65,6 @@ export const createTokenOnChain = async (
             program.programId
         );
 
-        // 计算 mint state PDA
         const [mintStatePda] = PublicKey.findProgramAddressSync(
             [
                 Buffer.from(MINT_STATE_SEED),
@@ -172,13 +121,18 @@ export const createTokenOnChain = async (
     }
 };
 
-export const getReferrerCodeHash = (wallet: AnchorWallet | undefined, code: string) => {
+export const getReferrerCodeHash = (
+    wallet: AnchorWallet | undefined, 
+    connection: Connection,
+    code: string // without hashed
+): ResponseData => {
     if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
 
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
+    // Hash the code
     const [codeHash] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFERRAL_CODE_SEED), Buffer.from(code)],
         program.programId,
@@ -191,7 +145,10 @@ export const getReferrerCodeHash = (wallet: AnchorWallet | undefined, code: stri
 }
 
 // 获取钱包余额
-export const getBalance = async (publicKey: string) => {
+export const getBalance = async (
+    connection: Connection,
+    publicKey: string
+): Promise<number> => {
     try {
         const balance = await connection.getBalance(new PublicKey(publicKey));
         return balance / 1e9; // Convert lamports to SOL
@@ -201,11 +158,6 @@ export const getBalance = async (publicKey: string) => {
     }
 };
 
-export const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
-
 export const reactiveReferrerCode = async (
     wallet: AnchorWallet | undefined,
     connection: Connection,
@@ -213,15 +165,16 @@ export const reactiveReferrerCode = async (
     tokenSymbol: string,
     mint: PublicKey,
     code: string,
-) => {
+): Promise<ResponseData> => {
     if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
 
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
 
-    const codeHash = getReferrerCodeHash(wallet, code);
+    // Get code hash
+    const codeHash = getReferrerCodeHash(wallet, connection, code);
     if (!codeHash.success) {
         return {
             success: false,
@@ -229,6 +182,7 @@ export const reactiveReferrerCode = async (
         }
     }
 
+    // Get code account pda
     const [codeAccountPda] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(CODE_ACCOUNT_SEEDS),
@@ -236,21 +190,25 @@ export const reactiveReferrerCode = async (
         ],
         program.programId,
     );
+
+    // check if the code account initialized
     const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
     if (codeAccountInfo) {
-        // 如果codeAccountInfo存在，说明code已经被使用
-        // 检查该code的所有者是不是自己，以及mint是不是相符，如果不是的话，则返回错误
+        // if codeAccountInfo exists, it means the code has already been used.
+        // The system will not allow you to use the same code again or generate a new URC code.
+        // Check the owner of the existing code is the wallet owner or not
         const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
         const referralAccountPda = codeAccountData.referralAccount;
         const referralAccountData = await program.account.tokenReferralData.fetch(referralAccountPda);
         if (referralAccountData.referrerMain.toBase58() !== wallet.publicKey.toBase58() || referralAccountData.mint.toBase58() !== mint.toBase58()) {
             return {
                 success: false,
-                message: 'Code already exists but the owner is not you',
+                message: 'Code already exists but the owner is not you, nor the mint is not the same',
             }
         }
     }
 
+    // get config account pda
     const [configAccountPda] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(CONFIG_DATA_SEED),
@@ -259,21 +217,20 @@ export const reactiveReferrerCode = async (
         program.programId
     );
 
+    // get referrer ata
     let referrerAta = await getAssociatedTokenAddress(
         mint,
         wallet.publicKey, // 需要查询账户的公钥
         false,
     )
 
+    // get referral account pda
     const [referralAccountPda] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from(REFERRAL_SEED),
-            mint.toBuffer(),
-            wallet.publicKey.toBuffer(),
-        ],
-        PROGRAM_ID
+        [Buffer.from(REFERRAL_SEED), mint.toBuffer(), wallet.publicKey.toBuffer()],
+        program.programId,
     );
 
+    // Get system config account
     const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
@@ -290,10 +247,11 @@ export const reactiveReferrerCode = async (
     };
 
     try {
+        // do the tranasaction
         const tx = await program.methods
             .setReferrerCode(tokenName, tokenSymbol, codeHash.data as PublicKey)
             .accounts(setReferrerCodeAccounts)
-            .signers([])  // 使用钱包的 payer
+            .signers([])
             .rpc();
 
         return {
@@ -319,15 +277,15 @@ export const setReferrerCode = async (
     tokenSymbol: string,
     mint: PublicKey,
     code: string,
-) => {
+): Promise<ResponseData> => {
     if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
 
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
 
-    const codeHash = getReferrerCodeHash(wallet, code);
+    const codeHash = getReferrerCodeHash(wallet, connection, code);
     if (!codeHash.success) {
         return {
             success: false,
@@ -366,26 +324,19 @@ export const setReferrerCode = async (
     }
 
     const [configAccountPda] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from(CONFIG_DATA_SEED),
-            mint.toBuffer()
-        ],
+        [Buffer.from(CONFIG_DATA_SEED), mint.toBuffer()],
         program.programId
     );
 
     let referrerAta = await getAssociatedTokenAddress(
         mint,
-        wallet.publicKey, // 需要查询账户的公钥
+        wallet.publicKey,
         false,
     )
 
     const [referralAccountPda] = PublicKey.findProgramAddressSync(
-        [
-            Buffer.from(REFERRAL_SEED),
-            mint.toBuffer(),
-            wallet.publicKey.toBuffer(),
-        ],
-        PROGRAM_ID
+        [Buffer.from(REFERRAL_SEED), mint.toBuffer(), wallet.publicKey.toBuffer()],
+        program.programId
     );
 
     const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
@@ -426,7 +377,12 @@ export const setReferrerCode = async (
     }
 };
 
-export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connection: Connection, mint: PublicKey, referrerCode: string) => {
+export const getMyReferrerData = async (
+    wallet: AnchorWallet | undefined, 
+    connection: Connection, 
+    mint: PublicKey, 
+    referrerCode: string
+): Promise<ResponseData> => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
@@ -438,7 +394,7 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         false,
     )
     // console.log('referrerAta', referrerAta.toBase58())
-    // 确认referrerAta是否存在
+    // Check if the referrer's ATA account exists
     const referrerAtaAccountInfo = await connection.getAccountInfo(referrerAta);
     if (!referrerAtaAccountInfo) {
         return {
@@ -447,7 +403,7 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         };
     }
 
-    const codeHash = getReferrerCodeHash(wallet, referrerCode);
+    const codeHash = getReferrerCodeHash(wallet, connection, referrerCode);
     if (!codeHash.success) {
         return {
             success: false,
@@ -455,13 +411,14 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
         }
     }
     // console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
+    const program = getProgram(wallet, connection);
     const [referralAccountPda] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(REFERRAL_SEED),
             mint.toBuffer(),
             wallet.publicKey.toBuffer(),
         ],
-        PROGRAM_ID
+        program.programId,
     );
     console.log('referralAccount', referralAccountPda.toBase58());
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
@@ -473,7 +430,6 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
     }
 
     console.log('referralAccountInfo', referralAccountInfo);
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     return {
         success: true,
@@ -481,12 +437,15 @@ export const getMyReferrerData = async (wallet: AnchorWallet | undefined, connec
     }
 }
 
-export const getSystemConfig = async (wallet: AnchorWallet | undefined, connection: Connection) => {
+export const getSystemConfig = async (
+    wallet: AnchorWallet | undefined,
+    connection: Connection
+): Promise<ResponseData> => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
     const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
@@ -503,12 +462,12 @@ export const refund = async (
     connection: Connection,
     token: InitiazlizedTokenData,
     protocolFeeAccount: PublicKey,
-) => {
+): Promise<ResponseData> => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
     const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
         program.programId,
@@ -563,13 +522,13 @@ export const mintToken = async (
     referrerMain: PublicKey,
     referrerAta: PublicKey,
     code: string,
-) => {
+): Promise<ResponseData> => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
     console.log("code", code);
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
     // Check referrer account
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
     if (!referralAccountInfo) {
@@ -587,7 +546,7 @@ export const mintToken = async (
             message: 'Wrong referrer account'
         }
     }
-    const codeHash = getReferrerCodeHash(wallet, code);
+    const codeHash = getReferrerCodeHash(wallet, connection, code);
     if(!codeHash.success) {
         return {
             success: false,
@@ -661,20 +620,24 @@ export const getTokenBalance = async (ata: PublicKey, connection: Connection): P
     return account.value.uiAmount;
 }
 
-export const getReferralDataByCodeHash = async (wallet: AnchorWallet | undefined, connection: Connection, codeHash: PublicKey) => {
+export const getReferralDataByCodeHash = async (
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
+    codeHash: PublicKey
+) => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
 
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
 
     const [codeAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(CODE_ACCOUNT_SEEDS), codeHash.toBuffer()],
         program.programId,
     );
 
-    console.log('codeAccountPda', codeAccountPda.toBase58());
+    // console.log('codeAccountPda', codeAccountPda.toBase58());
     const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
     if(!codeAccountInfo) {
         return {
@@ -684,7 +647,7 @@ export const getReferralDataByCodeHash = async (wallet: AnchorWallet | undefined
     }
     const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
     const referralAccountPda = codeAccountData.referralAccount;
-    console.log('referralAccountPda', referralAccountPda.toBase58());
+    // console.log('referralAccountPda', referralAccountPda.toBase58());
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
     if(!referralAccountInfo) {
         return {
@@ -702,12 +665,16 @@ export const getReferralDataByCodeHash = async (wallet: AnchorWallet | undefined
     }
 }
 
-export const getReferrerDataByReferralAccount = async (wallet: AnchorWallet | undefined, connection: Connection, referralAccountPda: PublicKey) => {
+export const getReferrerDataByReferralAccount = async (
+    wallet: AnchorWallet | undefined, 
+    connection: Connection, 
+    referralAccountPda: PublicKey
+): Promise<ResponseData> => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
-    const program = new Program(fairMintTokenIdl as FairMintToken, new AnchorProvider(connection, wallet, { commitment: 'confirmed' }));
+    const program = getProgram(wallet, connection);
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     return {
         success: true,
