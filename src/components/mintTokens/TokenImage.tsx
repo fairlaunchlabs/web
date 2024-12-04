@@ -4,9 +4,9 @@ import { TokenImageProps } from '../../types/types';
 import { pinata } from '../../utils/web3';
 
 // Cache configuration
-const DB_NAME = 'token_image_cache';
-const STORE_NAME = 'images';
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const DB_NAME = 'POM_IMAGE_CACHE';
+const STORE_NAME = 'token_images';
+const CACHE_DURATION = 60 * 24 * 60 * 60 * 1000; // 60 days
 
 // IndexedDB helper functions
 const openDB = (): Promise<IDBDatabase> => {
@@ -26,7 +26,7 @@ const openDB = (): Promise<IDBDatabase> => {
     });
 };
 
-const getCachedImage = async (url: string): Promise<string | null> => {
+const getCachedImage = async (url: string): Promise<ArrayBuffer | null> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ const getCachedImage = async (url: string): Promise<string | null> => {
     }
 };
 
-const setCachedImage = async (url: string, data: string): Promise<void> => {
+const setCachedImage = async (url: string, data: ArrayBuffer): Promise<void> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
@@ -87,6 +87,10 @@ const setCachedImage = async (url: string, data: string): Promise<void> => {
     }
 };
 
+const arrayBufferToBlob = (buffer: ArrayBuffer, type: string): Blob => {
+    return new Blob([buffer], { type });
+};
+
 export const TokenImage: React.FC<TokenImageProps> = ({ 
     imageUrl, 
     name,
@@ -98,40 +102,62 @@ export const TokenImage: React.FC<TokenImageProps> = ({
     const [retryCount, setRetryCount] = useState(0);
     const [imageData, setImageData] = useState("");
 
+    const createBlobUrl = (data: ArrayBuffer | Blob, type: string = 'image/png'): string => {
+        if (imageData) {
+            URL.revokeObjectURL(imageData);
+        }
+        const blob = data instanceof Blob ? data : arrayBufferToBlob(data, type);
+        return URL.createObjectURL(blob);
+    };
+
     const fetchImage = async () => {
         try {
             setIsLoading(true);
             setError(null);
 
-            // Try to get from cache first
+            // Extract CID and validate
             const cid = extractIPFSHash(imageUrl as string);
-            const cachedImage = await getCachedImage(cid as string);
+            if (!cid) {
+                throw new Error('Invalid IPFS hash');
+            }
+
+            // Try to get from cache first
+            const cachedImage = await getCachedImage(cid);
             if (cachedImage) {
-                setImageData(cachedImage);
+                console.log('Using cached image', cid);
+                const blobUrl = createBlobUrl(cachedImage);
+                setImageData(blobUrl);
                 setIsLoading(false);
                 return;
             }
 
             // If not in cache, fetch from network
-            if (!cid) {
-                throw new Error('Invalid IPFS hash');
+            const imageResponse = await pinata.gateways.get(cid);
+            if (!imageResponse?.data) {
+                throw new Error('Failed to fetch image');
             }
 
-            const imageResponse = await pinata.gateways.get(cid);
-            
-            const blobPart = imageResponse.data instanceof Blob 
-                ? imageResponse.data 
-                : typeof imageResponse.data === 'string' 
-                    ? new Blob([imageResponse.data], { type: imageResponse.contentType as string }) 
-                    : new Blob([JSON.stringify(imageResponse.data)], { type: 'application/json' });
-            
-            const blob = new Blob([blobPart], { type: imageResponse.contentType as string });
-            const objectUrl = URL.createObjectURL(blob);
-            
-            // Cache the image
-            await setCachedImage(cid as string, objectUrl);
-            
-            setImageData(objectUrl);
+            let imageBuffer: ArrayBuffer;
+            if (imageResponse.data instanceof ArrayBuffer) {
+                console.log('Using ArrayBuffer');
+                imageBuffer = imageResponse.data;
+            } else if (imageResponse.data instanceof Blob) {
+                console.log('Using Blob');
+                imageBuffer = await imageResponse.data.arrayBuffer();
+            } else if (typeof imageResponse.data === 'string') {
+                console.log('Using string');
+                const encoder = new TextEncoder();
+                imageBuffer = encoder.encode(imageResponse.data).buffer;
+            } else {
+                throw new Error('Unsupported image data format');
+            }
+
+            // Cache the image data
+            await setCachedImage(cid, imageBuffer);
+
+            // Create blob URL
+            const blobUrl = createBlobUrl(imageBuffer, imageResponse.contentType || 'image/png');
+            setImageData(blobUrl);
             setIsLoading(false);
             setRetryCount(0);
         } catch (err) {
@@ -164,7 +190,7 @@ export const TokenImage: React.FC<TokenImageProps> = ({
                 URL.revokeObjectURL(imageData);
             }
         };
-    }, [imageUrl, size, retryCount]);
+    }, [imageUrl, retryCount]);
 
     if (isLoading) {
         return (
@@ -191,6 +217,13 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             className={`object-cover ${className}`}
             style={{ width: size, height: size }}
             loading="lazy"
+            onError={() => {
+                console.error('Image failed to load:', imageUrl);
+                setError('Failed to display image');
+                if (imageData) {
+                    URL.revokeObjectURL(imageData);
+                }
+            }}
         />
     ) : null;
 };
