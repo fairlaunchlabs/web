@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { FaSun, FaMoon, FaBars } from 'react-icons/fa';
-import { useTheme } from '../../hooks/useTheme';
 import { NavbarProps } from '../../types/types';
+import { useTheme } from '../../utils/contexts';
 
 export const Navbar: React.FC<NavbarProps> = ({ 
     title = "Logo",
     onMenuClick,
     isMenuOpen 
 }) => {
-    const { theme, toggleTheme } = useTheme();
+    const { isDarkMode, toggleTheme } = useTheme();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -36,14 +36,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {/* 左侧区域：菜单按钮和Logo */}
                     <div className="flex-1 flex items-center">
                         <button 
-                            className={`menu-button btn btn-ghost btn-circle md:hidden ${theme === 'light' ? 'hover:bg-base-200' : ''}`}
+                            className={`menu-button btn btn-ghost btn-circle md:hidden ${isDarkMode ? '' : 'hover:bg-base-200'}`}
                             onClick={onMenuClick}
                         >
                             <FaBars className="w-5 h-5" />
                         </button>
                         <a 
                             href="/" 
-                            className={`btn btn-ghost normal-case text-lg md:text-xl ${theme === 'light' ? 'hover:bg-base-200' : ''}`}
+                            className={`btn btn-ghost normal-case text-lg md:text-xl ${isDarkMode ? '' : 'hover:bg-base-200'}`}
                             onClick={(e) => {
                                 e.preventDefault();
                                 window.location.href = '/';
@@ -56,19 +56,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {/* 右侧区域：主题切换和钱包按钮 */}
                     <div className="flex-1 flex items-center justify-end gap-2">
                         <button 
-                            className={`btn btn-ghost btn-circle ${theme === 'light' ? 'hover:bg-base-200' : ''}`}
+                            className={`btn btn-ghost btn-circle ${isDarkMode ? '' : 'hover:bg-base-200'}`}
                             onClick={toggleTheme}
-                            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                            title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
                         >
-                            {theme === 'light' ? (
-                                <FaMoon className="w-5 h-5" />
-                            ) : (
+                            {isDarkMode ? (
                                 <FaSun className="w-5 h-5" />
+                            ) : (
+                                <FaMoon className="w-5 h-5" />
                             )}
                         </button>
                         <div className="">
                             <WalletMultiButton 
-                                className={`btn btn-primary whitespace-nowrap min-w-[160px] ${theme === 'light' ? 'hover:bg-primary-focus' : ''}`}
+                                className={`btn btn-primary whitespace-nowrap min-w-[160px] ${isDarkMode ? '' : 'hover:bg-primary-focus'}`}
                             />
                         </div>
                     </div>

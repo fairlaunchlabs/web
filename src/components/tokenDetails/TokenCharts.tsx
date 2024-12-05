@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createChart, ColorType, UTCTimestamp } from 'lightweight-charts';
-import { TokenChartsProps } from '../../types/types';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { createChart, UTCTimestamp } from 'lightweight-charts';
 import { useQuery } from '@apollo/client';
 import { queryAllTokenMintForChart } from '../../utils/graphql';
 import { formatPrice } from '../../utils/format';
+import { TokenChartsProps } from '../../types/types';
+import { useTheme } from '../../utils/contexts';
 
 // 定义时间周期类型
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
@@ -67,7 +68,7 @@ const processRawData = (data: MintData[], feeRate: number) => {
 
 export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
-    const [timeFrame, setTimeFrame] = useState<TimeFrame>('30min');
+    const [timeFrame, setTimeFrame] = useState<TimeFrame>('5min');
     const [isLineChart, setIsLineChart] = useState(false);
     const chart = useRef<any>(null);
     const series = useRef<any>(null);
@@ -84,6 +85,141 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         'day': []
     });
     const tooltipRef = useRef<HTMLDivElement>(null);
+    
+    // 使用ThemeContext
+    const { isDarkMode } = useTheme();
+
+    // 根据主题设置颜色
+    const gridColor = isDarkMode ? 'rgba(70, 130, 180, 0.2)' : 'rgba(70, 130, 180, 0.1)';
+    const labelColor = isDarkMode ? '#DDD' : '#333';
+
+    // 清理和初始化图表
+    const cleanupAndInitChart = useCallback(() => {
+        if (chart.current) {
+            chart.current.remove();
+            chart.current = null;
+        }
+
+        if(chartContainerRef.current) {
+            chartContainerRef.current.innerHTML = '';
+
+            chart.current = createChart(chartContainerRef.current, {
+                layout: {
+                    background: { color: 'transparent' },
+                    textColor: '#DDD',
+                },
+                grid: {
+                    vertLines: {
+                        color: gridColor,
+                        style: 1,
+                    },
+                    horzLines: {
+                        color: gridColor,
+                        style: 1,
+                    },
+                },
+                width: chartContainerRef.current?.clientWidth,
+                height: 560,
+                leftPriceScale: {
+                    visible: false,
+                    borderColor: '#2B2B43',
+                    textColor: '#DDD',
+                    scaleMargins: {
+                        top: 0.1,
+                        bottom: 0.3,
+                    },
+                },
+                rightPriceScale: {
+                    visible: true,
+                    borderColor: '#2B2B43',
+                    textColor: labelColor,
+                    scaleMargins: {
+                        top: 0.1,
+                        bottom: 0.3,
+                    },
+                    borderVisible: true,
+                    alignLabels: true,
+                    autoScale: true,
+                    mode: 2,
+                    ticksVisible: true,
+                    entireTextOnly: true,
+                },
+                timeScale: {
+                    timeVisible: true,
+                    secondsVisible: timeFrame === '1min',
+                    rightOffset: 5,
+                    barSpacing: 12,
+                    fixLeftEdge: true,
+                    fixRightEdge: true,
+                    lockVisibleTimeRangeOnResize: true,
+                    rightBarStaysOnScroll: true,
+                    borderVisible: true,
+                    borderColor: '#2B2B43',
+                },
+                crosshair: {
+                    mode: 1,
+                    vertLine: {
+                        color: '#758696',
+                        width: 1,
+                        style: 3,
+                        labelBackgroundColor: '#758696',
+                    },
+                    horzLine: {
+                        color: '#758696',
+                        width: 1,
+                        style: 3,
+                        labelBackgroundColor: '#758696',
+                    },
+                },
+                localization: {
+                    locale: 'en-US',
+                    timeFormatter: (time: number) => {
+                        const date = new Date(time * 1000);
+                        return date.toLocaleString();
+                    },
+                    priceFormatter: (price: number) => {
+                        return formatPrice(price);
+                    }
+                },
+                handleScroll: {
+                    mouseWheel: true,
+                    pressedMouseMove: true,
+                    horzTouchDrag: true,
+                    vertTouchDrag: true
+                },
+                handleScale: {
+                    mouseWheel: true,
+                    pinch: true,
+                    axisPressedMouseMove: {
+                        time: true,
+                        price: true
+                    }
+                },
+            });
+
+            // 添加K线图或折线图
+            series.current = chart.current.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+                priceScaleId: 'right',
+                priceFormat: {
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
+                },
+                lastValueVisible: true,
+                priceLineVisible: true,
+                title: 'Price',
+            });
+
+            // 更新数据
+            if (timeFrameData.current[timeFrame].length > 0) {
+                updateChartData();
+            }
+        }
+    }, [isDarkMode, gridColor, labelColor, timeFrame]);
 
     // 查询图表数据
     const { loading, error, data } = useQuery(queryAllTokenMintForChart, {
@@ -380,11 +516,17 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 textColor: '#DDD',
             },
             grid: {
-                vertLines: { color: '#2B2B43' },
-                horzLines: { color: '#2B2B43' },
+                vertLines: {
+                    color: gridColor,
+                    style: 1,
+                },
+                horzLines: {
+                    color: gridColor,
+                    style: 1,
+                },
             },
             width: chartContainerRef.current.clientWidth,
-            height: 560, // 原来是400，增加40%
+            height: 560,
             leftPriceScale: {
                 visible: false,
                 borderColor: '#2B2B43',
@@ -397,15 +539,17 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             rightPriceScale: {
                 visible: true,
                 borderColor: '#2B2B43',
-                textColor: '#DDD',
+                textColor: labelColor,
                 scaleMargins: {
                     top: 0.1,
                     bottom: 0.3,
                 },
-                // priceFormat: {
-                //     type: 'custom',
-                //     formatter: (price: number) => formatPrice(price),
-                // },
+                borderVisible: true,
+                alignLabels: true,
+                autoScale: true,
+                mode: 2,
+                ticksVisible: true,
+                entireTextOnly: true,
             },
             timeScale: {
                 timeVisible: true,
@@ -598,6 +742,11 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     useEffect(() => {
         updateChartData();
     }, [timeFrame, updateChartData]);
+
+    // 主题变化时重新创建图表
+    useEffect(() => {
+        cleanupAndInitChart();
+    }, [isDarkMode, cleanupAndInitChart]);
 
     // 时间周期选项
     const timeFrameOptions = [
