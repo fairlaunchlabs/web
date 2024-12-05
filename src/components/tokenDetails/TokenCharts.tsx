@@ -49,7 +49,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
     // 根据主题设置颜色
     const gridColor = isDarkMode ? 'rgba(70, 130, 180, 0.2)' : 'rgba(70, 130, 180, 0.1)';
-    const labelColor = isDarkMode ? '#DDD' : '#333';
+    const labelColor = isDarkMode ? '#DDD' : '#000';
 
     const addChart = (_isLineChart: boolean) => {
         if (_isLineChart) {
@@ -400,6 +400,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     // 使用useLazyQuery替代useQuery
     const [fetchMintData, { loading, error }] = useLazyQuery(queryAllTokenMintForChart, {
         onCompleted: (data) => {
+            console.log('GraphQL response:', data);
             if (data?.mintTokenEntities && token?.mint) {
                 // 保存数据到缓存
                 setCachedData(token.mint, timeFrame, data.mintTokenEntities);
@@ -485,6 +486,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             }
         }
 
+        console.log("加载图片");
         if (chart.current) {
             chart.current.remove();
             chart.current = null;
@@ -492,7 +494,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
         if(chartContainerRef?.current) initializeChart(chartContainerRef?.current, isLineChart);
         else return;
-    }, [loading, error, timeFrame, isLineChart]);
+    }, [loading, error, timeFrame, isLineChart, gridColor, labelColor]);
 
     // 获取默认显示的K线数量
     const getVisibleBarsCount = (tf: TimeFrame) => {
@@ -565,12 +567,28 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             <div className="bg-base-200 rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold text-base-content">Price History</h2>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                        <button 
+                            className="btn btn-sm btn-outline btn-primary"
+                            onClick={loadData}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
                         <button
-                            className="btn btn-sm btn-outline"
+                            className="btn btn-sm btn-outline btn-primary"
                             onClick={() => setIsLineChart(!isLineChart)}
                         >
-                            {isLineChart ? 'K-Line' : 'Dot-Line'}
+                            {isLineChart ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4V4z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            )}
                         </button>
                         <select
                             value={timeFrame}
