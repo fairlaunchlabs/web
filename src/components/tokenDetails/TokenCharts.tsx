@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { createChart, UTCTimestamp } from 'lightweight-charts';
 import { useLazyQuery } from '@apollo/client';
 import { queryAllTokenMintForChart } from '../../utils/graphql';
@@ -8,7 +8,6 @@ import { useTheme } from '../../utils/contexts';
 import { ErrorBox } from '../common/ErrorBox';
 import { LOCAL_STORAGE_HISTORY_CACHE_EXPIRY, LOCAL_STORAGE_HISTORY_CACHE_PREFIX } from '../../config/constants';
 
-// 定义时间周期类型
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
 
 const USE_CACHE = false; // TODO: 先都从GraphQL加载，以后再优化Cache
@@ -59,7 +58,7 @@ const timeFrameDatas = {
 export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const [timeFrame, setTimeFrame] = useState<TimeFrame>('5min');
-    const [isLineChart, setIsLineChart] = useState(false);
+    const [isLineChart, setIsLineChart] = useState(true);
     const chart = useRef<any>(null);
     const series = useRef<any>(null);
     const volumeSeries = useRef<any>(null);
@@ -76,10 +75,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     });
     const tooltipRef = useRef<HTMLDivElement>(null);
     
-    // 使用ThemeContext
     const { isDarkMode } = useTheme();
 
-    // 根据主题设置颜色
     const gridColor = isDarkMode ? 'rgba(70, 130, 180, 0.2)' : 'rgba(70, 130, 180, 0.1)';
     const labelColor = isDarkMode ? '#DDD' : '#000';
 
@@ -120,7 +117,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }        
     }
 
-    const createMainChart = (chartRef: HTMLDivElement, _timeFrame: TimeFrame) => {
+    const createMainChart = (chartRef: HTMLDivElement) => {
         chart.current = createChart(chartRef, {
             layout: {
                 background: { color: 'transparent' },
@@ -164,7 +161,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             },
             timeScale: {
                 timeVisible: true,
-                secondsVisible: _timeFrame === '1min',
                 rightOffset: 5,
                 barSpacing: 12,
                 fixLeftEdge: true,
@@ -253,12 +249,12 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     tooltipRef.current.innerHTML = tooltipContent;
                     tooltipRef.current.style.display = 'block';
                     
-                    // 计算tooltip位置
+                    // Get tooltip position
                     const container = chartContainerRef.current.getBoundingClientRect();
                     const tooltipWidth = tooltipRef.current.offsetWidth;
                     const tooltipHeight = tooltipRef.current.offsetHeight;
                     
-                    // 确保tooltip不会超出容器边界
+                    // Ensure tooltip does not go beyond container boundaries
                     let left = param.point.x;
                     let top = param.point.y;
                     
@@ -294,29 +290,15 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
     const initializeChart = (chartRef: HTMLDivElement, _isLineChart: boolean, _timeFrame: TimeFrame) => {
         chartRef.innerHTML = '';
-        console.log("initializeChart...");
-        createMainChart(chartRef, _timeFrame);
-
-        // 添加K线图或折线图
+        createMainChart(chartRef);
         addChart(_isLineChart);
-
-        // 添加成交量图
         addHistogramSeries();
-
-        // 配置成交量的价格轴
         applyOptions();
-        console.log("===2===")
-        // 添加K线数据提示
         subscribeCrosshairMove(_isLineChart);
-
-        // 更新数据
         if (timeFrameData.current[_timeFrame].length > 0) {
-            updateChartData(_timeFrame);
+            updateChartData(_isLineChart, _timeFrame);
         }
-
         window.addEventListener('resize', handleResize);
-        console.log("===3===")
-
         return () => {
             window.removeEventListener('resize', handleResize);
             if (chart.current) {
@@ -355,7 +337,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         });    
     }
 
-    // 缓存相关的常量和工具函数
     const getCacheKey = (mint: string, timeFrame: string) => `${LOCAL_STORAGE_HISTORY_CACHE_PREFIX}${mint}_${timeFrame}`;
 
     const getCachedData = (mint: string, timeFrame: string) => {
@@ -366,7 +347,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
             const { data, timestamp } = JSON.parse(cached);
             
-            // 检查缓存是否过期
+            // Check if cache is expired
             if (Date.now() - timestamp > LOCAL_STORAGE_HISTORY_CACHE_EXPIRY) {
                 localStorage.removeItem(cacheKey);
                 return null;
@@ -392,25 +373,20 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
     };
 
-    // 更新图表数据
-    const updateChartData = useCallback((_timeFrame: TimeFrame) => {
+    const updateChartData = (_isLineChart: boolean, _timeFrame: TimeFrame) => {
         if (!chart.current || !timeFrameData.current[_timeFrame].length || !series.current) return;
 
         const data = timeFrameData.current[_timeFrame];
-
-        if (isLineChart) {
-            // 转换为折线图数据
+        if (_isLineChart) {
             const lineData = data.map(item => ({
                 time: item.time as UTCTimestamp,
                 value: Number(item.close),
             }));
             series.current.setData(lineData);
         } else {
-            // K线图数据
             series.current.setData(data);
         }
         
-        console.log("===4===")
         if (volumeSeries.current) {
             volumeSeries.current.setData(data.map(item => ({
                 time: item.time,
@@ -419,7 +395,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             })));
         }
 
-        // 设置可见范围
         const visibleBars = timeFrameDatas[_timeFrame].bars;
         const timeScale = chart.current.timeScale();
         const lastIndex = data.length - 1;
@@ -429,10 +404,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             from: lastIndex - visibleBars,
             to: lastIndex + 5
         });
-        console.log("===5===")
-    }, [isLineChart]);
+    }
     
-    // 使用useLazyQuery替代useQuery
     const [fetchMintData, { loading, error }] = useLazyQuery(queryAllTokenMintForChart, {
         fetchPolicy: 'network-only',
         nextFetchPolicy: 'network-only',
@@ -456,102 +429,25 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
     });
 
-    // 处理和更新数据的函数
-    const processAndUpdateData = useCallback((mintTokenEntities: any[], _timeFrame: TimeFrame) => {
+    const processAndUpdateData = (mintTokenEntities: any[], _timeFrame: TimeFrame) => {
         if (!token?.feeRate) return;
 
         try {
-            // 处理数据
             baseData.current = processRawData(mintTokenEntities, parseFloat(token.feeRate));
             timeFrameData.current['1min'] = baseData.current;
 
-            // 生成其他时间周期的数据
             const timeFrames: TimeFrame[] = ['5min', '15min', '30min', '1hour', '2hour', '4hour', 'day'];
             timeFrames.forEach(tf => {
                 const minutes = timeFrameDatas[tf].minutes;
                 timeFrameData.current[tf] = aggregateCandles(baseData.current, minutes);
             });
 
-            // 更新图表数据
-            updateChartData(_timeFrame);
+            updateChartData(isLineChart, _timeFrame);
         } catch (err) {
             console.error('Error processing data:', err);
         }
-    }, [token?.feeRate]);
-
-    const _loadData = (_timeFrame: TimeFrame) => {
-        console.log('Loading data...', _timeFrame);
-        try {
-            // 尝试从缓存获取数据
-            const cachedData = getCachedData(token.mint, _timeFrame);
-            
-            if (cachedData && USE_CACHE) {
-                // 如果有缓存数据，直接使用
-                console.log('Using cached data...');
-                processAndUpdateData(cachedData, _timeFrame);
-            } else {
-                // 如果没有缓存数据，从GraphQL获取
-                console.log('Fetching data from GraphQL...');
-                fetchMintData({
-                    variables: {
-                        skip: 0,
-                        first: 1000,
-                        mint: token.mint
-                    }
-                });
-            }
-        } catch (err) {
-            console.error('Error loading data:', err);
-        }    
     }
 
-    const _loadChart = (_timeFrame: TimeFrame) => {
-        console.log("加载图片", _timeFrame);
-        if (chart.current) {
-            chart.current.remove();
-            chart.current = null;
-        }
-
-        if(chartContainerRef?.current) initializeChart(chartContainerRef.current, isLineChart, _timeFrame);
-        else return;
-    }
-
-    // 获取数据的函数
-    const loadData = useCallback(async () => {
-        if (!token?.mint) return;
-        _loadData(timeFrame);
-    }, [token?.mint, fetchMintData, processAndUpdateData]);
-
-    // 监听token或timeFrame变化时加载数据
-    useEffect(() => {
-        loadData();
-    }, [loadData, token?.mint]);
-
-    // 显示加载状态或错误
-    useEffect(() => {
-        if (loading) {
-            if (chartContainerRef.current) {
-                chartContainerRef.current.innerHTML = `
-                    <div class="flex items-center justify-center h-[560px]">
-                        <div class="text-base-content">Loading chart data...</div>
-                    </div>
-                `;
-            }
-            return;
-        } else if (error) {
-            if (chartContainerRef.current) {
-                chartContainerRef.current.innerHTML = `
-                    <ErrorBox title="Error loading chart data" message={error.message} />
-                `;
-            }
-            return;
-        }
-
-        console.log("current time", timeFrame);
-        _loadChart(timeFrame);
-    }, [loading, error, isLineChart, gridColor, labelColor]);
-
-    // 合并K线数据
     const aggregateCandles = (data: any[], timeFrameMinutes: number) => {
         if (!data.length) return [];
         
@@ -589,6 +485,62 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         return result;
     };
     
+    const _loadData = (_timeFrame: TimeFrame) => {
+        try {
+            const cachedData = getCachedData(token.mint, _timeFrame);
+            
+            if (cachedData && USE_CACHE) {
+                processAndUpdateData(cachedData, _timeFrame);
+            } else {
+                fetchMintData({
+                    variables: {
+                        skip: 0,
+                        first: 1000,
+                        mint: token.mint
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Error loading data:', err);
+        }    
+    }
+
+    const _loadChart = (_timeFrame: TimeFrame) => {
+        if (chart.current) {
+            chart.current.remove();
+            chart.current = null;
+        }
+
+        if(chartContainerRef?.current) initializeChart(chartContainerRef.current, isLineChart, _timeFrame);
+        else return;
+    }
+
+    useEffect(() => {
+        if (!token?.mint) return;
+        _loadData(timeFrame);
+    }, [token?.mint]);
+
+    useEffect(() => {
+        if (loading) {
+            if (chartContainerRef.current) {
+                chartContainerRef.current.innerHTML = `
+                    <div class="flex items-center justify-center h-[560px]">
+                        <div class="text-base-content">Loading chart data...</div>
+                    </div>
+                `;
+            }
+            return;
+        } else if (error) {
+            if (chartContainerRef.current) {
+                chartContainerRef.current.innerHTML = `
+                    <ErrorBox title="Error loading chart data" message={error.message} />
+                `;
+            }
+            return;
+        }
+        _loadChart(timeFrame);
+    }, [loading, error, isLineChart, gridColor, labelColor]);
+
     return (
         <div className="mt-6">
             <div className="bg-base-200 rounded-lg shadow-lg p-6">
