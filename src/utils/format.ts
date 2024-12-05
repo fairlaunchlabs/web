@@ -1,4 +1,6 @@
 import { BN } from "@coral-xyz/anchor";
+import { UTCTimestamp } from "lightweight-charts";
+import { MintData } from "../types/types";
 
 export const formatAddress = (address: string, showCharacters = 4): string => {
     if (!address) return '';
@@ -186,3 +188,55 @@ export const formatPrice = (price: number): string => {
     // 如果不需要特殊处理，保留5位小数
     return parseFloat(priceStr).toFixed(digitalsAfterZero);
 };
+
+export const processRawData = (data: MintData[], feeRate: number) => {
+    if (!data || data.length === 0) return [];
+
+    // 按时间戳排序
+    const sortedData = [...data].sort((a, b) => parseInt(a.timestamp) - parseInt(b.timestamp));
+    
+    // 按分钟聚合数据
+    const minuteData = new Map<number, {
+        prices: number[];
+        volumes: number[];
+        timestamp: number;
+    }>();
+
+    // 遍历所有数据点，按分钟分组
+    sortedData.forEach(item => {
+        const timestamp = parseInt(item.timestamp);
+        const mintSize = parseFloat(item.mintSizeEpoch);
+        const price = feeRate / mintSize;
+        
+        // 将时间戳转换为分钟级别（去掉秒数）
+        const minuteTimestamp = Math.floor(timestamp / 60) * 60;
+
+        if (!minuteData.has(minuteTimestamp)) {
+            minuteData.set(minuteTimestamp, {
+                prices: [],
+                volumes: [],
+                timestamp: minuteTimestamp
+            });
+        }
+
+        const minute = minuteData.get(minuteTimestamp)!;
+        minute.prices.push(price);
+        minute.volumes.push(mintSize / 1000000000); // 转换为标准单位
+    });
+
+    // 转换为K线数据
+    return Array.from(minuteData.values()).map(minute => {
+        const prices = minute.prices;
+        const volumes = minute.volumes;
+        
+        return {
+            time: minute.timestamp as UTCTimestamp,
+            open: prices[0], // 这一分钟内的第一个价格
+            high: Math.max(...prices), // 最高价
+            low: Math.min(...prices), // 最低价
+            close: prices[prices.length - 1], // 这一分钟内的最后一个价格
+            volume: volumes.reduce((a, b) => a + b, 0) // 总交易量
+        };
+    });
+};
+

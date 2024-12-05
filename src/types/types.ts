@@ -403,3 +403,9 @@ export type ResponseData = {
     message?: string;
     data?: any;
 }
+
+export type MintData = {
+    timestamp: string;
+    mintSizeEpoch: string;
+};
+
