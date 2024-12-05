@@ -120,7 +120,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }        
     }
 
-    const createMainChart = (chartRef: HTMLDivElement) => {
+    const createMainChart = (chartRef: HTMLDivElement, _timeFrame: TimeFrame) => {
         chart.current = createChart(chartRef, {
             layout: {
                 background: { color: 'transparent' },
@@ -164,7 +164,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             },
             timeScale: {
                 timeVisible: true,
-                secondsVisible: timeFrame === '1min',
+                secondsVisible: _timeFrame === '1min',
                 rightOffset: 5,
                 barSpacing: 12,
                 fixLeftEdge: true,
@@ -292,10 +292,10 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         });
     }
 
-    const initializeChart = (chartRef: HTMLDivElement, _isLineChart: boolean) => {
+    const initializeChart = (chartRef: HTMLDivElement, _isLineChart: boolean, _timeFrame: TimeFrame) => {
         chartRef.innerHTML = '';
 
-        createMainChart(chartRef);
+        createMainChart(chartRef, _timeFrame);
 
         // 添加K线图或折线图
         addChart(_isLineChart);
@@ -310,8 +310,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         subscribeCrosshairMove(_isLineChart);
 
         // 更新数据
-        if (timeFrameData.current[timeFrame].length > 0) {
-            updateChartData();
+        if (timeFrameData.current[_timeFrame].length > 0) {
+            updateChartData(_timeFrame);
         }
 
         window.addEventListener('resize', handleResize);
@@ -392,10 +392,10 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     };
 
     // 更新图表数据
-    const updateChartData = useCallback(() => {
-        if (!chart.current || !timeFrameData.current[timeFrame].length || !series.current) return;
+    const updateChartData = useCallback((_timeFrame: TimeFrame) => {
+        if (!chart.current || !timeFrameData.current[_timeFrame].length || !series.current) return;
 
-        const data = timeFrameData.current[timeFrame];
+        const data = timeFrameData.current[_timeFrame];
 
         if (isLineChart) {
             // 转换为折线图数据
@@ -418,7 +418,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
 
         // 设置可见范围
-        const visibleBars = timeFrameDatas[timeFrame].bars;
+        const visibleBars = timeFrameDatas[_timeFrame].bars;
         const timeScale = chart.current.timeScale();
         const lastIndex = data.length - 1;
         
@@ -427,23 +427,34 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             from: lastIndex - visibleBars,
             to: lastIndex + 5
         });
-    }, [timeFrame, isLineChart]);
+    }, [isLineChart]);
     
     // 使用useLazyQuery替代useQuery
     const [fetchMintData, { loading, error }] = useLazyQuery(queryAllTokenMintForChart, {
+        fetchPolicy: 'network-only',
+        nextFetchPolicy: 'network-only',
         onCompleted: (data) => {
-            console.log('GraphQL response:', data);
-            if (data?.mintTokenEntities && token?.mint) {
-                // 保存数据到缓存
-                setCachedData(token.mint, timeFrame, data.mintTokenEntities);
-                // 处理获取到的数据
-                processAndUpdateData(data.mintTokenEntities);
+            if (data?.mintTokenEntities && data.mintTokenEntities.length > 0) {
+                try {
+                    setCachedData(token.mint, timeFrame, data.mintTokenEntities);
+                    processAndUpdateData(data.mintTokenEntities, timeFrame);
+                } catch (processingError) {
+                    console.error('Error processing fetched data:', processingError);
+                }
+            } else {
+                console.warn('No token entities found for mint:', token?.mint);
             }
+        },
+        onError: (err) => {
+            console.error('GraphQL Query Error:', {
+                errorMessage: err.message,
+                errorDetails: err
+            });
         }
     });
 
     // 处理和更新数据的函数
-    const processAndUpdateData = useCallback((mintTokenEntities: any[]) => {
+    const processAndUpdateData = useCallback((mintTokenEntities: any[], _timeFrame: TimeFrame) => {
         if (!token?.feeRate) return;
 
         try {
@@ -459,24 +470,22 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             });
 
             // 更新图表数据
-            updateChartData();
+            updateChartData(_timeFrame);
         } catch (err) {
             console.error('Error processing data:', err);
         }
     }, [token?.feeRate]);
 
-    // 获取数据的函数
-    const loadData = useCallback(async () => {
-        if (!token?.mint) return;
-        console.log('Loading data...', timeFrame);
+    const _loadData = (_timeFrame: TimeFrame) => {
+        console.log('Loading data...', _timeFrame);
         try {
             // 尝试从缓存获取数据
-            const cachedData = getCachedData(token.mint, timeFrame);
+            const cachedData = getCachedData(token.mint, _timeFrame);
             
             if (cachedData && USE_CACHE) {
                 // 如果有缓存数据，直接使用
                 console.log('Using cached data...');
-                processAndUpdateData(cachedData);
+                processAndUpdateData(cachedData, _timeFrame);
             } else {
                 // 如果没有缓存数据，从GraphQL获取
                 console.log('Fetching data from GraphQL...');
@@ -490,8 +499,25 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             }
         } catch (err) {
             console.error('Error loading data:', err);
+        }    
+    }
+
+    const _loadChart = (_timeFrame: TimeFrame) => {
+        console.log("加载图片", _timeFrame);
+        if (chart.current) {
+            chart.current.remove();
+            chart.current = null;
         }
-    }, [token?.mint, fetchMintData, processAndUpdateData, timeFrame]);
+
+        if(chartContainerRef?.current) initializeChart(chartContainerRef?.current, isLineChart, _timeFrame);
+        else return;
+    }
+
+    // 获取数据的函数
+    const loadData = useCallback(async () => {
+        if (!token?.mint) return;
+        _loadData(timeFrame);
+    }, [token?.mint, fetchMintData, processAndUpdateData]);
 
     // 监听token或timeFrame变化时加载数据
     useEffect(() => {
@@ -508,23 +534,19 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     </div>
                 `;
             }
+            return;
         } else if (error) {
             if (chartContainerRef.current) {
                 chartContainerRef.current.innerHTML = `
                     <ErrorBox title="Error loading chart data" message={error.message} />
                 `;
             }
+            return;
         }
 
-        console.log("加载图片");
-        if (chart.current) {
-            chart.current.remove();
-            chart.current = null;
-        }
-
-        if(chartContainerRef?.current) initializeChart(chartContainerRef?.current, isLineChart);
-        else return;
-    }, [loading, error, timeFrame, isLineChart, gridColor, labelColor]);
+        console.log("current time", timeFrame);
+        _loadChart(timeFrame);
+    }, [loading, error, isLineChart, gridColor, labelColor]);
 
     // 合并K线数据
     const aggregateCandles = (data: any[], timeFrameMinutes: number) => {
@@ -572,7 +594,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     <div className="flex items-center space-x-2">
                         <button 
                             className="btn btn-sm btn-outline btn-primary"
-                            onClick={loadData}
+                            onClick={() => _loadData(timeFrame)}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -594,7 +616,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                         </button>
                         <select
                             value={timeFrame}
-                            onChange={(e) => setTimeFrame(e.target.value as TimeFrame)}
+                            onChange={(e) => {setTimeFrame(e.target.value as TimeFrame); _loadChart(e.target.value as TimeFrame);}}
                             className="select select-bordered select-sm w-40 bg-base-300 text-base-content"
                         >
                             {Object.entries(timeFrameDatas).map(([key, value]) => (
