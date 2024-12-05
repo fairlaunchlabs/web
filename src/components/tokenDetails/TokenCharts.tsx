@@ -9,6 +9,18 @@ import { useTheme } from '../../utils/contexts';
 // 定义时间周期类型
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
 
+// 时间周期选项
+const timeFrameOptions = [
+    { value: '1min', label: '1 Minute' },
+    { value: '5min', label: '5 Minutes' },
+    { value: '15min', label: '15 Minutes' },
+    { value: '30min', label: '30 Minutes' },
+    { value: '1hour', label: '1 Hour' },
+    { value: '2hour', label: '2 Hours' },
+    { value: '4hour', label: '4 Hours' },
+    { value: 'day', label: '1 Day' },
+];
+
 export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const [timeFrame, setTimeFrame] = useState<TimeFrame>('5min');
@@ -36,27 +48,45 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     const gridColor = isDarkMode ? 'rgba(70, 130, 180, 0.2)' : 'rgba(70, 130, 180, 0.1)';
     const labelColor = isDarkMode ? '#DDD' : '#333';
 
-    // 清理和初始化图表
-    const cleanupAndInitChart = useCallback(() => {
-        if (chart.current) {
-            chart.current.remove();
-            chart.current = null;
-        }
+    const addChart = (_isLineChart: boolean) => {
+        if (_isLineChart) {
+            series.current = chart.current.addLineSeries({
+                color: '#2196F3',
+                lineWidth: 2,
+                priceScaleId: 'right',
+                priceFormat: {
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
+                },
+                lastValueVisible: true,
+                priceLineVisible: true,
+                title: 'Price',
+                crosshairMarkerVisible: true,
+                crosshairMarkerRadius: 4,
+                crosshairMarkerBorderColor: '#2196F3',
+                crosshairMarkerBackgroundColor: '#ffffff',
+            });
+        } else {
+            series.current = chart.current.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+                priceScaleId: 'right',
+                priceFormat: {
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
+                },
+                lastValueVisible: true,
+                priceLineVisible: true,
+                title: 'Price',
+            });
+        }        
+    }
 
-        if (!chartContainerRef.current) return;
-        console.log("cleanupAndInitChart start");
-        const handleResize = () => {
-            if (chart.current && chartContainerRef.current) {
-                chart.current.applyOptions({
-                    width: chartContainerRef.current.clientWidth,
-                    height: 560,
-                });
-            }
-        };
-
-        chartContainerRef.current.innerHTML = '';
-
-        chart.current = createChart(chartContainerRef.current, {
+    const createMainChart = (chartRef: HTMLDivElement) => {
+        chart.current = createChart(chartRef, {
             layout: {
                 background: { color: 'transparent' },
                 textColor: '#DDD',
@@ -71,7 +101,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     style: 1,
                 },
             },
-            width: chartContainerRef.current.clientWidth,
+            width: chartRef.clientWidth,
             height: 560,
             leftPriceScale: {
                 visible: false,
@@ -149,76 +179,9 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 }
             },
         });
+    }
 
-        // 添加K线图或折线图
-        if (isLineChart) {
-            series.current = chart.current.addLineSeries({
-                color: '#2196F3',
-                lineWidth: 2,
-                priceScaleId: 'right',
-                priceFormat: {
-                    type: 'custom',
-                    formatter: (price: number) => formatPrice(price),
-                },
-                lastValueVisible: true,
-                priceLineVisible: true,
-                title: 'Price',
-                crosshairMarkerVisible: true,
-                crosshairMarkerRadius: 4,
-                crosshairMarkerBorderColor: '#2196F3',
-                crosshairMarkerBackgroundColor: '#ffffff',
-            });
-        } else {
-            series.current = chart.current.addCandlestickSeries({
-                upColor: '#26a69a',
-                downColor: '#ef5350',
-                borderVisible: false,
-                wickUpColor: '#26a69a',
-                wickDownColor: '#ef5350',
-                priceScaleId: 'right',
-                priceFormat: {
-                    type: 'custom',
-                    formatter: (price: number) => formatPrice(price),
-                },
-                lastValueVisible: true,
-                priceLineVisible: true,
-                title: 'Price',
-            });
-        }
-
-        // 添加成交量图
-        volumeSeries.current = chart.current.addHistogramSeries({
-            color: '#26a69a',
-            priceFormat: {
-                type: 'volume',
-                precision: 0,
-            },
-            priceScaleId: 'volume',
-            lastValueVisible: true,
-            priceLineVisible: true,
-            title: 'Volume',
-        });
-
-        // 配置成交量的价格轴
-        chart.current.priceScale('volume').applyOptions({
-            scaleMargins: {
-                top: 0.8,
-                bottom: 0,
-            },
-            visible: true,
-            autoScale: true,
-            borderVisible: true,
-            borderColor: '#2B2B43',
-            textColor: '#DDD',
-            alignLabels: true,
-            priceFormat: {
-                type: 'volume',
-                precision: 0,
-                minMove: 1,
-            },
-        });
-
-        // 添加K线数据提示
+    const subscribeCrosshairMove = (_isLineChart: boolean) => {
         chart.current.subscribeCrosshairMove((param: any) => {
             if (!tooltipRef.current || !chartContainerRef.current) return;
             
@@ -229,7 +192,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 
                 if (price) {
                     let tooltipContent = '';
-                    if (isLineChart) {
+                    if (_isLineChart) {
                         tooltipContent = `
                             <div class="space-y-1">
                                 <div class="font-medium">${time}</div>
@@ -253,7 +216,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     }
                     
                     tooltipRef.current.innerHTML = tooltipContent;
-                    
                     tooltipRef.current.style.display = 'block';
                     
                     // 计算tooltip位置
@@ -279,6 +241,38 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 tooltipRef.current.style.display = 'none';
             }
         });
+    }
+
+    const addHistogramSeries = () => {
+        volumeSeries.current = chart.current.addHistogramSeries({
+            color: '#26a69a',
+            priceFormat: {
+                type: 'volume',
+                precision: 0,
+            },
+            priceScaleId: 'volume',
+            lastValueVisible: true,
+            priceLineVisible: true,
+            title: 'Volume',
+        });
+    }
+
+    const initializeChart = (chartRef: HTMLDivElement) => {
+        chartRef.innerHTML = '';
+
+        createMainChart(chartRef);
+
+        // 添加K线图或折线图
+        addChart(isLineChart);
+
+        // 添加成交量图
+        addHistogramSeries();
+
+        // 配置成交量的价格轴
+        applyOptions();
+
+        // 添加K线数据提示
+        subscribeCrosshairMove(isLineChart);
 
         // 更新数据
         if (timeFrameData.current[timeFrame].length > 0) {
@@ -286,7 +280,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
 
         window.addEventListener('resize', handleResize);
-        console.log("cleanupAndInitChart end");
 
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -295,6 +288,46 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 chart.current = null;
             }
         };
+    }
+
+    const handleResize = () => {
+        if (chart.current && chartContainerRef.current) {
+            chart.current.applyOptions({
+                width: chartContainerRef.current.clientWidth,
+                height: 560,
+            });
+        }
+    };
+
+    const applyOptions = () => {
+        chart.current.priceScale('volume').applyOptions({
+            scaleMargins: {
+                top: 0.8,
+                bottom: 0,
+            },
+            visible: true,
+            autoScale: true,
+            borderVisible: true,
+            borderColor: '#2B2B43',
+            textColor: '#DDD',
+            alignLabels: true,
+            priceFormat: {
+                type: 'volume',
+                precision: 0,
+                minMove: 1,
+            },
+        });    
+    }
+
+    // 清理和初始化图表
+    const cleanupAndInitChart = useCallback(() => {
+        if (chart.current) {
+            chart.current.remove();
+            chart.current = null;
+        }
+
+        if (!chartContainerRef.current) return;
+        initializeChart(chartContainerRef.current);
     }, [isDarkMode, gridColor, labelColor, timeFrame, isLineChart]);
 
     // 组件挂载时初始化图表
@@ -415,8 +448,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 time: item.time as UTCTimestamp,
                 value: Number(item.close),
             }));
-            console.log(lineData);
-            series.current.setData(lineData); // ######
+            series.current.setData(lineData);
         } else {
             // K线图数据
             series.current.setData(data);
@@ -440,13 +472,11 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             from: lastIndex - visibleBars,
             to: lastIndex + 5
         });
-        console.log("updateChartData end");
     }, [timeFrame, isLineChart]);
 
     // 切换图表类型
     const toggleChartType = useCallback(() => {
         if (!chart.current) return;
-        console.log("toggleChartType start");
         // 移除现有的系列
         if (series.current) {
             chart.current.removeSeries(series.current);
@@ -455,110 +485,16 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         const newIsLineChart = !isLineChart;
 
         // 创建新的系列
-        if (newIsLineChart) {
-            // 创建折线图
-            series.current = chart.current.addLineSeries({
-                color: '#2196F3',
-                lineWidth: 2,
-                priceScaleId: 'right',
-                priceFormat: {
-                    type: 'custom',
-                    formatter: (price: number) => formatPrice(price),
-                },
-                lastValueVisible: true,
-                priceLineVisible: true,
-                title: 'Price',
-                crosshairMarkerVisible: true,
-                crosshairMarkerRadius: 4,
-                crosshairMarkerBorderColor: '#2196F3',
-                crosshairMarkerBackgroundColor: '#ffffff',
-            });
-        } else {
-            // 创建K线图
-            series.current = chart.current.addCandlestickSeries({
-                upColor: '#26a69a',
-                downColor: '#ef5350',
-                borderVisible: false,
-                wickUpColor: '#26a69a',
-                wickDownColor: '#ef5350',
-                priceScaleId: 'right',
-                priceFormat: {
-                    type: 'custom',
-                    formatter: (price: number) => formatPrice(price),
-                },
-                lastValueVisible: true,
-                priceLineVisible: true,
-                title: 'Price',
-            });
-        }
+        addChart(newIsLineChart);
 
         // 更新数据
-        // updateChartData(); // ######
+        updateChartData();
         
         // 切换状态
         setIsLineChart(newIsLineChart);
 
         // 重新设置crosshairMove事件
-        chart.current.subscribeCrosshairMove((param: any) => {
-            if (!tooltipRef.current || !chartContainerRef.current) return;
-            
-            if (param.time && param.point && param.point.x >= 0 && param.point.y >= 0) {
-                const price = param.seriesData.get(series.current);
-                const volume = param.seriesData.get(volumeSeries.current);
-                const time = new Date(param.time * 1000).toLocaleString();
-                
-                if (price) {
-                    let tooltipContent = '';
-                    if (newIsLineChart) {
-                        tooltipContent = `
-                            <div class="space-y-1">
-                                <div class="font-medium">${time}</div>
-                                <div>Price: ${formatPrice(price.value || 0)}</div>
-                                <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
-                            </div>
-                        `;
-                    } else {
-                        tooltipContent = `
-                            <div class="space-y-1">
-                                <div class="font-medium">${time}</div>
-                                <div class="grid grid-cols-1 gap-x-4">
-                                    <div>Open: ${formatPrice(price.open || 0)}</div>
-                                    <div>High: ${formatPrice(price.high || 0)}</div>
-                                    <div>Low: ${formatPrice(price.low || 0)}</div>
-                                    <div>Close: ${formatPrice(price.close || 0)}</div>
-                                    <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    tooltipRef.current.innerHTML = tooltipContent;
-                    tooltipRef.current.style.display = 'block';
-                    
-                    // 计算tooltip位置
-                    const container = chartContainerRef.current.getBoundingClientRect();
-                    const tooltipWidth = tooltipRef.current.offsetWidth;
-                    const tooltipHeight = tooltipRef.current.offsetHeight;
-                    
-                    // 确保tooltip不会超出容器边界
-                    let left = param.point.x;
-                    let top = param.point.y;
-                    
-                    if (left + tooltipWidth > container.width) {
-                        left = param.point.x - tooltipWidth;
-                    }
-                    
-                    if (top + tooltipHeight > container.height) {
-                        top = param.point.y - tooltipHeight;
-                    }
-                    
-                    tooltipRef.current.style.transform = `translate(${left}px, ${top}px)`;
-                }
-            } else {
-                tooltipRef.current.style.display = 'none';
-            }
-        });
-        console.log("toggleChartType end");
+        subscribeCrosshairMove(newIsLineChart);
     }, [isLineChart, updateChartData]);
 
     // 初始化图表
@@ -590,249 +526,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             `;
             return;
         }
-
-        // 清除任何现有内容
-        chartContainerRef.current.innerHTML = '';
-
-        chart.current = createChart(chartContainerRef.current, {
-            layout: {
-                background: { color: 'transparent' },
-                textColor: '#DDD',
-            },
-            grid: {
-                vertLines: {
-                    color: gridColor,
-                    style: 1,
-                },
-                horzLines: {
-                    color: gridColor,
-                    style: 1,
-                },
-            },
-            width: chartContainerRef.current.clientWidth,
-            height: 560,
-            leftPriceScale: {
-                visible: false,
-                borderColor: '#2B2B43',
-                textColor: '#DDD',
-                scaleMargins: {
-                    top: 0.1,
-                    bottom: 0.3,
-                },
-            },
-            rightPriceScale: {
-                visible: true,
-                borderColor: '#2B2B43',
-                textColor: labelColor,
-                scaleMargins: {
-                    top: 0.1,
-                    bottom: 0.3,
-                },
-                borderVisible: true,
-                alignLabels: true,
-                autoScale: true,
-                mode: 2,
-                ticksVisible: true,
-                entireTextOnly: true,
-            },
-            timeScale: {
-                timeVisible: true,
-                secondsVisible: timeFrame === '1min',
-                rightOffset: 5,
-                barSpacing: 12,
-                fixLeftEdge: true,
-                fixRightEdge: true,
-                lockVisibleTimeRangeOnResize: true,
-                rightBarStaysOnScroll: true,
-                borderVisible: true,
-                borderColor: '#2B2B43',
-            },
-            crosshair: {
-                mode: 1,
-                vertLine: {
-                    color: '#758696',
-                    width: 1,
-                    style: 3,
-                    labelBackgroundColor: '#758696',
-                },
-                horzLine: {
-                    color: '#758696',
-                    width: 1,
-                    style: 3,
-                    labelBackgroundColor: '#758696',
-                },
-            },
-            localization: {
-                locale: 'en-US',
-                timeFormatter: (time: number) => {
-                    const date = new Date(time * 1000);
-                    return date.toLocaleString();
-                },
-                priceFormatter: (price: number) => {
-                    return formatPrice(price);
-                }
-            },
-            handleScroll: {
-                mouseWheel: true,
-                pressedMouseMove: true,
-                horzTouchDrag: true,
-                vertTouchDrag: true
-            },
-            handleScale: {
-                mouseWheel: true,
-                pinch: true,
-                axisPressedMouseMove: {
-                    time: true,
-                    price: true
-                }
-            },
-        });
-
-        // 添加K线图或折线图
-        series.current = chart.current.addCandlestickSeries({
-            upColor: '#26a69a',
-            downColor: '#ef5350',
-            borderVisible: false,
-            wickUpColor: '#26a69a',
-            wickDownColor: '#ef5350',
-            priceScaleId: 'right',
-            priceFormat: {
-                type: 'custom',
-                formatter: (price: number) => formatPrice(price),
-            },
-            lastValueVisible: true,
-            priceLineVisible: true,
-            title: 'Price',
-        });
-
-        // 添加成交量图
-        volumeSeries.current = chart.current.addHistogramSeries({
-            color: '#26a69a',
-            priceFormat: {
-                type: 'volume',
-                precision: 0,
-            },
-            priceScaleId: 'volume',
-            lastValueVisible: true,
-            priceLineVisible: true,
-            title: 'Volume',
-        });
-
-        // 配置成交量的价格轴
-        chart.current.priceScale('volume').applyOptions({
-            scaleMargins: {
-                top: 0.8,
-                bottom: 0,
-            },
-            visible: true,
-            autoScale: true,
-            borderVisible: true,
-            borderColor: '#2B2B43',
-            textColor: '#DDD',
-            alignLabels: true,
-            priceFormat: {
-                type: 'volume',
-                precision: 0,
-                minMove: 1,
-            },
-        });
-
-        // 添加K线数据提示
-        chart.current.subscribeCrosshairMove((param: any) => {
-            if (!tooltipRef.current || !chartContainerRef.current) return;
-            
-            if (param.time && param.point && param.point.x >= 0 && param.point.y >= 0) {
-                const price = param.seriesData.get(series.current);
-                const volume = param.seriesData.get(volumeSeries.current);
-                const time = new Date(param.time * 1000).toLocaleString();
-                
-                if (price) {
-                    let tooltipContent = '';
-                    if (isLineChart) {
-                        tooltipContent = `
-                            <div class="space-y-1">
-                                <div class="font-medium">${time}</div>
-                                <div>Price: ${formatPrice(price.value || 0)}</div>
-                                <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
-                            </div>
-                        `;
-                    } else {
-                        tooltipContent = `
-                            <div class="space-y-1">
-                                <div class="font-medium">${time}</div>
-                                <div class="grid grid-cols-1 gap-x-4">
-                                    <div>Open: ${formatPrice(price.open || 0)}</div>
-                                    <div>High: ${formatPrice(price.high || 0)}</div>
-                                    <div>Low: ${formatPrice(price.low || 0)}</div>
-                                    <div>Close: ${formatPrice(price.close || 0)}</div>
-                                    <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    tooltipRef.current.innerHTML = tooltipContent;
-                    
-                    tooltipRef.current.style.display = 'block';
-                    
-                    // 计算tooltip位置
-                    const container = chartContainerRef.current.getBoundingClientRect();
-                    const tooltipWidth = tooltipRef.current.offsetWidth;
-                    const tooltipHeight = tooltipRef.current.offsetHeight;
-                    
-                    // 确保tooltip不会超出容器边界
-                    let left = param.point.x;
-                    let top = param.point.y;
-                    
-                    if (left + tooltipWidth > container.width) {
-                        left = param.point.x - tooltipWidth;
-                    }
-                    
-                    if (top + tooltipHeight > container.height) {
-                        top = param.point.y - tooltipHeight;
-                    }
-                    
-                    tooltipRef.current.style.transform = `translate(${left}px, ${top}px)`;
-                }
-            } else {
-                tooltipRef.current.style.display = 'none';
-            }
-        });
-
-        // 初始化数据
-        updateChartData();
-
-        // 响应式处理
-        const handleResize = () => {
-            if (chart.current && chartContainerRef.current) {
-                chart.current.applyOptions({
-                    width: chartContainerRef.current.clientWidth,
-                    height: 560,
-                });
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-            if (chart.current) {
-                chart.current.remove();
-            }
-        };
+        initializeChart(chartContainerRef.current);
     }, [error, loading]);
-
-    // 时间周期选项
-    const timeFrameOptions = [
-        { value: '1min', label: '1 Minute' },
-        { value: '5min', label: '5 Minutes' },
-        { value: '15min', label: '15 Minutes' },
-        { value: '30min', label: '30 Minutes' },
-        { value: '1hour', label: '1 Hour' },
-        { value: '2hour', label: '2 Hours' },
-        { value: '4hour', label: '4 Hours' },
-        { value: 'day', label: '1 Day' },
-    ];
 
     return (
         <div className="mt-6">
