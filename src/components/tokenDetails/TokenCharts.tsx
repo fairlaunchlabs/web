@@ -294,7 +294,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
     const initializeChart = (chartRef: HTMLDivElement, _isLineChart: boolean, _timeFrame: TimeFrame) => {
         chartRef.innerHTML = '';
-
+        console.log("initializeChart...");
         createMainChart(chartRef, _timeFrame);
 
         // 添加K线图或折线图
@@ -305,7 +305,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
         // 配置成交量的价格轴
         applyOptions();
-
+        console.log("===2===")
         // 添加K线数据提示
         subscribeCrosshairMove(_isLineChart);
 
@@ -315,6 +315,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
 
         window.addEventListener('resize', handleResize);
+        console.log("===3===")
 
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -409,6 +410,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             series.current.setData(data);
         }
         
+        console.log("===4===")
         if (volumeSeries.current) {
             volumeSeries.current.setData(data.map(item => ({
                 time: item.time,
@@ -427,6 +429,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             from: lastIndex - visibleBars,
             to: lastIndex + 5
         });
+        console.log("===5===")
     }, [isLineChart]);
     
     // 使用useLazyQuery替代useQuery
@@ -509,7 +512,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             chart.current = null;
         }
 
-        if(chartContainerRef?.current) initializeChart(chartContainerRef?.current, isLineChart, _timeFrame);
+        if(chartContainerRef?.current) initializeChart(chartContainerRef.current, isLineChart, _timeFrame);
         else return;
     }
 
@@ -616,7 +619,10 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                         </button>
                         <select
                             value={timeFrame}
-                            onChange={(e) => {setTimeFrame(e.target.value as TimeFrame); _loadChart(e.target.value as TimeFrame);}}
+                            onChange={(e) => {
+                                setTimeFrame(e.target.value as TimeFrame);
+                                _loadChart(e.target.value as TimeFrame);
+                            }}
                             className="select select-bordered select-sm w-40 bg-base-300 text-base-content"
                         >
                             {Object.entries(timeFrameDatas).map(([key, value]) => (
