@@ -6,6 +6,7 @@ import { Pagination } from '../common/Pagination';
 import { queryHolders } from '../../utils/graphql';
 import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, BN_MILLION, BN_ZERO, numberStringToBN } from '../../utils/format';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
+import { ErrorBox } from '../common/ErrorBox';
 
 export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,8 +48,7 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
     if (error) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Token Holders</h3>
-                <p className="text-error">Error loading token holders</p>
+                <ErrorBox title="Get token holders error" message={error.message} />
             </div>
         );
     }

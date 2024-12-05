@@ -11,6 +11,7 @@ import { pinata } from '../../utils/web3';
 import { Pagination } from '../common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 import { AddressDisplay } from '../common/AddressDisplay';
+import { ErrorBox } from '../common/ErrorBox';
 
 export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
@@ -118,8 +119,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
 
     if (urcError || tokenError) {
         return (
-            <div className={`flex justify-center items-center min-h-[400px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <span className="text-2xl font-bold text-center">Error</span>
+            <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+                <ErrorBox title="URC list error" message={urcError?.message || tokenError?.message} />
             </div>
         );
     }

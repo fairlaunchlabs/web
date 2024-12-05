@@ -7,6 +7,7 @@ import { Pagination } from '../common/Pagination';
 import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
+import { ErrorBox } from '../common/ErrorBox';
 
 export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -48,8 +49,7 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
     if (error) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Refund</h3>
-                <p className="text-error">Error loading transactions</p>
+                <ErrorBox title="Get refund transactions error" message={error.message} />
             </div>
         );
     }

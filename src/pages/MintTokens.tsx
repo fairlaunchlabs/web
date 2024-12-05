@@ -4,6 +4,7 @@ import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '..
 import { TokenCard } from '../components/mintTokens/TokenCard';
 import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
+import { ErrorBox } from '../components/common/ErrorBox';
 
 export const MintTokens: React.FC<MintTokensProps> = ({
     expanded
@@ -62,9 +63,8 @@ export const MintTokens: React.FC<MintTokensProps> = ({
 
     if (error) {
         return (
-            <div className="alert alert-error ml-64 m-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span>Error loading tokens. Please try again later.</span>
+            <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+                <ErrorBox title={`Error loading tokens. Please try again later.`} message={error.message}/>
             </div>
         );
     }

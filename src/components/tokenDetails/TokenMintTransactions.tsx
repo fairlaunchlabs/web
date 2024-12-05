@@ -6,6 +6,7 @@ import { MintTransactionData, TokenMintTransactionsProps } from '../../types/typ
 import { Pagination } from '../common/Pagination';
 import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
+import { ErrorBox } from '../common/ErrorBox';
 
 export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,8 +48,7 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
     if (error) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Mint</h3>
-                <p className="text-error">Error loading transactions</p>
+                <ErrorBox title="Get recent mint error" message={error.message} />
             </div>
         );
     }

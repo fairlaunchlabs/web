@@ -5,6 +5,7 @@ import { queryAllTokenMintForChart } from '../../utils/graphql';
 import { formatPrice, processRawData } from '../../utils/format';
 import { TokenChartsProps } from '../../types/types';
 import { useTheme } from '../../utils/contexts';
+import { ErrorBox } from '../common/ErrorBox';
 import { LOCAL_STORAGE_HISTORY_CACHE_EXPIRY, LOCAL_STORAGE_HISTORY_CACHE_PREFIX } from '../../config/constants';
 
 // 定义时间周期类型
@@ -479,9 +480,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         } else if (error) {
             if (chartContainerRef.current) {
                 chartContainerRef.current.innerHTML = `
-                    <div class="flex items-center justify-center h-[560px]">
-                        <div class="text-error">Error loading chart data: ${error.message}</div>
-                    </div>
+                    <ErrorBox title="Error loading chart data" message={error.message} />
                 `;
             }
         }
