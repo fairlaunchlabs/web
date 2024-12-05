@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { LOCAL_STORAGE_KEY_THEME } from '../config/constants';
 
 // Theme Context
 interface ThemeContextType {
@@ -10,14 +11,20 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isDarkMode, setIsDarkMode] = useState(() => {
-        const darkMode = document.documentElement.classList.contains('dark');
+        // 从localStorage获取主题设置
+        const savedTheme = localStorage.getItem(LOCAL_STORAGE_KEY_THEME);
+        const prefersDark = savedTheme === 'dark' || 
+            (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        
         // 初始化时确保 HTML 类名与状态一致
-        if (darkMode) {
+        if (prefersDark) {
             document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
         } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
         }
-        return darkMode;
+        return prefersDark;
     });
 
     const toggleTheme = () => {
@@ -26,13 +33,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     useEffect(() => {
         const root = document.documentElement;
+        const newTheme = isDarkMode ? 'dark' : 'light';
+        
+        // 更新DOM
         if (isDarkMode) {
             root.classList.add('dark');
-            root.setAttribute('data-theme', 'dark');
         } else {
             root.classList.remove('dark');
-            root.setAttribute('data-theme', 'light');
         }
+        root.setAttribute('data-theme', newTheme);
+        
+        // 保存到localStorage
+        localStorage.setItem(LOCAL_STORAGE_KEY_THEME, newTheme);
     }, [isDarkMode]);
 
     return (

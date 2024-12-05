@@ -23,5 +23,7 @@ export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';
 export const LOCAL_STORAGE_MY_REFERRAL_CODE = 'my_referral_code';
 export const NETWORK = 'devnet';
 export const SCANURL = 'https://solscan.io';
+export const LOCAL_STORAGE_HISTORY_CACHE_PREFIX = 'mint_history_';
+export const LOCAL_STORAGE_HISTORY_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24小时的缓存时间
 
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];

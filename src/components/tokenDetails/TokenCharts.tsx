@@ -5,6 +5,7 @@ import { queryAllTokenMintForChart } from '../../utils/graphql';
 import { formatPrice, processRawData } from '../../utils/format';
 import { TokenChartsProps } from '../../types/types';
 import { useTheme } from '../../utils/contexts';
+import { LOCAL_STORAGE_HISTORY_CACHE_EXPIRY, LOCAL_STORAGE_HISTORY_CACHE_PREFIX } from '../../config/constants';
 
 // 定义时间周期类型
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
@@ -320,10 +321,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     }
 
     // 缓存相关的常量和工具函数
-    const CACHE_PREFIX = 'mint_history_';
-    const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24小时的缓存时间
-
-    const getCacheKey = (mint: string, timeFrame: string) => `${CACHE_PREFIX}${mint}_${timeFrame}`;
+    const getCacheKey = (mint: string, timeFrame: string) => `${LOCAL_STORAGE_HISTORY_CACHE_PREFIX}${mint}_${timeFrame}`;
 
     const getCachedData = (mint: string, timeFrame: string) => {
         try {
@@ -334,7 +332,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             const { data, timestamp } = JSON.parse(cached);
             
             // 检查缓存是否过期
-            if (Date.now() - timestamp > CACHE_EXPIRY) {
+            if (Date.now() - timestamp > LOCAL_STORAGE_HISTORY_CACHE_EXPIRY) {
                 localStorage.removeItem(cacheKey);
                 return null;
             }
