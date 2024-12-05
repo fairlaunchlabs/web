@@ -10,7 +10,24 @@ import {
     RemoveLiquidity, 
     BurnLPTokens 
 } from '../pages/TokenManagement';
-import { MdAccountCircle, MdToken, MdHome, MdAddCircle, MdQrCode, MdVerified, MdSupervisorAccount, MdGroups, MdPerson, MdManageAccounts, MdSettings, MdRemoveCircle, MdLocalFireDepartment } from 'react-icons/md';
+import { 
+    MdSmartToy, 
+    MdQrCode, 
+    MdGroups, 
+    MdCurrencyExchange,
+    MdLocalFireDepartment,
+    MdRocketLaunch,
+    MdOutlineEnergySavingsLeaf,
+    MdAccountBalanceWallet,
+    MdQrCodeScanner,
+    MdBadge,
+    MdEngineering,
+    MdSupportAgent,
+    MdAccountBalance,
+    MdPool,
+    MdAddBox,
+    MdRemoveCircleOutline
+} from 'react-icons/md';
 import { MyAccount } from '../pages/MyAccount';
 import { LaunchTokenForm } from '../pages/LaunchToken';
 import { MenuItem } from '../types/types';
@@ -24,38 +41,38 @@ import { SocialValueManager } from '../pages/SocialValueManager';
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
         id: 'launch-token', 
-        label: 'Launch Token', 
-        icon: <MdAddCircle className="w-5 h-5" />,
+        label: 'Launch Token', // Launch a new crypto token
+        icon: <MdRocketLaunch className="w-5 h-5" />,
         component: <LaunchTokenForm expanded={expended} /> 
     },
     { 
         id: 'mint-tokens', 
-        label: 'Mint Tokens', 
-        icon: <MdToken className="w-5 h-5" />,
+        label: 'Mint Tokens', // Mint or mine tokens
+        icon: <MdOutlineEnergySavingsLeaf className="w-5 h-5" />,
         component: <MintTokens expanded={expended} /> 
     },
     { 
         id: 'my-account', 
-        label: 'My Mints', 
-        icon: <MdManageAccounts className="w-5 h-5" />,
+        label: 'My Mints', // My token list
+        icon: <MdAccountBalanceWallet className="w-5 h-5" />,
         component: <MyAccount expanded={expended} /> 
     },
     {
         id: `tools`,
-        label: `URC Tools`,
-        icon: <MdQrCode className="w-5 h-5" />,
+        label: `URC Tools`, // URC means unique referral code, this is tools for URC management
+        icon: <MdQrCodeScanner className="w-5 h-5" />,
         component: null,
         subItems: [
             {
                 id: 'tools-check-urc',
-                label: 'Validate URC',
-                icon: <MdVerified className="w-5 h-5" />,
+                label: 'Validate URC', // validate code
+                icon: <MdBadge className="w-5 h-5" />,
                 component: <CheckURC expanded={expended} />
             },
             {
                 id: 'tools-my-urc',
-                label: 'My URC',
-                icon: <MdPerson className="w-5 h-5" />,
+                label: 'My URC', // my URC code list
+                icon: <MdQrCode className="w-5 h-5" />,
                 component: <MyUniqueReferralCode expanded={expended} />
             }
         ]
@@ -68,20 +85,20 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         subItems: [
             {
                 id: 'social-developer',
-                label: 'Developer',
-                icon: <MdSupervisorAccount className="w-5 h-5" />,
+                label: 'Developer', // here you can find and follow developers who launch tokens
+                icon: <MdEngineering className="w-5 h-5" />,
                 component: <SocialDeveloper expanded={expended} />
             },
             {
                 id: 'social-urc-provider',
-                label: 'URC provider',
-                icon: <MdPerson className="w-5 h-5" />,
+                label: 'URC provider', // here you can find URC providers
+                icon: <MdSupportAgent className="w-5 h-5" />,
                 component: <SocialURCProvider expanded={expended} />
             },
             {
                 id: 'social-value-manager',
-                label: 'Value Manager',
-                icon: <MdAccountCircle className="w-5 h-5" />,
+                label: 'Value Manager', // here you can find Value manager to manage the token value
+                icon: <MdCurrencyExchange className="w-5 h-5" />,
                 component: <SocialValueManager expanded={expended} />
             }
         ]
@@ -89,31 +106,31 @@ export const menuItems = (expended: boolean): MenuItem[] => [
     {
         id: 'token-management',
         label: 'Token Management',
-        icon: <MdToken className="w-5 h-5" />,
+        icon: <MdAccountBalance className="w-5 h-5" />,
         component: null,
         subItems: [
             {
                 id: 'create-market-id',
                 label: 'Create Market ID',
-                icon: <MdSettings className="w-5 h-5" />,
+                icon: <MdAddBox className="w-5 h-5" />,
                 component: <CreateMarketId />
             },
             {
                 id: 'create-liquidity-pool',
                 label: 'Create Pool',
-                icon: <MdToken className="w-5 h-5" />,
+                icon: <MdPool className="w-5 h-5" />,
                 component: <CreateLiquidityPool />
             },
             {
                 id: 'add-liquidity',
                 label: 'Add Liquidity',
-                icon: <MdAddCircle className="w-5 h-5" />,
+                icon: <MdAddBox className="w-5 h-5" />,
                 component: <AddLiquidity />
             },
             {
                 id: 'remove-liquidity',
                 label: 'Remove Liquidity',
-                icon: <MdRemoveCircle className="w-5 h-5" />,
+                icon: <MdRemoveCircleOutline className="w-5 h-5" />,
                 component: <RemoveLiquidity />
             },
             {
@@ -126,8 +143,8 @@ export const menuItems = (expended: boolean): MenuItem[] => [
     },
     {
         id: 'gpt',
-        label: 'Ask AI',
-        icon: <MdHome className="w-5 h-5" />,
+        label: 'Ask AI', // Here you can ask ChatGPT everything about this platform
+        icon: <MdSmartToy className="w-5 h-5" />,
         component: <AskAI expanded={expended} />
     }
 ];
