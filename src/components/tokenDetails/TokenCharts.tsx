@@ -10,6 +10,8 @@ import { LOCAL_STORAGE_HISTORY_CACHE_EXPIRY, LOCAL_STORAGE_HISTORY_CACHE_PREFIX 
 // 定义时间周期类型
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
 
+const USE_CACHE = false; // TODO: 先都从GraphQL加载，以后再优化Cache
+
 // 时间周期选项
 const timeFrameOptions = [
     { value: '1min', label: '1 Minute' },
@@ -258,13 +260,13 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         });
     }
 
-    const initializeChart = (chartRef: HTMLDivElement) => {
+    const initializeChart = (chartRef: HTMLDivElement, _isLineChart: boolean) => {
         chartRef.innerHTML = '';
 
         createMainChart(chartRef);
 
         // 添加K线图或折线图
-        addChart(isLineChart);
+        addChart(_isLineChart);
 
         // 添加成交量图
         addHistogramSeries();
@@ -273,7 +275,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         applyOptions();
 
         // 添加K线数据提示
-        subscribeCrosshairMove(isLineChart);
+        subscribeCrosshairMove(_isLineChart);
 
         // 更新数据
         if (timeFrameData.current[timeFrame].length > 0) {
@@ -357,6 +359,44 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
     };
 
+    // 更新图表数据
+    const updateChartData = useCallback(() => {
+        if (!chart.current || !timeFrameData.current[timeFrame].length || !series.current) return;
+
+        const data = timeFrameData.current[timeFrame];
+
+        if (isLineChart) {
+            // 转换为折线图数据
+            const lineData = data.map(item => ({
+                time: item.time as UTCTimestamp,
+                value: Number(item.close),
+            }));
+            series.current.setData(lineData);
+        } else {
+            // K线图数据
+            series.current.setData(data);
+        }
+        
+        if (volumeSeries.current) {
+            volumeSeries.current.setData(data.map(item => ({
+                time: item.time,
+                value: item.volume,
+                color: item.close >= item.open ? '#26a69a' : '#ef5350'
+            })));
+        }
+
+        // 设置可见范围
+        const visibleBars = getVisibleBarsCount(timeFrame);
+        const timeScale = chart.current.timeScale();
+        const lastIndex = data.length - 1;
+        
+        timeScale.scrollToPosition(5, false);
+        timeScale.setVisibleLogicalRange({
+            from: lastIndex - visibleBars,
+            to: lastIndex + 5
+        });
+    }, [timeFrame, isLineChart]);
+    
     // 使用useLazyQuery替代useQuery
     const [fetchMintData, { loading, error }] = useLazyQuery(queryAllTokenMintForChart, {
         onCompleted: (data) => {
@@ -395,12 +435,12 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     // 获取数据的函数
     const loadData = useCallback(async () => {
         if (!token?.mint) return;
-
+        console.log('Loading data...');
         try {
             // 尝试从缓存获取数据
             const cachedData = getCachedData(token.mint, timeFrame);
             
-            if (cachedData) {
+            if (cachedData && USE_CACHE) {
                 // 如果有缓存数据，直接使用
                 console.log('Using cached data...');
                 processAndUpdateData(cachedData);
@@ -418,12 +458,12 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         } catch (err) {
             console.error('Error loading data:', err);
         }
-    }, [token?.mint, timeFrame, fetchMintData, processAndUpdateData]);
+    }, [token?.mint, fetchMintData, processAndUpdateData]);
 
     // 监听token或timeFrame变化时加载数据
     useEffect(() => {
         loadData();
-    }, [loadData]);
+    }, [loadData, token?.mint]);
 
     // 显示加载状态或错误
     useEffect(() => {
@@ -444,23 +484,15 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 `;
             }
         }
-    }, [loading, error]);
 
-    // 清理和初始化图表
-    const cleanupAndInitChart = useCallback(() => {
         if (chart.current) {
             chart.current.remove();
             chart.current = null;
         }
 
-        if (!chartContainerRef.current) return;
-        initializeChart(chartContainerRef.current);
-    }, [isDarkMode, gridColor, labelColor, timeFrame, isLineChart]);
-
-    // 组件挂载时初始化图表
-    useEffect(() => {
-        return cleanupAndInitChart();
-    }, [cleanupAndInitChart, isDarkMode]);
+        if(chartContainerRef?.current) initializeChart(chartContainerRef?.current, isLineChart);
+        else return;
+    }, [loading, error, timeFrame, isLineChart]);
 
     // 获取默认显示的K线数量
     const getVisibleBarsCount = (tf: TimeFrame) => {
@@ -527,68 +559,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
         return result;
     };
-
-    // 更新图表数据
-    const updateChartData = useCallback(() => {
-        if (!chart.current || !timeFrameData.current[timeFrame].length || !series.current) return;
-
-        const data = timeFrameData.current[timeFrame];
-
-        if (isLineChart) {
-            // 转换为折线图数据
-            const lineData = data.map(item => ({
-                time: item.time as UTCTimestamp,
-                value: Number(item.close),
-            }));
-            series.current.setData(lineData);
-        } else {
-            // K线图数据
-            series.current.setData(data);
-        }
-        
-        if (volumeSeries.current) {
-            volumeSeries.current.setData(data.map(item => ({
-                time: item.time,
-                value: item.volume,
-                color: item.close >= item.open ? '#26a69a' : '#ef5350'
-            })));
-        }
-
-        // 设置可见范围
-        const visibleBars = getVisibleBarsCount(timeFrame);
-        const timeScale = chart.current.timeScale();
-        const lastIndex = data.length - 1;
-        
-        timeScale.scrollToPosition(5, false);
-        timeScale.setVisibleLogicalRange({
-            from: lastIndex - visibleBars,
-            to: lastIndex + 5
-        });
-    }, [timeFrame, isLineChart]);
-
-    // 切换图表类型
-    const toggleChartType = useCallback(() => {
-        if (!chart.current) return;
-        // 移除现有的系列
-        if (series.current) {
-            chart.current.removeSeries(series.current);
-        }
-
-        const newIsLineChart = !isLineChart;
-
-        // 创建新的系列
-        addChart(newIsLineChart);
-
-        // 更新数据
-        updateChartData();
-        
-        // 切换状态
-        setIsLineChart(newIsLineChart);
-
-        // 重新设置crosshairMove事件
-        subscribeCrosshairMove(newIsLineChart);
-    }, [isLineChart, updateChartData]);
-
+    
     return (
         <div className="mt-6">
             <div className="bg-base-200 rounded-lg shadow-lg p-6">
@@ -597,7 +568,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     <div className="flex items-center gap-4">
                         <button
                             className="btn btn-sm btn-outline"
-                            onClick={toggleChartType}
+                            onClick={() => setIsLineChart(!isLineChart)}
                         >
                             {isLineChart ? 'K-Line' : 'Dot-Line'}
                         </button>
