@@ -1,92 +1,68 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createChart, ColorType, UTCTimestamp } from 'lightweight-charts';
 import { TokenChartsProps } from '../../types/types';
+import { useQuery } from '@apollo/client';
+import { queryAllTokenMintForChart } from '../../utils/graphql';
+import { formatPrice } from '../../utils/format';
 
 // 定义时间周期类型
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
 
-// 生成模拟数据
-const generateMockData = (period: TimeFrame) => {
-    const data = [];
-    const now = new Date().getTime();
-    let baseMs: number;
-    let count: number;
+interface MintData {
+    timestamp: string;
+    mintSizeEpoch: string;
+}
+
+// 处理原始数据，生成基础K线数据
+const processRawData = (data: MintData[], feeRate: number) => {
+    if (!data || data.length === 0) return [];
+
+    // 按时间戳排序
+    const sortedData = [...data].sort((a, b) => parseInt(a.timestamp) - parseInt(b.timestamp));
     
-    // 根据周期设置时间间隔和数据点数量
-    switch (period) {
-        case '1min':
-            baseMs = 60 * 1000;
-            count = 60 * 24; // 一天的分钟数
-            break;
-        case '5min':
-            baseMs = 5 * 60 * 1000;
-            count = 12 * 24 * 5; // 5天
-            break;
-        case '15min':
-            baseMs = 15 * 60 * 1000;
-            count = 4 * 24 * 15; // 15天
-            break;
-        case '30min':
-            baseMs = 30 * 60 * 1000;
-            count = 2 * 24 * 30; // 30天
-            break;
-        case '1hour':
-            baseMs = 60 * 60 * 1000;
-            count = 24 * 30; // 30天
-            break;
-        case '2hour':
-            baseMs = 2 * 60 * 60 * 1000;
-            count = 12 * 30; // 30天
-            break;
-        case '4hour':
-            baseMs = 4 * 60 * 60 * 1000;
-            count = 6 * 30; // 30天
-            break;
-        case 'day':
-        default:
-            baseMs = 24 * 60 * 60 * 1000;
-            count = 365; // 365天
-            break;
-    }
+    // 按分钟聚合数据
+    const minuteData = new Map<number, {
+        prices: number[];
+        volumes: number[];
+        timestamp: number;
+    }>();
 
-    let price = 100;
-    let trend = 0.001;
-    
-    // 根据时间周期调整波动率
-    const baseVolatility = 0.02;
-    const timeAdjustment = Math.sqrt(baseMs / (24 * 60 * 60 * 1000));
-    let volatility = baseVolatility * timeAdjustment;
-
-    for (let i = count; i >= 0; i--) {
-        const time = now - i * baseMs;
-        const randomChange = (Math.random() - 0.5) * volatility;
-        const trendChange = trend * (1 + (Math.random() - 0.5) * 0.5);
+    // 遍历所有数据点，按分钟分组
+    sortedData.forEach(item => {
+        const timestamp = parseInt(item.timestamp);
+        const mintSize = parseFloat(item.mintSizeEpoch);
+        const price = feeRate / mintSize;
         
-        price = price * (1 + randomChange + trendChange);
-        price = Math.max(price, 0.01);
+        // 将时间戳转换为分钟级别（去掉秒数）
+        const minuteTimestamp = Math.floor(timestamp / 60) * 60;
 
-        const open = price;
-        const close = price * (1 + (Math.random() - 0.5) * volatility * 0.5);
-        const high = Math.max(open, close) * (1 + Math.random() * volatility * 0.5);
-        const low = Math.min(open, close) * (1 - Math.random() * volatility * 0.5);
-        
-        const volume = Math.floor(Math.random() * 1_000_000 + 100);
-
-        data.push({
-            time: (Math.floor(time / 1000)) as UTCTimestamp,
-            open,
-            high,
-            low,
-            close,
-            volume
-        });
-
-        if (Math.random() < 0.1) {
-            trend = (Math.random() - 0.5) * 0.002;
+        if (!minuteData.has(minuteTimestamp)) {
+            minuteData.set(minuteTimestamp, {
+                prices: [],
+                volumes: [],
+                timestamp: minuteTimestamp
+            });
         }
-    }
 
-    return data;
+        const minute = minuteData.get(minuteTimestamp)!;
+        minute.prices.push(price);
+        minute.volumes.push(mintSize / 1000000000); // 转换为标准单位
+    });
+
+    // 转换为K线数据
+    return Array.from(minuteData.values()).map(minute => {
+        const prices = minute.prices;
+        const volumes = minute.volumes;
+        
+        return {
+            time: minute.timestamp as UTCTimestamp,
+            open: prices[0], // 这一分钟内的第一个价格
+            high: Math.max(...prices), // 最高价
+            low: Math.min(...prices), // 最低价
+            close: prices[prices.length - 1], // 这一分钟内的最后一个价格
+            volume: volumes.reduce((a, b) => a + b, 0) // 总交易量
+        };
+    });
 };
 
 export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
@@ -108,6 +84,15 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         'day': []
     });
     const tooltipRef = useRef<HTMLDivElement>(null);
+
+    // 查询图表数据
+    const { loading, error, data } = useQuery(queryAllTokenMintForChart, {
+        variables: {
+            skip: 0,
+            first: 1000, // 根据需要调整
+            mint: token?.mint
+        }
+    });
 
     // 获取默认显示的K线数量
     const getVisibleBarsCount = (tf: TimeFrame) => {
@@ -176,9 +161,11 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     };
 
     // 生成所有时间周期的数据
-    const generateAllTimeFrameData = () => {
-        // 生成基础1分钟数据
-        baseData.current = generateMockData('1min');
+    const generateAllTimeFrameData = useCallback(() => {
+        if (!data?.mintTokenEntities || !token?.feeRate) return;
+
+        // 处理原始数据生成基础数据
+        baseData.current = processRawData(data.mintTokenEntities, parseFloat(token.feeRate));
         timeFrameData.current['1min'] = baseData.current;
 
         // 生成其他时间周期的数据
@@ -187,7 +174,17 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             const minutes = getTimeFrameMinutes(tf);
             timeFrameData.current[tf] = aggregateCandles(baseData.current, minutes);
         });
-    };
+
+        // 更新图表数据
+        updateChartData();
+    }, [data, token]);
+
+    // 在数据加载完成后生成图表数据
+    useEffect(() => {
+        if (!loading && data) {
+            generateAllTimeFrameData();
+        }
+    }, [loading, data, generateAllTimeFrameData]);
 
     // 更新图表数据
     const updateChartData = useCallback(() => {
@@ -246,9 +243,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 lineWidth: 2,
                 priceScaleId: 'right',
                 priceFormat: {
-                    type: 'price',
-                    precision: 6,
-                    minMove: 0.000001,
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
                 },
                 lastValueVisible: true,
                 priceLineVisible: true,
@@ -268,9 +264,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 wickDownColor: '#ef5350',
                 priceScaleId: 'right',
                 priceFormat: {
-                    type: 'price',
-                    precision: 6,
-                    minMove: 0.000001,
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
                 },
                 lastValueVisible: true,
                 priceLineVisible: true,
@@ -299,7 +294,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                         tooltipContent = `
                             <div class="space-y-1">
                                 <div class="font-medium">${time}</div>
-                                <div>Price: ${price.value?.toFixed(6)}</div>
+                                <div>Price: ${formatPrice(price.value || 0)}</div>
                                 <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
                             </div>
                         `;
@@ -308,10 +303,10 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                             <div class="space-y-1">
                                 <div class="font-medium">${time}</div>
                                 <div class="grid grid-cols-1 gap-x-4">
-                                    <div>Open: ${price.open?.toFixed(6)}</div>
-                                    <div>High: ${price.high?.toFixed(6)}</div>
-                                    <div>Low: ${price.low?.toFixed(6)}</div>
-                                    <div>Close: ${price.close?.toFixed(6)}</div>
+                                    <div>Open: ${formatPrice(price.open || 0)}</div>
+                                    <div>High: ${formatPrice(price.high || 0)}</div>
+                                    <div>Low: ${formatPrice(price.low || 0)}</div>
+                                    <div>Close: ${formatPrice(price.close || 0)}</div>
                                     <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
                                 </div>
                             </div>
@@ -350,8 +345,34 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     useEffect(() => {
         if (!chartContainerRef.current) return;
 
-        // 生成所有时间周期的数据
-        generateAllTimeFrameData();
+        if (error) {
+            // 如果有错误，显示错误信息
+            chartContainerRef.current.innerHTML = `
+                <div class="flex items-center justify-center w-full h-full min-h-[400px] text-red-500">
+                    <div class="text-center">
+                        <div class="text-lg font-medium mb-2">Failed to load chart data</div>
+                        <div class="text-sm opacity-75">Please try again later</div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        if (loading) {
+            // 显示加载状态
+            chartContainerRef.current.innerHTML = `
+                <div class="flex items-center justify-center w-full h-full min-h-[400px] text-gray-400">
+                    <div class="text-center">
+                        <div class="text-lg font-medium mb-2">Loading chart data...</div>
+                        <div class="text-sm opacity-75">Please wait</div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // 清除任何现有内容
+        chartContainerRef.current.innerHTML = '';
 
         chart.current = createChart(chartContainerRef.current, {
             layout: {
@@ -381,6 +402,10 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     top: 0.1,
                     bottom: 0.3,
                 },
+                // priceFormat: {
+                //     type: 'custom',
+                //     formatter: (price: number) => formatPrice(price),
+                // },
             },
             timeScale: {
                 timeVisible: true,
@@ -416,7 +441,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     return date.toLocaleString();
                 },
                 priceFormatter: (price: number) => {
-                    return price.toFixed(6);
+                    return formatPrice(price);
                 }
             },
             handleScroll: {
@@ -444,9 +469,8 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             wickDownColor: '#ef5350',
             priceScaleId: 'right',
             priceFormat: {
-                type: 'price',
-                precision: 6,
-                minMove: 0.000001,
+                type: 'custom',
+                formatter: (price: number) => formatPrice(price),
             },
             lastValueVisible: true,
             priceLineVisible: true,
@@ -500,7 +524,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                         tooltipContent = `
                             <div class="space-y-1">
                                 <div class="font-medium">${time}</div>
-                                <div>Price: ${price.value?.toFixed(6)}</div>
+                                <div>Price: ${formatPrice(price.value || 0)}</div>
                                 <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
                             </div>
                         `;
@@ -509,10 +533,10 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                             <div class="space-y-1">
                                 <div class="font-medium">${time}</div>
                                 <div class="grid grid-cols-1 gap-x-4">
-                                    <div>Open: ${price.open?.toFixed(6)}</div>
-                                    <div>High: ${price.high?.toFixed(6)}</div>
-                                    <div>Low: ${price.low?.toFixed(6)}</div>
-                                    <div>Close: ${price.close?.toFixed(6)}</div>
+                                    <div>Open: ${formatPrice(price.open || 0)}</div>
+                                    <div>High: ${formatPrice(price.high || 0)}</div>
+                                    <div>Low: ${formatPrice(price.low || 0)}</div>
+                                    <div>Close: ${formatPrice(price.close || 0)}</div>
                                     <div>Vol: ${volume?.value?.toLocaleString() || '0'}</div>
                                 </div>
                             </div>
@@ -568,7 +592,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 chart.current.remove();
             }
         };
-    }, []);
+    }, [error, loading]);
 
     // 当时间周期改变时更新数据
     useEffect(() => {

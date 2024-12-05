@@ -118,6 +118,20 @@ query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
 }
 `;
 
+export const queryAllTokenMintForChart = gql`
+query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
+    mintTokenEntities(
+        where: { mint: $mint }
+        skip: $skip
+        first: $first
+        orderBy: timestamp
+    ) {
+        timestamp
+        mintSizeEpoch
+    }
+}
+`;
+
 export const queryTokenRefundTransactions = gql`
 query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
     refundEventEntities(

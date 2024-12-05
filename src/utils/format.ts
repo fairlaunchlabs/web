@@ -143,3 +143,46 @@ export const extractIPFSHash = (url: string): string | null => {
 export const numberStringToBN = (decimalStr: string): BN => {
     return new BN(decimalStr.replace(/[,\s]/g, '').split('.')[0] || '0');
 };
+
+export const formatPrice = (price: number): string => {
+    if (price === 0) return '0';
+    const digitalsAfterZero = 5;
+    const priceStr = price.toString();
+    // 如果是科学计数法表示，先转换为普通数字字符串
+    if (priceStr.includes('e')) {
+        const [base, exponent] = priceStr.split('e');
+        const exp = parseInt(exponent);
+        if (exp < 0) {
+            // 处理小于1的数
+            const absExp = Math.abs(exp);
+            const baseNum = parseFloat(base);
+            const fullNumber = baseNum.toFixed(absExp + digitalsAfterZero); // 保留5位有效数字
+            const zeroCount = fullNumber.slice(2, fullNumber.length - digitalsAfterZero).length - 1;
+            if (zeroCount > 2) { // if 0.00012345 does not need to be formatted
+                return `0.0{${zeroCount}}${(baseNum * Math.pow(10, digitalsAfterZero)).toFixed(0)}`;
+            }
+            return parseFloat(fullNumber).toFixed(digitalsAfterZero);
+        }
+    }
+    
+    // 处理普通小数
+    const parts = priceStr.split('.');
+    if (parts.length === 2) {
+        const decimals = parts[1];
+        let zeroCount = 0;
+        for (const char of decimals) {
+            if (char === '0') {
+                zeroCount++;
+            } else {
+                break;
+            }
+        }
+        if (zeroCount > 3) {
+            const significantDigits = decimals.slice(zeroCount, zeroCount + digitalsAfterZero);
+            return `0.{${zeroCount}}${significantDigits}`;
+        }
+    }
+    
+    // 如果不需要特殊处理，保留5位小数
+    return parseFloat(priceStr).toFixed(digitalsAfterZero);
+};
