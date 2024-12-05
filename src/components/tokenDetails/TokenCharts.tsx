@@ -151,21 +151,40 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         });
 
         // 添加K线图或折线图
-        series.current = chart.current.addCandlestickSeries({
-            upColor: '#26a69a',
-            downColor: '#ef5350',
-            borderVisible: false,
-            wickUpColor: '#26a69a',
-            wickDownColor: '#ef5350',
-            priceScaleId: 'right',
-            priceFormat: {
-                type: 'custom',
-                formatter: (price: number) => formatPrice(price),
-            },
-            lastValueVisible: true,
-            priceLineVisible: true,
-            title: 'Price',
-        });
+        if (isLineChart) {
+            series.current = chart.current.addLineSeries({
+                color: '#2196F3',
+                lineWidth: 2,
+                priceScaleId: 'right',
+                priceFormat: {
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
+                },
+                lastValueVisible: true,
+                priceLineVisible: true,
+                title: 'Price',
+                crosshairMarkerVisible: true,
+                crosshairMarkerRadius: 4,
+                crosshairMarkerBorderColor: '#2196F3',
+                crosshairMarkerBackgroundColor: '#ffffff',
+            });
+        } else {
+            series.current = chart.current.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+                priceScaleId: 'right',
+                priceFormat: {
+                    type: 'custom',
+                    formatter: (price: number) => formatPrice(price),
+                },
+                lastValueVisible: true,
+                priceLineVisible: true,
+                title: 'Price',
+            });
+        }
 
         // 添加成交量图
         volumeSeries.current = chart.current.addHistogramSeries({
