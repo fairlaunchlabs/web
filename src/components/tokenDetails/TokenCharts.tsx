@@ -13,17 +13,48 @@ type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hou
 
 const USE_CACHE = false; // TODO: 先都从GraphQL加载，以后再优化Cache
 
-// 时间周期选项
-const timeFrameOptions = [
-    { value: '1min', label: '1 Minute' },
-    { value: '5min', label: '5 Minutes' },
-    { value: '15min', label: '15 Minutes' },
-    { value: '30min', label: '30 Minutes' },
-    { value: '1hour', label: '1 Hour' },
-    { value: '2hour', label: '2 Hours' },
-    { value: '4hour', label: '4 Hours' },
-    { value: 'day', label: '1 Day' },
-];
+const timeFrameDatas = {
+    "1min": {
+        label: "1 Minute",
+        bars: 240,
+        minutes: 1,
+    },
+    "5min": {
+        label: "5 Minutes",
+        bars: 144,
+        minutes: 5,
+    },
+    "15min": {
+        label: "15 Minutes",
+        bars: 96,
+        minutes: 15,
+    },
+    "30min": {
+        label: "30 Minutes",
+        bars: 48,
+        minutes: 30,
+    },
+    "1hour": {
+        label: "1 Hour",
+        bars: 24,
+        minutes: 60,
+    },
+    "2hour": {
+        label: "2 Hours",
+        bars: 48,
+        minutes: 120,
+    },
+    "4hour": {
+        label: "4 Hours",
+        bars: 42,
+        minutes: 240,
+    },
+    "day": {
+        label: "1 Day",
+        bars: 90,
+        minutes: 1440,
+    },
+}
 
 export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -387,7 +418,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         }
 
         // 设置可见范围
-        const visibleBars = getVisibleBarsCount(timeFrame);
+        const visibleBars = timeFrameDatas[timeFrame].bars;
         const timeScale = chart.current.timeScale();
         const lastIndex = data.length - 1;
         
@@ -423,7 +454,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
             // 生成其他时间周期的数据
             const timeFrames: TimeFrame[] = ['5min', '15min', '30min', '1hour', '2hour', '4hour', 'day'];
             timeFrames.forEach(tf => {
-                const minutes = getTimeFrameMinutes(tf);
+                const minutes = timeFrameDatas[tf].minutes;
                 timeFrameData.current[tf] = aggregateCandles(baseData.current, minutes);
             });
 
@@ -437,7 +468,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     // 获取数据的函数
     const loadData = useCallback(async () => {
         if (!token?.mint) return;
-        console.log('Loading data...');
+        console.log('Loading data...', timeFrame);
         try {
             // 尝试从缓存获取数据
             const cachedData = getCachedData(token.mint, timeFrame);
@@ -460,7 +491,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         } catch (err) {
             console.error('Error loading data:', err);
         }
-    }, [token?.mint, fetchMintData, processAndUpdateData]);
+    }, [token?.mint, fetchMintData, processAndUpdateData, timeFrame]);
 
     // 监听token或timeFrame变化时加载数据
     useEffect(() => {
@@ -494,34 +525,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         if(chartContainerRef?.current) initializeChart(chartContainerRef?.current, isLineChart);
         else return;
     }, [loading, error, timeFrame, isLineChart, gridColor, labelColor]);
-
-    // 获取默认显示的K线数量
-    const getVisibleBarsCount = (tf: TimeFrame) => {
-        switch (tf) {
-            case '1min': return 240;  // 4小时
-            case '5min': return 144;  // 12小时
-            case '15min': return 96;  // 24小时
-            case '30min': return 48;  // 24小时
-            case '1hour': return 24;  // 1天
-            case '2hour': return 48;  // 4天
-            case '4hour': return 42;  // 7天
-            case 'day': return 90;    // 3个月
-        }
-    };
-
-    // 获取时间周期的分钟数
-    const getTimeFrameMinutes = (tf: TimeFrame): number => {
-        switch (tf) {
-            case '1min': return 1;
-            case '5min': return 5;
-            case '15min': return 15;
-            case '30min': return 30;
-            case '1hour': return 60;
-            case '2hour': return 120;
-            case '4hour': return 240;
-            case 'day': return 1440;
-        }
-    };
 
     // 合并K线数据
     const aggregateCandles = (data: any[], timeFrameMinutes: number) => {
@@ -594,9 +597,9 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                             onChange={(e) => setTimeFrame(e.target.value as TimeFrame)}
                             className="select select-bordered select-sm w-40 bg-base-300 text-base-content"
                         >
-                            {timeFrameOptions.map(option => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
+                            {Object.entries(timeFrameDatas).map(([key, value]) => (
+                                <option key={key} value={key}>
+                                    {value.label}
                                 </option>
                             ))}
                         </select>
