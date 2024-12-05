@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { createChart, UTCTimestamp } from 'lightweight-charts';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { queryAllTokenMintForChart } from '../../utils/graphql';
 import { formatPrice, processRawData } from '../../utils/format';
 import { TokenChartsProps } from '../../types/types';
@@ -319,6 +319,135 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         });    
     }
 
+    // 缓存相关的常量和工具函数
+    const CACHE_PREFIX = 'mint_history_';
+    const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24小时的缓存时间
+
+    const getCacheKey = (mint: string, timeFrame: string) => `${CACHE_PREFIX}${mint}_${timeFrame}`;
+
+    const getCachedData = (mint: string, timeFrame: string) => {
+        try {
+            const cacheKey = getCacheKey(mint, timeFrame);
+            const cached = localStorage.getItem(cacheKey);
+            if (!cached) return null;
+
+            const { data, timestamp } = JSON.parse(cached);
+            
+            // 检查缓存是否过期
+            if (Date.now() - timestamp > CACHE_EXPIRY) {
+                localStorage.removeItem(cacheKey);
+                return null;
+            }
+
+            return data;
+        } catch (err) {
+            console.error('Error reading cache:', err);
+            return null;
+        }
+    };
+
+    const setCachedData = (mint: string, timeFrame: string, data: any[]) => {
+        try {
+            const cacheKey = getCacheKey(mint, timeFrame);
+            const cacheData = {
+                data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+        } catch (err) {
+            console.error('Error setting cache:', err);
+        }
+    };
+
+    // 使用useLazyQuery替代useQuery
+    const [fetchMintData, { loading, error }] = useLazyQuery(queryAllTokenMintForChart, {
+        onCompleted: (data) => {
+            if (data?.mintTokenEntities && token?.mint) {
+                // 保存数据到缓存
+                setCachedData(token.mint, timeFrame, data.mintTokenEntities);
+                // 处理获取到的数据
+                processAndUpdateData(data.mintTokenEntities);
+            }
+        }
+    });
+
+    // 处理和更新数据的函数
+    const processAndUpdateData = useCallback((mintTokenEntities: any[]) => {
+        if (!token?.feeRate) return;
+
+        try {
+            // 处理数据
+            baseData.current = processRawData(mintTokenEntities, parseFloat(token.feeRate));
+            timeFrameData.current['1min'] = baseData.current;
+
+            // 生成其他时间周期的数据
+            const timeFrames: TimeFrame[] = ['5min', '15min', '30min', '1hour', '2hour', '4hour', 'day'];
+            timeFrames.forEach(tf => {
+                const minutes = getTimeFrameMinutes(tf);
+                timeFrameData.current[tf] = aggregateCandles(baseData.current, minutes);
+            });
+
+            // 更新图表数据
+            updateChartData();
+        } catch (err) {
+            console.error('Error processing data:', err);
+        }
+    }, [token?.feeRate]);
+
+    // 获取数据的函数
+    const loadData = useCallback(async () => {
+        if (!token?.mint) return;
+
+        try {
+            // 尝试从缓存获取数据
+            const cachedData = getCachedData(token.mint, timeFrame);
+            
+            if (cachedData) {
+                // 如果有缓存数据，直接使用
+                console.log('Using cached data...');
+                processAndUpdateData(cachedData);
+            } else {
+                // 如果没有缓存数据，从GraphQL获取
+                console.log('Fetching data from GraphQL...');
+                fetchMintData({
+                    variables: {
+                        skip: 0,
+                        first: 1000,
+                        mint: token.mint
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Error loading data:', err);
+        }
+    }, [token?.mint, timeFrame, fetchMintData, processAndUpdateData]);
+
+    // 监听token或timeFrame变化时加载数据
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
+
+    // 显示加载状态或错误
+    useEffect(() => {
+        if (loading) {
+            if (chartContainerRef.current) {
+                chartContainerRef.current.innerHTML = `
+                    <div class="flex items-center justify-center h-[560px]">
+                        <div class="text-base-content">Loading chart data...</div>
+                    </div>
+                `;
+            }
+        } else if (error) {
+            if (chartContainerRef.current) {
+                chartContainerRef.current.innerHTML = `
+                    <div class="flex items-center justify-center h-[560px]">
+                        <div class="text-error">Error loading chart data: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+    }, [loading, error]);
+
     // 清理和初始化图表
     const cleanupAndInitChart = useCallback(() => {
         if (chart.current) {
@@ -334,15 +463,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
     useEffect(() => {
         return cleanupAndInitChart();
     }, [cleanupAndInitChart, isDarkMode]);
-
-    // 查询图表数据
-    const { loading, error, data } = useQuery(queryAllTokenMintForChart, {
-        variables: {
-            skip: 0,
-            first: 1000, // 根据需要调整
-            mint: token?.mint
-        }
-    });
 
     // 获取默认显示的K线数量
     const getVisibleBarsCount = (tf: TimeFrame) => {
@@ -410,32 +530,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         return result;
     };
 
-    // 生成所有时间周期的数据
-    const generateAllTimeFrameData = useCallback(() => {
-        if (!data?.mintTokenEntities || !token?.feeRate) return;
-
-        // 处理原始数据生成基础数据
-        baseData.current = processRawData(data.mintTokenEntities, parseFloat(token.feeRate));
-        timeFrameData.current['1min'] = baseData.current;
-
-        // 生成其他时间周期的数据
-        const timeFrames: TimeFrame[] = ['5min', '15min', '30min', '1hour', '2hour', '4hour', 'day'];
-        timeFrames.forEach(tf => {
-            const minutes = getTimeFrameMinutes(tf);
-            timeFrameData.current[tf] = aggregateCandles(baseData.current, minutes);
-        });
-
-        // 更新图表数据
-        updateChartData();
-    }, [data, token]);
-
-    // 在数据加载完成后生成图表数据
-    useEffect(() => {
-        if (!loading && data) {
-            generateAllTimeFrameData();
-        }
-    }, [loading, data, generateAllTimeFrameData]);
-
     // 更新图表数据
     const updateChartData = useCallback(() => {
         if (!chart.current || !timeFrameData.current[timeFrame].length || !series.current) return;
@@ -496,38 +590,6 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         // 重新设置crosshairMove事件
         subscribeCrosshairMove(newIsLineChart);
     }, [isLineChart, updateChartData]);
-
-    // 初始化图表
-    useEffect(() => {
-        if (!chartContainerRef.current) return;
-
-        if (error) {
-            // 如果有错误，显示错误信息
-            chartContainerRef.current.innerHTML = `
-                <div class="flex items-center justify-center w-full h-full min-h-[400px] text-red-500">
-                    <div class="text-center">
-                        <div class="text-lg font-medium mb-2">Failed to load chart data</div>
-                        <div class="text-sm opacity-75">Please try again later</div>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        if (loading) {
-            // 显示加载状态
-            chartContainerRef.current.innerHTML = `
-                <div class="flex items-center justify-center w-full h-full min-h-[400px] text-gray-400">
-                    <div class="text-center">
-                        <div class="text-lg font-medium mb-2">Loading chart data...</div>
-                        <div class="text-sm opacity-75">Please wait</div>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-        initializeChart(chartContainerRef.current);
-    }, [error, loading]);
 
     return (
         <div className="mt-6">
