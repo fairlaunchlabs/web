@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { queryTotalReferrerBonus } from '../../utils/graphql';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { formatTimestamp } from '../../utils/format';
+import { formatPrice, formatTimestamp } from '../../utils/format';
 import { Pagination } from '../common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 
@@ -85,7 +85,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                             <h4 className="card-title">Summary</h4>
                             <div className="space-y-2">
                                 <p>Total Referral Bonus: <span className="font-bold text-primary">
-                                    {totalBonus.toFixed(4)} SOL
+                                    {formatPrice(totalBonus, 3)} SOL
                                 </span></p>
                                 <p>Total Referral Transactions: {data.mintTokenEntities.length}</p>
                             </div>
@@ -135,7 +135,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                                     <td><AddressDisplay address={entity.sender} /></td>
                                     <td>{formatTimestamp(parseInt(entity.timestamp))}</td>
                                     <td>{entity.currentEpoch}</td>
-                                    <td>{(parseFloat(entity.referrerFee) / LAMPORTS_PER_SOL).toFixed(6)} SOL</td>
+                                    <td>{formatPrice(parseFloat(entity.referrerFee) / LAMPORTS_PER_SOL, 3)} SOL</td>
                                 </tr>
                             ))}
                         </tbody>

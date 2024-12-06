@@ -124,7 +124,6 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             // Try to get from cache first
             const cachedImage = await getCachedImage(cid);
             if (cachedImage) {
-                console.log('Using cached image', cid);
                 const blobUrl = createBlobUrl(cachedImage);
                 setImageData(blobUrl);
                 setIsLoading(false);
@@ -139,13 +138,10 @@ export const TokenImage: React.FC<TokenImageProps> = ({
 
             let imageBuffer: ArrayBuffer;
             if (imageResponse.data instanceof ArrayBuffer) {
-                console.log('Using ArrayBuffer');
                 imageBuffer = imageResponse.data;
             } else if (imageResponse.data instanceof Blob) {
-                console.log('Using Blob');
                 imageBuffer = await imageResponse.data.arrayBuffer();
             } else if (typeof imageResponse.data === 'string') {
-                console.log('Using string');
                 const encoder = new TextEncoder();
                 imageBuffer = encoder.encode(imageResponse.data).buffer;
             } else {
@@ -161,7 +157,6 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             setIsLoading(false);
             setRetryCount(0);
         } catch (err) {
-            console.error('Error loading token image:', err);
             setError(err instanceof Error ? err.message : 'Unknown error');
             setIsLoading(false);
 
@@ -218,7 +213,6 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             style={{ width: size, height: size }}
             loading="lazy"
             onError={() => {
-                console.error('Image failed to load:', imageUrl);
                 setError('Failed to display image');
                 if (imageData) {
                     URL.revokeObjectURL(imageData);

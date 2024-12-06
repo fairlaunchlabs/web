@@ -393,7 +393,7 @@ export const getMyReferrerData = async (
         wallet.publicKey, // 需要查询账户的公钥
         false,
     )
-    // console.log('referrerAta', referrerAta.toBase58())
+
     // Check if the referrer's ATA account exists
     const referrerAtaAccountInfo = await connection.getAccountInfo(referrerAta);
     if (!referrerAtaAccountInfo) {
@@ -410,7 +410,7 @@ export const getMyReferrerData = async (
             message: codeHash.message
         }
     }
-    // console.log('referrerAtaAccountInfo', referrerAtaAccountInfo);
+
     const program = getProgram(wallet, connection);
     const [referralAccountPda] = PublicKey.findProgramAddressSync(
         [
@@ -420,7 +420,7 @@ export const getMyReferrerData = async (
         ],
         program.programId,
     );
-    console.log('referralAccount', referralAccountPda.toBase58());
+
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
     if (!referralAccountInfo) {
         return {
@@ -429,7 +429,6 @@ export const getMyReferrerData = async (
         }
     }
 
-    console.log('referralAccountInfo', referralAccountInfo);
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     return {
         success: true,
@@ -527,7 +526,7 @@ export const mintToken = async (
         success: false,
         message: 'Please connect wallet'
     }
-    console.log("code", code);
+
     const program = getProgram(wallet, connection);
     // Check referrer account
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
@@ -539,7 +538,7 @@ export const mintToken = async (
     }
     // get data from referral account, and check if it is correct
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
-    console.log(referrerMain.toBase58(), referrerData.referrerMain.toBase58())
+
     if(referrerMain.toBase58() !== referrerData.referrerMain.toBase58()) {
         return {
             success: false,
@@ -637,7 +636,6 @@ export const getReferralDataByCodeHash = async (
         program.programId,
     );
 
-    // console.log('codeAccountPda', codeAccountPda.toBase58());
     const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
     if(!codeAccountInfo) {
         return {
@@ -647,7 +645,7 @@ export const getReferralDataByCodeHash = async (
     }
     const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
     const referralAccountPda = codeAccountData.referralAccount;
-    // console.log('referralAccountPda', referralAccountPda.toBase58());
+
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
     if(!referralAccountInfo) {
         return {

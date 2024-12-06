@@ -151,9 +151,9 @@ export const numberStringToBN = (decimalStr: string): BN => {
     return new BN(decimalStr.replace(/[,\s]/g, '').split('.')[0] || '0');
 };
 
-export const formatPrice = (price: number): string => {
+export const formatPrice = (price: number, digitalsAfterZero: number = 5): string => {
     if (price === 0) return '0';
-    const digitalsAfterZero = 5;
+    digitalsAfterZero = digitalsAfterZero - 1;
     const priceStr = price.toString();
     // 如果是科学计数法表示，先转换为普通数字字符串
     if (priceStr.includes('e')) {
@@ -166,9 +166,11 @@ export const formatPrice = (price: number): string => {
             const fullNumber = baseNum.toFixed(absExp + digitalsAfterZero); // 保留5位有效数字
             const zeroCount = fullNumber.slice(2, fullNumber.length - digitalsAfterZero).length - 1;
             if (zeroCount > 2) { // if 0.00012345 does not need to be formatted
-                return `0.0{${zeroCount}}${(baseNum * Math.pow(10, digitalsAfterZero)).toFixed(0)}`;
+                const result = `0.0{${zeroCount}}${(baseNum * Math.pow(10, digitalsAfterZero)).toFixed(0)}`;
+                return result.replace(/\.?0+$/, '');
             }
-            return parseFloat(fullNumber).toFixed(digitalsAfterZero);
+            const result = parseFloat(fullNumber).toFixed(digitalsAfterZero);
+            return result.replace(/\.?0+$/, '');
         }
     }
     

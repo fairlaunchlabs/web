@@ -203,7 +203,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                             
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">Bonus to URC provider</span>
-                                <span>{parseInt(referralData?.urcProviderBonus?.toString() || '0') / LAMPORTS_PER_SOL} SOL</span>
+                                <span>{formatPrice(parseInt(referralData?.urcProviderBonus?.toString() || '0') / LAMPORTS_PER_SOL)} SOL</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">Discount of URC</span>
