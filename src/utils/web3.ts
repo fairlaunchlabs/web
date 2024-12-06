@@ -492,6 +492,15 @@ export const refund = async (
         [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
         program.programId,
     );
+
+    const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
+    if (refundAccountData.owner.toBase58() !== wallet.publicKey.toBase58()) {
+        return {
+            success: false,
+            message: 'Only User Account Allowed'
+        }
+    }
+
     const tokenAta = await getAssociatedTokenAddress(
         new PublicKey(token.mint),
         wallet.publicKey,
@@ -525,7 +534,7 @@ export const refund = async (
     } catch (error) {
         return {
             success: false,
-            message: 'Error refunding'
+            message: 'Error refunding' + error
         }
     }
 }

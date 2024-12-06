@@ -19,21 +19,22 @@ export const RefundModal: FC<RefundModalProps> = ({
     const [confirmed, setConfirmed] = useState(false);
     const [protocolFeeAccount, setProtocolFeeAccount] = useState<PublicKey>(PublicKey.default);
     const [refundFeeRate, setRefundFeeRate] = useState(0);
-    const [refundAccount, setRefundAccount] = useState<RefundTokenData>();
+    const [refundAccountData, setRefundAccountData] = useState<RefundTokenData>();
 
     const liquidityRatio = Number(token.tokenData?.liquidityTokensRatio) / 100;
-
+    
     useEffect(() => {
         if (wallet) {
             getSystemConfig(wallet, connection).then((data) => {
                 if (data?.success && data.data) {
+                    console.log("protocol fee account", data.data.protocolFeeAccount.toBase58());
                     setProtocolFeeAccount(data.data.protocolFeeAccount);
                     setRefundFeeRate(data.data.refundFeeRate);
                 }
                 else toast.error(data.message as string);
             });
             getRefundAccountData(wallet, connection, token.tokenData as InitiazlizedTokenData).then((data) => {
-                if (data?.success) setRefundAccount(data.data);
+                if (data?.success) setRefundAccountData(data.data);
                 else toast.error(data.message as string);
             });
         }
@@ -45,12 +46,12 @@ export const RefundModal: FC<RefundModalProps> = ({
             return;
         }
 
-        if (!refundAccount) {
+        if (!refundAccountData) {
             toast.error('No refund data available');
             return;
         }
 
-        if (refundAccount.totalTokens.isZero()) {
+        if (refundAccountData.totalTokens.isZero()) {
             toast.error('No tokens available for refund');
             return;
         }
@@ -73,7 +74,7 @@ export const RefundModal: FC<RefundModalProps> = ({
                         urlText="View transaction"
                     />,
                 );
-                onClose();
+                close();
             } else {
                 toast.error(result.message as string);
             }
@@ -84,6 +85,13 @@ export const RefundModal: FC<RefundModalProps> = ({
             setLoading(false);
         }
     };
+
+    const close = () => {
+        setLoading(false);
+        setTimeout(() => {
+            onClose();
+        }, 3000);
+    }
 
     if (!isOpen) return null;
 
@@ -102,8 +110,8 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70">Total paid</span>
                             <span className="font-medium text-primary">
-                                {refundAccount ? 
-                                    formatPrice(refundAccount.totalMintFee.toNumber() / LAMPORTS_PER_SOL, 3) : 
+                                {refundAccountData ? 
+                                    formatPrice(refundAccountData.totalMintFee.toNumber() / LAMPORTS_PER_SOL, 3) : 
                                     '-'
                                 } SOL
                             </span>
@@ -111,17 +119,17 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70">- Bonus to referrer</span>
                             <span className="font-medium">
-                                {refundAccount ? 
-                                    formatPrice(refundAccount.totalReferrerFee.toNumber() / LAMPORTS_PER_SOL, 3) : 
+                                {refundAccountData ? 
+                                    formatPrice(refundAccountData.totalReferrerFee.toNumber() / LAMPORTS_PER_SOL, 3) : 
                                     '-'
                                 } SOL
                             </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">- Refund fee</span>
+                            <span className="text-base-content/70">- Refund fee ({refundFeeRate * 100}%)</span>
                             <span className="font-medium">
-                                {refundAccount ? 
-                                    formatPrice((refundAccount.totalMintFee.toNumber() * refundFeeRate) / LAMPORTS_PER_SOL, 3) : 
+                                {refundAccountData ? 
+                                    formatPrice((refundAccountData.totalMintFee.toNumber() * refundFeeRate) / LAMPORTS_PER_SOL, 3) : 
                                     '-'
                                 } SOL
                             </span>
@@ -129,8 +137,8 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70">Token burned from your wallet</span>
                             <span className="font-medium text-error">
-                                {refundAccount ? 
-                                    formatPrice(refundAccount.totalTokens.toNumber() / LAMPORTS_PER_SOL, 3) : 
+                                {refundAccountData ? 
+                                    formatPrice(refundAccountData.totalTokens.toNumber() / LAMPORTS_PER_SOL, 3) : 
                                     '-'
                                 } {token.tokenData?.tokenSymbol}
                             </span>
@@ -138,8 +146,8 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70">Token burned from vault</span>
                             <span className="font-medium text-error">
-                                {refundAccount ? 
-                                    formatPrice(refundAccount.totalTokens.toNumber() / LAMPORTS_PER_SOL / (1 - liquidityRatio) * liquidityRatio, 3) : 
+                                {refundAccountData ? 
+                                    formatPrice(refundAccountData.totalTokens.toNumber() / LAMPORTS_PER_SOL / (1 - liquidityRatio) * liquidityRatio, 3) : 
                                     '-'
                                 } {token.tokenData?.tokenSymbol}
                             </span>
@@ -147,11 +155,11 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70 font-bold">You get</span>
                             <span className="font-medium text-success font-bold">
-                                {refundAccount ? 
+                                {refundAccountData ? 
                                     formatPrice(
-                                        (refundAccount.totalMintFee.toNumber() - 
-                                         refundAccount.totalReferrerFee.toNumber() - 
-                                         (refundAccount.totalMintFee.toNumber() * refundFeeRate)) / LAMPORTS_PER_SOL, 
+                                        (refundAccountData.totalMintFee.toNumber() - 
+                                        refundAccountData.totalReferrerFee.toNumber() - 
+                                         (refundAccountData.totalMintFee.toNumber() * refundFeeRate)) / LAMPORTS_PER_SOL, 
                                         3
                                     ) : 
                                     '-'
@@ -189,6 +197,7 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <button
                             className={`btn btn-error w-full`}
                             onClick={handleRefund}
+                            disabled={!confirmed || !refundAccountData}
                         >
                             {loading ? 'Processing...' : 'Confirm Refund'}
                         </button>
