@@ -456,6 +456,23 @@ export const getSystemConfig = async (
     }
 }
 
+export const getRefundAccountData = async (wallet: AnchorWallet | undefined, connection: Connection, token: InitiazlizedTokenData) => {
+    if(!wallet) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    const program = getProgram(wallet, connection);
+    const [refundAccountPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
+        program.programId,
+    );
+    const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
+    return {
+        success: true,
+        data: refundAccountData
+    };
+}
+
 export const refund = async (
     wallet: AnchorWallet | undefined, 
     connection: Connection,

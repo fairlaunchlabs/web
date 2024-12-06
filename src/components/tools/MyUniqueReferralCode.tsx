@@ -185,7 +185,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                         </select>
                     </div>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
                     <table className="table w-full">
                         <thead>
                             <tr>

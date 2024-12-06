@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
 import { BN_LAMPORTS_PER_SOL, formatPrice, getFeeValue, numberStringToBN } from '../../utils/format';
-import { BN } from '@coral-xyz/anchor';
 import { AddressDisplay } from '../common/AddressDisplay';
 
 interface MintModalProps {
@@ -174,47 +173,84 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                             disabled={loading}
                         />
                     </div>
-                    {isValidCode && (
-                        <div className="mt-4 space-y-2 bg-base-200 p-4 rounded-lg">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">Current fee</span>
-                                <span className="font-medium">{parseInt(token.feeRate) / LAMPORTS_PER_SOL} SOL</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">Current mint size</span>
-                                <span className="font-medium">{(parseFloat(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toFixed(4)} {token.tokenSymbol}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">Current price</span>
-                                <span className="font-medium">{formatPrice(parseFloat(token.feeRate) / parseFloat(token.mintSizeEpoch))} SOL</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">URC provider</span>
-                                <span className="font-medium"><AddressDisplay address={referralData?.referrerMain?.toBase58() as string} /></span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">URC provider balance</span>
-                                <span className="font-medium">{referralData?.tokenBalance?.toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">URC usage count</span>
-                                <span className="font-medium">{referralData?.usageCount}</span>
-                            </div>
-                            
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">Bonus to URC provider</span>
-                                <span>{formatPrice(parseInt(referralData?.urcProviderBonus?.toString() || '0') / LAMPORTS_PER_SOL)} SOL</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">Discount of URC</span>
-                                <span className="font-medium text-success">-{(100 -Number(referralData?.acturalPay) / parseInt(token.feeRate) * 100).toFixed(2)}%</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm text-info font-semibold border-t border-base-300 pt-2 mt-2">
-                                <span>Actual pay</span>
-                                <span>{parseInt(referralData?.acturalPay?.toString() || '0') / LAMPORTS_PER_SOL} SOL</span>
-                            </div>
+                    {code &&
+                    <div className="mt-4 space-y-2 bg-base-200 p-4 rounded-lg">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">Current fee</span>
+                            <span className="font-medium">{
+                                isValidCode ?
+                                    (parseInt(token.feeRate) / LAMPORTS_PER_SOL).toFixed(4) + " SOL"
+                                    : '-'
+                                }
+                            </span>
                         </div>
-                    )}
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">Current mint size</span>
+                            <span className="font-medium">{
+                                isValidCode ? 
+                                    (parseFloat(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toFixed(4) + " " + token.tokenSymbol
+                                    : '-'
+                                }
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">Current price</span>
+                            <span className="font-medium">{
+                                isValidCode ? 
+                                    formatPrice(parseFloat(token.feeRate) / parseFloat(token.mintSizeEpoch))  + " SOL"
+                                    : '-'
+                                }
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">URC provider</span>
+                            <span className="font-medium">{
+                                isValidCode ?
+                                    <AddressDisplay address={referralData?.referrerMain?.toBase58() as string} />
+                                    : '-'
+                                }
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">URC provider balance</span>
+                            <span className="font-medium">{
+                                isValidCode && referralData ? 
+                                    referralData.tokenBalance?.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol
+                                    : '-'
+                                }
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">URC usage count</span>
+                            <span className="font-medium">{
+                                isValidCode ? referralData?.usageCount : '-'
+                                }
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">Bonus to URC provider</span>
+                            <span>{
+                                isValidCode ?
+                                    formatPrice(parseInt(referralData?.urcProviderBonus?.toString() || '0') / LAMPORTS_PER_SOL) + " SOL"
+                                    : '-'
+                                }
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-base-content/70">Discount of URC</span>
+                            <span className="font-medium text-success">-{isValidCode && (100 - Number(referralData?.acturalPay) / parseInt(token.feeRate) * 100).toFixed(2) + "%"}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm text-info font-semibold border-t border-base-300 pt-2 mt-2">
+                            <span>Actual pay</span>
+                            <span>{
+                                isValidCode ? 
+                                    formatPrice(parseInt(referralData?.acturalPay?.toString() || '0') / LAMPORTS_PER_SOL) + " SOL"
+                                    : '-'
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    }
                     <div className="space-y-2">
                         <button 
                             className={`btn btn-primary w-full`}

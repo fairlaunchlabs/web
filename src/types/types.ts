@@ -129,6 +129,13 @@ export type MintTokenData = {
     totalTokens: string;
 }
 
+export type RefundTokenData = {
+    owner: PublicKey;
+    totalTokens: BN;
+    totalMintFee: BN;
+    totalReferrerFee: BN;
+}
+
 export type TokenImageProps = {
     imageUrl: string | null;
     name: string;

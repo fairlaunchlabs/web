@@ -186,14 +186,14 @@ export const formatPrice = (price: number, digitalsAfterZero: number = 5): strin
                 break;
             }
         }
-        if (zeroCount > 3) {
+        if (zeroCount > 2) {
             const significantDigits = decimals.slice(zeroCount, zeroCount + digitalsAfterZero);
             return `0.{${zeroCount}}${significantDigits}`;
         }
     }
     
     // 如果不需要特殊处理，保留5位小数
-    return parseFloat(priceStr).toFixed(digitalsAfterZero);
+    return price.toLocaleString(undefined, { minimumFractionDigits: digitalsAfterZero });
 };
 
 export const processRawData = (data: MintData[], feeRate: number) => {

@@ -43,7 +43,7 @@ export const TransactionHistory = () => {
         <div className="card w-96 bg-base-100 shadow-xl">
             <div className="card-body">
                 <h2 className="card-title">Recent Transactions</h2>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
                     <table className="table w-full">
                         <thead>
                             <tr>
