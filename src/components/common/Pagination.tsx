@@ -7,6 +7,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     totalCount,
     pageSize,
     onPageChange,
+    hasMore = true, // 默认为 true
 }) => {
     return (
         <div className="flex justify-between items-center mt-4">
@@ -29,19 +30,18 @@ export const Pagination: React.FC<PaginationProps> = ({
                     ‹
                 </button>
                 <button className="join-item btn btn-sm">
-                    Page {currentPage} of {totalPages}
+                    Page {currentPage}
                 </button>
                 <button 
                     className="join-item btn btn-sm"
                     onClick={() => onPageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    disabled={!hasMore}
                 >
                     ›
                 </button>
                 <button 
                     className="join-item btn btn-sm"
-                    onClick={() => onPageChange(totalPages)}
-                    disabled={currentPage === totalPages}
+                    disabled
                 >
                     »
                 </button>

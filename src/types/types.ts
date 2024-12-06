@@ -269,6 +269,7 @@ export type PaginationProps = {
     totalCount: number;
     pageSize: number;
     onPageChange: (page: number) => void;
+    hasMore?: boolean;
 }
 
 export type ShareButtonProps = {

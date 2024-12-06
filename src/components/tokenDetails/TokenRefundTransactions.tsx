@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { queryTokenRefundTransactions } from '../../utils/graphql';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -13,24 +13,45 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
 
-    const { data, loading, error } = useQuery(queryTokenRefundTransactions, {
+    const { data, loading, error, refetch } = useQuery(queryTokenRefundTransactions, {
         variables: {
             mint: token.mint,
             skip: (currentPage - 1) * pageSize,
             first: pageSize
         },
+        fetchPolicy: 'network-only',
         onCompleted: (data) => {
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.refundEventEntities?.length ?? 0)));
+            // 如果返回的数据少于页面大小，说明没有更多数据
+            if (data?.refundEventEntities?.length < pageSize) {
+                setHasMore(false);
+                // 计算总数
+                setTotalCount((currentPage - 1) * pageSize + data.refundEventEntities.length);
+            } else {
+                // 如果有更多数据，至少保证总数大于当前页
+                setHasMore(true);
+                setTotalCount(Math.max(totalCount, currentPage * pageSize + 1));
+            }
         }
     });
 
-    const totalPages = Math.ceil(totalCount / pageSize);
+    useEffect(() => {
+        // 当页面或页面大小变化时重新获取数据
+        refetch({
+            mint: token.mint,
+            skip: (currentPage - 1) * pageSize,
+            first: pageSize
+        });
+    }, [currentPage, pageSize, token.mint, refetch]);
+
+    const totalPages = hasMore ? currentPage + 1 : currentPage;
 
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newPageSize = Number(event.target.value);
         setPageSize(newPageSize);
         setCurrentPage(1); // Reset to first page when changing page size
+        setHasMore(true);
     };
 
     if (loading && currentPage === 1) {
@@ -83,13 +104,19 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.refundEventEntities.map((tx: RefundTransactionData) => (
+                        {data ? data.refundEventEntities.map((tx: RefundTransactionData) => (
                             <tr key={tx.txId}>
                                 <td><AddressDisplay address={tx.sender} /></td>
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
                                 <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
                                 <td>{Number(tx.refundAmountIncludingFee) / LAMPORTS_PER_SOL}</td>
                                 <td>{numberStringToBN(tx.burnAmountFromUser).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()} + {numberStringToBN(tx.burnAmountFromVault).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()}</td>
+                            </tr>
+                        )) : Array.from({ length: pageSize }, (_, index) => (
+                            <tr key={`placeholder-${index}`} className="opacity-50">
+                                <td colSpan={5} className="text-center bg-base-300">
+                                    {loading ? '...' : 'No data available'}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -102,6 +129,7 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
                 totalCount={totalCount}
                 pageSize={pageSize}
                 onPageChange={setCurrentPage}
+                hasMore={hasMore}
             />
         </div>
     );

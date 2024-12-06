@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { queryTokenMintTransactions } from '../../utils/graphql';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -12,24 +12,45 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
 
-    const { data, loading, error } = useQuery(queryTokenMintTransactions, {
+    const { data, loading, error, refetch } = useQuery(queryTokenMintTransactions, {
         variables: {
             mint: token.mint,
             skip: (currentPage - 1) * pageSize,
             first: pageSize
         },
+        fetchPolicy: 'network-only',
         onCompleted: (data) => {
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.mintTokenEntities?.length ?? 0)));
+            // 如果返回的数据少于页面大小，说明没有更多数据
+            if (data?.mintTokenEntities?.length < pageSize) {
+                setHasMore(false);
+                // 计算总数
+                setTotalCount((currentPage - 1) * pageSize + data.mintTokenEntities.length);
+            } else {
+                // 如果有更多数据，至少保证总数大于当前页
+                setHasMore(true);
+                setTotalCount(Math.max(totalCount, currentPage * pageSize + 1));
+            }
         }
     });
 
-    const totalPages = Math.ceil(totalCount / pageSize);
+    useEffect(() => {
+        // 当页面或页面大小变化时重新获取数据
+        refetch({
+            mint: token.mint,
+            skip: (currentPage - 1) * pageSize,
+            first: pageSize
+        });
+    }, [currentPage, pageSize, token.mint, refetch]);
+
+    const totalPages = hasMore ? currentPage + 1 : currentPage;
 
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newPageSize = Number(event.target.value);
         setPageSize(newPageSize);
         setCurrentPage(1); // Reset to first page when changing page size
+        setHasMore(true);
     };
 
     if (loading && currentPage === 1) {
@@ -48,7 +69,10 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
     if (error) {
         return (
             <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
-                <ErrorBox title="Get recent mint error" message={error.message} />
+                <ErrorBox 
+                    title="Get recent mint error" 
+                    message={error.message} 
+                />
             </div>
         );
     }
@@ -82,13 +106,19 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.mintTokenEntities.map((tx: MintTransactionData) => (
+                        {data ? data.mintTokenEntities.map((tx: MintTransactionData) => (
                             <tr key={tx.txId}>
                                 <td><AddressDisplay address={tx.sender} /></td>
                                 <td><AddressDisplay address={tx.txId} type="tx" /></td>
                                 <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
                                 <td>{tx.currentEra} ({tx.currentEpoch})</td>
                                 <td>{(numberStringToBN(tx.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</td>
+                            </tr>
+                        )) : Array.from({ length: pageSize }, (_, index) => (
+                            <tr key={`placeholder-${index}`} className="opacity-50">
+                                <td colSpan={5} className="text-center bg-base-300">
+                                    {loading ? '...' : 'No data available'}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -101,6 +131,7 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
                 totalCount={totalCount}
                 pageSize={pageSize}
                 onPageChange={setCurrentPage}
+                hasMore={hasMore}
             />
         </div>
     );

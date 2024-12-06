@@ -98,6 +98,11 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
     }
 }`;
 
+export const queryTokenMintTransactionsCount = gql`
+query GetTokenTransactionsCount($mint: String!) {
+    mintTokenEntitiesCount(mint: $mint)
+}`;
+
 export const queryTokenMintTransactions = gql`
 query GetTokenTransactions($mint: String!, $skip: Int!, $first: Int!) {
     mintTokenEntities(
