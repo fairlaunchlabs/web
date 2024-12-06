@@ -409,3 +409,15 @@ export type MintData = {
     mintSizeEpoch: string;
 };
 
+export type ReferralData = {
+    referralAccount: PublicKey;
+    mint: PublicKey;
+    codeHash: PublicKey;
+    referrerMain: PublicKey;
+    referrerAta: PublicKey;
+    usageCount: number;
+    activeTimestamp: BN;
+    tokenBalance?: number | null;
+    acturalPay?: BN;
+    urcProviderBonus?: BN;
+}

@@ -240,3 +240,59 @@ export const processRawData = (data: MintData[], feeRate: number) => {
     });
 };
 
+export function getFeeValue(
+    feeRate: BN,
+    difficultyCoefficient: number,
+    referrerAtaBalance: BN,
+    totalSupply: BN
+): [BN, BN] {
+    // 为了在BN中进行小数计算，我们将比例放大1000000倍
+    const SCALE = BN_MILLION; // new BN(1000000);
+    
+    // Calculate balance ratio with scale
+    console.log("referrerAtaBalance:", referrerAtaBalance.toString());
+    console.log("totalSupply:", totalSupply.toString());
+    const balanceRatioScaled = referrerAtaBalance.mul(SCALE).div(totalSupply);
+    const balanceRatio = balanceRatioScaled.toNumber() / SCALE.toNumber();
+    console.log("balance_ratio:", balanceRatio);
+
+    // Determine discount rate and convert to scaled BN
+    let discountRateScaled: BN;
+    if (balanceRatio >= 0.01) {
+        discountRateScaled = new BN(250000); // 0.25 * SCALE
+    } else if (balanceRatio >= 0.008) {
+        discountRateScaled = new BN(200000); // 0.20 * SCALE
+    } else if (balanceRatio >= 0.006) {
+        discountRateScaled = new BN(150000); // 0.15 * SCALE
+    } else if (balanceRatio >= 0.004) {
+        discountRateScaled = new BN(100000); // 0.10 * SCALE
+    } else if (balanceRatio >= 0.002) {
+        discountRateScaled = new BN(50000);  // 0.05 * SCALE
+    } else {
+        discountRateScaled = new BN(0);
+    }
+    const discountRate = discountRateScaled.toNumber() / SCALE.toNumber();
+    console.log("discount_rate:", discountRate);
+
+    // Convert difficultyCoefficient to scaled BN
+    const difficultyScaled = new BN(Math.floor(difficultyCoefficient * SCALE.toNumber()));
+
+    // Calculate fee: feeRate * (1 + discountRate/difficultyCoefficient - discountRate)
+    const one = SCALE;
+    const discountByDifficulty = discountRateScaled.mul(SCALE).div(difficultyScaled);
+    const scaledMultiplier = one.add(discountByDifficulty).sub(discountRateScaled);
+    const fee = feeRate.mul(scaledMultiplier).div(SCALE);
+
+    console.log(
+        "fee:",
+        `${1} + ${discountRate} / ${difficultyCoefficient} - ${discountRate} = ${fee.toString()}`
+    );
+
+    // Calculate code sharer reward: 0.2 * feeRate * discountRate * (1 - 1/difficultyCoefficient)
+    const rewardBase = new BN(200000); // 0.2 * SCALE
+    const difficultyFactor = SCALE.sub(SCALE.mul(SCALE).div(difficultyScaled));
+    const rewardMultiplier = rewardBase.mul(discountRateScaled).mul(difficultyFactor);
+    const codeSharerReward = feeRate.mul(rewardMultiplier).div(SCALE.mul(SCALE).mul(SCALE));
+
+    return [fee, codeSharerReward];
+}
