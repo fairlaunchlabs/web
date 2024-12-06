@@ -49,12 +49,20 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
             }
             const ataBalance = await getTokenBalance(result.data.referrerAta, connection) as number;
 
+            console.log(
+                numberStringToBN(token.feeRate),
+                parseFloat(token.difficultyCoefficientEpoch),
+                numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
+                numberStringToBN(token.supply),
+            )
+            console.log("===1===");
             const [acturalPay, urcProviderBonus] = getFeeValue(
                 numberStringToBN(token.feeRate),
                 parseFloat(token.difficultyCoefficientEpoch),
                 numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
                 numberStringToBN(token.supply),
             )
+            console.log("===2===");
             setReferralData({
                 ...result.data,
                 tokenBalance: ataBalance,
@@ -182,7 +190,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">URC provider</span>
-                                <span className="font-medium"><AddressDisplay address={referralData?.referrerAta.toBase58() as string} /></span>
+                                <span className="font-medium"><AddressDisplay address={referralData?.referrerMain?.toBase58() as string} /></span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">URC provider balance</span>

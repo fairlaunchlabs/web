@@ -12,6 +12,8 @@ import { NETWORK, SCANURL } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
 import { numberStringToBN } from '../utils/format';
 import { connect } from 'http2';
+import { BN } from '@coral-xyz/anchor';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const wallet = useAnchorWallet();
@@ -178,12 +180,25 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                 epochesPerEra: numberStringToBN(epochesPerEra),
                 targetSecondsPerEpoch: numberStringToBN(targetSecondsPerEpoch),
                 reduceRatio: numberStringToBN(reduceRatio),
-                initialMintSize: numberStringToBN(initialMintSize),
-                initialTargetMintSizePerEpoch: numberStringToBN(initialTargetMintSizePerEpoch),
-                feeRate: numberStringToBN(feeRate),
+                initialMintSize: numberStringToBN(displayInitialMintSize + "000000000"),
+                initialTargetMintSizePerEpoch: numberStringToBN(displayInitialTargetMintSizePerEpoch + "000000000"),
+                feeRate: numberStringToBN((Number(displayFeeRate) * LAMPORTS_PER_SOL).toString()),
                 liquidityTokensRatio: numberStringToBN(liquidityTokensRatio),
                 startTimestamp: numberStringToBN(startTimestamp.toString()),
             };
+
+            // console.log('Token metadata:', tokenMetadata);
+            // console.log('Init config data:', 
+            //     initConfigData.targetEras.toString(),
+            //     initConfigData.epochesPerEra.toString(),
+            //     initConfigData.targetSecondsPerEpoch.toString(),
+            //     initConfigData.reduceRatio.toString(),
+            //     initConfigData.initialMintSize.toString(), // ??
+            //     initConfigData.initialTargetMintSizePerEpoch.toString(), // ??
+            //     initConfigData.feeRate.toString(), // ??
+            //     initConfigData.liquidityTokensRatio.toString(),
+            //     initConfigData.startTimestamp.toString(),
+            // );
 
             const result = await createTokenOnChain(tokenMetadata, wallet, connection, initConfigData);
             console.log('Token created:', result);
@@ -378,10 +393,10 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                                 onEpochesPerEraChange={setEpochesPerEra}
                                 onTargetSecondsPerEpochChange={setTargetSecondsPerEpoch}
                                 onReduceRatioChange={setReduceRatio}
+                                onLiquidityTokensRatioChange={setLiquidityTokensRatio}
+                                onDisplayFeeRateChange={setDisplayFeeRate}
                                 onDisplayInitialMintSizeChange={setDisplayInitialMintSize}
                                 onDisplayInitialTargetMintSizePerEpochChange={setDisplayInitialTargetMintSizePerEpoch}
-                                onDisplayFeeRateChange={setDisplayFeeRate}
-                                onLiquidityTokensRatioChange={setLiquidityTokensRatio}
                             />
                         )}
                     </div>

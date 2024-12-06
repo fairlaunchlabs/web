@@ -257,7 +257,7 @@ export function getFeeValue(
     // Calculate balance ratio with scale
     console.log("referrerAtaBalance:", referrerAtaBalance.toString());
     console.log("totalSupply:", totalSupply.toString());
-    const balanceRatioScaled = referrerAtaBalance.mul(SCALE).div(totalSupply);
+    const balanceRatioScaled = totalSupply.gt(new BN(0)) ? referrerAtaBalance.mul(SCALE).div(totalSupply) : new BN(0);
     const balanceRatio = balanceRatioScaled.toNumber() / SCALE.toNumber();
     console.log("balance_ratio:", balanceRatio);
 

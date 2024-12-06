@@ -85,7 +85,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         if (referralBonusData?.mintTokenEntities) {
             const bonusMap = referralBonusData.mintTokenEntities.reduce((acc: Record<string, string>, entity: any) => {
                 const existingBonus = acc[entity.mint] || '0';
-                const newBonus = (parseFloat(existingBonus) + parseFloat(entity.totalReferrerFee || '0')).toString();
+                const newBonus = (parseFloat(existingBonus) + parseFloat(entity.referrerFee || '0')).toString();
                 return { ...acc, [entity.mint]: newBonus };
             }, {});
             setBonusByMint(bonusMap);

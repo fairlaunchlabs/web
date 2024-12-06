@@ -283,8 +283,8 @@ query GetTotalReferrerBonus($mint: String!, $referrerMain: String!) {
         currentEra
         currentEpoch
         mintSizeEpoch
-        totalMintFee
-        totalReferrerFee
+        mintFee
+        referrerFee
     }
 }`;
 
@@ -292,9 +292,11 @@ export const queryTotalReferrerBonusSum = gql`
 query GetTotalReferrerBonusSum($mints: [String]!, $referrerMain: String!) {
     mintTokenEntities(
         mints: $mints, 
-        referrerMain: $referrerMain
+        where: {
+            referrerMain: $referrerMain
+        }
     ) {
         mint
-        totalReferrerFee
+        referrerFee
     }
 }`;

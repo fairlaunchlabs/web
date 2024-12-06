@@ -135,7 +135,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                                     <td><AddressDisplay address={entity.sender} /></td>
                                     <td>{formatTimestamp(parseInt(entity.timestamp))}</td>
                                     <td>{entity.currentEpoch}</td>
-                                    <td>{(parseFloat(entity.totalReferrerFee) / LAMPORTS_PER_SOL).toFixed(6)} SOL</td>
+                                    <td>{(parseFloat(entity.referrerFee) / LAMPORTS_PER_SOL).toFixed(6)} SOL</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -150,10 +150,6 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                         pageSize={pageSize}
                         onPageChange={(page) => setCurrentPage(page)}
                     />
-                </div>
-
-                <div className="modal-action">
-                    <button className="btn" onClick={handleClose}>Close</button>
                 </div>
             </div>
         </div>

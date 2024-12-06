@@ -2589,6 +2589,11 @@
       "code": 6047,
       "name": "WrongCodeHash",
       "msg": "Wrong code hash"
+    },
+    {
+      "code": 6048,
+      "name": "WrongMintAddress",
+      "msg": "Wrong mint address"
     }
   ],
   "types": [
@@ -2788,6 +2793,14 @@
                 "name": "TokenMintState"
               }
             }
+          },
+          {
+            "name": "mint_fee",
+            "type": "f64"
+          },
+          {
+            "name": "referrer_fee",
+            "type": "f64"
           }
         ]
       }
