@@ -25,6 +25,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [bonusByMint, setBonusByMint] = useState<Record<string, string>>({});
     const [selectedBonusMint, setSelectedBonusMint] = useState<string | null>(null);
+    const [totalBonus, setTotalBonus] = useState(0);
+    const [loadingMetadata, setLoadingMetadata] = useState(false);
 
     const { loading: urcLoading, error: urcError, data: urcData, refetch: refetchUrc } = useQuery(querySetRefererCodeEntitiesByOwner, {
         variables: {
@@ -60,7 +62,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     useEffect(() => {
         const fetchTokenMetadata = async () => {
             if (!tokenData?.initializeTokenEventEntities) return;
-            
+            setLoadingMetadata(true);
             const updatedMap: Record<string, any> = {};
             for (const token of tokenData.initializeTokenEventEntities) {
                 try {
@@ -72,6 +74,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                     updatedMap[token.mint] = token;
                 }
             }
+            setLoadingMetadata(false);
             setTokenMetadataMap(updatedMap);
         };
 
@@ -112,8 +115,9 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         setIsModalOpen(true);
     };
 
-    const handleOpenBonusDetail = (mint: string) => {
+    const handleOpenBonusDetail = (mint: string, totalBonus: number) => {
         setSelectedBonusMint(mint);
+        setTotalBonus(totalBonus);
     };
 
     const handleCloseBonusDetail = () => {
@@ -155,7 +159,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         );
     }
 
-    if (urcLoading || tokenLoading || referralBonusLoading) {
+    if (urcLoading || tokenLoading || referralBonusLoading || loadingMetadata) {
         return (
             <div className={`flex justify-center items-center min-h-[400px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
                 <span className="loading loading-spinner loading-lg"></span>
@@ -210,7 +214,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                         </td>
                                         <td><AddressDisplay address={item.mint} /></td>
                                         <td><AddressDisplay address={item.admin} /></td>
-                                        <td>{(Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL).toFixed(4)} SOL</td>
+                                        <td>{bonusByMint[item.mint] === undefined ? "0" : (Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL).toFixed(4)} SOL</td>
                                         <td className='text-right'>
                                             <div className="flex gap-2 justify-end">
                                                 <button
@@ -221,7 +225,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                                 </button>
                                                 <button
                                                     className="btn btn-sm btn-secondary"
-                                                    onClick={() => handleOpenBonusDetail(item.mint)}
+                                                    onClick={() => handleOpenBonusDetail(item.mint, bonusByMint[item.mint] === undefined ? 0 : Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL)}
                                                 >
                                                     Bonus Detail
                                                 </button>
@@ -262,6 +266,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                         onClose={handleCloseBonusDetail}
                         mint={selectedBonusMint}
                         referrerMain={wallet.publicKey.toBase58()}
+                        totalBonus={totalBonus}
                     />
                 )}
             </div>

@@ -545,7 +545,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
         <div className="mt-6">
             <div className="bg-base-200 rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-base-content">Price History</h2>
+                    <h2 className="text-xl font-semibold text-base-content">Mint Cost</h2>
                     <div className="flex items-center space-x-2">
                         <button 
                             className="btn btn-sm btn-outline btn-primary"

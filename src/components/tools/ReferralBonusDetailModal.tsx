@@ -3,20 +3,22 @@ import { useQuery } from '@apollo/client';
 import { queryTotalReferrerBonus } from '../../utils/graphql';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { formatSeconds, formatTimestamp } from '../../utils/format';
+import { formatTimestamp } from '../../utils/format';
 
 interface ReferralBonusDetailModalProps {
     isOpen: boolean;
     onClose: () => void;
     mint: string;
     referrerMain: string;
+    totalBonus: number;
 }
 
 export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> = ({ 
     isOpen, 
     onClose, 
     mint, 
-    referrerMain 
+    referrerMain,
+    totalBonus
 }) => {
     console.log('referrerMain', referrerMain);
     const { loading, error, data } = useQuery(queryTotalReferrerBonus, {
@@ -53,11 +55,6 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
         </div>
     );
 
-    const totalReferrerFee = data.mintTokenEntities.reduce(
-        (sum: number, entity: any) => sum + parseFloat(entity.totalReferrerFee || '0'), 
-        0
-    );
-
     return (
         <div className="modal modal-open">
             <div className="modal-box w-11/12 max-w-5xl">
@@ -69,7 +66,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                             <h4 className="card-title">Summary</h4>
                             <div className="space-y-2">
                                 <p>Total Referral Bonus: <span className="font-bold text-primary">
-                                    {(totalReferrerFee / LAMPORTS_PER_SOL).toFixed(4)} SOL
+                                    {totalBonus.toFixed(4)} SOL
                                 </span></p>
                                 <p>Total Referral Transactions: {data.mintTokenEntities.length}</p>
                             </div>
@@ -92,6 +89,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                         <thead>
                             <tr>
                                 <th>Transaction ID</th>
+                                {/* <th>Mint</th> */}
                                 <th>Minter</th>
                                 <th>Time</th>
                                 <th>Epoch</th>
@@ -103,6 +101,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                             {data.mintTokenEntities.map((entity: any, index: number) => (
                                 <tr key={index}>
                                     <td><AddressDisplay address={entity.txId} type='transaction' /></td>
+                                    {/* <td><AddressDisplay address={entity.mint} /></td> */}
                                     <td><AddressDisplay address={entity.sender} /></td>
                                     <td>{formatTimestamp(parseInt(entity.timestamp))}</td>
                                     <td>{entity.currentEpoch}</td>

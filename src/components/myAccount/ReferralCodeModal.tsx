@@ -18,7 +18,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     const [referralData, setReferralData] = useState<ReferrerData>();
     const [referrerResetIntervalSeconds, setReferrerResetIntervalSeconds] = useState(0);
     const [referralUsageMaxCount, setReferralUsageMaxCount] = useState(0);
-    const [myReferrerCode, setMyReferrerCode] =  useState<string>(localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint) !== null ? localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint) as string : "");
+    const [myReferrerCode, setMyReferrerCode] =  useState<string>(localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58()) !== null ? localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58()) as string : "");
 
     useEffect(() => {
         if (wallet) {
@@ -71,7 +71,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 if (data?.success) setReferralData(data.data);
                 else toast.error(data.message as string);
             });
-            localStorage.setItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint, myReferrerCode);
+            localStorage.setItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58(), myReferrerCode);
         } catch (error: any) {
             toast.error(error.message || 'Failed to generate referral code');
         } finally {
@@ -116,7 +116,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 if (data?.success) setReferralData(data.data);
                 else toast.error(data.message as string);
             });
-            localStorage.setItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint, myReferrerCode);
+            localStorage.setItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58(), myReferrerCode);
         } catch (error: any) {
             toast.error(error.message || 'Failed to generate referral code');
         } finally {
@@ -229,7 +229,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                 className={`btn btn-primary w-full mt-3`}
                                 onClick={handleGetCode}
                             >
-                                Generate URC
+                                Get URC
                             </button>
                         </div>
                     )}
