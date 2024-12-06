@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { useQuery } from '@apollo/client';
-import { querySetRefererCodeEntitiesByOwner, queryTokensByMints } from '../../utils/graphql';
+import { querySetRefererCodeEntitiesByOwner, queryTokensByMints, queryTotalReferrerBonusSum } from '../../utils/graphql';
 import { InitiazlizedTokenData, MyUniqueReferralCodeProps, TokenMetadataIPFS } from '../../types/types';
 import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,8 @@ import { Pagination } from '../common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { ErrorBox } from '../common/ErrorBox';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { ReferralBonusDetailModal } from './ReferralBonusDetailModal';
 
 export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
@@ -21,6 +23,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     const [totalCount, setTotalCount] = useState(0);
     const [selectedToken, setSelectedToken] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [bonusByMint, setBonusByMint] = useState<Record<string, string>>({});
+    const [selectedBonusMint, setSelectedBonusMint] = useState<string | null>(null);
 
     const { loading: urcLoading, error: urcError, data: urcData, refetch: refetchUrc } = useQuery(querySetRefererCodeEntitiesByOwner, {
         variables: {
@@ -42,6 +46,13 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
             first: mints?.length || 1,
         },
         skip: !mints?.length,
+    });
+
+    const { loading: referralBonusLoading, error: referralBonusError, data: referralBonusData} = useQuery(queryTotalReferrerBonusSum, {
+        variables: {
+            mints: mints,
+            referrerMain: wallet?.publicKey.toBase58(),
+        },
     });
 
     const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, any>>({});
@@ -68,6 +79,17 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     }, [tokenData]);
 
     useEffect(() => {
+        if (referralBonusData?.mintTokenEntities) {
+            const bonusMap = referralBonusData.mintTokenEntities.reduce((acc: Record<string, string>, entity: any) => {
+                const existingBonus = acc[entity.mint] || '0';
+                const newBonus = (parseFloat(existingBonus) + parseFloat(entity.totalReferrerFee || '0')).toString();
+                return { ...acc, [entity.mint]: newBonus };
+            }, {});
+            setBonusByMint(bonusMap);
+        }
+    }, [referralBonusData]);
+
+    useEffect(() => {
         if (wallet) {
             refetchUrc();
         }
@@ -88,6 +110,14 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         };
         setSelectedToken(newSelectedToken);
         setIsModalOpen(true);
+    };
+
+    const handleOpenBonusDetail = (mint: string) => {
+        setSelectedBonusMint(mint);
+    };
+
+    const handleCloseBonusDetail = () => {
+        setSelectedBonusMint(null);
     };
 
     const handleCloseModal = () => {
@@ -117,15 +147,15 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         );
     }
 
-    if (urcError || tokenError) {
+    if (urcError || tokenError || referralBonusError) {
         return (
             <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <ErrorBox title="URC list error" message={urcError?.message || tokenError?.message} />
+                <ErrorBox title="URC list error" message={urcError?.message || tokenError?.message || referralBonusError?.message} />
             </div>
         );
     }
 
-    if (urcLoading || tokenLoading) {
+    if (urcLoading || tokenLoading || referralBonusLoading) {
         return (
             <div className={`flex justify-center items-center min-h-[400px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
                 <span className="loading loading-spinner loading-lg"></span>
@@ -150,7 +180,6 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                             ))}
                         </select>
                     </div>
-
                 </div>
                 <div className="overflow-x-auto">
                     <table className="table w-full">
@@ -159,6 +188,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                 <th>Token</th>
                                 <th>Mint Address</th>
                                 <th>Developer</th>
+                                <th>Bonus</th>
                                 <th className='text-right'>Actions</th>
                             </tr>
                         </thead>
@@ -180,13 +210,20 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                         </td>
                                         <td><AddressDisplay address={item.mint} /></td>
                                         <td><AddressDisplay address={item.admin} /></td>
+                                        <td>{(Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL).toFixed(4)} SOL</td>
                                         <td className='text-right'>
                                             <div className="flex gap-2 justify-end">
                                                 <button
-                                                    className="btn btn-sm btn-primary"
+                                                    className="btn btn-sm btn-primary mr-2"
                                                     onClick={() => handleGetURC(item)}
                                                 >
-                                                    Detail
+                                                    Code Detail
+                                                </button>
+                                                <button
+                                                    className="btn btn-sm btn-secondary"
+                                                    onClick={() => handleOpenBonusDetail(item.mint)}
+                                                >
+                                                    Bonus Detail
                                                 </button>
                                             </div>
                                         </td>
@@ -216,6 +253,15 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                         isOpen={isModalOpen}
                         onClose={handleCloseModal}
                         token={selectedToken}
+                    />
+                )}
+
+                {selectedBonusMint && wallet && (
+                    <ReferralBonusDetailModal
+                        isOpen={!!selectedBonusMint}
+                        onClose={handleCloseBonusDetail}
+                        mint={selectedBonusMint}
+                        referrerMain={wallet.publicKey.toBase58()}
                     />
                 )}
             </div>

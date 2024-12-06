@@ -12,6 +12,11 @@ export const BN_ZERO = new BN(0);
 export const BN_HUNDRED = new BN(100);
 export const BN_MILLION = new BN(1000000);
 
+export const formatTimestamp = (timestamp: number): string => {
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleString();
+};
+
 export const formatSeconds = (totalSeconds: number): string => {
     if (isNaN(totalSeconds) || totalSeconds <= 0) return 'arrived';
 

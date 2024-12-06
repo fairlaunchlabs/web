@@ -258,3 +258,38 @@ query GetSetRefererCodeEntity($owner: String!, $skip: Int!, $first: Int!) {
         activeTimestamp
     }
 }`;
+
+export const queryTotalReferrerBonus = gql`
+query GetTotalReferrerBonus($mint: String!, $referrerMain: String!) {
+    mintTokenEntities(
+        where: {
+            mint: $mint, 
+            referrerMain: $referrerMain
+        }
+        orderBy: timestamp
+        orderDirection: desc
+    ) {
+        txId
+        sender
+        mint
+        refundAccount
+        referrerMain
+        timestamp
+        currentEra
+        currentEpoch
+        mintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+    }
+}`;
+
+export const queryTotalReferrerBonusSum = gql`
+query GetTotalReferrerBonusSum($mints: [String]!, $referrerMain: String!) {
+    mintTokenEntities(
+        mints: $mints, 
+        referrerMain: $referrerMain
+    ) {
+        mint
+        totalReferrerFee
+    }
+}`;
