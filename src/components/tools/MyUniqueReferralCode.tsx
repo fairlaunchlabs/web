@@ -6,8 +6,7 @@ import { InitiazlizedTokenData, MyUniqueReferralCodeProps, TokenMetadataIPFS } f
 import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
 import { useNavigate } from 'react-router-dom';
 import { TokenImage } from '../mintTokens/TokenImage';
-import { extractIPFSHash } from '../../utils/format';
-import { fetchTokenMetadata, pinata } from '../../utils/web3';
+import { fetchTokenMetadataMap } from '../../utils/web3';
 import { Pagination } from '../common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -61,7 +60,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
 
     useEffect(() => {
         setLoadingMetadata(true);
-        fetchTokenMetadata(tokenData?.initializeTokenEventEntities).then((updatedMap) => {
+        fetchTokenMetadataMap(tokenData?.initializeTokenEventEntities).then((updatedMap) => {
             setLoadingMetadata(false);
             setTokenMetadataMap(updatedMap);
         });

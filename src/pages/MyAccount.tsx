@@ -6,7 +6,7 @@ import { queryMyTokenList, queryTokensByMints } from '../utils/graphql';
 import { InitiazlizedTokenData, MyAccountProps, TokenListItem, TokenMetadataIPFS } from '../types/types';
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
-import { pinata } from '../utils/web3';
+import { fetchMetadata } from '../utils/web3';
 import { BN_LAMPORTS_PER_SOL, BN_ZERO, extractIPFSHash, numberStringToBN } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
@@ -99,12 +99,11 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
             updatedTokenList.forEach(async (token) => {
                 if (token.tokenData?.tokenUri) {
                     try {
-                        const response = await pinata.gateways.get(extractIPFSHash(token.tokenData.tokenUri) as string);
-                        const data = response.data as TokenMetadataIPFS;
+                        const data = await fetchMetadata(token.tokenData as InitiazlizedTokenData);
                         setTokenList(currentList => 
                             currentList.map(t => 
                                 t.mint === token.mint 
-                                    ? { ...t, imageUrl: data.image }
+                                    ? { ...t, imageUrl: data?.image }
                                     : t
                             )
                         );

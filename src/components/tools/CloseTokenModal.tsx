@@ -1,5 +1,8 @@
 import { FC, useState } from "react";
 import { InitiazlizedTokenData } from "../../types/types";
+import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
+import { closeToken } from "../../utils/web3";
+import toast from "react-hot-toast";
 
 interface CloseTokenModalProps {
     isOpen: boolean;
@@ -10,18 +13,35 @@ interface CloseTokenModalProps {
 export const CloseTokenModal: FC<CloseTokenModalProps> = ({ isOpen, onClose, token }) => {
     const [confirmed, setConfirmed] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { connection } = useConnection();
+    const wallet = useAnchorWallet();
 
     if (!isOpen || !token) return null;
 
     const handleClose = async () => {
-        if (!confirmed) return;
+        if (!confirmed) {
+            toast.error("Please confirm the action by checking the checkbox");
+            return;
+        }
+
+        if (!wallet) {
+            toast.error("Please connect your wallet first");
+            return;
+        }
         
         try {
             setLoading(true);
-            // TODO: Implement close token functionality
-            onClose();
-        } catch (error) {
+            const result = await closeToken(wallet, connection, token);
+            
+            if (result.success) {
+                toast.success("Token closed successfully");
+                onClose();
+            } else {
+                toast.error(result.message || "Failed to close token");
+            }
+        } catch (error: any) {
             console.error('Close mint error:', error);
+            toast.error(error.message || "An error occurred while closing the token");
         } finally {
             setLoading(false);
         }
@@ -46,8 +66,9 @@ export const CloseTokenModal: FC<CloseTokenModalProps> = ({ isOpen, onClose, tok
                         <div>
                             <h3 className="font-bold">Warning!</h3>
                             <div className="text-sm">
-                                You are about to close the mint for {token.tokenName} ({token.tokenSymbol}). 
-                                This action cannot be undone and will permanently prevent the creation of new tokens.
+                                <div>You are about to close the mint for {token.tokenName} ({token.tokenSymbol}). </div>
+                                <div>You will get back some SOL from the closed account.</div>
+                                <div>This action cannot be undone and will permanently prevent the creation of new tokens.</div>
                             </div>
                         </div>
                     </div>

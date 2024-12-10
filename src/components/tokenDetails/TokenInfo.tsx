@@ -14,7 +14,7 @@ import {
 import { AddressDisplay } from '../common/AddressDisplay';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { RenderSocialIcons } from '../mintTokens/RenderSocialIcons';
-import { pinata } from '../../utils/web3';
+import { fetchMetadata } from '../../utils/web3';
 import { TokenImage } from '../mintTokens/TokenImage';
 import MintModal from '../mintTokens/MintModal';
 import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
@@ -54,19 +54,14 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
 
     useEffect(() => {
-        const fetchMetadata = async () => {
-            try {
-                const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri as string) as string);
-                const data = response.data as TokenMetadataIPFS;
-                setMetadata(data);
-            } catch (error) {
-                console.error('Error fetching token metadata:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchMetadata();
+        setIsLoading(true);
+        fetchMetadata(token).then((data) => {
+            setMetadata(data);
+            setIsLoading(false);
+        }).catch((error) => {
+            console.error('Error fetching token metadata:', error);
+            setIsLoading(false);
+        }); 
     }, [token.tokenUri]);
     
     const totalSupplyToTargetEras = useMemo(() => {

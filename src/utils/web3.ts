@@ -12,8 +12,8 @@ import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { extractIPFSHash } from './format';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 
 export const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
@@ -140,6 +140,7 @@ export const getReferrerCodeHash = (
 
     return {
         success: true,
+        message: 'get code hash success',
         data: codeHash as PublicKey
     };
 }
@@ -257,6 +258,7 @@ export const reactiveReferrerCode = async (
 
         return {
             success: true,
+            message: 'Set referrer code success',
             data: {
                 tx,
                 referralAccount: referralAccountPda.toBase58(),
@@ -315,6 +317,7 @@ export const setReferrerCode = async (
         } else {
             return {
                 success: true,
+                message: 'Code already exists and the owner is you',
                 data: {
                     tx: "mine",
                     referralAccount: codeAccountData.referralAccount.toBase58(),
@@ -365,6 +368,7 @@ export const setReferrerCode = async (
 
         return {
             success: true,
+            message: 'Set referrer code success',
             data: {
                 tx,
                 referralAccount: referralAccountPda.toBase58(),
@@ -434,6 +438,7 @@ export const getMyReferrerData = async (
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     return {
         success: true,
+        message: 'Get referrer data success',
         data: referrerData
     }
 }
@@ -471,6 +476,7 @@ export const getRefundAccountData = async (wallet: AnchorWallet | undefined, con
     const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
     return {
         success: true,
+        message: 'Get refund data success',
         data: refundAccountData
     };
 }
@@ -529,6 +535,7 @@ export const refund = async (
             .rpc();
         return {    
             success: true,
+            message: 'Refund success',
             data: {
                 tx,
             }
@@ -626,6 +633,7 @@ export const mintToken = async (
             .rpc();
         return {    
             success: true,
+            message: 'Mint success',
             data: {
                 tx,
             }
@@ -704,22 +712,81 @@ export const getReferrerDataByReferralAccount = async (
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
     return {
         success: true,
+        message: 'Get referrer data success',
         data: referrerData
     }
 }
 
-export const fetchTokenMetadata = async (tokenData: Array<InitiazlizedTokenData>): Promise<Record<string, InitiazlizedTokenData>> => {
+export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<TokenMetadataIPFS | null> => {
+    try {
+        const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri as string) as string);
+        const data = response.data as TokenMetadataIPFS;
+        return data;
+    } catch (error) {
+        console.error('Error fetching token metadata:', error);
+        return null;
+    }
+};
+
+export const fetchTokenMetadataMap = async (tokenData: Array<InitiazlizedTokenData>): Promise<Record<string, InitiazlizedTokenData>> => {
     if (tokenData.length === 0) return {};
     const updatedMap: Record<string, InitiazlizedTokenData> = {};
-    for (const token of tokenData) {
-        try {
-            const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
-            const tokenMetadata = response.data as TokenMetadataIPFS;
-            updatedMap[token.mint] = { ...token, tokenMetadata };
-        } catch (error) {
-            console.error(`Error fetching metadata for token ${token.mint}:`, error);
-            updatedMap[token.mint] = token;
-        }
+    try {
+        for (const token of tokenData) {
+            try {
+                const tokenMetadata = await fetchMetadata(token) as TokenMetadataIPFS;
+                updatedMap[token.mint] = { ...token, tokenMetadata };
+            } catch (error) {
+                console.error(`Error fetching metadata for token ${token.mint}:`, error);
+                updatedMap[token.mint] = token;
+            }
+        }    
+    } catch (error) {
+        console.error('Error fetching metadata for token:', error);
+        return {};
     }
     return updatedMap;
+};
+
+export const closeToken = async (
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
+    token: InitiazlizedTokenData,
+): Promise<ResponseData> => {
+    try {
+        if (!wallet) {
+            return {
+                success: false,
+                message: 'Please connect your wallet first'
+            };
+        }
+
+        const program = getProgram(wallet, connection);
+
+        const context = {
+            mint: new PublicKey(token.mint),
+            configAccount: new PublicKey(token.configAccount),
+            tokenVault: new PublicKey(token.tokenVault),
+            payer: wallet.publicKey,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId,
+        };
+
+        const tx = await program.methods
+            .closeToken(token.tokenName, token.tokenSymbol)
+            .accounts(context)
+            .rpc();
+
+        return {
+            success: true,
+            message: 'Token closed successfully',
+            data: tx
+        };
+    } catch (error: any) {
+        console.error('Error closing token:', error);
+        return {
+            success: false,
+            message: error.message || 'Failed to close token'
+        };
+    }
 };

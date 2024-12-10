@@ -4,7 +4,7 @@ import { queryMyDeployments } from "../utils/graphql";
 import { ErrorBox } from "../components/common/ErrorBox";
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { InitiazlizedTokenData } from "../types/types";
-import { fetchTokenMetadata } from "../utils/web3";
+import { fetchTokenMetadataMap } from "../utils/web3";
 import { TokenImage } from "../components/mintTokens/TokenImage";
 import { AddressDisplay } from "../components/common/AddressDisplay";
 import { CloseTokenModal } from "../components/tools/CloseTokenModal";
@@ -44,7 +44,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     useEffect(() => {
         if (initialData?.initializeTokenEventEntities) {
             setLoadingMetadata(true);
-            fetchTokenMetadata(initialData.initializeTokenEventEntities).then((updatedMap) => {
+            fetchTokenMetadataMap(initialData.initializeTokenEventEntities).then((updatedMap) => {
                 setLoadingMetadata(false);
                 setTokenMetadataMap(updatedMap);
             });

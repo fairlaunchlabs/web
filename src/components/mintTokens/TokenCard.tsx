@@ -13,7 +13,7 @@ import { TokenImage } from './TokenImage';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useNavigate } from 'react-router-dom';
 import { RenderSocialIcons } from './RenderSocialIcons';
-import { pinata } from '../../utils/web3';
+import { fetchMetadata } from '../../utils/web3';
 
 export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
     const navigate = useNavigate();
@@ -25,19 +25,14 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
     };
 
     useEffect(() => {
-        const fetchMetadata = async () => {
-            try {
-                const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri as string) as string);
-                const data = response.data as TokenMetadataIPFS;
-                setMetadata(data);
-            } catch (error) {
-                console.error('Error fetching token metadata:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchMetadata();
+        setIsLoading(true);
+        fetchMetadata(token).then((data) => {
+            setMetadata(data);
+            setIsLoading(false);
+        }).catch((error) => {
+            console.error('Error fetching token metadata:', error);
+            setIsLoading(false);
+        }); 
     }, [token.tokenUri]);
 
     const totalSupplyToTargetEras = useMemo(() => {

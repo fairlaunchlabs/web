@@ -3,6 +3,7 @@ import { gql } from '@apollo/client';
 export const queryInitializeTokenEvent = gql`
 query GetInitializedTokenEvents($skip: Int!, $first: Int!) {
     initializeTokenEventEntities(
+        where: { status: 1 }
         skip: $skip
         first: $first
         orderBy: tokenId
@@ -42,13 +43,14 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!) {
         feeRate
         liquidityTokensRatio
         startTimestamp
+        status
     }
 }`;
 
 export const queryMyDeployments = gql`
 query GetMyDeployments($wallet: String!, $skip: Int!, $first: Int!) {
     initializeTokenEventEntities(
-        where: { admin: $wallet }
+        where: { admin: $wallet, status: 1 }
         skip: $skip
         first: $first
         orderBy: timestamp
@@ -88,6 +90,7 @@ query GetMyDeployments($wallet: String!, $skip: Int!, $first: Int!) {
         feeRate
         liquidityTokensRatio
         startTimestamp
+        status
     }
 }`;
 
@@ -97,11 +100,16 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
         skip: $skip
         first: $first
         where: {
-            or: [
-                { tokenName_contains_nocase: $searchQuery },
-                { tokenSymbol_contains_nocase: $searchQuery },
-                { admin_contains_nocase: $searchQuery },
-                { mint_contains_nocase: $searchQuery }
+            and: [
+                {
+                    or: [
+                        { tokenName_contains_nocase: $searchQuery },
+                        { tokenSymbol_contains_nocase: $searchQuery },
+                        { admin_contains_nocase: $searchQuery },
+                        { mint_contains_nocase: $searchQuery }
+                    ]
+                },
+                { status: 1 }
             ]
         }
         orderBy: tokenId
@@ -141,6 +149,7 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
         feeRate
         liquidityTokensRatio
         startTimestamp
+        status
     }
 }`;
 
@@ -239,7 +248,7 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
     initializeTokenEventEntities(
         skip: $skip
         first: $first
-        where: { mint_in: $mints }
+        where: { mint_in: $mints, status: 1 }
         orderBy: tokenId
         orderDirection: desc
     ) {
@@ -277,6 +286,7 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
         feeRate
         liquidityTokensRatio
         startTimestamp
+        status
     }
 }`;
 

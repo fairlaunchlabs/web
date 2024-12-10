@@ -11,8 +11,6 @@ import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
 import { numberStringToBN } from '../utils/format';
-import { connect } from 'http2';
-import { BN } from '@coral-xyz/anchor';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
