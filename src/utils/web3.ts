@@ -7,12 +7,13 @@ import {
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
 import { METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS } from '../config/constants';
-import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, ResponseData, TokenMetadata } from '../types/types';
+import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, ResponseData, TokenMetadata, TokenMetadataIPFS } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { PinataSDK } from 'pinata-web3';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { extractIPFSHash } from './format';
 
 export const pinata = new PinataSDK({
     pinataJwt: process.env.REACT_APP_PINATA_JWT,
@@ -51,8 +52,7 @@ export const createTokenOnChain = async (
             [
                 Buffer.from(MINT_SEED),
                 Buffer.from(metadata.name),
-                Buffer.from(metadata.symbol),
-                wallet.publicKey.toBuffer()
+                Buffer.from(metadata.symbol.toLowerCase()),
             ],
             program.programId
         );
@@ -140,7 +140,7 @@ export const getReferrerCodeHash = (
 
     return {
         success: true,
-        data: codeHash
+        data: codeHash as PublicKey
     };
 }
 
@@ -170,7 +170,6 @@ export const reactiveReferrerCode = async (
         success: false,
         message: 'Please connect wallet'
     }
-
     const program = getProgram(wallet, connection);
 
     // Get code hash
@@ -240,6 +239,7 @@ export const reactiveReferrerCode = async (
         mint,
         referralAccount: referralAccountPda,
         referrerAta,
+        codeAccount: codeAccountPda,
         configAccount: configAccountPda,
         systemConfigAccount: systemConfigAccountPda,
         payer: wallet.publicKey,
@@ -248,8 +248,9 @@ export const reactiveReferrerCode = async (
 
     try {
         // do the tranasaction
+        console.log("codeHash.data.toBuffer()", codeHash.data.toBuffer());
         const tx = await program.methods
-            .setReferrerCode(tokenName, tokenSymbol, codeHash.data as PublicKey)
+            .setReferrerCode(tokenName, tokenSymbol, codeHash.data.toBuffer())
             .accounts(setReferrerCodeAccounts)
             .signers([])
             .rpc();
@@ -284,7 +285,6 @@ export const setReferrerCode = async (
     }
 
     const program = getProgram(wallet, connection);
-
     const codeHash = getReferrerCodeHash(wallet, connection, code);
     if (!codeHash.success) {
         return {
@@ -347,6 +347,7 @@ export const setReferrerCode = async (
     const setReferrerCodeAccounts = {
         mint,
         referralAccount: referralAccountPda,
+        codeAccount: codeAccountPda,
         referrerAta,
         configAccount: configAccountPda,
         systemConfigAccount: systemConfigAccountPda,
@@ -355,8 +356,9 @@ export const setReferrerCode = async (
     };
 
     try {
+        console.log(tokenName, tokenSymbol, codeHash.data.toBuffer());
         const tx = await program.methods
-            .setReferrerCode(tokenName, tokenSymbol, codeHash.data as PublicKey)
+            .setReferrerCode(tokenName, tokenSymbol, codeHash.data.toBuffer())
             .accounts(setReferrerCodeAccounts)
             .signers([])  // 使用钱包的 payer
             .rpc();
@@ -618,7 +620,7 @@ export const mintToken = async (
     };
     try {
         const tx = await program.methods
-            .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data as PublicKey)
+            .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
             .accounts(mintAccounts)
             .signers([])
             .rpc();
@@ -705,3 +707,19 @@ export const getReferrerDataByReferralAccount = async (
         data: referrerData
     }
 }
+
+export const fetchTokenMetadata = async (tokenData: Array<InitiazlizedTokenData>): Promise<Record<string, InitiazlizedTokenData>> => {
+    if (tokenData.length === 0) return {};
+    const updatedMap: Record<string, InitiazlizedTokenData> = {};
+    for (const token of tokenData) {
+        try {
+            const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
+            const tokenMetadata = response.data as TokenMetadataIPFS;
+            updatedMap[token.mint] = { ...token, tokenMetadata };
+        } catch (error) {
+            console.error(`Error fetching metadata for token ${token.mint}:`, error);
+            updatedMap[token.mint] = token;
+        }
+    }
+    return updatedMap;
+};

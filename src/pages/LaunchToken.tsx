@@ -62,14 +62,6 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
         }
     }, [startImmediately]);
 
-    /// TEST 
-    // const { loading, error: queryError, data } = useQuery(queryInitializeTokenEvent);
-    // useEffect(() => {
-    //     if (loading) console.log('Loading token events...');
-    //     if (queryError) console.error('Error loading token events:', queryError);
-    //     if (data) console.log('Token events data:', data);
-    // }, [loading, queryError, data]);
-
     const validateImageFile = (file: File): boolean => {
         // Check file type
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -293,7 +285,15 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                             id="name"
                             type="text"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            placeholder='Max 20 chars, alphanumeric and punctuation'
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                // Validate name: max 20 chars, alphanumeric and punctuation, no consecutive spaces
+                                const consecutiveSpacesRegex = /  +/;
+                                if (value.length <= 20 && !consecutiveSpacesRegex.test(value)) {
+                                    setName(value);
+                                }
+                            }}
                             className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${name ? 'border-base-content' : ''}`}
                             required
                         />
@@ -307,7 +307,17 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                             id="symbol"
                             type="text"
                             value={symbol}
-                            onChange={(e) => setSymbol(e.target.value)}
+                            placeholder="Max 8 chars, alphanumeric, max 1 emoji"
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                // Validate symbol: max 8 chars, alphanumeric, max 1 emoji, no spaces/special chars
+                                const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}]/u;
+                                const alphanumericRegex = /^[a-zA-Z0-9]*$/;
+                                const emojiCount = (value.match(emojiRegex) || []).length;
+                                if (value.length <= 8 && alphanumericRegex.test(value.replace(emojiRegex, '')) && emojiCount <= 1) {
+                                    setSymbol(value);
+                                }
+                            }}
                             className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${symbol ? 'border-base-content' : ''}`}
                             required
                         />

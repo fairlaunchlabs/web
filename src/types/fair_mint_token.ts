@@ -52,11 +52,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -119,6 +114,114 @@ export type FairMintToken = {
       ]
     },
     {
+      "name": "closeToken",
+      "discriminator": [
+        26,
+        74,
+        236,
+        151,
+        104,
+        64,
+        183,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenName"
+              },
+              {
+                "kind": "arg",
+                "path": "tokenSymbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "tokenVault",
+          "writable": true
+        },
+        {
+          "name": "configAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenName",
+          "type": "string"
+        },
+        {
+          "name": "tokenSymbol",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "initializeLiquidityPool",
       "discriminator": [
         155,
@@ -157,11 +260,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -327,10 +425,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "metadata_params.symbol"
-              },
-              {
-                "kind": "account",
-                "path": "payer"
               }
             ]
           }
@@ -541,11 +635,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -770,8 +859,8 @@ export type FairMintToken = {
           "type": "string"
         },
         {
-          "name": "referralCode",
-          "type": "pubkey"
+          "name": "codeHash",
+          "type": "bytes"
         }
       ]
     },
@@ -1322,11 +1411,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -1531,11 +1615,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -1723,7 +1802,7 @@ export type FairMintToken = {
         },
         {
           "name": "codeHash",
-          "type": "pubkey"
+          "type": "bytes"
         }
       ]
     },
@@ -1766,11 +1845,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -1860,11 +1934,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -1943,11 +2012,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "tokenSymbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "tokenConfigData"
               }
             ]
           }
@@ -2028,6 +2092,7 @@ export type FairMintToken = {
       "accounts": [
         {
           "name": "admin",
+          "writable": true,
           "signer": true
         },
         {
@@ -2084,7 +2149,7 @@ export type FairMintToken = {
         },
         {
           "name": "referrerResetIntervalSeconds",
-          "type": "i64"
+          "type": "u64"
         }
       ]
     },
@@ -2101,10 +2166,6 @@ export type FairMintToken = {
         158
       ],
       "accounts": [
-        {
-          "name": "metadata",
-          "writable": true
-        },
         {
           "name": "mint",
           "pda": {
@@ -2130,10 +2191,6 @@ export type FairMintToken = {
               {
                 "kind": "arg",
                 "path": "metadata_params.symbol"
-              },
-              {
-                "kind": "account",
-                "path": "payer"
               }
             ]
           }
@@ -2169,6 +2226,39 @@ export type FairMintToken = {
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "metadata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  116,
+                  97,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tokenMetadataProgram"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "tokenMetadataProgram"
+            }
+          }
         },
         {
           "name": "systemProgram",
@@ -2263,6 +2353,19 @@ export type FairMintToken = {
     }
   ],
   "events": [
+    {
+      "name": "closeTokenEvent",
+      "discriminator": [
+        203,
+        9,
+        156,
+        247,
+        207,
+        50,
+        200,
+        219
+      ]
+    },
     {
       "name": "initializeLiquidityPoolEvent",
       "discriminator": [
@@ -2518,86 +2621,276 @@ export type FairMintToken = {
     },
     {
       "code": 6032,
+      "name": "refundTokensIsZero",
+      "msg": "Refund tokens is zero"
+    },
+    {
+      "code": 6033,
       "name": "invalidLiquidityTokensRatio",
       "msg": "Invalid liquidity tokens ratio, should be > 0 and <= 50"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "invalidReduceRatio",
       "msg": "Invalid reduce ratio, should be >= 50 and < 100"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "invalidEpochesPerEra",
       "msg": "Invalid epoches per era, should be > 0"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "invalidTargetSecondsPerEpoch",
       "msg": "Invalid target seconds per epoch, should be > 0"
     },
     {
-      "code": 6036,
+      "code": 6037,
       "name": "invalidTargetEras",
       "msg": "Invalid target eras, should be > 0"
     },
     {
-      "code": 6037,
+      "code": 6038,
       "name": "invalidInitialMintSize",
       "msg": "Invalid initial mint size, should be > 0"
     },
     {
-      "code": 6038,
+      "code": 6039,
       "name": "invalidInitialTargetMintSizePerEpoch",
       "msg": "Invalid initial target mint size per epoch, should be > 0"
     },
     {
-      "code": 6039,
+      "code": 6040,
       "name": "initialMintSizeOfEpochTooSmall",
       "msg": "Initial mint size of epoch too small, should be 10 * mint size per minting"
     },
     {
-      "code": 6040,
+      "code": 6041,
       "name": "userBalanceNotEnoughForRefund",
       "msg": "User token balance not enough for refund"
     },
     {
-      "code": 6041,
+      "code": 6042,
       "name": "vaultBalanceNotEnoughForRefund",
       "msg": "Vault token balance not enough for refund"
     },
     {
-      "code": 6042,
+      "code": 6043,
       "name": "onlySystemAdminAllowed",
       "msg": "Only system admin allowed"
     },
     {
-      "code": 6043,
+      "code": 6044,
+      "name": "systemAlreadyInitialized",
+      "msg": "System already initialized"
+    },
+    {
+      "code": 6045,
+      "name": "invalidFeeAccount",
+      "msg": "Invalid fee account"
+    },
+    {
+      "code": 6046,
       "name": "invalidTokenVault",
       "msg": "Invalid token vault"
     },
     {
-      "code": 6044,
+      "code": 6047,
       "name": "invalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
     },
     {
-      "code": 6045,
+      "code": 6048,
       "name": "mintNotStarted",
       "msg": "Mint has not started"
     },
     {
-      "code": 6046,
+      "code": 6049,
       "name": "wrongReferrerCode",
       "msg": "Wrong referrer account"
     },
     {
-      "code": 6047,
+      "code": 6050,
       "name": "wrongCodeHash",
       "msg": "Wrong code hash"
+    },
+    {
+      "code": 6051,
+      "name": "wrongMintAddress",
+      "msg": "Wrong mint address"
+    },
+    {
+      "code": 6052,
+      "name": "mintHasStarted",
+      "msg": "Mint has started"
+    },
+    {
+      "code": 6053,
+      "name": "invalidTokenMint",
+      "msg": "Invalid token mint"
+    },
+    {
+      "code": 6054,
+      "name": "invalidTokenOwner",
+      "msg": "Invalid token owner"
+    },
+    {
+      "code": 6055,
+      "name": "tokenHasDelegate",
+      "msg": "Token has delegate"
+    },
+    {
+      "code": 6056,
+      "name": "numericOverflow",
+      "msg": "Numeric overflow"
+    },
+    {
+      "code": 6057,
+      "name": "insufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6058,
+      "name": "amountConversionError",
+      "msg": "Amount conversion error"
+    },
+    {
+      "code": 6059,
+      "name": "burnOperationFailed",
+      "msg": "Burn operation failed"
+    },
+    {
+      "code": 6060,
+      "name": "refundInProgress",
+      "msg": "Refund in progress"
+    },
+    {
+      "code": 6061,
+      "name": "aountConversionError",
+      "msg": "Amount conversion error"
+    },
+    {
+      "code": 6062,
+      "name": "divideByZero",
+      "msg": "Division by zero"
+    },
+    {
+      "code": 6063,
+      "name": "invalidRatio",
+      "msg": "Invalid ratio value"
+    },
+    {
+      "code": 6064,
+      "name": "precisionError",
+      "msg": "Calculation precision error"
+    },
+    {
+      "code": 6065,
+      "name": "amountExceedsMaximum",
+      "msg": "Amount exceeds maximum allowed"
+    },
+    {
+      "code": 6066,
+      "name": "transferFailed",
+      "msg": "Transfer failed"
+    },
+    {
+      "code": 6067,
+      "name": "exceedMaxU64",
+      "msg": "Exceed max u64"
+    },
+    {
+      "code": 6068,
+      "name": "referrerMainAccountEmpty",
+      "msg": "Referrer main account empty"
+    },
+    {
+      "code": 6069,
+      "name": "payerMustSign",
+      "msg": "Payer must sign"
+    },
+    {
+      "code": 6070,
+      "name": "invalidPayerAccount",
+      "msg": "Invalid payer account"
+    },
+    {
+      "code": 6071,
+      "name": "invalidCodeHash",
+      "msg": "Invalid code hash"
+    },
+    {
+      "code": 6072,
+      "name": "invalidResetInterval",
+      "msg": "Invalid reset interval"
+    },
+    {
+      "code": 6073,
+      "name": "tokenAlreadyInitialized",
+      "msg": "Token already initialized"
+    },
+    {
+      "code": 6074,
+      "name": "invalidTokenName",
+      "msg": "Invalid token name"
+    },
+    {
+      "code": 6075,
+      "name": "invalidTokenSymbol",
+      "msg": "Invalid token symbol"
+    },
+    {
+      "code": 6076,
+      "name": "invalidTokenUri",
+      "msg": "Invalid token uri"
+    },
+    {
+      "code": 6077,
+      "name": "metadataAlreadyInitialized",
+      "msg": "Metadata already initialized"
+    },
+    {
+      "code": 6078,
+      "name": "invalidProtocolFeeRate",
+      "msg": "Invalid protocol fee rate, max 50000 which is 50%"
+    },
+    {
+      "code": 6079,
+      "name": "invalidRefundFeeRate",
+      "msg": "Invalid refund fee rate, max 50000 which is 50%"
+    },
+    {
+      "code": 6080,
+      "name": "mintInProgress",
+      "msg": "Mint in progress"
+    },
+    {
+      "code": 6081,
+      "name": "setReferrerCodeProcess",
+      "msg": "Set referrer code processing"
     }
   ],
   "types": [
+    {
+      "name": "closeTokenEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "configAccount",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenVault",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
     {
       "name": "codeAccountData",
       "type": {
@@ -2665,11 +2958,11 @@ export type FairMintToken = {
           },
           {
             "name": "initialMintSize",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "initialTargetMintSizePerEpoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "feeRate",
@@ -2729,7 +3022,7 @@ export type FairMintToken = {
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "tokenVault",
@@ -2785,7 +3078,7 @@ export type FairMintToken = {
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "mintStateData",
@@ -2794,6 +3087,14 @@ export type FairMintToken = {
                 "name": "tokenMintState"
               }
             }
+          },
+          {
+            "name": "mintFee",
+            "type": "u64"
+          },
+          {
+            "name": "referrerFee",
+            "type": "u64"
           }
         ]
       }
@@ -2829,11 +3130,11 @@ export type FairMintToken = {
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "supply",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "totalTokens",
@@ -2889,7 +3190,7 @@ export type FairMintToken = {
           },
           {
             "name": "activeTimestamp",
-            "type": "i64"
+            "type": "u64"
           }
         ]
       }
@@ -2925,7 +3226,7 @@ export type FairMintToken = {
           },
           {
             "name": "referrerResetIntervalSeconds",
-            "type": "i64"
+            "type": "u64"
           }
         ]
       }
@@ -2973,7 +3274,7 @@ export type FairMintToken = {
           },
           {
             "name": "maxSupply",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "targetEras",
@@ -2993,11 +3294,11 @@ export type FairMintToken = {
           },
           {
             "name": "initialMintSize",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "initialTargetMintSizePerEpoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "liquidityTokensRatio",
@@ -3018,6 +3319,10 @@ export type FairMintToken = {
           {
             "name": "startTimestamp",
             "type": "u64"
+          },
+          {
+            "name": "isProcessing",
+            "type": "bool"
           }
         ]
       }
@@ -3049,7 +3354,7 @@ export type FairMintToken = {
         "fields": [
           {
             "name": "supply",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "currentEra",
@@ -3061,11 +3366,11 @@ export type FairMintToken = {
           },
           {
             "name": "elapsedSecondsEpoch",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "startTimestampEpoch",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "lastDifficultyCoefficientEpoch",
@@ -3077,15 +3382,15 @@ export type FairMintToken = {
           },
           {
             "name": "mintSizeEpoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "quantityMintedEpoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "targetMintSizeEpoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "totalMintFee",
@@ -3129,7 +3434,11 @@ export type FairMintToken = {
           },
           {
             "name": "activeTimestamp",
-            "type": "i64"
+            "type": "u64"
+          },
+          {
+            "name": "isProcessing",
+            "type": "bool"
           }
         ]
       }
@@ -3154,6 +3463,10 @@ export type FairMintToken = {
           {
             "name": "totalReferrerFee",
             "type": "u64"
+          },
+          {
+            "name": "isProcessing",
+            "type": "bool"
           }
         ]
       }
@@ -3189,7 +3502,7 @@ export type FairMintToken = {
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           }
         ]
       }

@@ -16,7 +16,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
         variables: {
             skip: 0,
-            first: 12
+            first: 100
         }
     });
 
@@ -31,7 +31,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
             searchTokens({
                 variables: {
                     skip: 0,
-                    first: 12,
+                    first: 100,
                     searchQuery: searchInput.trim()
                 }
             });
@@ -55,7 +55,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-[200px] ml-64">
+            <div className={`flex justify-center items-center min-h-[200px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
                 <span className="loading loading-spinner loading-lg"></span>
             </div>
         );

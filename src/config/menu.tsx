@@ -37,6 +37,7 @@ import { AskAI } from '../pages/AskAI';
 import { SocialDeveloper } from '../pages/SocialDeveloper';
 import { SocialURCProvider } from '../pages/SocialURCProvider';
 import { SocialValueManager } from '../pages/SocialValueManager';
+import { MyDeployments } from '../pages/MyDeployments';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
@@ -59,7 +60,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
     },
     {
         id: `tools`,
-        label: `URC Tools`, // URC means unique referral code, this is tools for URC management
+        label: `Tools`, // URC means unique referral code, this is tools for URC management
         icon: <MdQrCodeScanner className="w-5 h-5" />,
         component: null,
         subItems: [
@@ -74,6 +75,12 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 label: 'My URC', // my URC code list
                 icon: <MdQrCode className="w-5 h-5" />,
                 component: <MyUniqueReferralCode expanded={expended} />
+            },
+            {
+                id: 'tools-my-deployed',
+                label: 'My Deployment',
+                icon: <MdSmartToy className="w-5 h-5" />,
+                component: <MyDeployments expanded={expended} />
             }
         ]
     },

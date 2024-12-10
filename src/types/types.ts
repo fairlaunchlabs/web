@@ -98,6 +98,8 @@ export type InitiazlizedTokenData = {
     feeRate: string;
     liquidityTokensRatio: string;
     startTimestamp: string;
+
+    tokenMetadata?: TokenMetadataIPFS;
 }
 
 export type MintTokenData = {

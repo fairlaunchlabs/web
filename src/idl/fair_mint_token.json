@@ -46,11 +46,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -113,6 +108,114 @@
       ]
     },
     {
+      "name": "close_token",
+      "discriminator": [
+        26,
+        74,
+        236,
+        151,
+        104,
+        64,
+        183,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_vault",
+          "writable": true
+        },
+        {
+          "name": "config_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "initialize_liquidity_pool",
       "discriminator": [
         155,
@@ -151,11 +254,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -321,10 +419,6 @@
               {
                 "kind": "arg",
                 "path": "metadata_params.symbol"
-              },
-              {
-                "kind": "account",
-                "path": "payer"
               }
             ]
           }
@@ -535,11 +629,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -764,8 +853,8 @@
           "type": "string"
         },
         {
-          "name": "referral_code",
-          "type": "pubkey"
+          "name": "code_hash",
+          "type": "bytes"
         }
       ]
     },
@@ -1316,11 +1405,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -1525,11 +1609,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -1717,7 +1796,7 @@
         },
         {
           "name": "code_hash",
-          "type": "pubkey"
+          "type": "bytes"
         }
       ]
     },
@@ -1760,11 +1839,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -1854,11 +1928,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -1937,11 +2006,6 @@
               {
                 "kind": "arg",
                 "path": "token_symbol"
-              },
-              {
-                "kind": "account",
-                "path": "config_account.admin",
-                "account": "TokenConfigData"
               }
             ]
           }
@@ -2022,6 +2086,7 @@
       "accounts": [
         {
           "name": "admin",
+          "writable": true,
           "signer": true
         },
         {
@@ -2078,7 +2143,7 @@
         },
         {
           "name": "referrer_reset_interval_seconds",
-          "type": "i64"
+          "type": "u64"
         }
       ]
     },
@@ -2095,10 +2160,6 @@
         158
       ],
       "accounts": [
-        {
-          "name": "metadata",
-          "writable": true
-        },
         {
           "name": "mint",
           "pda": {
@@ -2124,10 +2185,6 @@
               {
                 "kind": "arg",
                 "path": "metadata_params.symbol"
-              },
-              {
-                "kind": "account",
-                "path": "payer"
               }
             ]
           }
@@ -2163,6 +2220,39 @@
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "metadata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  116,
+                  97,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_metadata_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "token_metadata_program"
+            }
+          }
         },
         {
           "name": "system_program",
@@ -2257,6 +2347,19 @@
     }
   ],
   "events": [
+    {
+      "name": "CloseTokenEvent",
+      "discriminator": [
+        203,
+        9,
+        156,
+        247,
+        207,
+        50,
+        200,
+        219
+      ]
+    },
     {
       "name": "InitializeLiquidityPoolEvent",
       "discriminator": [
@@ -2512,91 +2615,276 @@
     },
     {
       "code": 6032,
+      "name": "RefundTokensIsZero",
+      "msg": "Refund tokens is zero"
+    },
+    {
+      "code": 6033,
       "name": "InvalidLiquidityTokensRatio",
       "msg": "Invalid liquidity tokens ratio, should be > 0 and <= 50"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "InvalidReduceRatio",
       "msg": "Invalid reduce ratio, should be >= 50 and < 100"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "InvalidEpochesPerEra",
       "msg": "Invalid epoches per era, should be > 0"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "InvalidTargetSecondsPerEpoch",
       "msg": "Invalid target seconds per epoch, should be > 0"
     },
     {
-      "code": 6036,
+      "code": 6037,
       "name": "InvalidTargetEras",
       "msg": "Invalid target eras, should be > 0"
     },
     {
-      "code": 6037,
+      "code": 6038,
       "name": "InvalidInitialMintSize",
       "msg": "Invalid initial mint size, should be > 0"
     },
     {
-      "code": 6038,
+      "code": 6039,
       "name": "InvalidInitialTargetMintSizePerEpoch",
       "msg": "Invalid initial target mint size per epoch, should be > 0"
     },
     {
-      "code": 6039,
+      "code": 6040,
       "name": "InitialMintSizeOfEpochTooSmall",
       "msg": "Initial mint size of epoch too small, should be 10 * mint size per minting"
     },
     {
-      "code": 6040,
+      "code": 6041,
       "name": "UserBalanceNotEnoughForRefund",
       "msg": "User token balance not enough for refund"
     },
     {
-      "code": 6041,
+      "code": 6042,
       "name": "VaultBalanceNotEnoughForRefund",
       "msg": "Vault token balance not enough for refund"
     },
     {
-      "code": 6042,
+      "code": 6043,
       "name": "OnlySystemAdminAllowed",
       "msg": "Only system admin allowed"
     },
     {
-      "code": 6043,
+      "code": 6044,
+      "name": "SystemAlreadyInitialized",
+      "msg": "System already initialized"
+    },
+    {
+      "code": 6045,
+      "name": "InvalidFeeAccount",
+      "msg": "Invalid fee account"
+    },
+    {
+      "code": 6046,
       "name": "InvalidTokenVault",
       "msg": "Invalid token vault"
     },
     {
-      "code": 6044,
+      "code": 6047,
       "name": "InvalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
     },
     {
-      "code": 6045,
+      "code": 6048,
       "name": "MintNotStarted",
       "msg": "Mint has not started"
     },
     {
-      "code": 6046,
+      "code": 6049,
       "name": "WrongReferrerCode",
       "msg": "Wrong referrer account"
     },
     {
-      "code": 6047,
+      "code": 6050,
       "name": "WrongCodeHash",
       "msg": "Wrong code hash"
     },
     {
-      "code": 6048,
+      "code": 6051,
       "name": "WrongMintAddress",
       "msg": "Wrong mint address"
+    },
+    {
+      "code": 6052,
+      "name": "MintHasStarted",
+      "msg": "Mint has started"
+    },
+    {
+      "code": 6053,
+      "name": "InvalidTokenMint",
+      "msg": "Invalid token mint"
+    },
+    {
+      "code": 6054,
+      "name": "InvalidTokenOwner",
+      "msg": "Invalid token owner"
+    },
+    {
+      "code": 6055,
+      "name": "TokenHasDelegate",
+      "msg": "Token has delegate"
+    },
+    {
+      "code": 6056,
+      "name": "NumericOverflow",
+      "msg": "Numeric overflow"
+    },
+    {
+      "code": 6057,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6058,
+      "name": "AmountConversionError",
+      "msg": "Amount conversion error"
+    },
+    {
+      "code": 6059,
+      "name": "BurnOperationFailed",
+      "msg": "Burn operation failed"
+    },
+    {
+      "code": 6060,
+      "name": "RefundInProgress",
+      "msg": "Refund in progress"
+    },
+    {
+      "code": 6061,
+      "name": "AountConversionError",
+      "msg": "Amount conversion error"
+    },
+    {
+      "code": 6062,
+      "name": "DivideByZero",
+      "msg": "Division by zero"
+    },
+    {
+      "code": 6063,
+      "name": "InvalidRatio",
+      "msg": "Invalid ratio value"
+    },
+    {
+      "code": 6064,
+      "name": "PrecisionError",
+      "msg": "Calculation precision error"
+    },
+    {
+      "code": 6065,
+      "name": "AmountExceedsMaximum",
+      "msg": "Amount exceeds maximum allowed"
+    },
+    {
+      "code": 6066,
+      "name": "TransferFailed",
+      "msg": "Transfer failed"
+    },
+    {
+      "code": 6067,
+      "name": "ExceedMaxU64",
+      "msg": "Exceed max u64"
+    },
+    {
+      "code": 6068,
+      "name": "ReferrerMainAccountEmpty",
+      "msg": "Referrer main account empty"
+    },
+    {
+      "code": 6069,
+      "name": "PayerMustSign",
+      "msg": "Payer must sign"
+    },
+    {
+      "code": 6070,
+      "name": "InvalidPayerAccount",
+      "msg": "Invalid payer account"
+    },
+    {
+      "code": 6071,
+      "name": "InvalidCodeHash",
+      "msg": "Invalid code hash"
+    },
+    {
+      "code": 6072,
+      "name": "InvalidResetInterval",
+      "msg": "Invalid reset interval"
+    },
+    {
+      "code": 6073,
+      "name": "TokenAlreadyInitialized",
+      "msg": "Token already initialized"
+    },
+    {
+      "code": 6074,
+      "name": "InvalidTokenName",
+      "msg": "Invalid token name"
+    },
+    {
+      "code": 6075,
+      "name": "InvalidTokenSymbol",
+      "msg": "Invalid token symbol"
+    },
+    {
+      "code": 6076,
+      "name": "InvalidTokenUri",
+      "msg": "Invalid token uri"
+    },
+    {
+      "code": 6077,
+      "name": "MetadataAlreadyInitialized",
+      "msg": "Metadata already initialized"
+    },
+    {
+      "code": 6078,
+      "name": "InvalidProtocolFeeRate",
+      "msg": "Invalid protocol fee rate, max 50000 which is 50%"
+    },
+    {
+      "code": 6079,
+      "name": "InvalidRefundFeeRate",
+      "msg": "Invalid refund fee rate, max 50000 which is 50%"
+    },
+    {
+      "code": 6080,
+      "name": "MintInProgress",
+      "msg": "Mint in progress"
+    },
+    {
+      "code": 6081,
+      "name": "SetReferrerCodeProcess",
+      "msg": "Set referrer code processing"
     }
   ],
   "types": [
+    {
+      "name": "CloseTokenEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "config_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_vault",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
     {
       "name": "CodeAccountData",
       "type": {
@@ -2664,11 +2952,11 @@
           },
           {
             "name": "initial_mint_size",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "initial_target_mint_size_per_epoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "fee_rate",
@@ -2728,7 +3016,7 @@
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "token_vault",
@@ -2784,7 +3072,7 @@
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "mint_state_data",
@@ -2796,11 +3084,11 @@
           },
           {
             "name": "mint_fee",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "referrer_fee",
-            "type": "f64"
+            "type": "u64"
           }
         ]
       }
@@ -2836,11 +3124,11 @@
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "supply",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "total_tokens",
@@ -2896,7 +3184,7 @@
           },
           {
             "name": "active_timestamp",
-            "type": "i64"
+            "type": "u64"
           }
         ]
       }
@@ -2932,7 +3220,7 @@
           },
           {
             "name": "referrer_reset_interval_seconds",
-            "type": "i64"
+            "type": "u64"
           }
         ]
       }
@@ -2980,7 +3268,7 @@
           },
           {
             "name": "max_supply",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "target_eras",
@@ -3000,11 +3288,11 @@
           },
           {
             "name": "initial_mint_size",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "initial_target_mint_size_per_epoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "liquidity_tokens_ratio",
@@ -3025,6 +3313,10 @@
           {
             "name": "start_timestamp",
             "type": "u64"
+          },
+          {
+            "name": "is_processing",
+            "type": "bool"
           }
         ]
       }
@@ -3056,7 +3348,7 @@
         "fields": [
           {
             "name": "supply",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "current_era",
@@ -3068,11 +3360,11 @@
           },
           {
             "name": "elapsed_seconds_epoch",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "start_timestamp_epoch",
-            "type": "i64"
+            "type": "u64"
           },
           {
             "name": "last_difficulty_coefficient_epoch",
@@ -3084,15 +3376,15 @@
           },
           {
             "name": "mint_size_epoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "quantity_minted_epoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "target_mint_size_epoch",
-            "type": "f64"
+            "type": "u64"
           },
           {
             "name": "total_mint_fee",
@@ -3136,7 +3428,11 @@
           },
           {
             "name": "active_timestamp",
-            "type": "i64"
+            "type": "u64"
+          },
+          {
+            "name": "is_processing",
+            "type": "bool"
           }
         ]
       }
@@ -3161,6 +3457,10 @@
           {
             "name": "total_referrer_fee",
             "type": "u64"
+          },
+          {
+            "name": "is_processing",
+            "type": "bool"
           }
         ]
       }
@@ -3196,7 +3496,7 @@
           },
           {
             "name": "timestamp",
-            "type": "i64"
+            "type": "u64"
           }
         ]
       }

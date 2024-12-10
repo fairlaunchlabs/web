@@ -20,7 +20,7 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
             first: pageSize
         },
         onCompleted: (data) => {
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.tokenAccountEntities?.length ?? 0)));
+            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.holdersEntities?.length ?? 0)));
         }
     });
 

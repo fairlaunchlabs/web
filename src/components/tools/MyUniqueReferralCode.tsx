@@ -7,7 +7,7 @@ import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
 import { useNavigate } from 'react-router-dom';
 import { TokenImage } from '../mintTokens/TokenImage';
 import { extractIPFSHash } from '../../utils/format';
-import { pinata } from '../../utils/web3';
+import { fetchTokenMetadata, pinata } from '../../utils/web3';
 import { Pagination } from '../common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 import { AddressDisplay } from '../common/AddressDisplay';
@@ -60,25 +60,11 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, any>>({});
 
     useEffect(() => {
-        const fetchTokenMetadata = async () => {
-            if (!tokenData?.initializeTokenEventEntities) return;
-            setLoadingMetadata(true);
-            const updatedMap: Record<string, any> = {};
-            for (const token of tokenData.initializeTokenEventEntities) {
-                try {
-                    const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
-                    const tokenMetadata = response.data as TokenMetadataIPFS;
-                    updatedMap[token.mint] = { ...token, tokenMetadata };
-                } catch (error) {
-                    console.error(`Error fetching metadata for token ${token.mint}:`, error);
-                    updatedMap[token.mint] = token;
-                }
-            }
+        setLoadingMetadata(true);
+        fetchTokenMetadata(tokenData?.initializeTokenEventEntities).then((updatedMap) => {
             setLoadingMetadata(false);
             setTokenMetadataMap(updatedMap);
-        };
-
-        fetchTokenMetadata();
+        });
     }, [tokenData]);
 
     useEffect(() => {
@@ -151,125 +137,126 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         );
     }
 
-    if (urcError || tokenError || referralBonusError) {
-        return (
-            <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <ErrorBox title="URC list error" message={urcError?.message || tokenError?.message || referralBonusError?.message} />
-            </div>
-        );
-    }
-
-    if (urcLoading || tokenLoading || referralBonusLoading || loadingMetadata) {
-        return (
-            <div className={`flex justify-center items-center min-h-[400px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
-
     return (
         <div className={`space-y-6 p-6 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <h2 className="text-2xl font-bold text-center">My URCs(Unique Referral Codes)</h2>
-            <div className="max-w-5xl mx-auto flex flex-col gap-4">
-                <div className="flex justify-end">
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-base-content">Rows per page:</span>
-                        <select 
-                            className="select select-bordered select-sm" 
-                            value={pageSize}
-                            onChange={handlePageSizeChange}
-                        >
-                            {PAGE_SIZE_OPTIONS.map(size => (
-                                <option key={size} value={size}>{size}</option>
-                            ))}
-                        </select>
+            <div className="max-w-6xl mx-auto flex flex-col gap-4">
+                <h2 className="card-title mb-4">My URCs(Unique Referral Codes)</h2>
+                {urcLoading || tokenLoading || loadingMetadata ? (
+                    <div className="flex justify-center">
+                        <span className="loading loading-spinner loading-lg"></span>
                     </div>
-                </div>
-                <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
-                    <table className="table w-full">
-                        <thead>
-                            <tr>
-                                <th>Token</th>
-                                <th>Mint Address</th>
-                                <th>Developer</th>
-                                <th>Bonus</th>
-                                <th className='text-right'>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {tokenData?.initializeTokenEventEntities?.map((item: any) => {
-                                const metadata = tokenMetadataMap[item.mint];
-                                return (
-                                    <tr key={item.id} className="hover">
-                                        <td className="cursor-pointer" onClick={() => handleTokenClick(item)}>
-                                            <div className="flex items-center space-x-2">
-                                                <div className='mr-2'>
-                                                    {metadata?.tokenMetadata?.image && <TokenImage imageUrl={metadata?.tokenMetadata.image as string} name={metadata.tokenName} size={40} className='rounded-full' />}
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold">{metadata?.tokenName || item.mint}</div>
-                                                    <div className="text-sm opacity-50">{metadata?.tokenSymbol}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><AddressDisplay address={item.mint} /></td>
-                                        <td><AddressDisplay address={item.admin} /></td>
-                                        <td>{bonusByMint[item.mint] === undefined ? "0" : (Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL).toFixed(4)} SOL</td>
-                                        <td className='text-right'>
-                                            <div className="flex gap-2 justify-end">
-                                                <button
-                                                    className="btn btn-sm btn-primary mr-2"
-                                                    onClick={() => handleGetURC(item)}
-                                                >
-                                                    Code Detail
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-secondary"
-                                                    onClick={() => handleOpenBonusDetail(item.mint, bonusByMint[item.mint] === undefined ? 0 : Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL)}
-                                                >
-                                                    Bonus Detail
-                                                </button>
-                                            </div>
-                                        </td>
+                ) : urcError ? (
+                    <ErrorBox title="Error loading URCs" message={urcError.message} />
+                ) : urcData?.setRefererCodeEventEntities?.length === 0 ? (
+                    <p>No URCs found</p>
+                ) : (
+                    <>
+                        <div className="flex justify-end mb-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-base-content">Rows per page:</span>
+                                <select 
+                                    className="select select-bordered select-sm" 
+                                    value={pageSize}
+                                    onChange={(e) => {
+                                        setPageSize(Number(e.target.value));
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    {PAGE_SIZE_OPTIONS.map(size => (
+                                        <option key={size} value={size}>{size}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
+                            <table className="table w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="text-left">Token</th>
+                                        <th className="text-left">Mint Address</th>
+                                        <th className="text-left">Developer</th>
+                                        <th className="text-right">Bonus</th>
+                                        <th className="text-center">Actions</th>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                </thead>
+                                <tbody>
+                                    {tokenData?.initializeTokenEventEntities?.map((item: any) => {
+                                        const metadata = tokenMetadataMap[item.mint];
+                                        return (
+                                            <tr key={item.id} className="hover">
+                                                <td className="cursor-pointer" onClick={() => handleTokenClick(item)}>
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className='mr-2'>
+                                                            {metadata?.tokenMetadata?.image && <TokenImage imageUrl={metadata?.tokenMetadata.image as string} name={metadata.tokenName} size={40} className='rounded-full' />}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-bold">{metadata?.tokenName || item.mint}</div>
+                                                            <div className="text-sm opacity-50">{metadata?.tokenSymbol}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><AddressDisplay address={item.mint} /></td>
+                                                <td><AddressDisplay address={item.admin} /></td>
+                                                <td>{bonusByMint[item.mint] === undefined ? "0" : (Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL).toFixed(4)} SOL</td>
+                                                <td className='text-right'>
+                                                    <div className="flex gap-2 justify-end">
+                                                        <button
+                                                            className="btn btn-sm btn-primary mr-2"
+                                                            onClick={() => handleGetURC(item)}
+                                                        >
+                                                            Code Detail
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-secondary"
+                                                            onClick={() => handleOpenBonusDetail(item.mint, bonusByMint[item.mint] === undefined ? 0 : Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL)}
+                                                        >
+                                                            Bonus Detail
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
 
-                {urcData?.setRefererCodeEventEntities?.length === 0 && (
-                    <div className="text-center py-10">
-                        <p className="text-gray-500">No URCs found</p>
-                    </div>
-                )}
+                        {urcData?.setRefererCodeEventEntities?.length === 0 && (
+                            <div className="text-center py-10">
+                                <p className="text-gray-500">No URCs found</p>
+                            </div>
+                        )}
 
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    totalCount={totalCount}
-                    pageSize={pageSize}
-                    onPageChange={(page) => setCurrentPage(page)}
-                />
-
-                {selectedToken && (
-                    <ReferralCodeModal
-                        isOpen={isModalOpen}
-                        onClose={handleCloseModal}
-                        token={selectedToken}
-                    />
-                )}
-
-                {selectedBonusMint && wallet && (
-                    <ReferralBonusDetailModal
-                        isOpen={!!selectedBonusMint}
-                        onClose={handleCloseBonusDetail}
-                        mint={selectedBonusMint}
-                        referrerMain={wallet.publicKey.toBase58()}
-                        totalBonus={totalBonus}
-                    />
+                        <div className="mt-4">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={Math.ceil(totalCount / pageSize)}
+                                totalCount={totalCount}
+                                pageSize={pageSize}
+                                onPageChange={setCurrentPage}
+                                hasMore={(currentPage * pageSize) < totalCount}
+                            />
+                        </div>
+                    </>
                 )}
             </div>
+            {selectedToken && (
+                <ReferralCodeModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    token={selectedToken}
+                />
+            )}
+
+            {selectedBonusMint && wallet && (
+                <ReferralBonusDetailModal
+                    isOpen={!!selectedBonusMint}
+                    onClose={handleCloseBonusDetail}
+                    mint={selectedBonusMint}
+                    referrerMain={wallet.publicKey.toBase58()}
+                    totalBonus={totalBonus}
+                />
+            )}
         </div>
     );
 };

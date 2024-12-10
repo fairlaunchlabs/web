@@ -11,6 +11,8 @@ import { BN_LAMPORTS_PER_SOL, BN_ZERO, extractIPFSHash, numberStringToBN } from 
 import { useNavigate } from 'react-router-dom';
 import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
 import { RefundModal } from '../components/myAccount/RefundModal';
+import { Pagination } from '../components/common/Pagination';
+import { PAGE_SIZE_OPTIONS } from '../config/constants';
 
 export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const { connection } = useConnection();
@@ -23,14 +25,25 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
     const [selectedTokenForRefund, setSelectedTokenForRefund] = useState<TokenListItem | null>(null);
     const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
 
     const { data: myTokensData, loading: loadingTokens } = useQuery(queryMyTokenList, {
         variables: {
             owner: publicKey?.toBase58() || '',
-            skip: 0,
-            first: 100
+            skip: (currentPage - 1) * pageSize,
+            first: pageSize
         },
-        skip: !publicKey
+        skip: !publicKey,
+        onCompleted: (data) => {
+            if (data?.tokenAccountEntities) {
+                const mints = data.tokenAccountEntities.map((token: TokenListItem) => token.mint);
+                setSearchMints(mints);
+                setTokenList(data.tokenAccountEntities);
+                setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.tokenAccountEntities?.length ?? 0)));
+            }
+        }
     });
 
     const { data: tokenDetailsData, loading: loadingDetails } = useQuery(queryTokensByMints, {
@@ -132,80 +145,109 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                 ) : tokenList.filter(token => numberStringToBN(token.amount).gt(BN_ZERO)).length === 0 ? (
                     <p>No tokens found</p>
                 ) : (
-                    <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
-                        <table className="table w-full">
-                            <thead>
-                                <tr>
-                                    <th className=""></th>
-                                    <th className="">Name & Symbol</th>
-                                    <th className="">Mint Address</th>
-                                    <th className="text-right">Balance</th>
-                                    <th className="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tokenList
-                                    .filter(token => numberStringToBN(token.amount).gt(BN_ZERO))
-                                    .map((token: TokenListItem) => (
-                                    <tr key={token.mint} className="hover">
-                                        <td className="">
-                                            {token.imageUrl && (
-                                                <TokenImage
-                                                    imageUrl={token.imageUrl}
-                                                    name={token.tokenData?.tokenName || 'Unknown'}
-                                                    size={48}
-                                                    className="w-12 h-12 rounded-full"
-                                                />
-                                            )}
-                                        </td>
-                                        <td className="">
-                                            <div className="font-bold">{token.tokenData?.tokenName || 'Unknown'}</div>
-                                            <div className="text-sm opacity-50">{token.tokenData?.tokenSymbol || 'Unknown'}</div>
-                                        </td>
-                                        <td className="">
-                                            <AddressDisplay address={token.mint} />
-                                        </td>
-                                        <td className="text-right">
-                                            {(numberStringToBN(token.amount).div(BN_LAMPORTS_PER_SOL)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                        </td>
-                                        <td>
-                                            <div className="flex gap-2 justify-end">
-                                                <button 
-                                                    className="btn btn-sm btn-primary"
-                                                    onClick={() => navigate(`/token/${token.mint}`)}
-                                                >
-                                                    Get more
-                                                </button>
-                                                <button 
-                                                    className="btn btn-sm btn-error"
-                                                    onClick={() => handleRefund(token)}
-                                                >
-                                                    Refund
-                                                </button>
-                                                <button 
-                                                    className="btn btn-sm btn-accent"
-                                                    onClick={() => {
-                                                        setSelectedTokenForReferral(token);
-                                                        setIsReferralModalOpen(true);
-                                                    }}
-                                                >
-                                                    Code
-                                                </button>
-                                                <button 
-                                                    className="btn btn-sm btn-info"
-                                                    onClick={() => {
-                                                        // TODO: Implement thaw functionality
-                                                    }}
-                                                >
-                                                    Thaw
-                                                </button>
-                                            </div>
-                                        </td>
+                    <>
+                        <div className="flex justify-end mb-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-base-content">Rows per page:</span>
+                                <select 
+                                    className="select select-bordered select-sm" 
+                                    value={pageSize}
+                                    onChange={(e) => {
+                                        setPageSize(Number(e.target.value));
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    {PAGE_SIZE_OPTIONS.map(size => (
+                                        <option key={size} value={size}>{size}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
+                            <table className="table w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="text-left">Image</th>
+                                        <th className="text-left">Name & Symbol</th>
+                                        <th className="text-left">Mint Address</th>
+                                        <th className="text-right">Balance</th>
+                                        <th className="text-center">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {tokenList
+                                        .filter(token => numberStringToBN(token.amount).gt(BN_ZERO))
+                                        .map((token: TokenListItem) => (
+                                        <tr key={token.mint} className="hover">
+                                            <td className="text-left">
+                                                {token.imageUrl && (
+                                                    <TokenImage
+                                                        imageUrl={token.imageUrl}
+                                                        name={token.tokenData?.tokenName || 'Unknown'}
+                                                        size={48}
+                                                        className="w-12 h-12 rounded-full"
+                                                    />
+                                                )}
+                                            </td>
+                                            <td className="text-left">
+                                                <div className="font-bold">{token.tokenData?.tokenName || 'Unknown'}</div>
+                                                <div className="text-sm opacity-50">{token.tokenData?.tokenSymbol || 'Unknown'}</div>
+                                            </td>
+                                            <td className="text-left">
+                                                <AddressDisplay address={token.mint} />
+                                            </td>
+                                            <td className="text-right">
+                                                {(numberStringToBN(token.amount).div(BN_LAMPORTS_PER_SOL)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            </td>
+                                            <td>
+                                                <div className="flex gap-2 justify-end">
+                                                    <button 
+                                                        className="btn btn-sm btn-primary"
+                                                        onClick={() => navigate(`/token/${token.mint}`)}
+                                                    >
+                                                        Get more
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-sm btn-error"
+                                                        onClick={() => handleRefund(token)}
+                                                    >
+                                                        Refund
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-sm btn-accent"
+                                                        onClick={() => {
+                                                            setSelectedTokenForReferral(token);
+                                                            setIsReferralModalOpen(true);
+                                                        }}
+                                                    >
+                                                        Code
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-sm btn-info"
+                                                        onClick={() => {
+                                                            // TODO: Implement thaw functionality
+                                                        }}
+                                                    >
+                                                        Thaw
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="mt-4">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={Math.ceil(totalCount / pageSize)}
+                                totalCount={totalCount}
+                                pageSize={pageSize}
+                                onPageChange={setCurrentPage}
+                                hasMore={(currentPage * pageSize) < totalCount}
+                            />
+                        </div>
+                    </>
                 )}
             </div>
             {selectedTokenForReferral && (
