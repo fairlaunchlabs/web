@@ -67,6 +67,8 @@ export type InitiazlizedTokenData = {
     metadataAccount: string;
     tokenVault: string;
     timestamp: string;
+    status: number;
+    metadataTimestamp: string;
 
     // TokenMetadata
     tokenName: string;

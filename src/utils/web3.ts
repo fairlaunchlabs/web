@@ -745,13 +745,16 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
             const itemId = extractArweaveHash(token.tokenUri);
             // 判断该Id是否已经被同步，或者token.timestamp是否已经过去超过2消失，如果符合条件，则直接从arweave加载
             let url = "";
-            if(Number(token.timestamp) + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
+            if(Number(token.metadataTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
                 // 从arweave加载
                 url = `${ARWEAVE_GATEWAY_URL}/${itemId}`;
             } else {
                 // 从arseeding加载
                 url = `${ARSEEDING_GATEWAY_URL}/${itemId}`;
             }
+            // console.log(Number(token.metadataTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME, Date.now() / 1000);
+            // console.log(Date.now() / 1000 - (Number(token.metadataTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME));
+            // console.log("url", url);
             const response = await axios.get(url);
 
             return {
@@ -785,7 +788,6 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
 
 export const fetchTokenMetadataMap = async (tokenData: Array<InitiazlizedTokenData>): Promise<Record<string, InitiazlizedTokenData>> => {
     if (!tokenData?.length) return {};
-    
     const updatedMap: Record<string, InitiazlizedTokenData> = {};
     try {
         await Promise.all(tokenData.map(async (token) => {
@@ -845,5 +847,120 @@ export const closeToken = async (
             success: false,
             message: error.message || 'Failed to close token'
         };
+    }
+};
+
+export const updateMetaData = async (
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
+    token: InitiazlizedTokenData,
+    newMetadata: TokenMetadataIPFS
+): Promise<ResponseData> => {
+    try {
+        if (!wallet) {
+            return {
+                success: false,
+                message: 'Please connect your wallet first'
+            };
+        }
+
+        const program = getProgram(wallet, connection);
+
+        const [metadataAccountPda] = PublicKey.findProgramAddressSync(
+            [
+              Buffer.from(METADATA_SEED),
+              TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+              new PublicKey(token.mint).toBuffer(),
+            ],
+            TOKEN_METADATA_PROGRAM_ID,
+          );
+        
+        const context = {
+            metadata: metadataAccountPda,
+            mint: new PublicKey(token.mint),
+            payer: wallet.publicKey,
+            configAccount: new PublicKey(token.configAccount),
+            systemProgram: SystemProgram.programId,
+            rent: SYSVAR_RENT_PUBKEY,
+            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+        };
+        
+        // 判断新的metadata是否和原来的metadata一样
+        if (token.tokenMetadata?.description === newMetadata.description &&
+            token.tokenMetadata?.image === newMetadata.image &&
+            token.tokenMetadata?.name === newMetadata.name &&
+            token.tokenMetadata?.symbol === newMetadata.symbol &&
+            token.tokenMetadata?.extensions?.twitter === newMetadata.extensions?.twitter &&
+            token.tokenMetadata?.extensions?.discord === newMetadata.extensions?.discord &&
+            token.tokenMetadata?.extensions?.github === newMetadata.extensions?.github &&
+            token.tokenMetadata?.extensions?.medium === newMetadata.extensions?.medium &&
+            token.tokenMetadata?.extensions?.telegram === newMetadata.extensions?.telegram &&
+            token.tokenMetadata?.extensions?.website === newMetadata.extensions?.website
+        ) {
+            return {
+                success: false,
+                message: 'Token metadata is the same as before',
+            };
+        }
+
+        // console.log(token.tokenMetadata);
+        // console.log(newMetadata);
+
+        const metadataBlob = new Blob([JSON.stringify(newMetadata)], {
+            type: 'application/json'
+        });
+        const metadataFile = new File([metadataBlob], 'metadata.json', {
+            type: 'application/json'
+        });
+
+        // const metadataUrl = "https://arweave.net/1pgcW4sWbenqKzOQ_dRk3ye9X7LVhZ-JI8xKvBU96AU";
+        const metadataUrl = await uploadToArweave(metadataFile);
+        console.log(metadataUrl);
+        const metadata: TokenMetadata = {
+            symbol: token.tokenSymbol,
+            name: token.tokenName,
+            decimals: 9,
+            uri: metadataUrl,
+        }
+      
+        const tx = await program.methods
+            .updateTokenMetadata(metadata)
+            .accounts(context)
+            .rpc();
+
+        return {
+            success: true,
+            message: 'Token metadata updated successfully',
+            data: {
+                tx
+            }
+        };
+    } catch (error: any) {
+        console.error('Error updating token metadata:', error);
+        return {
+            success: false,
+            message: error.message || 'Failed to update token metadata'
+        };
+    }
+};
+
+export const uploadToArweave = async (file: File, contentType: string = 'multipart/form-data'): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const url = `${ARWEAVE_API_URL}/upload`;
+        const response = await axios.post(url, formData, {
+            headers: {
+                'Content-Type': contentType,
+            }
+        });
+
+        if (response.data.status === 'success') {
+            return `${ARWEAVE_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
+        }
+        throw new Error('Upload failed: ' + JSON.stringify(response.data));
+    } catch (error) {
+        console.error('Error uploading image to Arweave:', error);
+        throw error;
     }
 };

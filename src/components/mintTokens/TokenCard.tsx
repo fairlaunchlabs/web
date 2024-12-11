@@ -86,7 +86,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                     <TokenImage
                         imageUrl={metadata?.image as string}
                         name={token.tokenName}
-                        launchTimestamp={Number(token.timestamp)}
+                        launchTimestamp={Number(token.metadataTimestamp)}
                         className="w-full h-full rounded-full"
                     />
                 </div>

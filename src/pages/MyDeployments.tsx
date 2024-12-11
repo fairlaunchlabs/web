@@ -110,7 +110,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                     <TokenImage 
                                                         imageUrl={tokenMetadataMap[token.mint]?.tokenMetadata?.image || ''}
                                                         name={token.tokenName}
-                                                        launchTimestamp={Number(token.timestamp)}
+                                                        launchTimestamp={Number(token.metadataTimestamp)}
                                                         size={48}
                                                         className="w-12 h-12 rounded-full"
                                                     />
@@ -185,7 +185,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                         setIsUpdateModalOpen(false);
                         setSelectedToken(null);
                     }}
-                    token={selectedToken}
+                    token={tokenMetadataMap[selectedToken?.mint as string]}
                 />
             </div>
         </div>

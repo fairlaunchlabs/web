@@ -190,7 +190,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                                             <TokenImage 
                                                                 imageUrl={metadata?.tokenMetadata.image as string} 
                                                                 name={metadata.tokenName} 
-                                                                launchTimestamp={Number(item.timestamp)}
+                                                                launchTimestamp={Number(item.metadataTimestamp)}
                                                                 size={40} 
                                                                 className='rounded-full' 
                                                             />}

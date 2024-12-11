@@ -183,7 +183,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                                     <TokenImage
                                                         imageUrl={token.imageUrl}
                                                         name={token.tokenData?.tokenName || 'Unknown'}
-                                                        launchTimestamp={Number(token.tokenData?.timestamp) || 0}
+                                                        launchTimestamp={Number(token.tokenData?.metadataTimestamp) || 0}
                                                         size={48}
                                                         className="w-12 h-12 rounded-full"
                                                     />

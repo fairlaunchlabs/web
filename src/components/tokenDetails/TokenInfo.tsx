@@ -98,7 +98,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                     <TokenImage
                         imageUrl={metadata?.image as string} 
                         name={token.tokenName} 
-                        launchTimestamp={Number(token.timestamp)}
+                        launchTimestamp={Number(token.metadataTimestamp)}
                         size={84} 
                         className='rounded-full' />
                 </div>

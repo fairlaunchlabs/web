@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
-import { createTokenOnChain } from '../utils/web3';
+import { createTokenOnChain, uploadToArweave } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Metrics } from '../components/launchToken/Metrics';
@@ -76,27 +76,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         }
 
         return true;
-    };
-
-    const uploadToArweave = async (file: File, contentType: string = 'multipart/form-data'): Promise<string> => {
-        const formData = new FormData();
-        formData.append('file', file);
-        try {
-            const url = `${ARWEAVE_API_URL}/upload`;
-            const response = await axios.post(url, formData, {
-                headers: {
-                    'Content-Type': contentType,
-                }
-            });
-
-            if (response.data.status === 'success') {
-                return `${ARWEAVE_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
-            }
-            throw new Error('Upload failed: ' + JSON.stringify(response.data));
-        } catch (error) {
-            console.error('Error uploading image to Arweave:', error);
-            throw error;
-        }
     };
 
     const handleImageChange = async (file: File | null) => {

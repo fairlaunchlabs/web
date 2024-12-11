@@ -44,6 +44,7 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!) {
         liquidityTokensRatio
         startTimestamp
         status
+        metadataTimestamp
     }
 }`;
 
@@ -91,6 +92,7 @@ query GetMyDeployments($wallet: String!, $skip: Int!, $first: Int!) {
         liquidityTokensRatio
         startTimestamp
         status
+        metadataTimestamp
     }
 }`;
 
@@ -150,6 +152,7 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
         liquidityTokensRatio
         startTimestamp
         status
+        metadataTimestamp
     }
 }`;
 
@@ -287,6 +290,7 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
         liquidityTokensRatio
         startTimestamp
         status
+        metadataTimestamp
     }
 }`;
 
