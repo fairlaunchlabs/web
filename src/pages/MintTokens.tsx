@@ -16,7 +16,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
         variables: {
             skip: 0,
-            first: 100
+            first: 5
         }
     });
 
@@ -31,7 +31,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
             searchTokens({
                 variables: {
                     skip: 0,
-                    first: 100,
+                    first: 5,
                     searchQuery: searchInput.trim()
                 }
             });

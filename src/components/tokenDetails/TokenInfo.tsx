@@ -6,7 +6,6 @@ import {
     calculateMaxSupply, 
     calculateMinTotalFee,
     calculateTotalSupplyToTargetEras,
-    extractIPFSHash,
     formatSeconds,
     getTimeRemaining,
     numberStringToBN
@@ -96,7 +95,12 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
         <div className="bg-base-200 rounded-lg shadow-lg p-6">
             <div className="flex items-start gap-6">
                 <div className="w-24 h-24 overflow-hidden">
-                    <TokenImage imageUrl={metadata?.image as string} name={token.tokenName} size={84} className='rounded-full' />
+                    <TokenImage
+                        imageUrl={metadata?.image as string} 
+                        name={token.tokenName} 
+                        launchTimestamp={Number(token.timestamp)}
+                        size={84} 
+                        className='rounded-full' />
                 </div>
                 <div className="flex-1">
                     <div className="flex justify-between items-start">

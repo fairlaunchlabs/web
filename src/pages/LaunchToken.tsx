@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
-import { createTokenOnChain, pinata } from '../utils/web3';
+import { createTokenOnChain } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Metrics } from '../components/launchToken/Metrics';
@@ -8,17 +8,18 @@ import { AdvancedSettings } from '../components/launchToken/AdvancedSettings';
 import { ToggleSwitch } from '../components/common/ToggleSwitch';
 import { TokenImageUpload } from '../components/launchToken/TokenImageUpload';
 import toast from 'react-hot-toast';
-import { NETWORK, SCANURL } from '../config/constants';
+import { ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, NETWORK, SCANURL } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
 import { numberStringToBN } from '../utils/format';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import axios from 'axios';
 
-export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
+export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
     const [name, setName] = useState('');
     const [symbol, setSymbol] = useState('');
     const [imageUrl, setImageUrl] = useState('');
-    const [imageCid, setImageCid] = useState('');
+    // const [imageCid, setImageCid] = useState('');
     const [description, setDescription] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
@@ -26,7 +27,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const [success, setSuccess] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [decimals, setDecimals] = useState(9);
-    
+
     // 社交信息状态
     const [showSocial, setShowSocial] = useState(false);
     const [website, setWebsite] = useState('');
@@ -53,7 +54,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const [startTime, setStartTime] = useState<string>('');
 
     const { connection } = useConnection();
-    
+
     useEffect(() => {
         if (startImmediately) {
             setStartTime('');
@@ -77,10 +78,23 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
         return true;
     };
 
-    const uploadToPinata = async (file: File): Promise<string> => {
+    const uploadToArweave = async (file: File, contentType: string = 'multipart/form-data'): Promise<string> => {
+        const formData = new FormData();
+        formData.append('file', file);
         try {
-            return (await pinata.upload.file(file)).IpfsHash;
+            const url = `${ARWEAVE_API_URL}/upload`;
+            const response = await axios.post(url, formData, {
+                headers: {
+                    'Content-Type': contentType,
+                }
+            });
+
+            if (response.data.status === 'success') {
+                return `${ARWEAVE_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
+            }
+            throw new Error('Upload failed: ' + JSON.stringify(response.data));
         } catch (error) {
+            console.error('Error uploading image to Arweave:', error);
             throw error;
         }
     };
@@ -88,7 +102,6 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
     const handleImageChange = async (file: File | null) => {
         // If no file, reset image-related states
         if (!file) {
-            setImageCid('');
             setImageUrl('');
             return;
         }
@@ -104,10 +117,8 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
         }
 
         try {
-            // Upload to Pinata
-            const hash = await uploadToPinata(file);
-            setImageCid(hash);
-            setImageUrl(`ipfs://${hash}`);
+            const arweaveUrl = await uploadToArweave(file);
+            setImageUrl(arweaveUrl);
         } catch (err) {
             setError('Failed to upload image: ' + (err instanceof Error ? err.message : String(err)));
         } finally {
@@ -134,8 +145,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                 throw new Error('Please connect your wallet first');
             }
 
-            // 准备元数据
-            const metadataForIpfs = {
+            const metadataForArweave = {
                 name,
                 symbol,
                 description,
@@ -149,16 +159,22 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                     medium,
                 },
             };
+            
+            const metadataBlob = new Blob([JSON.stringify(metadataForArweave)], {
+                type: 'application/json'
+            });
+            const metadataFile = new File([metadataBlob], 'metadata.json', {
+                type: 'application/json'
+            });
 
-            // 上传元数据到 IPFS
-            const metadataResponse = await pinata.upload.json(metadataForIpfs);
+            const metadataUrl = await uploadToArweave(metadataFile);
+            console.log('Metadata uploaded to Arweave:', metadataUrl);
 
-            // 准备创建代币所需的元数据
             const tokenMetadata: TokenMetadata = {
                 name,
                 symbol,
                 decimals,
-                uri: `ipfs://${metadataResponse.IpfsHash}`,
+                uri: metadataUrl,
             };
 
             const startTimestamp = startImmediately 
@@ -260,7 +276,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-                // 验证表单数据
+        // 验证表单数据
         const validation = validateFormData();
         if (!validation.isValid) {
             setError(validation.error);
@@ -416,7 +432,7 @@ export const LaunchTokenForm:FC<LaunchTokenFormProps> = ({expanded}) => {
                                 ? 'bg-gray-300 cursor-not-allowed'
                                 : 'bg-primary hover:bg-primary'
                         }`}
-                        disabled={isCreating || isUploading || !name || !symbol || !imageCid}
+                        disabled={isCreating || isUploading || !name || !symbol || !imageUrl}
                     >
                         {isCreating ? 'Creating Token...' : 'Create Token'}
                     </button>

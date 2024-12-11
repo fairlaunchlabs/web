@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { extractIPFSHash } from '../../utils/format';
 import { TokenImageProps } from '../../types/types';
-import { pinata } from '../../utils/web3';
+import { checkAvailableArweaveItemId, extractArweaveHash } from '../../utils/web3';
+import { ARSEEDING_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, ARWEAVE_GATEWAY_URL } from '../../config/constants';
+import axios from 'axios';
 
 // Cache configuration
 const DB_NAME = 'POM_IMAGE_CACHE';
@@ -91,9 +92,33 @@ const arrayBufferToBlob = (buffer: ArrayBuffer, type: string): Blob => {
     return new Blob([buffer], { type });
 };
 
+const detectImageType = (buffer: Buffer): string | null => {
+    // 检查文件头部字节来判断图片类型
+    const header = buffer.slice(0, 4);
+    
+    // JPEG signature: FF D8 FF
+    if (header[0] === 0xFF && header[1] === 0xD8 && header[2] === 0xFF) {
+        return 'image/jpeg';
+    }
+    
+    // PNG signature: 89 50 4E 47
+    if (header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4E && header[3] === 0x47) {
+        return 'image/png';
+    }
+    
+    // GIF signature: 47 49 46 38
+    if (header[0] === 0x47 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x38) {
+        return 'image/gif';
+    }
+    
+    // 如果无法识别，返回null
+    return null;
+}
+
 export const TokenImage: React.FC<TokenImageProps> = ({ 
     imageUrl, 
     name,
+    launchTimestamp,
     size = 64, 
     className = ''
 }) => {
@@ -116,13 +141,13 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             setError(null);
 
             // Extract CID and validate
-            const cid = extractIPFSHash(imageUrl as string);
-            if (!cid) {
-                throw new Error('Invalid IPFS hash');
+            const itemId = extractArweaveHash(imageUrl as string);
+            if (!itemId || !checkAvailableArweaveItemId(itemId)) {
+                throw new Error('Invalid Arweave id');
             }
 
             // Try to get from cache first
-            const cachedImage = await getCachedImage(cid);
+            const cachedImage = await getCachedImage(itemId);
             if (cachedImage) {
                 const blobUrl = createBlobUrl(cachedImage);
                 setImageData(blobUrl);
@@ -130,29 +155,38 @@ export const TokenImage: React.FC<TokenImageProps> = ({
                 return;
             }
 
-            // If not in cache, fetch from network
-            const imageResponse = await pinata.gateways.get(cid);
+            let url = "";
+            if(Number(launchTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
+                // 从arweave加载
+                url = `${ARWEAVE_GATEWAY_URL}/${itemId}`;
+            } else {
+                // 从arseeding加载
+                url = `${ARSEEDING_GATEWAY_URL}/${itemId}`;
+            }
+
+            // 获取二进制图片数据
+            const imageResponse = await axios.get(url, {
+                responseType: 'arraybuffer'
+            });
+
             if (!imageResponse?.data) {
                 throw new Error('Failed to fetch image');
             }
 
-            let imageBuffer: ArrayBuffer;
-            if (imageResponse.data instanceof ArrayBuffer) {
-                imageBuffer = imageResponse.data;
-            } else if (imageResponse.data instanceof Blob) {
-                imageBuffer = await imageResponse.data.arrayBuffer();
-            } else if (typeof imageResponse.data === 'string') {
-                const encoder = new TextEncoder();
-                imageBuffer = encoder.encode(imageResponse.data).buffer;
-            } else {
-                throw new Error('Unsupported image data format');
+            // 将arraybuffer转换为Buffer
+            const imageBuffer = Buffer.from(imageResponse.data);
+
+            // 检测图片格式
+            const imageType = detectImageType(imageBuffer);
+            if (!imageType) {
+                throw new Error('Invalid image format');
             }
 
             // Cache the image data
-            await setCachedImage(cid, imageBuffer);
+            await setCachedImage(itemId, imageBuffer);
 
-            // Create blob URL
-            const blobUrl = createBlobUrl(imageBuffer, imageResponse.contentType || 'image/png');
+            // Create blob URL with detected image type
+            const blobUrl = createBlobUrl(imageBuffer, imageType);
             setImageData(blobUrl);
             setIsLoading(false);
             setRetryCount(0);

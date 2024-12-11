@@ -3,7 +3,6 @@ import {
     calculateMaxSupply, 
     calculateTargetMintTime,
     calculateMinTotalFee,
-    extractIPFSHash,
     formatSeconds,
     getTimeRemaining
 } from '../../utils/format';
@@ -87,6 +86,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                     <TokenImage
                         imageUrl={metadata?.image as string}
                         name={token.tokenName}
+                        launchTimestamp={Number(token.timestamp)}
                         className="w-full h-full rounded-full"
                     />
                 </div>

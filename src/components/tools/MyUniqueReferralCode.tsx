@@ -179,14 +179,21 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {tokenData?.initializeTokenEventEntities?.map((item: any) => {
+                                    {tokenData?.initializeTokenEventEntities?.map((item: InitiazlizedTokenData) => {
                                         const metadata = tokenMetadataMap[item.mint];
                                         return (
                                             <tr key={item.id} className="hover">
                                                 <td className="cursor-pointer" onClick={() => handleTokenClick(item)}>
                                                     <div className="flex items-center space-x-2">
                                                         <div className='mr-2'>
-                                                            {metadata?.tokenMetadata?.image && <TokenImage imageUrl={metadata?.tokenMetadata.image as string} name={metadata.tokenName} size={40} className='rounded-full' />}
+                                                            {metadata?.tokenMetadata?.image && 
+                                                            <TokenImage 
+                                                                imageUrl={metadata?.tokenMetadata.image as string} 
+                                                                name={metadata.tokenName} 
+                                                                launchTimestamp={Number(item.timestamp)}
+                                                                size={40} 
+                                                                className='rounded-full' 
+                                                            />}
                                                         </div>
                                                         <div>
                                                             <div className="font-bold">{metadata?.tokenName || item.mint}</div>

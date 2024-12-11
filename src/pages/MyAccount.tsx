@@ -7,7 +7,7 @@ import { InitiazlizedTokenData, MyAccountProps, TokenListItem, TokenMetadataIPFS
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
 import { fetchMetadata } from '../utils/web3';
-import { BN_LAMPORTS_PER_SOL, BN_ZERO, extractIPFSHash, numberStringToBN } from '../utils/format';
+import { BN_LAMPORTS_PER_SOL, BN_ZERO, numberStringToBN } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
 import { RefundModal } from '../components/myAccount/RefundModal';
@@ -183,6 +183,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                                     <TokenImage
                                                         imageUrl={token.imageUrl}
                                                         name={token.tokenData?.tokenName || 'Unknown'}
+                                                        launchTimestamp={Number(token.tokenData?.timestamp) || 0}
                                                         size={48}
                                                         className="w-12 h-12 rounded-full"
                                                     />

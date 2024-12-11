@@ -6,19 +6,13 @@ import {
 } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS } from '../config/constants';
+import { METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME } from '../config/constants';
 import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, ResponseData, TokenMetadata, TokenMetadataIPFS } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
-import { PinataSDK } from 'pinata-web3';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { extractIPFSHash } from './format';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
-
-export const pinata = new PinataSDK({
-    pinataJwt: process.env.REACT_APP_PINATA_JWT,
-    pinataGateway: process.env.REACT_APP_PINATA_GATEWAY
-});
+import axios from 'axios';
 
 export const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     const provider = new AnchorProvider(
@@ -717,11 +711,62 @@ export const getReferrerDataByReferralAccount = async (
     }
 }
 
+export const extractArweaveHash = (url: string): string => {
+    // 移除可能的末尾斜杠
+    const cleanUrl = url.replace(/\/$/, '');
+    // 从URL中提取最后一段作为hash
+    const hash = cleanUrl.split('/').pop();
+    if (!hash) {
+        throw new Error('Invalid Arweave URL format');
+    }
+    return hash;
+};
+
+export const checkAvailableArweaveItemId = (id: string) => {
+    return id.length === 43;
+};
+
 export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<TokenMetadataIPFS | null> => {
     try {
-        const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri as string) as string);
-        const data = response.data as TokenMetadataIPFS;
-        return data;
+        if (!token.tokenUri) return null;
+        // Check if the URI is an Arweave URL
+        if (token.tokenUri.startsWith(ARWEAVE_GATEWAY_URL)) {
+            // 从url中提取itemId
+            const itemId = extractArweaveHash(token.tokenUri);
+            // 判断该Id是否已经被同步，或者token.timestamp是否已经过去超过2消失，如果符合条件，则直接从arweave加载
+            let url = "";
+            if(Number(token.timestamp) + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
+                // 从arweave加载
+                url = `${ARWEAVE_GATEWAY_URL}/${itemId}`;
+            } else {
+                // 从arseeding加载
+                url = `${ARSEEDING_GATEWAY_URL}/${itemId}`;
+            }
+            const response = await axios.get(url);
+
+            return {
+                name: response.data.name,
+                symbol: response.data.symbol,
+                description: response.data.description,
+                image: response.data.image,
+                extensions: response.data.extensions,
+            } as TokenMetadataIPFS
+        }
+        
+        // Fallback to IPFS for backward compatibility
+        if (token.tokenUri.startsWith('ipfs://') || token.tokenUri.startsWith('https://gateway.pinata.cloud')) {
+            // Deprecated
+            // 忽略之前通过IPFS保存的metadata和图片
+            // const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
+            // return response.data as TokenMetadataIPFS;
+            return {
+                name: 'Test',
+                description: 'Test',
+                image: 'https://picsum.photos/200/200',
+            } as TokenMetadataIPFS
+        }
+
+        throw new Error('Unsupported URI format');
     } catch (error) {
         console.error('Error fetching token metadata:', error);
         return null;
@@ -729,21 +774,21 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
 };
 
 export const fetchTokenMetadataMap = async (tokenData: Array<InitiazlizedTokenData>): Promise<Record<string, InitiazlizedTokenData>> => {
-    if (tokenData.length === 0) return {};
+    if (!tokenData?.length) return {};
+    
     const updatedMap: Record<string, InitiazlizedTokenData> = {};
     try {
-        for (const token of tokenData) {
+        await Promise.all(tokenData.map(async (token) => {
             try {
-                const tokenMetadata = await fetchMetadata(token) as TokenMetadataIPFS;
-                updatedMap[token.mint] = { ...token, tokenMetadata };
+                const tokenMetadata = await fetchMetadata(token);
+                updatedMap[token.mint] = tokenMetadata ? { ...token, tokenMetadata } : token;
             } catch (error) {
                 console.error(`Error fetching metadata for token ${token.mint}:`, error);
                 updatedMap[token.mint] = token;
             }
-        }    
+        }));
     } catch (error) {
-        console.error('Error fetching metadata for token:', error);
-        return {};
+        console.error('Error fetching metadata for tokens:', error);
     }
     return updatedMap;
 };

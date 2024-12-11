@@ -114,38 +114,38 @@ export const calculateMinTotalFee = (
     return initialTargetMintSizePerEpochNum / initialMintSizeNum * feeRateNum * (targetErasNum * epochesPerEraNum + 1) / 1e9;
 };
 
-export const extractIPFSHash = (url: string): string | null => {
-    // 处理直接的 IPFS 哈希
-    if (url.startsWith('Qm') || url.startsWith('baf')) {
-        return url;
-    }
+// export const extractIPFSHash = (url: string): string | null => {
+//     // 处理直接的 IPFS 哈希
+//     if (url.startsWith('Qm') || url.startsWith('baf')) {
+//         return url;
+//     }
 
-    // 处理 ipfs:// 协议的链接
-    if (url.startsWith('ipfs://')) {
-        const hash = url.replace('ipfs://', '');
-        if (hash.startsWith('Qm') || hash.startsWith('baf')) {
-            return hash;
-        }
-    }
+//     // 处理 ipfs:// 协议的链接
+//     if (url.startsWith('ipfs://')) {
+//         const hash = url.replace('ipfs://', '');
+//         if (hash.startsWith('Qm') || hash.startsWith('baf')) {
+//             return hash;
+//         }
+//     }
 
-    try {
-        // 创建 URL 对象处理 https:// 链接
-        const urlObj = new URL(url);
+//     try {
+//         // 创建 URL 对象处理 https:// 链接
+//         const urlObj = new URL(url);
         
-        // 从路径中提取 IPFS 哈希
-        const pathParts = urlObj.pathname.split('/');
-        const ipfsIndex = pathParts.indexOf('ipfs');
+//         // 从路径中提取 IPFS 哈希
+//         const pathParts = urlObj.pathname.split('/');
+//         const ipfsIndex = pathParts.indexOf('ipfs');
         
-        if (ipfsIndex !== -1 && pathParts[ipfsIndex + 1]) {
-            return pathParts[ipfsIndex + 1];
-        }
+//         if (ipfsIndex !== -1 && pathParts[ipfsIndex + 1]) {
+//             return pathParts[ipfsIndex + 1];
+//         }
 
-        return null;
-    } catch (error) {
-        console.error('Invalid URL:', error);
-        return null;
-    }
-};
+//         return null;
+//     } catch (error) {
+//         console.error('Invalid URL:', error);
+//         return null;
+//     }
+// };
 
 export const numberStringToBN = (decimalStr: string): BN => {
     return new BN(decimalStr.replace(/[,\s]/g, '').split('.')[0] || '0');

@@ -22,9 +22,14 @@ export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
 export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';
 export const LOCAL_STORAGE_MY_REFERRAL_CODE = 'my_referral_code';
 export const NETWORK = 'devnet';
+export const IRYS_NETWORK = 'devnet';
 // export const SCANURL = 'https://solscan.io';
 export const SCANURL = 'https://explorer.solana.com';
 export const LOCAL_STORAGE_HISTORY_CACHE_PREFIX = 'mint_history_';
 export const LOCAL_STORAGE_HISTORY_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24小时的缓存时间
 
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+export const ARWEAVE_API_URL = "http://localhost:8000/arweave";
+export const ARWEAVE_GATEWAY_URL = "https://arweave.net";
+export const ARSEEDING_GATEWAY_URL = "https://arseed.web3infra.dev";
+export const ARWEAVE_DEFAULT_SYNC_TIME = 2 * 60 * 60;
