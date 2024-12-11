@@ -3,6 +3,8 @@ import { InitiazlizedTokenData } from "../../types/types";
 import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import { closeToken } from "../../utils/web3";
 import toast from "react-hot-toast";
+import { ToastBox } from "../common/ToastBox";
+import { NETWORK, SCANURL } from "../../config/constants";
 
 interface CloseTokenModalProps {
     isOpen: boolean;
@@ -34,8 +36,14 @@ export const CloseTokenModal: FC<CloseTokenModalProps> = ({ isOpen, onClose, tok
             const result = await closeToken(wallet, connection, token);
             
             if (result.success) {
-                toast.success("Token closed successfully");
-                onClose();
+                toast.success(
+                    <ToastBox 
+                        url={`${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`}
+                        urlText="View transaction"
+                        title="Token closed success fully!"
+                    />
+                );
+                close();
             } else {
                 toast.error(result.message || "Failed to close token");
             }
@@ -47,12 +55,20 @@ export const CloseTokenModal: FC<CloseTokenModalProps> = ({ isOpen, onClose, tok
         }
     };
 
+    const close = () => {
+        setLoading(false);
+        setConfirmed(false);
+        setTimeout(() => {
+            onClose();
+        }, 3000);
+    }
+
     return (
         <div className="modal modal-open">
             <div className="modal-box relative">
                 <button
                     className="btn btn-circle btn-sm absolute right-2 top-2"
-                    onClick={onClose}
+                    onClick={() => {setConfirmed(false); onClose()}}
                 >
                     ✕
                 </button>
@@ -96,7 +112,7 @@ export const CloseTokenModal: FC<CloseTokenModalProps> = ({ isOpen, onClose, tok
                     </div>
                 </div>
             </div>
-            <div className="modal-backdrop" onClick={onClose}></div>
+            <div className="modal-backdrop" onClick={() => {setConfirmed(false); onClose() }}></div>
         </div>
     );
 };

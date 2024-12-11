@@ -11,6 +11,8 @@ import { CloseTokenModal } from "../components/tools/CloseTokenModal";
 import { UpdateMetadataModal } from "../components/tools/UpdateMetadataModal";
 import { Pagination } from "../components/common/Pagination";
 import { PAGE_SIZE_OPTIONS } from "../config/constants";
+import { useNavigate } from "react-router-dom";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 export type MyDeploymentsProps = {
     expanded: boolean;
@@ -28,6 +30,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
+    const navigate = useNavigate();
 
     const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryMyDeployments, {
         variables: {
@@ -50,6 +53,10 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
             });
         }
     }, [initialData]);
+
+    const handleClick = (mint: string) => {
+        navigate(`/token/${mint}`);
+    };
 
     const loading = initialLoading || metadataLoading;
 
@@ -98,7 +105,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                 <tbody>
                                     {initialData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => (
                                         <tr key={token.id} className="hover">
-                                            <td className="text-left">
+                                            <td className="text-left cursor-pointer" onClick={() => handleClick(token.mint)}>
                                                 <div className="">
                                                     <TokenImage 
                                                         imageUrl={tokenMetadataMap[token.mint]?.tokenMetadata?.image || ''}
@@ -109,7 +116,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                     />
                                                 </div>
                                             </td>
-                                            <td className="text-left">
+                                            <td className="text-left cursor-pointer" onClick={() => handleClick(token.mint)}>
                                                 <div className="font-bold">{token.tokenName}</div>
                                                 <div className="text-sm opacity-50">{token.tokenSymbol}</div>
                                             </td>
@@ -117,7 +124,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                 <AddressDisplay address={token.mint} />
                                             </td>
                                             <td className="text-right">
-                                                {token.supply}
+                                                {(Number(token.supply) / LAMPORTS_PER_SOL).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="text-center">
                                                 <div className="flex gap-2 justify-end">

@@ -27,7 +27,7 @@ export const RefundModal: FC<RefundModalProps> = ({
         if (wallet) {
             getSystemConfig(wallet, connection).then((data) => {
                 if (data?.success && data.data) {
-                    console.log("protocol fee account", data.data.protocolFeeAccount.toBase58());
+                    // console.log("protocol fee account", data.data.protocolFeeAccount.toBase58());
                     setProtocolFeeAccount(data.data.protocolFeeAccount);
                     setRefundFeeRate(data.data.refundFeeRate);
                 }

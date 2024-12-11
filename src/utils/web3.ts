@@ -457,22 +457,31 @@ export const getSystemConfig = async (
     }
 }
 
-export const getRefundAccountData = async (wallet: AnchorWallet | undefined, connection: Connection, token: InitiazlizedTokenData) => {
+export const getRefundAccountData = async (wallet: AnchorWallet, connection: Connection, token: InitiazlizedTokenData) => {
     if(!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
     const program = getProgram(wallet, connection);
-    const [refundAccountPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
-        program.programId,
-    );
-    const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
-    return {
-        success: true,
-        message: 'Get refund data success',
-        data: refundAccountData
-    };
+    try {
+        const [refundAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
+            program.programId,
+        );
+        const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
+        console.log("refundAccountData", refundAccountData);
+        return {
+            success: true,
+            message: 'Get refund data success',
+            data: refundAccountData
+        };    
+    } catch (error) {
+        console.log("getRefundAccountData", error);
+        return {
+            success: false,
+            message: 'Error getting refund account data'
+        }
+    }
 }
 
 export const refund = async (
@@ -532,6 +541,7 @@ export const refund = async (
             message: 'Refund success',
             data: {
                 tx,
+                mint: token.mint
             }
         };
     } catch (error) {
@@ -825,7 +835,9 @@ export const closeToken = async (
         return {
             success: true,
             message: 'Token closed successfully',
-            data: tx
+            data: {
+                tx
+            }
         };
     } catch (error: any) {
         console.error('Error closing token:', error);
