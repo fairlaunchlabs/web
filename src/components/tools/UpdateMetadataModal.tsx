@@ -46,6 +46,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         const result = await updateMetaData(wallet, connection, token, {
             name: token.tokenName,
             symbol: token.tokenSymbol,
@@ -71,6 +72,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             close();
         } else {
             toast.error(result.message as string);
+            setLoading(false);
         }
     };
 

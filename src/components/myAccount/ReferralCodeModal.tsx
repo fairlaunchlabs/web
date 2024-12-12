@@ -30,8 +30,8 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
             }
             getSystemConfig(wallet, connection).then((data) => {
                 if (data?.success && data.data) {
-                    setReferrerResetIntervalSeconds(data.data.referrerResetIntervalSeconds.toNumber());
-                    setReferralUsageMaxCount(data.data.referralUsageMaxCount);
+                    setReferrerResetIntervalSeconds(data.data.systemConfigData.referrerResetIntervalSeconds.toNumber());
+                    setReferralUsageMaxCount(data.data.systemConfigData.referralUsageMaxCount);
                 }
                 else toast.error(data.message as string);
             });

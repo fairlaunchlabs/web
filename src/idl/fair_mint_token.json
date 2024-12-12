@@ -298,7 +298,8 @@
           "writable": true
         },
         {
-          "name": "system_config_account"
+          "name": "system_config_account",
+          "writable": true
         },
         {
           "name": "payer",
@@ -340,7 +341,7 @@
           "signer": true
         },
         {
-          "name": "system_config_data",
+          "name": "system_config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -791,6 +792,13 @@
           "name": "system_config_account"
         },
         {
+          "name": "referrer_ata"
+        },
+        {
+          "name": "referrer_main",
+          "writable": true
+        },
+        {
           "name": "referral_account",
           "writable": true,
           "pda": {
@@ -818,13 +826,6 @@
               }
             ]
           }
-        },
-        {
-          "name": "referrer_ata"
-        },
-        {
-          "name": "referrer_main",
-          "writable": true
         },
         {
           "name": "rent",
@@ -1480,7 +1481,8 @@
           "writable": true
         },
         {
-          "name": "system_config_account"
+          "name": "system_config_account",
+          "writable": true
         },
         {
           "name": "payer",
@@ -2090,7 +2092,7 @@
           "signer": true
         },
         {
-          "name": "system_config_data",
+          "name": "system_config_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2255,12 +2257,23 @@
           }
         },
         {
+          "name": "system_config_account",
+          "writable": true
+        },
+        {
+          "name": "protocol_fee_account",
+          "docs": [
+            "CHECK the protocol fee account"
+          ],
+          "writable": true
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "rent",
-          "address": "SysvarRent111111111111111111111111111111111"
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
           "name": "token_metadata_program",
@@ -2680,188 +2693,198 @@
     },
     {
       "code": 6045,
+      "name": "WrongSystemConfigAccount",
+      "msg": "Wrong system config account"
+    },
+    {
+      "code": 6046,
       "name": "InvalidFeeAccount",
       "msg": "Invalid fee account"
     },
     {
-      "code": 6046,
+      "code": 6047,
       "name": "InvalidTokenVault",
       "msg": "Invalid token vault"
     },
     {
-      "code": 6047,
+      "code": 6048,
       "name": "InvalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
     },
     {
-      "code": 6048,
+      "code": 6049,
       "name": "MintNotStarted",
       "msg": "Mint has not started"
     },
     {
-      "code": 6049,
+      "code": 6050,
       "name": "WrongReferrerCode",
       "msg": "Wrong referrer account"
     },
     {
-      "code": 6050,
+      "code": 6051,
       "name": "WrongCodeHash",
       "msg": "Wrong code hash"
     },
     {
-      "code": 6051,
+      "code": 6052,
       "name": "WrongMintAddress",
       "msg": "Wrong mint address"
     },
     {
-      "code": 6052,
+      "code": 6053,
       "name": "MintHasStarted",
       "msg": "Mint has started"
     },
     {
-      "code": 6053,
+      "code": 6054,
       "name": "InvalidTokenMint",
       "msg": "Invalid token mint"
     },
     {
-      "code": 6054,
+      "code": 6055,
       "name": "InvalidTokenOwner",
       "msg": "Invalid token owner"
     },
     {
-      "code": 6055,
+      "code": 6056,
       "name": "TokenHasDelegate",
       "msg": "Token has delegate"
     },
     {
-      "code": 6056,
+      "code": 6057,
       "name": "NumericOverflow",
       "msg": "Numeric overflow"
     },
     {
-      "code": 6057,
+      "code": 6058,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6058,
+      "code": 6059,
       "name": "AmountConversionError",
       "msg": "Amount conversion error"
     },
     {
-      "code": 6059,
+      "code": 6060,
       "name": "BurnOperationFailed",
       "msg": "Burn operation failed"
     },
     {
-      "code": 6060,
+      "code": 6061,
       "name": "RefundInProgress",
       "msg": "Refund in progress"
     },
     {
-      "code": 6061,
+      "code": 6062,
       "name": "AountConversionError",
       "msg": "Amount conversion error"
     },
     {
-      "code": 6062,
+      "code": 6063,
       "name": "DivideByZero",
       "msg": "Division by zero"
     },
     {
-      "code": 6063,
+      "code": 6064,
       "name": "InvalidRatio",
       "msg": "Invalid ratio value"
     },
     {
-      "code": 6064,
+      "code": 6065,
       "name": "PrecisionError",
       "msg": "Calculation precision error"
     },
     {
-      "code": 6065,
+      "code": 6066,
       "name": "AmountExceedsMaximum",
       "msg": "Amount exceeds maximum allowed"
     },
     {
-      "code": 6066,
+      "code": 6067,
       "name": "TransferFailed",
       "msg": "Transfer failed"
     },
     {
-      "code": 6067,
+      "code": 6068,
       "name": "ExceedMaxU64",
       "msg": "Exceed max u64"
     },
     {
-      "code": 6068,
+      "code": 6069,
       "name": "ReferrerMainAccountEmpty",
       "msg": "Referrer main account empty"
     },
     {
-      "code": 6069,
+      "code": 6070,
       "name": "PayerMustSign",
       "msg": "Payer must sign"
     },
     {
-      "code": 6070,
+      "code": 6071,
       "name": "InvalidPayerAccount",
       "msg": "Invalid payer account"
     },
     {
-      "code": 6071,
+      "code": 6072,
       "name": "InvalidCodeHash",
       "msg": "Invalid code hash"
     },
     {
-      "code": 6072,
+      "code": 6073,
       "name": "InvalidResetInterval",
       "msg": "Invalid reset interval"
     },
     {
-      "code": 6073,
+      "code": 6074,
       "name": "TokenAlreadyInitialized",
       "msg": "Token already initialized"
     },
     {
-      "code": 6074,
+      "code": 6075,
       "name": "InvalidTokenName",
       "msg": "Invalid token name"
     },
     {
-      "code": 6075,
+      "code": 6076,
       "name": "InvalidTokenSymbol",
       "msg": "Invalid token symbol"
     },
     {
-      "code": 6076,
+      "code": 6077,
       "name": "InvalidTokenUri",
       "msg": "Invalid token uri"
     },
     {
-      "code": 6077,
+      "code": 6078,
       "name": "MetadataAlreadyInitialized",
       "msg": "Metadata already initialized"
     },
     {
-      "code": 6078,
+      "code": 6079,
       "name": "InvalidProtocolFeeRate",
       "msg": "Invalid protocol fee rate, max 50000 which is 50%"
     },
     {
-      "code": 6079,
+      "code": 6080,
       "name": "InvalidRefundFeeRate",
       "msg": "Invalid refund fee rate, max 50000 which is 50%"
     },
     {
-      "code": 6080,
+      "code": 6081,
       "name": "MintInProgress",
       "msg": "Mint in progress"
     },
     {
-      "code": 6081,
+      "code": 6082,
       "name": "SetReferrerCodeProcess",
       "msg": "Set referrer code processing"
+    },
+    {
+      "code": 6083,
+      "name": "PayerAmountTooLow",
+      "msg": "Payer amount too low"
     }
   ],
   "types": [
@@ -3327,11 +3350,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "name",
+            "name": "symbol",
             "type": "string"
           },
           {
-            "name": "symbol",
+            "name": "name",
             "type": "string"
           },
           {

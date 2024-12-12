@@ -13,12 +13,12 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     const [isSearchMode, setIsSearchMode] = useState(false);
     
     // 初始加载数据
-    const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
-        variables: {
-            skip: 0,
-            first: 5
-        }
-    });
+    // const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
+    //     variables: {
+    //         skip: 0,
+    //         first: 5
+    //     }
+    // });
 
     // 搜索查询
     const [searchTokens, { loading: searchLoading, error: searchError, data: searchData }] = useLazyQuery(queryInitializeTokenEventBySearch, {
@@ -31,7 +31,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
             searchTokens({
                 variables: {
                     skip: 0,
-                    first: 5,
+                    first: 50,
                     searchQuery: searchInput.trim()
                 }
             });
@@ -48,10 +48,10 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     };
 
     // 合并错误和加载状态
-    const loading = initialLoading || searchLoading;
-    const error = initialError || searchError;
+    const loading = searchLoading;
+    const error = searchError;
     // 使用搜索结果或初始数据
-    const displayData = isSearchMode ? searchData : initialData;
+    const displayData = isSearchMode ? searchData : null;
 
     if (loading) {
         return (

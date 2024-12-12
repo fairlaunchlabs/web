@@ -96,7 +96,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         }
 
         try {
-            const arweaveUrl = await uploadToArweave(file);
+            // const arweaveUrl = await uploadToArweave(file); // ######
+            const arweaveUrl = "https://arweave.net/zYjcUg1xkcKIryig0nuhJbpUSRHwIjXuqyuWY6kglm4"; // pic
             setImageUrl(arweaveUrl);
         } catch (err) {
             setError('Failed to upload image: ' + (err instanceof Error ? err.message : String(err)));
@@ -146,7 +147,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 type: 'application/json'
             });
 
-            const metadataUrl = await uploadToArweave(metadataFile);
+            // const metadataUrl = await uploadToArweave(metadataFile); // ######
+            const metadataUrl = "https://arweave.net/UEuuJkHW3rgw4tcmlL_9loURN3Hc3YVYs_m7e5rngww"; // metadata
             console.log('Metadata uploaded to Arweave:', metadataUrl);
 
             const tokenMetadata: TokenMetadata = {

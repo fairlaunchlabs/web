@@ -8,7 +8,7 @@ export type TokenMetadata = {
     name: string;
     symbol: string;
     uri: string;
-    decimals: number;
+    decimals?: number;
     sellerFeeBasisPoints?: number;
     creators?: null;
     collection?: null;

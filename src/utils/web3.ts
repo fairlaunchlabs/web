@@ -6,13 +6,13 @@ import {
 } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
-import { METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME } from '../config/constants';
+import { METADATA_SEED, MINT_STATE_SEED, CONFIG_DATA_SEED, MINT_SEED, TOKEN_METADATA_PROGRAM_ID, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, NETWORK, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT } from '../config/constants';
 import { InitializeTokenAccounts, InitializeTokenConfig, InitiazlizedTokenData, ResponseData, TokenMetadata, TokenMetadataIPFS } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { getAssociatedTokenAddress } from '@solana/spl-token';
 import axios from 'axios';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 
 export const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     const provider = new AnchorProvider(
@@ -445,15 +445,25 @@ export const getSystemConfig = async (
         success: false,
         message: 'Please connect wallet'
     }
-    const program = getProgram(wallet, connection);
-    const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
-        program.programId,
-    );
-    const systemConfigData = await program.account.systemConfigData.fetch(systemConfigAccountPda);
-    return {
-        success: true,
-        data: systemConfigData
+    try {
+        const program = getProgram(wallet, connection);
+        const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+            program.programId,
+        );
+        const systemConfigData = await program.account.systemConfigData.fetch(systemConfigAccountPda);
+        return {
+            success: true,
+            data: {
+                systemConfigData,
+                systemConfigAccountPda,
+            }
+        }    
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Error getting system config'
+        }
     }
 }
 
@@ -875,16 +885,29 @@ export const updateMetaData = async (
             TOKEN_METADATA_PROGRAM_ID,
           );
         
+        const systemConfig = await getSystemConfig(wallet, connection);
+        if (!systemConfig.success) {
+            return {
+                success: false,
+                message: systemConfig.message,
+            };
+        }
+        const systemConfigData = systemConfig.data;
+        console.log("system config account pda", systemConfigData.systemConfigAccountPda.toBase58());
+
         const context = {
-            metadata: metadataAccountPda,
             mint: new PublicKey(token.mint),
-            payer: wallet.publicKey,
             configAccount: new PublicKey(token.configAccount),
+            payer: wallet.publicKey,
+            metadata: metadataAccountPda,
+            protocolFeeAccount: new PublicKey(systemConfigData.systemConfigData.protocolFeeAccount),
+            systemConfigAccount: new PublicKey(systemConfigData.systemConfigAccountPda),
             systemProgram: SystemProgram.programId,
-            rent: SYSVAR_RENT_PUBKEY,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            // rent: SYSVAR_RENT_PUBKEY,
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         };
-        
+
         // 判断新的metadata是否和原来的metadata一样
         if (token.tokenMetadata?.description === newMetadata.description &&
             token.tokenMetadata?.image === newMetadata.image &&
@@ -913,13 +936,13 @@ export const updateMetaData = async (
             type: 'application/json'
         });
 
-        // const metadataUrl = "https://arweave.net/1pgcW4sWbenqKzOQ_dRk3ye9X7LVhZ-JI8xKvBU96AU";
-        const metadataUrl = await uploadToArweave(metadataFile);
+        const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
+        // const metadataUrl = await uploadToArweave(metadataFile); // ######
         console.log(metadataUrl);
         const metadata: TokenMetadata = {
             symbol: token.tokenSymbol,
             name: token.tokenName,
-            decimals: 9,
+            // decimals: 9,
             uri: metadataUrl,
         }
       
