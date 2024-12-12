@@ -54,7 +54,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
     },
     { 
         id: 'my-account', 
-        label: 'My Mints', // My token list
+        label: 'My mint tokens', // My token list
         icon: <MdAccountBalanceWallet className="w-5 h-5" />,
         component: <MyAccount expanded={expended} /> 
     },

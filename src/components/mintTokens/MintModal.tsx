@@ -139,9 +139,11 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                 close();
             } else {
                 toast.error(result.message as string);
+                setLoading(false);
             }
         } catch (error: any) {
             toast.error(error.message);
+            setLoading(false);
         }
     };
 

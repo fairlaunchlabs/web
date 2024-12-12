@@ -94,20 +94,20 @@ export const createTokenOnChain = async (
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
 
-        try {
-            const tx = await program.methods
-                .initializeToken(metadata, config as any)
-                .accounts(initializeTokenAccounts)
-                .signers([])  // 使用钱包的 payer
-                .rpc();
-            return await waitConfirmation(tx, 'Create token successfully', connection, {mintAddress: mintPda.toString()});
-        } catch (error) {
-            console.error('Error in token creation:', error);
-            throw error;
+        const tx = await program.methods
+            .initializeToken(metadata, config as any)
+            .accounts(initializeTokenAccounts)
+            .signers([])  // 使用钱包的 payer
+            .rpc();
+        return await waitConfirmation(tx, 'Create token successfully', connection, {mintAddress: mintPda.toString()});
+    } catch (error: any) {
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but the token was createdsuccessfully',
+            }
         }
-    } catch (err) {
-        console.error('Error creating token:', err);
-        throw err;
+        throw error;
     }
 };
 
@@ -251,8 +251,13 @@ export const reactiveReferrerCode = async (
             .signers([])
             .rpc();
         return await waitConfirmation(tx, 'Set referrer code success', connection, {referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58()});
-    } catch (error) {
-        console.log("setReferrerCode", error);
+    } catch (error:any) {
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but the referrer code was set successfully',
+            }
+        }
         return {
             success: false,
             message: 'Error setting referrer code'
@@ -353,8 +358,13 @@ export const setReferrerCode = async (
             .signers([])  // 使用钱包的 payer
             .rpc();
         return await waitConfirmation(tx, 'Set referrer code success', connection, {referralAccount: referralAccountPda.toBase58()});
-    } catch (error) {
-        console.log("setReferrerCode", error);
+    } catch (error: any) {
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but the referrer code was set successfully',
+            }
+        }
         return {
             success: false,
             message: 'Error setting referrer code'
@@ -532,7 +542,13 @@ export const refund = async (
             .signers([])
             .rpc();
         return await waitConfirmation(tx, 'Refund success', connection, {mint: token.mint});
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but you have refund successfully',
+            }
+        }
         return {
             success: false,
             message: 'Error refunding' + error
@@ -625,6 +641,12 @@ export const mintToken = async (
             .rpc();
         return await waitConfirmation(tx, 'Mint success', connection, {mint: token.mint});
     } catch (error: any) {
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but you have mint successfully',
+            }
+        }
         return {
             success: false,
             message: 'Error: ' + error.message,
@@ -809,7 +831,12 @@ export const closeToken = async (
             .rpc();
         return await waitConfirmation(tx, 'Token closed successfully', connection, {mint: token.mint});
     } catch (error: any) {
-        console.error('Error closing token:', error);
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but the token was closed successfully',
+            }
+        }
         return {
             success: false,
             message: error.message || 'Failed to close token'
@@ -906,7 +933,12 @@ export const updateMetaData = async (
             .rpc();
         return await waitConfirmation(tx, 'Token metadata updated successfully', connection);
     } catch (error: any) {
-        console.error('Error updating token metadata:', error);
+        if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+            return {
+                success: false,
+                message: 'Something went wrong but the token metadata was updated successfully',
+            }
+        }
         return {
             success: false,
             message: error.message || 'Failed to update token metadata'

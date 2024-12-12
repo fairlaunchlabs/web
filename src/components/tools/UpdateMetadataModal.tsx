@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TokenImage } from '../mintTokens/TokenImage';
-import { InitiazlizedTokenData, TokenMetadataIPFS } from '../../types/types';
+import { InitiazlizedTokenData } from '../../types/types';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import toast from 'react-hot-toast';
 import { AddressDisplay } from '../common/AddressDisplay';
