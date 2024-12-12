@@ -174,26 +174,19 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 startTimestamp: numberStringToBN(startTimestamp.toString()),
             };
 
-            // console.log('Token metadata:', tokenMetadata);
-            // console.log('Init config data:', 
-            //     initConfigData.targetEras.toString(),
-            //     initConfigData.epochesPerEra.toString(),
-            //     initConfigData.targetSecondsPerEpoch.toString(),
-            //     initConfigData.reduceRatio.toString(),
-            //     initConfigData.initialMintSize.toString(), // ??
-            //     initConfigData.initialTargetMintSizePerEpoch.toString(), // ??
-            //     initConfigData.feeRate.toString(), // ??
-            //     initConfigData.liquidityTokensRatio.toString(),
-            //     initConfigData.startTimestamp.toString(),
-            // );
-
             const result = await createTokenOnChain(tokenMetadata, wallet, connection, initConfigData);
-            console.log('Token created:', result);
 
+            if(!result.success) {
+                toast.error(result.message, {
+                    id: toastId,
+                });
+                setIsCreating(false);
+                return;
+            }
             setIsCreating(false);
             setSuccess(true);
 
-            const explorerUrl = `${SCANURL}/tx/${result.signature}?cluster=${NETWORK}`;
+            const explorerUrl = `${SCANURL}/tx/${result.data.tx}?cluster=${NETWORK}`;
             toast.success(
                 <ToastBox url={explorerUrl} urlText="View transaction" title="Token created successfully!" />,
                 {

@@ -14,7 +14,7 @@ import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/
 import axios from 'axios';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 
-export const getProgram = (wallet: AnchorWallet, connection: Connection) => {
+const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     const provider = new AnchorProvider(
         connection,
         {
@@ -100,11 +100,7 @@ export const createTokenOnChain = async (
                 .accounts(initializeTokenAccounts)
                 .signers([])  // 使用钱包的 payer
                 .rpc();
-
-            return {
-                signature: tx,
-                mintAddress: mintPda.toString()
-            };
+            return await waitConfirmation(tx, 'Create token successfully', connection, {mintAddress: mintPda.toString()});
         } catch (error) {
             console.error('Error in token creation:', error);
             throw error;
@@ -152,6 +148,11 @@ export const getBalance = async (
         throw error;
     }
 };
+
+export const getTokenBalance = async (ata: PublicKey, connection: Connection): Promise<number | null> => {
+    const account = await connection.getTokenAccountBalance(ata);
+    return account.value.uiAmount;
+}
 
 export const reactiveReferrerCode = async (
     wallet: AnchorWallet | undefined,
@@ -249,15 +250,7 @@ export const reactiveReferrerCode = async (
             .accounts(setReferrerCodeAccounts)
             .signers([])
             .rpc();
-
-        return {
-            success: true,
-            message: 'Set referrer code success',
-            data: {
-                tx,
-                referralAccount: referralAccountPda.toBase58(),
-            }
-        };
+        return await waitConfirmation(tx, 'Set referrer code success', connection, {referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58()});
     } catch (error) {
         console.log("setReferrerCode", error);
         return {
@@ -333,7 +326,7 @@ export const setReferrerCode = async (
 
     const [referralAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFERRAL_SEED), mint.toBuffer(), wallet.publicKey.toBuffer()],
-        program.programId
+        program.programId,
     );
 
     const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
@@ -359,15 +352,7 @@ export const setReferrerCode = async (
             .accounts(setReferrerCodeAccounts)
             .signers([])  // 使用钱包的 payer
             .rpc();
-
-        return {
-            success: true,
-            message: 'Set referrer code success',
-            data: {
-                tx,
-                referralAccount: referralAccountPda.toBase58(),
-            }
-        };
+        return await waitConfirmation(tx, 'Set referrer code success', connection, {referralAccount: referralAccountPda.toBase58()});
     } catch (error) {
         console.log("setReferrerCode", error);
         return {
@@ -546,14 +531,7 @@ export const refund = async (
             .accounts(refundAccounts)
             .signers([])
             .rpc();
-        return {    
-            success: true,
-            message: 'Refund success',
-            data: {
-                tx,
-                mint: token.mint
-            }
-        };
+        return await waitConfirmation(tx, 'Refund success', connection, {mint: token.mint});
     } catch (error) {
         return {
             success: false,
@@ -645,13 +623,7 @@ export const mintToken = async (
             .accounts(mintAccounts)
             .signers([])
             .rpc();
-        return {    
-            success: true,
-            message: 'Mint success',
-            data: {
-                tx,
-            }
-        };
+        return await waitConfirmation(tx, 'Mint success', connection, {mint: token.mint});
     } catch (error: any) {
         return {
             success: false,
@@ -660,14 +632,6 @@ export const mintToken = async (
     }
 }
 
-export const getSolanaBalance = async (ata: PublicKey, connection: Connection): Promise<number> => {
-    return await connection.getBalance(ata);
-}
-
-export const getTokenBalance = async (ata: PublicKey, connection: Connection): Promise<number | null> => {
-    const account = await connection.getTokenAccountBalance(ata);
-    return account.value.uiAmount;
-}
 
 export const getReferralDataByCodeHash = async (
     wallet: AnchorWallet | undefined,
@@ -843,14 +807,7 @@ export const closeToken = async (
             .closeToken(token.tokenName, token.tokenSymbol)
             .accounts(context)
             .rpc();
-
-        return {
-            success: true,
-            message: 'Token closed successfully',
-            data: {
-                tx
-            }
-        };
+        return await waitConfirmation(tx, 'Token closed successfully', connection, {mint: token.mint});
     } catch (error: any) {
         console.error('Error closing token:', error);
         return {
@@ -926,9 +883,6 @@ export const updateMetaData = async (
             };
         }
 
-        // console.log(token.tokenMetadata);
-        // console.log(newMetadata);
-
         const metadataBlob = new Blob([JSON.stringify(newMetadata)], {
             type: 'application/json'
         });
@@ -950,14 +904,7 @@ export const updateMetaData = async (
             .updateTokenMetadata(metadata)
             .accounts(context)
             .rpc();
-
-        return {
-            success: true,
-            message: 'Token metadata updated successfully',
-            data: {
-                tx
-            }
-        };
+        return await waitConfirmation(tx, 'Token metadata updated successfully', connection);
     } catch (error: any) {
         console.error('Error updating token metadata:', error);
         return {
@@ -966,6 +913,36 @@ export const updateMetaData = async (
         };
     }
 };
+
+export const waitConfirmation = async (
+    tx: string, 
+    successMessage: string, 
+    connection: Connection, 
+    extraReturnData?: any
+) => {
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const status = await connection.confirmTransaction({
+        signature: tx,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    });
+
+    if (status.value.err) {
+        return {    
+            success: false,
+            message: 'Transaction failed: ' + status.value.err.toString()
+        }
+    } else {
+        return {
+            success: true,
+            message: successMessage,
+            data: {
+                tx,
+                ...extraReturnData
+            }
+        };    
+    }
+}
 
 export const uploadToArweave = async (file: File, contentType: string = 'multipart/form-data'): Promise<string> => {
     const formData = new FormData();
