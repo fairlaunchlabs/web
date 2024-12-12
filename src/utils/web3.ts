@@ -936,8 +936,8 @@ export const updateMetaData = async (
             type: 'application/json'
         });
 
-        const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
-        // const metadataUrl = await uploadToArweave(metadataFile); // ######
+        // const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
+        const metadataUrl = await uploadToArweave(metadataFile); // ######
         console.log(metadataUrl);
         const metadata: TokenMetadata = {
             symbol: token.tokenSymbol,
