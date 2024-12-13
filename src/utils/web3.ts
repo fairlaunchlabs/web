@@ -670,15 +670,15 @@ const processTransaction = async (
         const serializedTx = signedTx.serialize();
 
         // 先进行交易模拟
-        const simulation = await connection.simulateTransaction(signedTx);
+        // const simulation = await connection.simulateTransaction(signedTx);
         
-        // 如果模拟出现错误，直接返回错误信息
-        if (simulation.value.err) {
-            return {
-                success: false,
-                message: `Transaction simulation failed: ${simulation.value.err.toString()}`
-            };
-        }
+        // // 如果模拟出现错误，直接返回错误信息
+        // if (simulation.value.err) {
+        //     return {
+        //         success: false,
+        //         message: `Transaction simulation failed: ${simulation.value.err.toString()}`
+        //     };
+        // }
 
         // 标记交易开始处理
         localStorage.setItem('processing_tx', 'true');
@@ -1019,36 +1019,6 @@ export const updateMetaData = async (
         };
     }
 };
-
-export const waitConfirmation = async (
-    tx: string, 
-    successMessage: string, 
-    connection: Connection, 
-    extraReturnData?: any
-) => {
-    const latestBlockhash = await connection.getLatestBlockhash();
-    const status = await connection.confirmTransaction({
-        signature: tx,
-        blockhash: latestBlockhash.blockhash,
-        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-    });
-
-    if (status.value.err) {
-        return {    
-            success: false,
-            message: 'Transaction failed: ' + status.value.err.toString()
-        }
-    } else {
-        return {
-            success: true,
-            message: successMessage,
-            data: {
-                tx,
-                ...extraReturnData
-            }
-        };    
-    }
-}
 
 export const uploadToArweave = async (file: File, contentType: string = 'multipart/form-data'): Promise<string> => {
     const formData = new FormData();
