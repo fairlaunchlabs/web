@@ -92,12 +92,23 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     const hasStarted = !token.startTimestamp || Number(token.startTimestamp) <= Math.floor(Date.now() / 1000);
 
     return (
-        <div className="bg-base-200 rounded-lg shadow-lg p-6">
-            <div className="flex items-start gap-6">
+        <div className="w-full space-y-6">
+            {/* Header Image */}
+            {metadata?.header && (
+                <div className="w-full relative">
+                    <img
+                        src={metadata.header}
+                        alt="Token Header"
+                        className="w-full h-auto aspect-[3/1] object-cover rounded-lg"
+                    />
+                </div>
+            )}
+
+            <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-24 h-24 overflow-hidden">
                     <TokenImage
                         imageUrl={metadata?.image as string} 
-                        name={token.tokenName} 
+                        name={metadata?.name as string} 
                         launchTimestamp={Number(token.metadataTimestamp)}
                         size={84} 
                         className='rounded-full' />
@@ -105,11 +116,13 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                 <div className="flex-1">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h1 className="text-2xl font-bold text-base-content">{token.tokenName}</h1>
-                            <p className="text-base-content">{token.tokenSymbol}</p>
+                            <h1 className="text-2xl font-bold text-base-content">{metadata?.name}</h1>
+                            <p className="text-base-content">{metadata?.symbol}</p>
                         </div>
                     </div>
-                    <div className='mt-2'><RenderSocialIcons metadata={metadata as TokenMetadataIPFS} /></div>
+                    <div className='mt-2'>
+                        <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
+                    </div>
                     <p className="mt-4 text-base-content">{metadata?.description}</p>
 
                     {!hasStarted && (
@@ -142,17 +155,17 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         />
                         <DataBlock 
                             label="Current Mint Size"
-                            value={(numberStringToBN(token.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            value={(numberStringToBN(token.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + metadata?.symbol}
                             tooltip={tooltip.currentMintSize}
                         />
                         <DataBlock 
                             label="Current minted" 
-                            value={(mintedSupply).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            value={(mintedSupply).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + metadata?.symbol}
                             tooltip={tooltip.currentMinted}
                         />
                         <DataBlock 
                             label={`Target Supply (Era:${token.targetEras})`} 
-                            value={totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            value={totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + metadata?.symbol}
                             tooltip={tooltip.targetSupply}
                         />
                         <DataBlock 
@@ -186,7 +199,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                             tooltip={tooltip.liquidityVaultSOL}
                         />
                         <DataBlock 
-                            label={`Liquidity Vault (${token.tokenSymbol})`} 
+                            label={`Liquidity Vault (${metadata?.symbol})`} 
                             value={<AddressDisplay address={token.tokenVault} />}
                             tooltip={tooltip.liquidityVaultToken}
                         />
@@ -207,7 +220,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         />
                         <DataBlock 
                             label="Max Supply" 
-                            value={calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol}
+                            value={calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + metadata?.symbol}
                             tooltip={tooltip.maxSupply}
                         />
                         <DataBlock 
