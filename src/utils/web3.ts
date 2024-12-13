@@ -630,7 +630,7 @@ export const mintToken = async (
         systemProgram: SystemProgram.programId,
         associatedAddressProgram: ASSOCIATED_PROGRAM_ID,
     };
-    // 获取交易对象 ######
+
     const tx = await program.methods
         .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
         .accounts(mintAccounts)
@@ -670,15 +670,15 @@ const processTransaction = async (
         const serializedTx = signedTx.serialize();
 
         // 先进行交易模拟
-        // const simulation = await connection.simulateTransaction(signedTx);
+        const simulation = await connection.simulateTransaction(signedTx);
         
-        // // 如果模拟出现错误，直接返回错误信息
-        // if (simulation.value.err) {
-        //     return {
-        //         success: false,
-        //         message: `Transaction simulation failed: ${simulation.value.err.toString()}`
-        //     };
-        // }
+        // 如果模拟出现错误，直接返回错误信息
+        if (simulation.value.err) {
+            return {
+                success: false,
+                message: `Transaction simulation failed: ${simulation.value.err.toString()}`
+            };
+        }
 
         // 标记交易开始处理
         localStorage.setItem('processing_tx', 'true');
@@ -791,8 +791,13 @@ export const getReferrerDataByReferralAccount = async (
     }
 }
 
+export const checkAvailableArweaveItemId = (id: string) => {
+    return id.length === 43;
+};
+
 export const extractArweaveHash = (url: string): string => {
     // 移除可能的末尾斜杠
+    if(url === undefined) return "";
     const cleanUrl = url.replace(/\/$/, '');
     // 从URL中提取最后一段作为hash
     const hash = cleanUrl.split('/').pop();
@@ -802,8 +807,12 @@ export const extractArweaveHash = (url: string): string => {
     return hash;
 };
 
-export const checkAvailableArweaveItemId = (id: string) => {
-    return id.length === 43;
+export const generateArweaveUrl = (updateTimestamp: number, id: string) => {
+    if(updateTimestamp + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
+        return `${ARWEAVE_GATEWAY_URL}/${id}`; // 从arweave加载
+    } else {
+        return `${ARSEEDING_GATEWAY_URL}/${id}`; // 从arseeding加载
+    }
 };
 
 export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<TokenMetadataIPFS | null> => {
@@ -811,27 +820,15 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
         if (!token.tokenUri) return null;
         // Check if the URI is an Arweave URL
         if (token.tokenUri.startsWith(ARWEAVE_GATEWAY_URL)) {
-            // 从url中提取itemId
-            const itemId = extractArweaveHash(token.tokenUri);
-            // 判断该Id是否已经被同步，或者token.timestamp是否已经过去超过2消失，如果符合条件，则直接从arweave加载
-            let url = "";
-            if(Number(token.metadataTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
-                // 从arweave加载
-                url = `${ARWEAVE_GATEWAY_URL}/${itemId}`;
-            } else {
-                // 从arseeding加载
-                url = `${ARSEEDING_GATEWAY_URL}/${itemId}`;
-            }
-            // console.log(Number(token.metadataTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME, Date.now() / 1000);
-            // console.log(Date.now() / 1000 - (Number(token.metadataTimestamp) + ARWEAVE_DEFAULT_SYNC_TIME));
-            // console.log("url", url);
+            let url = generateArweaveUrl(Number(token.metadataTimestamp), extractArweaveHash(token.tokenUri));
             const response = await axios.get(url);
-
+            console.log('response', response.data);
             return {
                 name: response.data.name,
                 symbol: response.data.symbol,
                 description: response.data.description,
-                image: response.data.image,
+                image: generateArweaveUrl(Number(token.metadataTimestamp), extractArweaveHash(response.data.image)),
+                header: generateArweaveUrl(Number(token.metadataTimestamp), extractArweaveHash(response.data.header)),
                 extensions: response.data.extensions,
             } as TokenMetadataIPFS
         }
@@ -983,7 +980,7 @@ export const updateMetaData = async (
                 message: 'Token metadata is the same as before',
             };
         }
-        console.log("new metadata", newMetadata);
+
         const metadataBlob = new Blob([JSON.stringify(newMetadata)], {
             type: 'application/json'
         });
@@ -993,7 +990,7 @@ export const updateMetaData = async (
 
         // const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
         const metadataUrl = await uploadToArweave(metadataFile); // ######
-        console.log(metadataUrl);
+        console.log("metadataUrl", metadataUrl);
         const metadata: TokenMetadata = {
             symbol: token.tokenSymbol,
             name: token.tokenName,

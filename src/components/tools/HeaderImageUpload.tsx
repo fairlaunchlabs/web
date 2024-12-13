@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { MAX_HEADER_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
+import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL, MAX_HEADER_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
 
 interface HeaderImageUploadProps {
     onImageChange: (file: File | null) => void;
@@ -133,10 +133,10 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                             </svg>
                         </button>
                     </div>
-                ) : currentHeader ? (
+                ) : currentHeader && currentHeader !== ARWEAVE_GATEWAY_URL + "/" && currentHeader !== ARSEEDING_GATEWAY_URL + "/" ? (
                     <div className="relative">
                         <img
-                            src={`https://arweave.net/${currentHeader}`}
+                            src={`${currentHeader}`}
                             alt="Current header"
                             className="w-full h-auto aspect-[3/1] object-cover rounded-lg"
                         />

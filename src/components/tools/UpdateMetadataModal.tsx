@@ -60,8 +60,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             let headerItemId = '';
             if (headerImage) {
                 try {
-                    headerItemId = await uploadToArweave(headerImage);
-                    console.log("header image itemId", headerItemId);
+                    headerItemId = await uploadToArweave(headerImage); // ######
                 } catch (error) {
                     toast.error('Failed to upload header image');
                     setLoading(false);
@@ -151,7 +150,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                     <div className="mb-6">
                         <HeaderImageUpload
                             onImageChange={(file) => setHeaderImage(file)}
-                            currentHeader={token.tokenMetadata?.header}
+                            currentHeader={token.tokenMetadata?.header} // ###### 需要转换成arseedings
                         />
                     </div>
 
