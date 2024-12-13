@@ -3,6 +3,7 @@ import {
     PublicKey,
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
+    Transaction,
 } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
@@ -97,9 +98,8 @@ export const createTokenOnChain = async (
         const tx = await program.methods
             .initializeToken(metadata, config as any)
             .accounts(initializeTokenAccounts)
-            .signers([])  // 使用钱包的 payer
-            .rpc();
-        return await waitConfirmation(tx, 'Create token successfully', connection, {mintAddress: mintPda.toString()});
+            .transaction();
+        return await processTransaction(tx, connection, wallet, {mintAddress: mintPda.toString()});
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -248,9 +248,8 @@ export const reactiveReferrerCode = async (
         const tx = await program.methods
             .setReferrerCode(tokenName, tokenSymbol, codeHash.data.toBuffer())
             .accounts(setReferrerCodeAccounts)
-            .signers([])
-            .rpc();
-        return await waitConfirmation(tx, 'Set referrer code success', connection, {referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58()});
+            .transaction();
+        return await processTransaction(tx, connection, wallet, {referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58()});
     } catch (error:any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -355,9 +354,8 @@ export const setReferrerCode = async (
         const tx = await program.methods
             .setReferrerCode(tokenName, tokenSymbol, codeHash.data.toBuffer())
             .accounts(setReferrerCodeAccounts)
-            .signers([])  // 使用钱包的 payer
-            .rpc();
-        return await waitConfirmation(tx, 'Set referrer code success', connection, {referralAccount: referralAccountPda.toBase58()});
+            .transaction();
+        return await processTransaction(tx, connection, wallet, {referralAccount: referralAccountPda.toBase58()});
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -539,9 +537,8 @@ export const refund = async (
         const tx = await program.methods
             .refund(token.tokenName, token.tokenSymbol)
             .accounts(refundAccounts)
-            .signers([])
-            .rpc();
-        return await waitConfirmation(tx, 'Refund success', connection, {mint: token.mint});
+            .transaction()
+        return await processTransaction(tx, connection, wallet, {mint: token.mint});
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -633,13 +630,87 @@ export const mintToken = async (
         systemProgram: SystemProgram.programId,
         associatedAddressProgram: ASSOCIATED_PROGRAM_ID,
     };
+    // 获取交易对象 ######
+    const tx = await program.methods
+        .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
+        .accounts(mintAccounts)
+        .transaction();
+    return await processTransaction(tx, connection, wallet, {mint: token.mint});
+}
+
+const processTransaction = async (
+    tx: Transaction,
+    connection: Connection,
+    wallet: AnchorWallet,
+    extraData: {}
+) => {
     try {
-        const tx = await program.methods
-            .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
-            .accounts(mintAccounts)
-            .signers([])
-            .rpc();
-        return await waitConfirmation(tx, 'Mint success', connection, {mint: token.mint});
+        // 获取最新的 blockhash
+        const latestBlockhash = await connection.getLatestBlockhash();
+        
+        // 获取正在处理的交易
+        const processingTx = localStorage.getItem('processing_tx');
+        const processingTimestamp = localStorage.getItem('processing_timestamp');
+        const now = Date.now();
+
+        // 检查是否有正在处理的交易（2秒内的交易视为处理中）
+        if (processingTx && processingTimestamp && (now - parseInt(processingTimestamp)) < 2000) {
+            return {
+                success: false,
+                message: 'Previous transaction is still processing. Please wait.'
+            }
+        }
+
+        // 设置交易参数
+        tx.recentBlockhash = latestBlockhash.blockhash;
+        tx.feePayer = wallet.publicKey;
+
+        // 签名和序列化
+        const signedTx = await wallet.signTransaction(tx);                
+        const serializedTx = signedTx.serialize();
+
+        // 先进行交易模拟
+        const simulation = await connection.simulateTransaction(signedTx);
+        
+        // 如果模拟出现错误，直接返回错误信息
+        if (simulation.value.err) {
+            return {
+                success: false,
+                message: `Transaction simulation failed: ${simulation.value.err.toString()}`
+            };
+        }
+
+        // 标记交易开始处理
+        localStorage.setItem('processing_tx', 'true');
+        localStorage.setItem('processing_timestamp', now.toString());
+
+        // 发送交易
+        const signature = await connection.sendRawTransaction(serializedTx, {
+            skipPreflight: true // 跳过预检，因为我们已经模拟过了
+        });
+        
+        // 等待交易确认
+        const confirmation = await connection.confirmTransaction({
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+        });
+
+        if (confirmation.value.err) {
+            return {
+                success: false,
+                message: 'Transaction failed: ' + confirmation.value.err.toString()
+            }
+        }
+
+        return {
+            success: true,
+            message: 'Mint success',
+            data: {
+                tx,
+                ...extraData
+            }
+        };
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -651,9 +722,12 @@ export const mintToken = async (
             success: false,
             message: 'Error: ' + error.message,
         };
+    } finally {
+        // 清除处理状态
+        localStorage.removeItem('processing_tx');
+        localStorage.removeItem('processing_timestamp');
     }
 }
-
 
 export const getReferralDataByCodeHash = async (
     wallet: AnchorWallet | undefined,
@@ -828,8 +902,8 @@ export const closeToken = async (
         const tx = await program.methods
             .closeToken(token.tokenName, token.tokenSymbol)
             .accounts(context)
-            .rpc();
-        return await waitConfirmation(tx, 'Token closed successfully', connection, {mint: token.mint});
+            .transaction();
+        return await processTransaction(tx, connection, wallet, {mint: token.mint});
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -930,8 +1004,8 @@ export const updateMetaData = async (
         const tx = await program.methods
             .updateTokenMetadata(metadata)
             .accounts(context)
-            .rpc();
-        return await waitConfirmation(tx, 'Token metadata updated successfully', connection);
+            .transaction();
+        return await processTransaction(tx, connection, wallet, {mint: token.mint});
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {

@@ -89,12 +89,12 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
         return () => clearTimeout(debounceTimeout);
     }, [code, wallet, connection]);
 
-    const close = () => {
-        setLoading(false);
-        setTimeout(() => {
-            onClose();
-        }, 3000);
-    }
+    // const close = () => {
+    //     setLoading(false);
+    //     setTimeout(() => {
+    //         onClose();
+    //     }, 3000);
+    // }
 
     const handleMint = async () => {
         if (!wallet) {
@@ -136,7 +136,8 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                         id: toastId,
                     }
                 );
-                close();
+                setLoading(false);
+                // close();
             } else {
                 toast.error(result.message as string);
                 setLoading(false);

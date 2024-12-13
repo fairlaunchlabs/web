@@ -186,7 +186,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
             setIsCreating(false);
             setSuccess(true);
 
-            const explorerUrl = `${SCANURL}/tx/${result.data.tx}?cluster=${NETWORK}`;
+            const explorerUrl = `${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`;
             toast.success(
                 <ToastBox url={explorerUrl} urlText="View transaction" title="Token created successfully!" />,
                 {
