@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, KeyboardEvent, useEffect } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '../utils/graphql';
 import { TokenCard } from '../components/mintTokens/TokenCard';
@@ -11,7 +11,23 @@ export const MintTokens: React.FC<MintTokensProps> = ({
 }) => {
     const [searchInput, setSearchInput] = useState('');
     const [isSearchMode, setIsSearchMode] = useState(false);
+    const [searchHistory, setSearchHistory] = useState<string[]>([]);
     
+    // Load search history on component mount
+    useEffect(() => {
+        const history = localStorage.getItem('search_history');
+        if (history) {
+            setSearchHistory(JSON.parse(history));
+        }
+    }, []);
+
+    // Save search term to history
+    const saveToHistory = (term: string) => {
+        const newHistory = [term, ...searchHistory.filter(item => item !== term)].slice(0, 5);
+        setSearchHistory(newHistory);
+        localStorage.setItem('search_history', JSON.stringify(newHistory));
+    };
+
     // 初始加载数据
     // const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
     //     variables: {
@@ -28,6 +44,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     const handleSearch = () => {
         if (searchInput.trim()) {
             setIsSearchMode(true);
+            saveToHistory(searchInput.trim());
             searchTokens({
                 variables: {
                     skip: 0,
@@ -45,6 +62,19 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         if (event.key === 'Enter') {
             handleSearch();
         }
+    };
+
+    const handleHistoryClick = (term: string) => {
+        setSearchInput(term);
+        setIsSearchMode(true);
+        saveToHistory(term);
+        searchTokens({
+            variables: {
+                skip: 0,
+                first: 50,
+                searchQuery: term
+            }
+        });
     };
 
     // 合并错误和加载状态
@@ -93,6 +123,21 @@ export const MintTokens: React.FC<MintTokensProps> = ({
                         {loading ? <span className="loading loading-spinner loading-sm"></span> : 'Search'}
                     </button>
                 </div>
+                
+                {/* Search History */}
+                {searchHistory.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {searchHistory.map((term, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleHistoryClick(term)}
+                                className="btn btn-sm btn-ghost text-sm hover:bg-base-200 hover:text-focus text-gray-500 transition-colors"
+                            >
+                                {term}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
