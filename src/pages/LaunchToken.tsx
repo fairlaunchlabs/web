@@ -8,7 +8,7 @@ import { AdvancedSettings } from '../components/launchToken/AdvancedSettings';
 import { ToggleSwitch } from '../components/common/ToggleSwitch';
 import { TokenImageUpload } from '../components/launchToken/TokenImageUpload';
 import toast from 'react-hot-toast';
-import { ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, NETWORK, SCANURL } from '../config/constants';
+import { ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, MAX_AVATAR_FILE_SIZE, NETWORK, SCANURL, VALID_IMAGE_TYPES } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
 import { numberStringToBN } from '../utils/format';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -63,15 +63,14 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
 
     const validateImageFile = (file: File): boolean => {
         // Check file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
+        if (!VALID_IMAGE_TYPES.includes(file.type)) {
             setError('Only JPEG, JPG and PNG files are allowed');
             return false;
         }
 
         // Check file size (4MB = 4 * 1024 * 1024 bytes)
-        if (file.size > 4 * 1024 * 1024) {
-            setError('Image size must be less than 4MB');
+        if (file.size > MAX_AVATAR_FILE_SIZE) {
+            setError('Image size must be less than 250K');
             return false;
         }
 

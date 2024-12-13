@@ -4,9 +4,11 @@ import { InitiazlizedTokenData } from '../../types/types';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import toast from 'react-hot-toast';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { updateMetaData } from '../../utils/web3';
+import { updateMetaData, uploadToArweave } from '../../utils/web3';
 import { ToastBox } from '../common/ToastBox';
 import { NETWORK, SCANURL } from '../../config/constants';
+import { FaUpload } from 'react-icons/fa';
+import { HeaderImageUpload } from './HeaderImageUpload';
 
 interface UpdateMetadataModalProps {
     isOpen: boolean;
@@ -28,6 +30,8 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
     const [github, setGithub] = useState('');
     const [medium, setMedium] = useState('');
     const [isConfirmed, setIsConfirmed] = useState(false);
+    const [headerImage, setHeaderImage] = useState<File | null>(null);
+    const [headerPreview, setHeaderPreview] = useState<string>('');
 
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
@@ -41,37 +45,62 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             setTelegram(token.tokenMetadata.extensions.telegram || '');
             setGithub(token.tokenMetadata.extensions.github || '');
             setMedium(token.tokenMetadata.extensions.medium || '');
+            // Reset header image preview when token changes
+            setHeaderPreview('');
+            setHeaderImage(null);
         }
     }, [token, token?.tokenMetadata, token?.tokenMetadata?.extensions]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const result = await updateMetaData(wallet, connection, token, {
-            name: token.tokenName,
-            symbol: token.tokenSymbol,
-            image: token.tokenMetadata?.image,
-            description,
-            extensions: {
-                website,
-                twitter,
-                discord,
-                telegram,
-                github,
-                medium
+        
+        try {
+            // Upload header image to Arweave if one is selected
+            let headerItemId = '';
+            if (headerImage) {
+                try {
+                    headerItemId = await uploadToArweave(headerImage);
+                    console.log("header image itemId", headerItemId);
+                } catch (error) {
+                    toast.error('Failed to upload header image');
+                    setLoading(false);
+                    return;
+                }
             }
-        });
-        if (result.success) {
-            toast.success(
-                <ToastBox 
-                    url={`${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`}
-                    urlText="View transaction"
-                    title={result.message as string}
-                />
-            );
-            close();
-        } else {
-            toast.error(result.message as string);
+
+            const newMetadata = {
+                name: token.tokenName,
+                symbol: token.tokenSymbol,
+                image: token.tokenMetadata?.image,
+                header: headerItemId || token.tokenMetadata?.header, // Keep existing header if no new one
+                description,
+                extensions: {
+                    website,
+                    twitter,
+                    discord,
+                    telegram,
+                    github,
+                    medium
+                }
+            }
+            
+            const result = await updateMetaData(wallet, connection, token, newMetadata);
+            if (result.success) {
+                toast.success(
+                    <ToastBox 
+                        url={`${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`}
+                        urlText="View transaction"
+                        title={result.message as string}
+                    />
+                );
+                close();
+            } else {
+                toast.error(result.message as string);
+            }
+        } catch (error) {
+            toast.error('Failed to update metadata');
+        } finally {
             setLoading(false);
         }
     };
@@ -116,6 +145,14 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                 <span className="font-mono"><AddressDisplay address={token.mint} showCharacters={10}/></span>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Header Image Upload */}
+                    <div className="mb-6">
+                        <HeaderImageUpload
+                            onImageChange={(file) => setHeaderImage(file)}
+                            currentHeader={token.tokenMetadata?.header}
+                        />
                     </div>
 
                     {/* Description */}

@@ -33,3 +33,7 @@ export const ARWEAVE_API_URL = "http://localhost:8000/arweave";
 export const ARWEAVE_GATEWAY_URL = "https://arweave.net";
 export const ARSEEDING_GATEWAY_URL = "https://arseed.web3infra.dev";
 export const ARWEAVE_DEFAULT_SYNC_TIME = 2 * 60 * 60;
+
+export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
+export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB

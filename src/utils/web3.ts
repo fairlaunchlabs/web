@@ -951,7 +951,6 @@ export const updateMetaData = async (
             };
         }
         const systemConfigData = systemConfig.data;
-        console.log("system config account pda", systemConfigData.systemConfigAccountPda.toBase58());
 
         const context = {
             mint: new PublicKey(token.mint),
@@ -969,6 +968,7 @@ export const updateMetaData = async (
         // 判断新的metadata是否和原来的metadata一样
         if (token.tokenMetadata?.description === newMetadata.description &&
             token.tokenMetadata?.image === newMetadata.image &&
+            token.tokenMetadata?.header === newMetadata.header &&
             token.tokenMetadata?.name === newMetadata.name &&
             token.tokenMetadata?.symbol === newMetadata.symbol &&
             token.tokenMetadata?.extensions?.twitter === newMetadata.extensions?.twitter &&
@@ -983,7 +983,7 @@ export const updateMetaData = async (
                 message: 'Token metadata is the same as before',
             };
         }
-
+        console.log("new metadata", newMetadata);
         const metadataBlob = new Blob([JSON.stringify(newMetadata)], {
             type: 'application/json'
         });

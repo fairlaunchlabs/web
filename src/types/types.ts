@@ -28,6 +28,7 @@ export type TokenMetadataIPFS = {
     name?: string;
     symbol?: string;
     image?: string;
+    header?: string;
     description?: string;
     extensions?: TokenMetadataExtensions;
     attributes?: string[];

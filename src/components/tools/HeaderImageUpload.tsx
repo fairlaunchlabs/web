@@ -1,9 +1,14 @@
 import React, { useRef, useState } from 'react';
-import { TokenImageUploadProps } from '../../types/types';
-import { MAX_AVATAR_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
+import { MAX_HEADER_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
 
-export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
+interface HeaderImageUploadProps {
+    onImageChange: (file: File | null) => void;
+    currentHeader?: string;
+}
+
+export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
     onImageChange,
+    currentHeader
 }) => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -13,8 +18,8 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
     const validateImage = (file: File): Promise<boolean> => {
         return new Promise((resolve) => {
             // Check file size
-            if (file.size > MAX_AVATAR_FILE_SIZE) {
-                setError('File size must be less than 250K');
+            if (file.size > MAX_HEADER_FILE_SIZE) {
+                setError('File size must be less than 3MB');
                 resolve(false);
                 return;
             }
@@ -26,22 +31,8 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                 return;
             }
 
-            // Check if image is square
-            const img = new Image();
-            img.onload = () => {
-                if (img.width !== img.height) {
-                    setError('Image must be square (same width and height)');
-                    resolve(false);
-                } else {
-                    setError(null);
-                    resolve(true);
-                }
-            };
-            img.onerror = () => {
-                setError('Invalid image file');
-                resolve(false);
-            };
-            img.src = URL.createObjectURL(file);
+            setError(null);
+            resolve(true);
         });
     };
 
@@ -102,11 +93,11 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
 
     return (
         <div className="space-y-2">
-            <label className="block text-sm font-medium mb-1">
-                Token Image
+            <label className="label">
+                <span className="label-text">Header Image (Max 3MB, suggested ratio width:height = 3:1)</span>
             </label>
             <div
-                className={`relative border-2 h-[200px] border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
+                className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
                     ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
                 `}
                 onDragOver={handleDragOver}
@@ -123,15 +114,15 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                 />
                 
                 {previewUrl ? (
-                    <div className="relative h-full">
+                    <div className="relative">
                         <img
                             src={previewUrl}
-                            alt="Token preview"
-                            className="h-full mx-auto object-contain rounded"
+                            alt="Header preview"
+                            className="w-full h-auto aspect-[3/1] object-cover rounded-lg"
                         />
                         <button
                             type="button"
-                            className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none"
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemoveImage();
@@ -142,20 +133,33 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                             </svg>
                         </button>
                     </div>
-                ) : (
-                    <div className="space-y-2 py-8">
-                        <svg className="mx-auto h-12 w-12 text-base-content" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <div className="text-sm text-base-content">
-                            <span className="font-medium text-primary">Click to upload</span> or drag and drop
+                ) : currentHeader ? (
+                    <div className="relative">
+                        <img
+                            src={`https://arweave.net/${currentHeader}`}
+                            alt="Current header"
+                            className="w-full h-auto aspect-[3/1] object-cover rounded-lg"
+                        />
+                        <div className="absolute top-2 right-2 bg-base-100 px-2 py-1 rounded text-sm opacity-75">
+                            Current Header
                         </div>
-                        <p className="text-xs text-base-content">PNG, JPG, GIF up to 2MB (must be square)</p>
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-8">
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p className="mt-2 text-sm text-gray-500">
+                            Drag and drop an image here, or click to select
+                        </p>
+                        <p className="mt-1 text-xs text-gray-400">
+                            PNG, JPG, GIF up to 3MB
+                        </p>
                     </div>
                 )}
             </div>
             {error && (
-                <p className="mt-2 text-sm text-red-600">{error}</p>
+                <div className="text-error text-sm mt-1">{error}</div>
             )}
         </div>
     );
