@@ -100,10 +100,10 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                     <img
                         src={metadata.header}
                         alt="Token Header"
-                        className="w-full h-auto aspect-[3/1] object-cover rounded-t-lg"
+                        className="w-full h-auto aspect-[3/1] object-cover"
                     />
                 ) : (
-                    <div className="w-full aspect-[3/1] rounded-t-lg" />
+                    <div className="w-full aspect-[3/1]" />
                 )}
                 
                 {/* Double Gradient Overlay for better text contrast */}
@@ -145,7 +145,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
             </div>
 
             {/* Rest of the content */}
-            <div className="bg-base-200 rounded-lg shadow-lg p-6">
+            <div className="pixel-box bg-base-200 p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <DataBlock 
                         label="Current Era" 
@@ -289,12 +289,11 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         <div className="text-sm font-medium mb-1 text-base-content">
                         {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
                         </div>
-                        <div className="w-full bg-base-300 rounded-full h-2.5">
-                            <div 
-                                className="bg-secondary h-2.5 rounded-full" 
-                                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                            ></div>
-                        </div>
+                        <progress 
+                            className="progress w-full" 
+                            value={Math.min(progressPercentage, 100)} 
+                            max="100"
+                        ></progress>
                     </div>
 
                     <div className="mt-8">
@@ -302,12 +301,11 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         <div className="text-sm font-medium mb-1 text-base-content">
                         {(numberStringToBN(token.quantityMintedEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(numberStringToBN(token.targetMintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                         </div>
-                        <div className="w-full bg-base-300 rounded-full h-2.5">
-                            <div 
-                                className="bg-secondary h-2.5 rounded-full" 
-                                style={{ width: `${Math.min(progressPercentageOfEpoch, 100)}%` }}
-                            ></div>
-                        </div>
+                        <progress 
+                            className="progress w-full" 
+                            value={Math.min(progressPercentageOfEpoch, 100)} 
+                            max="100"
+                        ></progress>
                     </div>
 
                     {/* 铸造于获取URC按钮 */}

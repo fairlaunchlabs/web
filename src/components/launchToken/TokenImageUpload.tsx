@@ -106,9 +106,10 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                 Token Image
             </label>
             <div
-                className={`relative border-2 h-[200px] border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
-                    ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
-                `}
+            className='pixel-box text-center cursor-pointer'
+                // className={`relative border-2 h-[200px] border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
+                //     ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
+                // `}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}

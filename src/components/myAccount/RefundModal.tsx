@@ -106,7 +106,7 @@ export const RefundModal: FC<RefundModalProps> = ({
                 </button>
                 <h3 className="font-bold text-lg mb-4">Refund {token.tokenData?.tokenSymbol}</h3>
                 <div className="space-y-4">
-                    <div className="mt-4 space-y-2 bg-base-200 p-4 rounded-lg">
+                    <div className="pixel-box mt-4 space-y-2 bg-base-200 p-4">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70">Total paid</span>
                             <span className="font-medium text-primary">

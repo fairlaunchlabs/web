@@ -30,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     }, [isMenuOpen, onMenuClick]);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-base-100 shadow-md">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-base-300 shadow-md border-b-2 border-primary-content">
             <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* 左侧区域：菜单按钮和Logo */}

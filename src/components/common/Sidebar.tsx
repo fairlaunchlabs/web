@@ -102,13 +102,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     return (
         <div 
-            className={`sidebar bg-base-200 p-1 duration-50 fixed inset-y-0 left-0 
+            className={`sidebar bg-base-300 p-1 duration-50 fixed inset-y-0 left-0 border-r-2 border-primary-content
                 ${isMobile ? 'w-64' : isExpanded ? 'w-64' : 'w-20'}
                 ${isMobile && !isMobileOpen ? '-translate-x-full' : 'translate-x-0'}
             `}
         >
             <button
-                className="absolute -right-3 top-3 btn btn-circle btn-sm btn-ghost bg-base-200 hover:bg-base-300 md:flex items-center justify-center shadow-lg z-[100] hidden"
+                className="absolute -right-3 top-3 btn btn-circle btn-sm bg-base-300 hover:bg-base-300 md:flex items-center justify-center shadow-lg z-[100] hidden"
                 onClick={() => handleExpandedChange(!isExpanded)}
                 title={isExpanded ? 'Collapse menu' : 'Expand menu'}
             >
@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
             
             <div className={`h-full overflow-y-auto ${isMobile ? 'mt-16' : 'mt-6'}`}>
-                <ul className="menu bg-base-200 w-full p-2 rounded-box">
+                <ul className="menu bg-base-300 w-full p-2 rounded-box">
                     {menuItems.map(item => renderMenuItem(item))}
                 </ul>
             </div>

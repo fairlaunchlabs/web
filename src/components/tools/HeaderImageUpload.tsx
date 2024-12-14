@@ -97,9 +97,10 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                 <span className="label-text">Header Image (Max 3MB, suggested ratio width:height = 3:1)</span>
             </label>
             <div
-                className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
-                    ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
-                `}
+                // className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
+                //     ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
+                // `}
+                className='pixed-box'
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -114,11 +115,11 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                 />
                 
                 {previewUrl ? (
-                    <div className="relative">
+                    <div className="pixel-box relative">
                         <img
                             src={previewUrl}
                             alt="Header preview"
-                            className="w-full h-auto aspect-[3/1] object-cover rounded-lg"
+                            className="w-full h-auto aspect-[3/1] object-cover"
                         />
                         <button
                             type="button"
@@ -134,18 +135,18 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                         </button>
                     </div>
                 ) : currentHeader && currentHeader !== ARWEAVE_GATEWAY_URL + "/" && currentHeader !== ARSEEDING_GATEWAY_URL + "/" ? (
-                    <div className="relative">
+                    <div className="pixel-box relative">
                         <img
                             src={`${currentHeader}`}
                             alt="Current header"
-                            className="w-full h-auto aspect-[3/1] object-cover rounded-lg"
+                            className="w-full h-auto aspect-[3/1] object-cover"
                         />
                         <div className="absolute top-2 right-2 bg-base-100 px-2 py-1 rounded text-sm opacity-75">
                             Current Header
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-8">
+                    <div className="pixel-box flex flex-col items-center justify-center py-8">
                         <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>

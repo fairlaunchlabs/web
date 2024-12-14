@@ -135,7 +135,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
 
     return (
         <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="w-full max-w-6xl px-4">
+            <div className="w-full max-w-6xl px-4 mb-20">
                 <h2 className="card-title mb-4">My Tokens</h2>
                 {loadingTokens || loadingDetails ? (
                     <div className="flex justify-center">
@@ -162,8 +162,8 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                 </select>
                             </div>
                         </div>
-                        <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
-                            <table className="table w-full">
+                        {/* <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl"> */}
+                            <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
                                         <th className="text-left">Image</th>
@@ -236,7 +236,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        {/* </div> */}
                         <div className="mt-4">
                             <Pagination
                                 currentPage={currentPage}

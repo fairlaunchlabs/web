@@ -80,9 +80,9 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                 <h3 className="font-bold text-lg mb-4">Referral Bonus Details</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="card bg-base-100 shadow-xl">
-                        <div className="card-body">
-                            <h4 className="card-title">Summary</h4>
+                    <div className="pixel-card">
+                        <div className="pixel-card-body">
+                            <h4 className="pixel-card-title">Summary</h4>
                             <div className="space-y-2">
                                 <p>Total Referral Bonus: <span className="font-bold text-primary">
                                     {formatPrice(totalBonus, 3)} SOL
@@ -91,9 +91,9 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                             </div>
                         </div>
                     </div>
-                    <div className="card bg-base-100 shadow-xl">
-                        <div className="card-body">
-                            <h4 className="card-title">Token Information</h4>
+                    <div className="pixel-card">
+                        <div className="pixel-card-body">
+                            <h4 className="pixel-card-title">Token Information</h4>
                             <div className="space-y-2">
                                 <p>Mint Address: <AddressDisplay address={mint} /></p>
                                 <p>Referrer: <AddressDisplay address={referrerMain} /></p>
@@ -118,7 +118,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                 </div>
 
                 <div className="overflow-x-auto mt-6">
-                    <table className="table table-zebra w-full">
+                    <table className="pixel-table w-full">
                         <thead>
                             <tr>
                                 <th>Transaction ID</th>

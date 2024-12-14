@@ -543,7 +543,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
     return (
         <div className="mt-6">
-            <div className="bg-base-200 rounded-lg shadow-lg p-6">
+            <div className="pixel-box bg-base-200 p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold text-base-content">Mint Cost</h2>
                     <div className="flex items-center space-x-2">

@@ -149,13 +149,16 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 <div className="space-y-4">
                     {referralData ? (
                         <div className="space-y-2">
-                            <p className="font-semibold">Your URC for {token.tokenData?.tokenSymbol}</p>
+                            <p className="font-semibold">
+                                HereYour URC for {token.tokenData?.tokenSymbol}
+                            </p>
                             <div className="flex justify-between items-center">
                                 <input
                                     type="text"
                                     value={myReferrerCode}
                                     onChange={(e) => setMyReferrerCode(e.target.value)}
-                                    className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                    // className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                    className='input w-full'
                                     placeholder="Enter your favourite name as URC"
                                 />
                                 <button
@@ -174,15 +177,15 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
 
                             <p className="font-semibold">Current used count (Max: {referralUsageMaxCount})</p>
-                            <div className="bg-base-200 p-2 rounded-lg break-all">
+                            <div className="input bg-base-200 p-2 break-all">
                                 {referralData.usageCount}
                             </div>
                             <p className="font-semibold">Active URC time</p>
-                            <div className="bg-base-200 p-2 rounded-lg break-all">
+                            <div className="input bg-base-200 p-2 break-all">
                                 {new Date(Number(referralData.activeTimestamp) * 1000).toLocaleString()}
                             </div>
                             <p className="font-semibold">Re-active URC time</p>
-                            <div className="bg-base-200 p-2 rounded-lg break-all">
+                            <div className="input bg-base-200 p-2 break-all">
                                 {new Date(Number(referralData.activeTimestamp) * 1000 + referrerResetIntervalSeconds * 1000).toLocaleString()}
                             </div>
 
@@ -190,7 +193,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             <div>
                                 <p className="font-semibold text-primary">Your personal link</p>
                                 <div className="flex gap-2">
-                                    <div className="bg-base-200 p-2 rounded-lg break-all flex-1">
+                                    <div className="textarea bg-base-200 p-2 break-all flex-1">
                                         {window.location.origin}/token/{token.tokenData?.mint}/{myReferrerCode}
                                     </div>
                                 </div>
@@ -221,7 +224,8 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                 type="text"
                                 value={myReferrerCode}
                                 onChange={(e) => setMyReferrerCode(e.target.value)}
-                                className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                // className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                className='input w-full'
                                 placeholder="Enter your favourite name as URC"
                             />
                             <p className='text-error'>This code is stored locally, please remember it when you change device!</p>

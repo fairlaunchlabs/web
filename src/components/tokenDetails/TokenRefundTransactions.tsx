@@ -56,7 +56,7 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
 
     if (loading && currentPage === 1) {
         return (
-            <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
+            <div className="pixel-box bg-base-200 p-6 mt-6">
                 <h3 className="text-xl font-semibold mb-4 text-base-content">Recent Refund</h3>
                 <div className="animate-pulse">
                     <div className="h-8 bg-base-300 rounded mb-4"></div>
@@ -69,14 +69,14 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
 
     if (error) {
         return (
-            <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
+            <div className="pixel-box bg-base-200 p-6 mt-6">
                 <ErrorBox title="Get refund transactions error" message={error.message} />
             </div>
         );
     }
 
     return (
-        <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
+        <div className="pixel-box bg-base-200 p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-base-content">Recent Refund</h3>
                 <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
                 </div>
             </div>
             <div className="overflow-x-auto">
-                <table className="table w-full">
+                <table className="pixel-table w-full">
                     <thead>
                         <tr>
                             <th>Refunder</th>

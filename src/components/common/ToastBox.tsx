@@ -3,7 +3,7 @@ import { ToastBoxProps } from "../../types/types"
 
 export const ToastBox:FC<ToastBoxProps> = ({title, url, urlText}) => {
     return (
-    <div>
+    <div className="">
         {title}
         <br />
         <a

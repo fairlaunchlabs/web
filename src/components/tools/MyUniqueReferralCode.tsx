@@ -138,7 +138,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
 
     return (
         <div className={`space-y-6 p-6 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="max-w-6xl mx-auto flex flex-col gap-4">
+            <div className="max-w-6xl mx-auto flex flex-col gap-4 mb-20">
                 <h2 className="card-title mb-4">My URCs(Unique Referral Codes)</h2>
                 {urcLoading || tokenLoading || loadingMetadata ? (
                     <div className="flex justify-center">
@@ -167,8 +167,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                 </select>
                             </div>
                         </div>
-                        <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
-                            <table className="table w-full">
+                        {/* <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl pixel-table-container"> */}
+                            <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
                                         <th className="text-left">Token</th>
@@ -225,7 +225,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                     })}
                                 </tbody>
                             </table>
-                        </div>
+                        {/* </div> */}
 
                         {urcData?.setRefererCodeEventEntities?.length === 0 && (
                             <div className="text-center py-10">

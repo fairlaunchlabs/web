@@ -54,7 +54,7 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
     }
 
     return (
-        <div className="bg-base-200 rounded-lg shadow-lg p-6 mt-6">
+        <div className="pixel-box bg-base-200 p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-base-content">Token Holders</h3>
                 <div className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
                 </div>
             </div>
             <div className="overflow-x-auto">
-                <table className="table w-full">
+                <table className="pixel-table w-full">
                     <thead>
                         <tr>
                             <th>Rank</th>

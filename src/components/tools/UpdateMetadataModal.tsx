@@ -126,13 +126,14 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Token Logo and Basic Info */}
-                    <div className="flex items-center space-x-6 bg-base-200/50 p-4 rounded-lg">
+                    <div className="pixel-box flex items-center space-x-6 bg-base-200/50 p-4">
                         <div className="w-16 h-16 flex-shrink-0">
                             <TokenImage
                                 imageUrl={token.tokenMetadata?.image as string}
                                 name={token.tokenName}
                                 launchTimestamp={Number(token.metadataTimestamp)}
-                                className="w-full h-full rounded-lg border-2 border-base-300"
+                                // className="w-full h-full rounded-full border-2 border-base-300"
+                                className='avatar rounded-full'
                             />
                         </div>
                         <div className="flex-1 min-w-0 space-y-3">
@@ -141,7 +142,9 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                 <div className="badge badge-sm badge-primary">{token.tokenSymbol}</div>
                             </div>
                             <div className="text-xs text-base-content/70">
-                                <span className="font-mono"><AddressDisplay address={token.mint} showCharacters={10}/></span>
+                                <span className="font-mono">
+                                    <AddressDisplay address={token.mint} showCharacters={10}/>
+                                </span>
                             </div>
                         </div>
                     </div>

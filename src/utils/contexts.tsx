@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LOCAL_STORAGE_KEY_THEME } from '../config/constants';
+import { DARK_THEME, LIGHT_THEME, LOCAL_STORAGE_KEY_THEME } from '../config/constants';
 
 // Theme Context
 interface ThemeContextType {
@@ -19,10 +19,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         // 初始化时确保 HTML 类名与状态一致
         if (prefersDark) {
             document.documentElement.classList.add('dark');
-            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.setAttribute('data-theme', DARK_THEME);
         } else {
             document.documentElement.classList.remove('dark');
-            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.setAttribute('data-theme', LIGHT_THEME);
         }
         return prefersDark;
     });
@@ -33,7 +33,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     useEffect(() => {
         const root = document.documentElement;
-        const newTheme = isDarkMode ? 'dark' : 'light';
+        const newTheme = isDarkMode ? DARK_THEME : LIGHT_THEME;
         
         // 更新DOM
         if (isDarkMode) {

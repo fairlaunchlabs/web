@@ -175,7 +175,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                         />
                     </div>
                     {code &&
-                    <div className="mt-4 space-y-2 bg-base-200 p-4 rounded-lg">
+                    <div className="pixel-box mt-4 space-y-2 bg-base-200 p-4">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-base-content/70">Current fee</span>
                             <span className="font-medium">{

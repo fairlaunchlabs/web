@@ -21,7 +21,7 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({
             <span className="font-mono">{formatAddress(address, showCharacters)}</span>
             <button
                 onClick={handleCopy}
-                className="btn btn-ghost btn-xs p-0 min-h-0 h-auto"
+                className="btn-ghost btn-xs p-0 min-h-0 h-auto"
                 title="Copy Address"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -32,7 +32,7 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({
                 href={explorerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-ghost btn-xs p-0 min-h-0 h-auto"
+                className="btn-ghost btn-xs p-0 min-h-0 h-auto"
                 title="View on Solscan"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">

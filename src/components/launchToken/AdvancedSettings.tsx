@@ -30,7 +30,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                     id="targetEras"
                     value={targetEras}
                     onChange={(e) => onTargetErasChange(e.target.value.replace(/[^0-9]/g, ''))}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${targetEras ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${targetEras ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter target eras"
                 />
             </div>
@@ -44,7 +45,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                     id="epochesPerEra"
                     value={epochesPerEra}
                     onChange={(e) => onEpochesPerEraChange(e.target.value.replace(/[^0-9]/g, ''))}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${epochesPerEra ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${epochesPerEra ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter epochs per era"
                 />
             </div>
@@ -58,7 +60,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                     id="targetSecondsPerEpoch"
                     value={targetSecondsPerEpoch}
                     onChange={(e) => onTargetSecondsPerEpochChange(e.target.value.replace(/[^0-9]/g, ''))}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${targetSecondsPerEpoch ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${targetSecondsPerEpoch ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter target seconds"
                 />
             </div>
@@ -78,7 +81,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                             onReduceRatioChange(value);
                         }
                     }}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${reduceRatio ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${reduceRatio ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter reduce ratio (0-100)"
                 />
             </div>
@@ -96,7 +100,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                         const mintSize = (parseFloat(value) * 1000000000).toString();
                         onDisplayInitialMintSizeChange(value, mintSize);
                     }}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${displayInitialMintSize ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${displayInitialMintSize ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter initial mint size"
                 />
             </div>
@@ -114,7 +119,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                         const targetMintSize = (parseFloat(value) * 1000000000).toString();
                         onDisplayInitialTargetMintSizePerEpochChange(value, targetMintSize);
                     }}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${displayInitialTargetMintSizePerEpoch ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${displayInitialTargetMintSizePerEpoch ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter target mint size per epoch"
                 />
             </div>
@@ -132,7 +138,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                         const feeRate = (parseFloat(value) * 1000000000).toString();
                         onDisplayFeeRateChange(value, feeRate);
                     }}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${displayFeeRate ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${displayFeeRate ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter fee rate"
                 />
             </div>
@@ -146,7 +153,8 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                     id="liquidityTokensRatio"
                     value={liquidityTokensRatio}
                     onChange={(e) => onLiquidityTokensRatioChange(e.target.value.replace(/[^0-9]/g, ''))}
-                    className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${liquidityTokensRatio ? 'border-base-content' : ''}`}
+                    // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${liquidityTokensRatio ? 'border-base-content' : ''}`}
+                    className='input w-full'
                     placeholder="Enter liquidity tokens ratio"
                 />
             </div>

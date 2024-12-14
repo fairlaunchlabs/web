@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
     ];
 
     return (
-        <footer className="footer footer-center p-2 md:p-4 bg-base-300 text-base-content fixed bottom-0 z-40">
+        <footer className="footer footer-center p-2 border-t-2 border-primary-content md:p-4 bg-base-300 text-base-content fixed bottom-0 z-40">
             <div className="flex gap-2 md:gap-4">
                 {socialIcons.map((social, index) => (
                     <a

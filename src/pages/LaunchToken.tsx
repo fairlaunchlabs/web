@@ -281,7 +281,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                                     setName(value);
                                 }
                             }}
-                            className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${name ? 'border-base-content' : ''}`}
+                            className="input w-full"
+                            // className={`input w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${name ? 'border-base-content' : ''}`}
                             required
                         />
                     </div>
@@ -305,7 +306,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                                     setSymbol(value);
                                 }
                             }}
-                            className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${symbol ? 'border-base-content' : ''}`}
+                            className='input w-full'
+                            // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${symbol ? 'border-base-content' : ''}`}
                             required
                         />
                     </div>
@@ -400,7 +402,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
 
                     <button
                         type="submit"
-                        className={`w-full py-4 px-4 rounded-lg text-white font-medium ${
+                        className={`btn btn-primary w-full py-4 px-4 font-medium ${
                             isCreating || isUploading
                                 ? 'bg-gray-300 cursor-not-allowed'
                                 : 'bg-primary hover:bg-primary'
@@ -413,7 +415,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 </form>
 
                 {/* 计算结果显示框 */}
-                <div className="w-full lg:w-[480px] p-6 border-2 border-dashed rounded-lg mt-4 lg:mt-[40px] lg:sticky lg:top-4">
+                {/* <div className="w-full lg:w-[480px] p-6 border-2 border-dashed rounded-lg mt-4 lg:mt-[40px] lg:sticky lg:top-4"> */}
                     <Metrics
                         targetEras={targetEras}
                         epochesPerEra={epochesPerEra}
@@ -425,7 +427,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                         liquidityTokensRatio={liquidityTokensRatio}
                         symbol={symbol}
                     />
-                </div>
+                {/* </div> */}
             </div>
         </div>
     );

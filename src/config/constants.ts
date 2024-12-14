@@ -37,3 +37,6 @@ export const ARWEAVE_DEFAULT_SYNC_TIME = 2 * 60 * 60;
 export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
 export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+
+export const DARK_THEME = 'skypixel';
+export const LIGHT_THEME = 'pixel';
