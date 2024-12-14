@@ -16,6 +16,7 @@ import { fetchMetadata } from '../../utils/web3';
 import { TokenImage } from '../mintTokens/TokenImage';
 import MintModal from '../mintTokens/MintModal';
 import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
+import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from '../../config/constants';
 
 const tooltip = {
     currentEra: "The current era number in the token's lifecycle",
@@ -95,19 +96,19 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
             {/* Header Section with Background */}
             <div className="w-full relative">
                 {/* Background Image */}
-                {metadata?.header ? (
+                {metadata && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
                     <img
                         src={metadata.header}
                         alt="Token Header"
                         className="w-full h-auto aspect-[3/1] object-cover rounded-t-lg"
                     />
                 ) : (
-                    <div className="w-full aspect-[3/1] bg-base-300 rounded-t-lg" />
+                    <div className="w-full aspect-[3/1] rounded-t-lg" />
                 )}
                 
                 {/* Double Gradient Overlay for better text contrast */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60 rounded-t-lg" />
-                <div className="absolute inset-0 bg-gradient-to-t from-base-200/80 via-base-200/20 to-transparent rounded-t-lg" />
+                {/* <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60 rounded-t-lg" />
+                <div className="absolute inset-0 bg-gradient-to-t from-base-200/80 via-base-200/20 to-transparent rounded-t-lg" /> */}
 
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex gap-6 items-end">

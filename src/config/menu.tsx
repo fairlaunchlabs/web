@@ -41,16 +41,16 @@ import { MyDeployments } from '../pages/MyDeployments';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
+        id: 'mint-tokens', 
+        label: 'Discover', // Mint or mine tokens
+        icon: <MdOutlineEnergySavingsLeaf className="w-5 h-5" />,
+        component: <MintTokens expanded={expended} /> 
+    },
+    { 
         id: 'launch-token', 
         label: 'Launch Token', // Launch a new crypto token
         icon: <MdRocketLaunch className="w-5 h-5" />,
         component: <LaunchTokenForm expanded={expended} /> 
-    },
-    { 
-        id: 'mint-tokens', 
-        label: 'Mint Tokens', // Mint or mine tokens
-        icon: <MdOutlineEnergySavingsLeaf className="w-5 h-5" />,
-        component: <MintTokens expanded={expended} /> 
     },
     { 
         id: 'my-account', 

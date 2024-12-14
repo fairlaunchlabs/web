@@ -150,7 +150,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                     <div className="mb-6">
                         <HeaderImageUpload
                             onImageChange={(file) => setHeaderImage(file)}
-                            currentHeader={token.tokenMetadata?.header} // ###### 需要转换成arseedings
+                            currentHeader={token.tokenMetadata?.header}
                         />
                     </div>
 
