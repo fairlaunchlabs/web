@@ -102,7 +102,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     return (
         <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:px-8 md:py-6 pl-5 pr-4 py-6 mb-20`}>
             {/* Search Bar */}
-            <div className="mb-12">
+            <div className="max-w-6xl mx-auto mb-12">
                 <div className="join w-full">
                     <div className="relative join-item flex-1">
                         <input
@@ -140,6 +140,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
                 )}
             </div>
 
+            {/* Token Cards // ###### TODO */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                 {displayData?.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => (
                     <TokenCard key={token.tokenId} token={token} />

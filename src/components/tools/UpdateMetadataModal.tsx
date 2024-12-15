@@ -9,6 +9,7 @@ import { ToastBox } from '../common/ToastBox';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { FaUpload } from 'react-icons/fa';
 import { HeaderImageUpload } from './HeaderImageUpload';
+import AlertBox from '../common/AlertBox';
 
 interface UpdateMetadataModalProps {
     isOpen: boolean;
@@ -120,7 +121,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                     className="btn btn-circle btn-sm absolute right-2 top-2"
                     onClick={onClose}
                 >
-                    ✕
+                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>
                 </button>
                 <h3 className="font-bold text-lg mb-4">Update Token Metadata</h3>
                 
@@ -263,13 +264,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
 
                     {/* Submit Button */}
                     <div className="space-y-4">
-                        <div className="alert alert-warning">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                            <div>
-                                <h3 className="font-bold">Warning!</h3>
-                                <div className="text-sm">Updating token metadata will cost 0.1 SOL as a transaction fee.</div>
-                            </div>
-                        </div>
+                        <AlertBox title='Warning!' message='Updating token metadata will cost 0.1 SOL as a transaction fee.' />
 
                         <div className="form-control">
                             <label className="label cursor-pointer justify-start gap-3">

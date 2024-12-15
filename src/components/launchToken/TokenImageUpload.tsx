@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { TokenImageUploadProps } from '../../types/types';
-import { MAX_AVATAR_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
+import { MAX_AVATAR_FILE_SIZE, MAX_HEADER_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
 
 export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
     onImageChange,
@@ -145,13 +145,13 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                     </div>
                 ) : (
                     <div className="space-y-2 py-8">
-                        <svg className="mx-auto h-12 w-12 text-base-content" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <svg className="mx-auto h-12 w-12 text-base-content" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M22 3H2v18h20v-2h-2v-2h2v-2h-2v-2h2v-2h-2V9h2V7h-2V5h2V3zm-2 4v2h-2v2h2v2h-2v2h2v2h-2v2H4V5h14v2h2zm-6 2h-2v2h-2v2H8v2H6v2h2v-2h2v-2h2v-2h2v2h2v-2h-2V9zM6 7h2v2H6V7z" fill="currentColor"/> </svg>
                         <div className="text-sm text-base-content">
                             <span className="font-medium text-primary">Click to upload</span> or drag and drop
                         </div>
-                        <p className="text-xs text-base-content">PNG, JPG, GIF up to 2MB (must be square)</p>
+                        <p className="text-xs text-base-content">
+                            PNG, JPG, GIF up to {MAX_AVATAR_FILE_SIZE / 1024 / 1024} MB (must be square)
+                        </p>
                     </div>
                 )}
             </div>

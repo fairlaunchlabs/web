@@ -147,14 +147,12 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                     </div>
                 ) : (
                     <div className="pixel-box flex flex-col items-center justify-center py-8">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p className="mt-2 text-sm text-gray-500">
+                        <svg className="mx-auto h-12 w-12 text-base-content" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M22 3H2v18h20v-2h-2v-2h2v-2h-2v-2h2v-2h-2V9h2V7h-2V5h2V3zm-2 4v2h-2v2h2v2h-2v2h2v2h-2v2H4V5h14v2h2zm-6 2h-2v2h-2v2H8v2H6v2h2v-2h2v-2h2v-2h2v2h2v-2h-2V9zM6 7h2v2H6V7z" fill="currentColor"/> </svg>
+                        <p className="mt-2 text-sm text-base-content">
                             Drag and drop an image here, or click to select
                         </p>
-                        <p className="mt-1 text-xs text-gray-400">
-                            PNG, JPG, GIF up to 3MB
+                        <p className="mt-1 text-xs text-base-content">
+                            PNG, JPG, GIF up to {MAX_HEADER_FILE_SIZE / 1024 / 1024}MB
                         </p>
                     </div>
                 )}

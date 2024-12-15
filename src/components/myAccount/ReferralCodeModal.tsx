@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { ReferralCodeModalProps, ReferrerData } from '../../types/types';
 import { LOCAL_STORAGE_MY_REFERRAL_CODE, NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
+import AlertBox from '../common/AlertBox';
 
 export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     isOpen,
@@ -143,7 +144,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                     className="btn btn-circle btn-sm absolute right-2 top-2"
                     onClick={onClose}
                 >
-                    ✕
+                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>
                 </button>
                 <h3 className="font-bold text-lg mb-4">Activate Unique Referral Code(URC)</h3>
                 <div className="space-y-4">
@@ -169,12 +170,13 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                     }}
                                     disabled={loading}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2h11v2H6v13H4V2zm4 4h12v16H8V6zm2 2v12h8V8h-8z" fill="currentColor"/> </svg>
+                                    {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                    </svg>
+                                    </svg> */}
                                 </button>
                             </div>
-                            <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
+                            <AlertBox title="Attention" message="The URC code is stored locally, please remember it when you change device!" />
 
                             <p className="font-semibold">Current used count (Max: {referralUsageMaxCount})</p>
                             <div className="input bg-base-200 p-2 break-all">
