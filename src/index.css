@@ -1,14 +1,64 @@
+/* 定义字体 */
+@font-face {
+  font-family: 'Retro Pixel Cute Mono';
+  src: url('../public/fonts/retro-pixel-cute-mono.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Retro Pixel Arcade';
+  src: url('../public/fonts/retro-pixel-arcade.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Retro Pixel Thick';
+  src: url('../public/fonts/retro-pixel-thick.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 基础样式 */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-thick;
+  }
+  
+  body {
+    @apply font-pixel;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* 通用字体类 */
+@layer components {
+  .text-label {
+    @apply text-sm font-pixel;
+  }
+  
+  .text-value {
+    @apply font-pixel;
+  }
+  
+  .text-heading {
+    @apply font-heading tracking-thick;
+  }
+  
+  .text-bold {
+    @apply font-pixel font-bold;
+  }
+  
+  .text-medium {
+    @apply font-pixel font-medium;
+  }
 }
 
 code {

@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </button>
                         <a 
                             href="/" 
-                            className={`btn btn-ghost normal-case text-lg md:text-xl ${isDarkMode ? '' : 'hover:bg-base-200'}`}
+                            className={`btn btn-ghost normal-case text-lg md:text-xl font-arcade ${isDarkMode ? '' : 'hover:bg-base-200'}`}
                             onClick={(e) => {
                                 e.preventDefault();
                                 window.location.href = '/';

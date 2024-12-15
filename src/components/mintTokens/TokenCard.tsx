@@ -139,7 +139,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                 </div>
                 {hasStarted ? (
                     <div className="mt-4">
-                        <div className="text-sm font-medium mb-1 text-base-content">
+                        <div className="text-sm text-medium mb-1 text-base-content">
                         {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
                         </div>
                         <div className="w-full bg-base-300 rounded-full h-2.5">

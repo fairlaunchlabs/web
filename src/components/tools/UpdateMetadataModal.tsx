@@ -142,7 +142,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                 <div className="badge badge-sm badge-primary">{token.tokenSymbol}</div>
                             </div>
                             <div className="text-xs text-base-content/70">
-                                <span className="font-mono">
+                                <span className="font-pixel">
                                     <AddressDisplay address={token.mint} showCharacters={10}/>
                                 </span>
                             </div>

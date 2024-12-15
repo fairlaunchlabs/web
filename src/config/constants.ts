@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 
-export const APP_NAME = 'Logo';
+export const APP_NAME = 'Flipflip';
 export const FAIR_MINT_PROGRAM_ID = 'CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 

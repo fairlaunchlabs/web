@@ -20,7 +20,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
     return (
         <div className="space-y-4 p-4">
             <div>
-                <label htmlFor="description" className="block text-sm font-medium mb-1">
+                <label htmlFor="description" className="text-label mb-1">
                     Description
                 </label>
                 <textarea
@@ -34,7 +34,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                 />
             </div>
             <div>
-                <label htmlFor="website" className="block text-sm font-medium mb-1">
+                <label htmlFor="website" className="text-label mb-1">
                     Website
                 </label>
                 <input
@@ -48,7 +48,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                 />
             </div>
             <div>
-                <label htmlFor="twitter" className="block text-sm font-medium mb-1">
+                <label htmlFor="twitter" className="text-label mb-1">
                     Twitter
                 </label>
                 <input
@@ -62,7 +62,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                 />
             </div>
             <div>
-                <label htmlFor="discord" className="block text-sm font-medium mb-1">
+                <label htmlFor="discord" className="text-label mb-1">
                     Discord
                 </label>
                 <input
@@ -76,7 +76,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                 />
             </div>
             <div>
-                <label htmlFor="telegram" className="block text-sm font-medium mb-1">
+                <label htmlFor="telegram" className="text-label mb-1">
                     Telegram
                 </label>
                 <input
@@ -90,7 +90,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                 />
             </div>
             <div>
-                <label htmlFor="github" className="block text-sm font-medium mb-1">
+                <label htmlFor="github" className="text-label mb-1">
                     GitHub
                 </label>
                 <input
@@ -104,7 +104,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                 />
             </div>
             <div>
-                <label htmlFor="medium" className="block text-sm font-medium mb-1">
+                <label htmlFor="medium" className="text-label mb-1">
                     Medium
                 </label>
                 <input

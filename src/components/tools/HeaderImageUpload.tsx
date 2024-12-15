@@ -100,7 +100,7 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                 // className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
                 //     ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
                 // `}
-                className='pixed-box'
+                className='pixed-box cursor-pointer'
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
