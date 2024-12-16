@@ -5,14 +5,14 @@ const pixelLight = {
     "primary-content": "#000000", // 黑色文字
 
     // 次要颜色
-    "secondary": "#FFFFFF",      // 白色背景
-    "secondary-focus": "#F8F9FA",
-    "secondary-content": "#000000",
+    "secondary": "#FF00F5",      // 次要颜色背景
+    "secondary-focus": "##D303CC",
+    "secondary-content": "#FFFFFF",
 
     // 强调色
-    "accent": "#FFD43B",        // 黄色强调
-    "accent-focus": "#FCC419",
-    "accent-content": "#000000",
+    "accent": "#FF4911",        // 橙色强调
+    "accent-focus": "#FA4007",
+    "accent-content": "#FFFFFF",
 
     // 中性色
     "neutral": "#F5F0E6",       // 浅米色
@@ -26,10 +26,10 @@ const pixelLight = {
     "base-content": "#000000",   // 文本颜色
 
     // 功能色
-    "info": "#4A9EFF",
-    "success": "#51CF66",
+    "info": "#7DF9FF",
+    "success": "#2FFF2F",
     "warning": "#FFD43B",
-    "error": "#FF6B6B",
+    "error": "#FF4911",
 
     // 按钮
     ".btn": {
@@ -45,11 +45,20 @@ const pixelLight = {
     },
     ".btn-primary": {
       "background-color": "#FFD43B",
-      "color": "#000000"
+      "color": "#000000",
+      "&:hover": {
+        "background-color": "#FCC419",
+        "color": "#000000",
+      }
     },
-    ".btn-outline": {
-      "background-color": "#FFFFFF",
-      "color": "#000000"
+
+    ".btn-secondary": {
+      "background-color": "#FF00F5",
+      "color": "#FFFFFF",
+      "&:hover": {
+        "background-color": "#D303CC",
+        "color": "#FFFFFF",
+      }
     },
 
     ".search-btn": {
@@ -59,6 +68,17 @@ const pixelLight = {
       "&:hover": {
         "border": "2px solid #333333",
         "box-shadow": "3px 3px 0 0 #000000",
+        "background-color": "#f8d764"
+      }
+    },
+
+    ".pagination-btn": {
+      "border": "2px solid #000000",
+      "box-shadow": "2px 2px 0 0 #000000",
+      "border-radius": "6px",
+      "&:hover": {
+        "border": "2px solid #333333",
+        "box-shadow": "2px 2px 0 0 #000000",
         "background-color": "#f8d764"
       }
     },
@@ -79,11 +99,11 @@ const pixelLight = {
       "color": "#000000"
     },
     ".badge-primary": {
-      "background-color": "#000000",
-      "color": "#FFFFFF"
+      "background-color": "#FFD43B",
+      "color": "#000000"
     },
     ".badge-accent": {
-      "background-color": "#FFD43B",
+      "background-color": "#2FFF2F",
       "color": "#000000"
     },
 
@@ -108,11 +128,12 @@ const pixelLight = {
     },
 
     // Textarea
-    ".textarea": {
+    ".pixel-textarea": {
       "border": "2px solid #000000",
       "background-color": "#FFFFFF",
       "box-shadow": "3px 3px 0 0 #000000",
       "border-radius": "8px",
+      "padding": "1rem",
       "&:focus": {
         "outline": "none",
         "border-color": "#000000"
@@ -120,16 +141,19 @@ const pixelLight = {
     },
 
     // Alert
-    ".alert": {
+    ".pixel-alert": {
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
       "background-color": "#FFD43B",
+      "border-radius": "8px",
+      "padding": "1rem",
       "color": "#000000"
     },
 
     // Avatar
-    ".avatar": {
-      "border": "2px solid #000000"
+    ".pixel-avatar": {
+      "border": "3px solid #000000",
+      "border-radius": "100%",
     },
 
     // Collapse
@@ -142,9 +166,9 @@ const pixelLight = {
     ".pixel-box": {
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
-      "background-color": "#FFFFFF",
+      "background-color": "#FDF8EF",
       "border-radius": "8px",
-      "padding": "1rem",
+      "padding": "0.75rem 1rem",
     },
 
     // Pixel Switch
@@ -185,29 +209,26 @@ const pixelLight = {
       "border-spacing": "0",
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
-      "background-color": "#FFFFFF",
-      "border-radius": "8px",
+      "background-color": "#FDF8EF",
       "& thead": {
         "background-color": "#FFD43B",
-        "border-top-left-radius": "8px",
-        "border-top-right-radius": "8px",
-        "border-bottom": "3px solid #000000",
+        "border-bottom": "2px solid #000000",
       },
       "& th": {
         "color": "#000000",
         "font-weight": "600",
         "text-align": "left",
         "padding": "1rem",
-        "border-bottom": "3px solid #000000",
-        "border-right": "3px solid #000000",
+        "border-bottom": "2px solid #000000",
+        "border-right": "2px solid #000000",
         "&:last-child": {
           "border-right": "none"
         }
       },
       "& td": {
         "padding": "1rem",
-        "border-bottom": "3px solid #000000",
-        "border-right": "3px solid #000000",
+        "border-bottom": "2px solid #000000",
+        "border-right": "2px solid #000000",
         "&:last-child": {
           "border-right": "none"
         }
@@ -215,12 +236,14 @@ const pixelLight = {
       "& tbody tr": {
         "transition": "background-color 0.2s",
         "&:hover": {
-          "background-color": "#F8F9FA"
+          "background-color": "#E3A018",
+          "color": "#000000"
         },
         "&:last-child td": {
           "border-bottom": "none"
         }
       },
+
       // 紧凑模式
       "&.pixel-table-compact": {
         "& th, & td": {
@@ -248,9 +271,10 @@ const pixelLight = {
 
     ".pixel-card": {
       "position": "relative",
-      "background-color": "#FFFFFF",
+      "background-color": "#9723C9",
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
+      "color": "#FFFFFF",
       "transition": "transform 0.2s, box-shadow 0.2s",
       "&:hover": {
         "transform": "translate(1px, 1px)",
@@ -265,12 +289,14 @@ const pixelLight = {
       "font-weight": "600",
       "display": "flex",
       "align-items": "center",
-      "justify-content": "space-between"
+      "justify-content": "space-between",
+      "color": "#FFFFFF",
     },
 
     ".pixel-card-body": {
       "padding": "1rem",
-      "background-color": "#FFFFFF"
+      "background-color": "#9723C9",
+      "color": "#FFFFFF",
     },
 
     ".pixel-card-footer": {
@@ -280,7 +306,8 @@ const pixelLight = {
       "display": "flex",
       "align-items": "center",
       "justify-content": "flex-end",
-      "gap": "0.5rem"
+      "gap": "0.5rem",
+      "color": "#FFFFFF",
     },
 
     ".pixel-card-compact": {
@@ -305,14 +332,15 @@ const pixelLight = {
       "width": "100%",
       "height": "auto",
       "border-bottom": "3px solid #000000",
-      "object-fit": "cover"
+      "object-fit": "cover",
+      "color": "#FFFFFF",
     },
 
     // 卡片标题
     ".pixel-card-title": {
       "font-size": "1.25rem",
       "font-weight": "600",
-      "color": "#000000",
+      "color": "#FFFFFF",
       "margin-bottom": "0.5rem"
     },
 
@@ -329,21 +357,59 @@ const pixelLight = {
     "--tab-radius": "0",
 
     // 进度条样式
-    ".progress": {
+    ".pixel-progress": {
       "height": "1.5rem",
       "border": "2px solid #000000",
       "background-color": "#FFFFFF",
-      "box-shadow": "3px 3px 0 0 #000000",
+      "box-shadow": "2px 2px 0 0 #000000",
+      "border-radius": "8px",
       "&::-webkit-progress-bar": {
-        "background-color": "#FFFFFF"
+        "background-color": "#FFFFFF",
+        "border-radius": "8px",
       },
       "&::-webkit-progress-value": {
-        "background-color": "#000000"
+        "background-color": "#2FFF2F",
+        "border-radius": "8px",
       },
       "&::-moz-progress-bar": {
-        "background-color": "#000000"
+        "background-color": "#000000",
+        "border-radius": "8px",
       }
     },
+
+    // Select
+    ".pixel-select": {
+      "border": "2px solid #000000",
+      "background-color": "#FFFFFF",
+      "box-shadow": "2px 2px 0 0 #000000",
+      "border-radius": "8px",
+      "cursor": "pointer",
+      "&:focus": {
+        "outline": "none",
+        "border-color": "#000000"
+      },
+    },
+
+    // Checkbox
+    ".checkbox": {
+      "border": "2px solid #000000",
+      "background-color": "#FFFFFF",
+      "margin-right": "0.5rem",
+      "box-shadow": "2px 2px 0 0 #000000",
+      "border-radius": "8px",
+      "cursor": "pointer",
+      "transition": "transform 0.2s, box-shadow 0.2s",
+      "&:hover": {
+        "border": "2px solid #000000",
+        "box-shadow": "2px 2px 0 0 #000000",
+        "border-radius": "8px",
+      },
+      "&:focus": {
+        "border": "2px solid #000000",
+        "box-shadow": "2px 2px 0 0 #000000",
+        "border-radius": "8px",
+        },
+    }
   };
 
 export default pixelLight;

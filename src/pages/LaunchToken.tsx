@@ -415,7 +415,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 </form>
 
                 {/* 计算结果显示框 */}
-                {/* <div className="w-full lg:w-[480px] p-6 border-2 border-dashed rounded-lg mt-4 lg:mt-[40px] lg:sticky lg:top-4"> */}
+                <div className="md:mt-6">
                     <Metrics
                         targetEras={targetEras}
                         epochesPerEra={epochesPerEra}
@@ -427,7 +427,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                         liquidityTokensRatio={liquidityTokensRatio}
                         symbol={symbol}
                     />
-                {/* </div> */}
+                </div>
             </div>
         </div>
     );

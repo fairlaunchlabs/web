@@ -28,7 +28,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
                     value={description}
                     onChange={(e) => onDescriptionChange(e.target.value)}
                     // className={`w-full px-3 py-2 border-2 border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${description ? 'border-base-content' : ''}`}
-                    className='textarea w-full'
+                    className='pixel-textarea w-full'
                     placeholder='Describe your development'
                     rows={4}
                 />

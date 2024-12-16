@@ -75,7 +75,7 @@ export const Metrics: React.FC<MetricsProps> = ({
 
 
     return (
-        <div className="pixel-box space-y-4 w-full lg:w-[480px] p-6 mt-4">
+        <div className="pixel-box space-y-4 w-full lg:w-[480px] p-6 mt-4" style={{}}>
             <div>
                 <p className="text-sm text-base-content/70 mb-1">Max Supply</p>
                 <p className="font-medium text-base-content">{calculateMetrics().maxSupply} {symbol}</p>

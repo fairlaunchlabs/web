@@ -41,5 +41,15 @@ export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 export const DARK_THEME = 'skypixel';
 export const LIGHT_THEME = 'pixel';
 
-export const BADGE_BG_COLORS = ["#2FFF2F", "#FF00F5", "#FF4911", "#FFFF00", "#7DF9FF", "#3300FF", "#7FBC8C", "#E3A018", "#9723C9"]
+export const BADGE_BG_COLORS = [
+    "#2FFF2F",
+    "#FF00F5",
+    "#FF4911",
+    "#FFFF00",
+    "#7DF9FF",
+    "#3300FF",
+    "#7FBC8C",
+    "#E3A018",
+    "#9723C9"
+]
 export const BADGE_TEXT_COLORS = ["black", "white", "white", "black", "black", "white", "black", "black", "white"]

@@ -145,7 +145,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
             </div>
 
             {/* Rest of the content */}
-            <div className="pixel-box bg-base-200 p-6">
+            <div className="pixel-box p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <DataBlock 
                         label="Current Era" 
@@ -290,7 +290,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
                         </div>
                         <progress 
-                            className="progress w-full" 
+                            className="pixel-progress w-full" 
                             value={Math.min(progressPercentage, 100)} 
                             max="100"
                         ></progress>
@@ -302,7 +302,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                         {(numberStringToBN(token.quantityMintedEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(numberStringToBN(token.targetMintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                         </div>
                         <progress 
-                            className="progress w-full" 
+                            className="pixel-progress w-full" 
                             value={Math.min(progressPercentageOfEpoch, 100)} 
                             max="100"
                         ></progress>

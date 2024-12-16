@@ -133,14 +133,13 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                 imageUrl={token.tokenMetadata?.image as string}
                                 name={token.tokenName}
                                 launchTimestamp={Number(token.metadataTimestamp)}
-                                // className="w-full h-full rounded-full border-2 border-base-300"
-                                className='avatar rounded-full'
+                                className='pixel-avatar'
                             />
                         </div>
                         <div className="flex-1 min-w-0 space-y-3">
                             <div className="flex items-center gap-2 mb-1">
                                 <h4 className="text-base font-bold truncate">{token.tokenName}</h4>
-                                <div className="badge badge-sm badge-primary">{token.tokenSymbol}</div>
+                                <div className="badge badge-md badge-accent px-3">{token.tokenSymbol}</div>
                             </div>
                             <div className="text-xs text-base-content/70">
                                 <span className="font-pixel">
@@ -166,7 +165,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="textarea textarea-bordered w-full h-24"
+                            className="pixel-textarea textarea-bordered w-full h-24"
                             placeholder="Enter token description..."
                         />
                     </div>

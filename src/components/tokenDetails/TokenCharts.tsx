@@ -548,7 +548,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                     <h2 className="text-xl font-semibold text-base-content">Mint Cost</h2>
                     <div className="flex items-center space-x-2">
                         <button 
-                            className="btn btn-sm btn-outline btn-primary"
+                            className="btn btn-sm btn-secondary"
                             onClick={() => _loadData(timeFrame)}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -556,7 +556,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                             </svg>
                         </button>
                         <button
-                            className="btn btn-sm btn-outline btn-primary"
+                            className="btn btn-sm btn-secondary"
                             onClick={() => setIsLineChart(!isLineChart)}
                         >
                             {isLineChart ? (

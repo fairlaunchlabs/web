@@ -16,31 +16,31 @@ export const Pagination: React.FC<PaginationProps> = ({
             </div>
             <div className="join">
                 <button 
-                    className="join-item btn btn-sm"
+                    className="join-item pagination-btn btn-sm"
                     onClick={() => onPageChange(1)}
                     disabled={currentPage === 1}
                 >
                     «
                 </button>
                 <button 
-                    className="join-item btn btn-sm"
+                    className="join-item pagination-btn btn-sm"
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                 >
                     ‹
                 </button>
-                <button className="join-item btn btn-sm">
+                <button className="join-item pagination-btn btn-sm">
                     Page {currentPage}
                 </button>
                 <button 
-                    className="join-item btn btn-sm"
+                    className="join-item pagination-btn btn-sm"
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={!hasMore}
                 >
                     ›
                 </button>
                 <button 
-                    className="join-item btn btn-sm"
+                    className="join-item pagination-btn btn-sm"
                     disabled
                 >
                     »

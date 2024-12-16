@@ -150,8 +150,8 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                 <div className="space-y-4">
                     {referralData ? (
                         <div className="space-y-2">
-                            <p className="font-semibold">
-                                HereYour URC for {token.tokenData?.tokenSymbol}
+                            <p className="">
+                                Here's your URC for {token.tokenData?.tokenSymbol}
                             </p>
                             <div className="flex justify-between items-center">
                                 <input
@@ -171,31 +171,28 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                     disabled={loading}
                                 >
                                     <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2h11v2H6v13H4V2zm4 4h12v16H8V6zm2 2v12h8V8h-8z" fill="currentColor"/> </svg>
-                                    {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                    </svg> */}
                                 </button>
                             </div>
                             <AlertBox title="Attention" message="The URC code is stored locally, please remember it when you change device!" />
 
-                            <p className="font-semibold">Current used count (Max: {referralUsageMaxCount})</p>
-                            <div className="input bg-base-200 p-2 break-all">
+                            <p className="">Current used count (Max: {referralUsageMaxCount})</p>
+                            <div className="pixel-box bg-base-200 p-2 break-all">
                                 {referralData.usageCount}
                             </div>
-                            <p className="font-semibold">Active URC time</p>
-                            <div className="input bg-base-200 p-2 break-all">
+                            <p className="">Active URC time</p>
+                            <div className="pixel-box bg-base-200 p-2 break-all">
                                 {new Date(Number(referralData.activeTimestamp) * 1000).toLocaleString()}
                             </div>
-                            <p className="font-semibold">Re-active URC time</p>
-                            <div className="input bg-base-200 p-2 break-all">
+                            <p className="">Re-active URC time</p>
+                            <div className="pixel-box bg-base-200 p-2 break-all">
                                 {new Date(Number(referralData.activeTimestamp) * 1000 + referrerResetIntervalSeconds * 1000).toLocaleString()}
                             </div>
 
                             {myReferrerCode && 
-                            <div>
-                                <p className="font-semibold text-primary">Your personal link</p>
+                            <div className="">
+                                <p className="mb-2">Your personal link</p>
                                 <div className="flex gap-2">
-                                    <div className="textarea bg-base-200 p-2 break-all flex-1">
+                                    <div className="pixel-box bg-base-200 p-2 break-all flex-1">
                                         {window.location.origin}/token/{token.tokenData?.mint}/{myReferrerCode}
                                     </div>
                                 </div>
@@ -211,7 +208,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                             {(new Date()).getTime() - Number(referralData.activeTimestamp) * 1000 > referrerResetIntervalSeconds * 1000 && <div className="space-y-2">
                                 {/* <div className="divider"></div> */}
                                 <button
-                                    className={`btn btn-outline btn-primary w-full mt-3`}
+                                    className={`btn btn-secondary w-full mt-3`}
                                     onClick={handleReactiveCode}
                                     disabled={loading}
                                 >
