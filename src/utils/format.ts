@@ -1,6 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { UTCTimestamp } from "lightweight-charts";
 import { MintData } from "../types/types";
+import { BADGE_BG_COLORS } from "../config/constants";
 
 export const formatAddress = (address: string, showCharacters = 4): string => {
     if (!address) return '';
@@ -270,3 +271,20 @@ export function getFeeValue(
 
     return [fee, codeSharerReward];
 }
+
+export const addressToNumber = (address: string, maxNumber: number): number => {
+    // Convert address to number array
+    const numbers = address.split('').map(char => char.charCodeAt(0));
+    
+    // Sum all numbers
+    const sum = numbers.reduce((acc, curr) => acc + curr, 0);
+    
+    // Use modulo to get a number between 0-99, then add 1 to get 1-100
+    return (sum % maxNumber) + 1;
+};
+
+export const addressToColor = (address: string): string => {
+    const number = addressToNumber(address, BADGE_BG_COLORS.length);
+    const colors = BADGE_BG_COLORS[number - 1];
+    return colors;
+};

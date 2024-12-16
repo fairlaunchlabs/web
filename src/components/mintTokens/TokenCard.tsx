@@ -82,7 +82,7 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
                 <div className='absolute top-2 right-2 flex gap-1.5'>
                     <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
                 </div>
-                <div className="absolute -top-6 -left-6 w-16 h-16 border-4 border-base-100 rounded-full shadow-lg overflow-hidden bg-base-200">
+                <div className="absolute -top-6 -left-6">
                     <TokenImage
                         imageUrl={metadata?.image as string}
                         name={token.tokenName}

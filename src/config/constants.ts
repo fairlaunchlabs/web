@@ -53,3 +53,6 @@ export const BADGE_BG_COLORS = [
     "#9723C9"
 ]
 export const BADGE_TEXT_COLORS = ["black", "white", "white", "black", "black", "white", "black", "black", "white"]
+export const DEPRECATED_SYMBOLS = [
+    "ar5", "ar4", "ar3", "aaa785"
+]

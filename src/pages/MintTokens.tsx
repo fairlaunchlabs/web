@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, useEffect } from 'react';
+import React, { useState, KeyboardEvent, useEffect, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '../utils/graphql';
 import { TokenCard } from '../components/mintTokens/TokenCard';
@@ -6,7 +6,8 @@ import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
 import { ErrorBox } from '../components/common/ErrorBox';
 import { formatAddress } from '../utils/format';
-import { BADGE_BG_COLORS, BADGE_TEXT_COLORS } from '../config/constants';
+import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS } from '../config/constants';
+import { TokenCardMobile } from '../components/mintTokens/TokenCardMobile';
 
 export const MintTokens: React.FC<MintTokensProps> = ({
     expanded
@@ -29,14 +30,6 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         setSearchHistory(newHistory);
         localStorage.setItem('search_history', JSON.stringify(newHistory));
     };
-
-    // 初始加载数据
-    // const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
-    //     variables: {
-    //         skip: 0,
-    //         first: 5
-    //     }
-    // });
 
     // 搜索查询
     const [searchTokens, { loading: searchLoading, error: searchError, data: searchData }] = useLazyQuery(queryInitializeTokenEventBySearch, {
@@ -79,11 +72,31 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         });
     };
 
+    // Filter out deprecated tokens
+    const filterTokens = (data: any) => {
+        if (!data?.initializeTokenEventEntities) return [];
+        return data.initializeTokenEventEntities.filter(
+            (token: InitiazlizedTokenData) => !DEPRECATED_SYMBOLS.includes(token.tokenSymbol)
+        );
+    };
+
+    const sortedTokens = useMemo(() => {
+        if (!searchData?.initializeTokenEventEntities) return [];
+        return [...searchData.initializeTokenEventEntities].sort((a, b) => {
+            const aValue = parseInt(a.difficultyCoefficientEpoch || '0');
+            const bValue = parseInt(b.difficultyCoefficientEpoch || '0');
+            return bValue - aValue; // 降序排序
+        });
+    }, [searchData]);
+
+    // Get the display data based on search mode
+    const displayData = {
+        initializeTokenEventEntities: filterTokens({ initializeTokenEventEntities: sortedTokens })
+    };
+
     // 合并错误和加载状态
     const loading = searchLoading;
     const error = searchError;
-    // 使用搜索结果或初始数据
-    const displayData = isSearchMode ? searchData : null;
 
     // if (loading) {
     //     return (
@@ -145,21 +158,21 @@ export const MintTokens: React.FC<MintTokensProps> = ({
                         })}
                     </div>
                 )}
-            </div>
 
-            {/* Token Cards // ###### TODO */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                {displayData?.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => (
-                    <TokenCard key={token.tokenId} token={token} />
-                ))}
-            </div>
-
-            {/* No Results Message */}
-            {displayData?.initializeTokenEventEntities.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                    No tokens found
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {displayData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => 
+                        <TokenCardMobile key={token.tokenId} token={token} />
+                    )}
                 </div>
-            )}
+
+                {/* No Results Message */}
+                {displayData.initializeTokenEventEntities.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                        No tokens found
+                    </div>
+                )}
+            </div>
+
         </div>
     );
 };

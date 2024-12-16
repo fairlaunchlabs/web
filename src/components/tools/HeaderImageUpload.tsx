@@ -97,9 +97,6 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                 <span className="label-text">Header Image (Max 3MB, suggested ratio width:height = 3:1)</span>
             </label>
             <div
-                // className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
-                //     ${isDragging ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary'}
-                // `}
                 className='pixed-box cursor-pointer'
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}

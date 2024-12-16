@@ -195,6 +195,10 @@ export type TokenCardProps = {
     token: InitiazlizedTokenData;
 }
 
+export type TokenCardMobileProps = {
+    token: InitiazlizedTokenData;
+}
+
 export type TokenFormData = {
     name: string;
     symbol: string;

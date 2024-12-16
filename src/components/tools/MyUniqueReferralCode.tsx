@@ -172,7 +172,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                 <thead>
                                     <tr>
                                         <th className="text-center"></th>
-                                        <th className="text-left">Name & Symbol</th>
+                                        <th className="text-left">Symbol & Name</th>
                                         <th className="text-left">Mint Address</th>
                                         <th className="text-left">Developer</th>
                                         <th className="text-right">Bonus</th>
@@ -200,8 +200,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                                 </td>
                                                 <td>
                                                     <div>
-                                                        <div className="font-bold">{metadata?.tokenName || item.mint}</div>
-                                                        <div className="text-sm opacity-50">{metadata?.tokenSymbol}</div>
+                                                        <div className="font-bold">{metadata?.tokenSymbol || item.mint}</div>
+                                                        <div className="text-sm opacity-50">{metadata?.tokenName}</div>
                                                     </div>
                                                 </td>
                                                 <td><AddressDisplay address={item.mint} /></td>

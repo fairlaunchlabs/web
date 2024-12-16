@@ -163,7 +163,7 @@ const pixelLight = {
     ".pixel-avatar": {
       "border": "2px solid #FFFFFF",
       "border-radius": "100%",
-      "box-shadow": "1px 1px 0 0 #000000",
+      // "box-shadow": "1px 1px 0 0 #000000",
     },
 
     // Collapse
@@ -179,6 +179,11 @@ const pixelLight = {
       "background-color": "#FDF8EF",
       "border-radius": "8px",
       "padding": "0.75rem 1rem",
+      "transition": "transform 0.2s, box-shadow 0.2s",
+      "&:hover": {
+        "transform": "translate(1px, 1px)",
+        "box-shadow": "2px 2px 0 0 #000000"
+      }
     },
 
     // Pixel Switch
@@ -419,7 +424,15 @@ const pixelLight = {
         "box-shadow": "2px 2px 0 0 #000000",
         "border-radius": "8px",
         },
-    }
+    },
+    
+    // Title
+    ".title": {
+      "font-size": "1.5rem",
+      "font-weight": "600",
+      "color": "#000000",
+      "text-shadow": "4px 4px 0 0 #FFFFFF",
+    },
   };
 
 export default pixelLight;

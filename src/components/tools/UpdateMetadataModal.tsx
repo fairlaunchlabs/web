@@ -137,8 +137,8 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                         </div>
                         <div className="flex-1 min-w-0 space-y-3">
                             <div className="flex items-center gap-2 mb-1">
-                                <h4 className="badge badge-md badge-accent px-3">{token.tokenName}</h4>
-                                <div className="text-base truncate ml-3">{token.tokenSymbol}</div>
+                                <h4 className="badge badge-md badge-secondary px-3">{token.tokenSymbol}</h4>
+                                <div className="text-base truncate ml-3">{token.tokenName}</div>
                             </div>
                             <div className="text-sm text-base-content/70">
                                 <span className="font-pixel">
@@ -279,7 +279,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                         <div className="modal-action">
                             <button
                                 type="submit"
-                                className={`btn btn-primary ${loading ? 'loading' : ''}`}
+                                className={`btn btn-primary`}
                                 disabled={loading || !isConfirmed}
                             >
                                 {loading ? 'Updating...' : 'Update Metadata'}

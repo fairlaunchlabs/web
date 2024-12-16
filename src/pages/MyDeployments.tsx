@@ -96,7 +96,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                 <thead>
                                     <tr>
                                         <th className="text-center"></th>
-                                        <th className="text-left">Name & Symbol</th>
+                                        <th className="text-left">Symbol & Name</th>
                                         <th className="text-left">Mint Address</th>
                                         <th className="text-right">Supply</th>
                                         <th className="text-center">Actions</th>
@@ -117,8 +117,8 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                 </div>
                                             </td>
                                             <td className="text-left cursor-pointer" onClick={() => handleClick(token.mint)}>
-                                                <div className="font-bold">{token.tokenName}</div>
-                                                <div className="text-sm opacity-50">{token.tokenSymbol}</div>
+                                                <div className="font-bold">{token.tokenSymbol}</div>
+                                                <div className="text-sm opacity-50">{token.tokenName}</div>
                                             </td>
                                             <td className="text-left">
                                                 <AddressDisplay address={token.mint} />

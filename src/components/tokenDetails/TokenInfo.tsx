@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { DataBlockProps, TokenInfoProps, TokenMetadataIPFS } from '../../types/types';
 import { 
+    addressToColor,
     BN_HUNDRED,
     BN_LAMPORTS_PER_SOL,
     calculateMaxSupply, 
@@ -17,6 +18,9 @@ import { TokenImage } from '../mintTokens/TokenImage';
 import MintModal from '../mintTokens/MintModal';
 import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
 import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from '../../config/constants';
+import { TokenHero } from './TokenHero';
+import { useDeviceType } from '../../utils/contexts';
+import { TokenHeroMobile } from './TokenHeroMobile';
 
 const tooltip = {
     currentEra: "The current era number in the token's lifecycle",
@@ -51,6 +55,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+    const { isMobile } = useDeviceType();
 
     useEffect(() => {
         setIsLoading(true);
@@ -94,55 +99,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     return (
         <div className="w-full space-y-6">
             {/* Header Section with Background */}
-            <div className="w-full relative">
-                {/* Background Image */}
-                {metadata && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
-                    <img
-                        src={metadata.header}
-                        alt="Token Header"
-                        className="w-full h-auto aspect-[3/1] object-cover"
-                    />
-                ) : (
-                    <div className="w-full aspect-[3/1]" />
-                )}
-                
-                {/* Double Gradient Overlay for better text contrast */}
-                {/* <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60 rounded-t-lg" />
-                <div className="absolute inset-0 bg-gradient-to-t from-base-200/80 via-base-200/20 to-transparent rounded-t-lg" /> */}
-
-                {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex gap-6 items-end">
-                    {/* Token Image */}
-                    <div className="w-24 h-24 relative z-10">
-                        <TokenImage
-                            imageUrl={metadata?.image as string} 
-                            name={metadata?.name as string} 
-                            launchTimestamp={Number(token.metadataTimestamp)}
-                            size={96} 
-                            className="rounded-full ring-4 ring-white shadow-xl" />
-                    </div>
-
-                    {/* Token Info with enhanced text shadows */}
-                    <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className="text-3xl font-bold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.8),0_4px_12px_rgba(0,0,0,0.4)]">
-                                    {metadata?.name}
-                                </h1>
-                                <p className="text-xl text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.6),0_3px_6px_rgba(0,0,0,0.3)]">
-                                    {metadata?.symbol}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="mt-2 [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">
-                            <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
-                        </div>
-                        <p className="mt-3 text-white line-clamp-2 [text-shadow:0_1px_3px_rgba(0,0,0,0.6),0_2px_4px_rgba(0,0,0,0.3)]">
-                            {metadata?.description}
-                        </p>
-                    </div>
-                </div>
-            </div>
+            {isMobile ? <TokenHeroMobile token={token} metadata={metadata as TokenMetadataIPFS} /> : <TokenHero token={token} metadata={metadata as TokenMetadataIPFS} />}
 
             {/* Rest of the content */}
             <div className="pixel-box p-6">
@@ -329,6 +286,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
                     </button>
                 </div>)}
             </div>
+
             <MintModal 
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

@@ -23,9 +23,9 @@ export const RenderSocialIcons:FC<RenderSocialIconsProps> = ({ metadata }) => {
                         href={social.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-base-content/10 hover:bg-base-content/20 transition-colors"
+                        className="btn btn-sm w-8 h-8 p-0"
                     >
-                        <social.icon className="w-3 h-3 text-white" />
+                        <social.icon />
                     </a>
                 )
             ))}

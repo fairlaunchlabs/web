@@ -114,7 +114,7 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
                 { status: 1 }
             ]
         }
-        orderBy: tokenId
+        orderBy: difficultyCoefficientEpoch
         orderDirection: desc
     ) {
         id
