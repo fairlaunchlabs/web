@@ -148,11 +148,11 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                 ) : (
                     <div className="pixel-box flex flex-col items-center justify-center py-8">
                         <svg className="mx-auto h-12 w-12 text-base-content" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M22 3H2v18h20v-2h-2v-2h2v-2h-2v-2h2v-2h-2V9h2V7h-2V5h2V3zm-2 4v2h-2v2h2v2h-2v2h2v2h-2v2H4V5h14v2h2zm-6 2h-2v2h-2v2H8v2H6v2h2v-2h2v-2h2v-2h2v2h2v-2h-2V9zM6 7h2v2H6V7z" fill="currentColor"/> </svg>
-                        <p className="mt-2 text-sm text-base-content">
-                            Drag and drop an image here, or click to select
-                        </p>
-                        <p className="mt-1 text-xs text-base-content">
-                            PNG, JPG, GIF up to {MAX_HEADER_FILE_SIZE / 1024 / 1024}MB
+                        <div className="text-sm text-base-content">
+                            <span className="font-medium text-primary">Click to upload</span> or drag and drop
+                        </div>
+                        <p className="text-xs text-base-content">
+                            PNG, JPG, GIF up to {MAX_HEADER_FILE_SIZE / 1024 / 1024} MB (must be square)
                         </p>
                     </div>
                 )}
