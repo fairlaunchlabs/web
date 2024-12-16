@@ -133,15 +133,14 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                 imageUrl={token.tokenMetadata?.image as string}
                                 name={token.tokenName}
                                 launchTimestamp={Number(token.metadataTimestamp)}
-                                className='pixel-avatar'
                             />
                         </div>
                         <div className="flex-1 min-w-0 space-y-3">
                             <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-base font-bold truncate">{token.tokenName}</h4>
-                                <div className="badge badge-md badge-accent px-3">{token.tokenSymbol}</div>
+                                <h4 className="badge badge-md badge-accent px-3">{token.tokenName}</h4>
+                                <div className="text-base truncate ml-3">{token.tokenSymbol}</div>
                             </div>
-                            <div className="text-xs text-base-content/70">
+                            <div className="text-sm text-base-content/70">
                                 <span className="font-pixel">
                                     <AddressDisplay address={token.mint} showCharacters={10}/>
                                 </span>

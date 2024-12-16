@@ -171,7 +171,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-left">Token</th>
+                                        <th className="text-center"></th>
+                                        <th className="text-left">Name & Symbol</th>
                                         <th className="text-left">Mint Address</th>
                                         <th className="text-left">Developer</th>
                                         <th className="text-right">Bonus</th>
@@ -192,13 +193,15 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                                                 name={metadata.tokenName} 
                                                                 launchTimestamp={Number(item.metadataTimestamp)}
                                                                 size={40} 
-                                                                className='rounded-full' 
+                                                                className='w-12 h-12' 
                                                             />}
                                                         </div>
-                                                        <div>
-                                                            <div className="font-bold">{metadata?.tokenName || item.mint}</div>
-                                                            <div className="text-sm opacity-50">{metadata?.tokenSymbol}</div>
-                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <div className="font-bold">{metadata?.tokenName || item.mint}</div>
+                                                        <div className="text-sm opacity-50">{metadata?.tokenSymbol}</div>
                                                     </div>
                                                 </td>
                                                 <td><AddressDisplay address={item.mint} /></td>

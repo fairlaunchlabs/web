@@ -95,7 +95,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-left"></th>
+                                        <th className="text-center"></th>
                                         <th className="text-left">Name & Symbol</th>
                                         <th className="text-left">Mint Address</th>
                                         <th className="text-right">Supply</th>
@@ -105,14 +105,14 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                 <tbody>
                                     {initialData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => (
                                         <tr key={token.id} className="hover">
-                                            <td className="text-left cursor-pointer" onClick={() => handleClick(token.mint)}>
+                                            <td className="text-center cursor-pointer" onClick={() => handleClick(token.mint)}>
                                                 <div className="">
                                                     <TokenImage 
                                                         imageUrl={tokenMetadataMap[token.mint]?.tokenMetadata?.image || ''}
                                                         name={token.tokenName}
                                                         launchTimestamp={Number(token.metadataTimestamp)}
                                                         size={48}
-                                                        className="w-12 h-12 rounded-full"
+                                                        className="w-12 h-12"
                                                     />
                                                 </div>
                                             </td>

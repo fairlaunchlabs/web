@@ -243,7 +243,7 @@ export const TokenImage: React.FC<TokenImageProps> = ({
         <img
             src={imageData}
             alt={name || 'Token'}
-            className={`object-cover ${className}`}
+            className={`pixel-avatar ${className}`}
             style={{ width: size, height: size }}
             loading="lazy"
             onError={() => {

@@ -48,7 +48,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             className={``}
                             onClick={(e) => {
                                 e.preventDefault();
-                                window.location.href = '/';
+                                window.location.href = '/home';
                             }}
                         >
                             <Logo />

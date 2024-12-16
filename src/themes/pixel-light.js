@@ -61,6 +61,15 @@ const pixelLight = {
       }
     },
 
+    ".btn-error": {
+      "background-color": "#FF4911",
+      "color": "#FFFFFF",
+      "&:hover": {
+        "background-color": "#FA4007",
+        "color": "#FFFFFF",
+      }
+    },
+
     ".search-btn": {
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
@@ -152,8 +161,9 @@ const pixelLight = {
 
     // Avatar
     ".pixel-avatar": {
-      "border": "3px solid #000000",
+      "border": "2px solid #FFFFFF",
       "border-radius": "100%",
+      "box-shadow": "1px 1px 0 0 #000000",
     },
 
     // Collapse
@@ -378,7 +388,7 @@ const pixelLight = {
     },
 
     // Select
-    ".pixel-select": {
+    ".select": {
       "border": "2px solid #000000",
       "background-color": "#FFFFFF",
       "box-shadow": "2px 2px 0 0 #000000",
