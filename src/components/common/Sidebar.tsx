@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { MenuItem, SidebarProps } from '../../types/types';
 import { LOCAL_STORAGE_KEY_EXPANDED } from '../../config/constants';
+import { FaTwitter, FaDiscord, FaTelegram, FaGithub, FaMedium } from 'react-icons/fa';
+import { socialLinks } from '../../config/social';
+import { useDeviceType } from '../../utils/contexts';
 
 export const Sidebar: React.FC<SidebarProps> = ({
     menuItems,
@@ -12,22 +15,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [expandedSubMenus, setExpandedSubMenus] = useState<string[]>([]);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const socialIcons = [
+        { icon: <FaTwitter className="w-5 h-5 md:w-6 md:h-6" />, ...socialLinks.twitter },
+        { icon: <FaDiscord className="w-5 h-5 md:w-6 md:h-6" />, ...socialLinks.discord },
+        { icon: <FaTelegram className="w-5 h-5 md:w-6 md:h-6" />, ...socialLinks.telegram },
+        { icon: <FaGithub className="w-5 h-5 md:w-6 md:h-6" />, ...socialLinks.github },
+        { icon: <FaMedium className="w-5 h-5 md:w-6 md:h-6" />, ...socialLinks.medium },
+    ];
 
-    // 监听窗口大小变化
-    useEffect(() => {
-        const handleResize = () => {
-            const mobile = window.innerWidth < 768;
-            setIsMobile(mobile);
-        };
+    const {isMobile, isDesktop} = useDeviceType();
 
-        window.addEventListener('resize', handleResize);
-        handleResize(); // 初始化检查
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    // 从 localStorage 加载展开状态
     useEffect(() => {
         const savedExpandedMenus = localStorage.getItem(LOCAL_STORAGE_KEY_EXPANDED);
         if (savedExpandedMenus) {
@@ -119,11 +116,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }
             </button>
             
+            {/* Menu items */}
             <div className={`h-full overflow-y-auto ${isMobile ? 'mt-16' : 'mt-6'}`}>
                 <ul className="menu bg-base-300 w-full p-2 rounded-box">
                     {menuItems.map(item => renderMenuItem(item))}
                 </ul>
             </div>
+
+            {/* Social icons */}
+            <div className="absolute bottom-20 left-5">
+                {socialIcons.map((social, index) => (
+                    <a
+                        key={index}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-circle btn-sm mr-3 mb-3"
+                        title={social.name}
+                    >
+                        {social.icon}
+                    </a>
+                ))}
+            </div>
+
         </div>
     );
 };

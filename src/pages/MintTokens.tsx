@@ -5,6 +5,8 @@ import { TokenCard } from '../components/mintTokens/TokenCard';
 import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
 import { ErrorBox } from '../components/common/ErrorBox';
+import { formatAddress } from '../utils/format';
+import { BADGE_BG_COLORS, BADGE_TEXT_COLORS } from '../config/constants';
 
 export const MintTokens: React.FC<MintTokensProps> = ({
     expanded
@@ -83,13 +85,13 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     // 使用搜索结果或初始数据
     const displayData = isSearchMode ? searchData : null;
 
-    if (loading) {
-        return (
-            <div className={`flex justify-center items-center min-h-[200px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
+    // if (loading) {
+    //     return (
+    //         <div className={`flex justify-center items-center min-h-[200px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+    //             <span className="loading loading-spinner loading-lg"></span>
+    //         </div>
+    //     );
+    // }
 
     if (error) {
         return (
@@ -103,7 +105,7 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:px-8 md:py-6 pl-5 pr-4 py-6 mb-20`}>
             {/* Search Bar */}
             <div className="max-w-6xl mx-auto mb-12">
-                <div className="join w-full">
+                <div className="join w-full mb-2">
                     <div className="relative join-item flex-1">
                         <input
                             type="text"
@@ -111,12 +113,12 @@ export const MintTokens: React.FC<MintTokensProps> = ({
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            className="input input-bordered w-full pl-10 focus:outline-none focus:border-primary focus:border-2 rounded-r-none"
+                            className='input search-input w-full pl-10'
                         />
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
                     <button 
-                        className="btn join-item btn-primary"
+                        className="search-btn join-item btn-primary w-24"
                         onClick={handleSearch}
                         disabled={loading}
                     >
@@ -127,15 +129,20 @@ export const MintTokens: React.FC<MintTokensProps> = ({
                 {/* Search History */}
                 {searchHistory.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
-                        {searchHistory.map((term, index) => (
-                            <button
+                        {searchHistory.map((term, index) => {
+                            const colorIndex = index % BADGE_BG_COLORS.length;
+                            return <button
                                 key={index}
                                 onClick={() => handleHistoryClick(term)}
-                                className="btn btn-sm btn-ghost text-sm hover:bg-base-200 hover:text-focus text-gray-500 transition-colors"
+                                className={`badge`}
+                                style={{
+                                    backgroundColor: BADGE_BG_COLORS[colorIndex],
+                                    color: BADGE_TEXT_COLORS[colorIndex]
+                                }}
                             >
-                                {term}
+                                {term.length > 40 ? formatAddress(term, 6) : term}
                             </button>
-                        ))}
+                        })}
                     </div>
                 )}
             </div>

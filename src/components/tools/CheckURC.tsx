@@ -5,6 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import { getReferralDataByCodeHash, getReferrerCodeHash, getTokenBalance } from '../../utils/web3';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { CheckURCProps, SetRefererCodeEntity } from '../../types/types';
+import { FaSearch } from 'react-icons/fa';
 
 export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     const { connection } = useConnection();
@@ -56,21 +57,24 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
         <div className={`space-y-6 p-6 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
             <h2 className="text-2xl text-center font-bold">Validate URC</h2>
             <div className="max-w-5xl mx-auto w-full flex flex-col gap-4">
-                <div className="flex gap-2">
+                <div className="join w-full">
+                    <div className='relative join-item flex-1'>
                     <input
                         type="text"
                         placeholder="Enter URC ID"
-                        className="input input-bordered flex-1"
+                        className='input search-input w-full pl-10'
                         value={searchId}
                         onChange={(e) => setSearchId(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
+                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
                     <button 
-                        className={`btn btn-primary ${loading ? 'loading' : ''}`}
+                        className="search-btn join-item btn-primary w-24"
                         onClick={handleSearch}
                         disabled={loading}
                     >
-                        Search
+                        {loading ? <span className="loading loading-spinner loading-sm"></span> : 'Search'}
                     </button>
                 </div>
 

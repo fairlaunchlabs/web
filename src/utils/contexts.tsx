@@ -75,38 +75,50 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
     );
 };
 
-// 在这里可以继续添加其他的Context
-// 例如：
-/*
-// User Context
-interface UserContextType {
-    user: User | null;
-    login: (user: User) => void;
-    logout: () => void;
-}
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
-
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // ... implementation
-};
-
-export const useUser = () => {
-    const context = useContext(UserContext);
-    if (context === undefined) {
-        throw new Error('useUser must be used within a UserProvider');
-    }
-    return context;
-};
-
-// 然后在Providers组件中添加：
-export const Providers: React.FC<ProvidersProps> = ({ children }) => {
-    return (
-        <ThemeProvider>
-            <UserProvider>
-                {children}
-            </UserProvider>
-        </ThemeProvider>
-    );
-};
-*/
+// 定义设备类型枚举
+export enum DeviceType {
+    Mobile = 'mobile',
+    Desktop = 'desktop'
+  }
+  
+  // 定义断点
+  const MOBILE_BREAKPOINT = 768; // 小于这个宽度认为是移动设备
+  
+  export const useDeviceType = () => {
+    // 初始化设备类型状态
+    const [deviceType, setDeviceType] = useState<DeviceType>(() => {
+      // 初始化时判断窗口宽度
+      return window.innerWidth < MOBILE_BREAKPOINT
+        ? DeviceType.Mobile
+        : DeviceType.Desktop;
+    });
+  
+    useEffect(() => {
+      // 创建处理窗口大小变化的函数
+      const handleResize = () => {
+        const width = window.innerWidth;
+        const newDeviceType = width < MOBILE_BREAKPOINT
+          ? DeviceType.Mobile
+          : DeviceType.Desktop;
+        
+        setDeviceType(newDeviceType);
+      };
+  
+      // 添加事件监听器
+      window.addEventListener('resize', handleResize);
+  
+      // 清理函数
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []); // 空依赖数组，只在组件挂载时运行
+  
+    // 返回当前设备类型和一些辅助函数
+    return {
+      deviceType,
+      isMobile: deviceType === DeviceType.Mobile,
+      isDesktop: deviceType === DeviceType.Desktop
+    };
+  };
+  

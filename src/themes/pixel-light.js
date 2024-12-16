@@ -31,12 +31,16 @@ const pixelLight = {
     "warning": "#FFD43B",
     "error": "#FF6B6B",
 
+    // 按钮
     ".btn": {
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
+      "border-radius": "8px",
       "&:hover": {
-        "box-shadow": "2px 2px 0 0 #000000",
-        "transform": "translate(1px, 1px)"
+        "border": "2px solid #333333",
+        "box-shadow": "3px 3px 0 0 #000000",
+        "transform": "translate(1px, 1px)",
+        "background-color": "#FDF8EF"
       }
     },
     ".btn-primary": {
@@ -47,9 +51,24 @@ const pixelLight = {
       "background-color": "#FFFFFF",
       "color": "#000000"
     },
+
+    ".search-btn": {
+      "border": "2px solid #000000",
+      "box-shadow": "3px 3px 0 0 #000000",
+      "border-radius": "8px",
+      "&:hover": {
+        "border": "2px solid #333333",
+        "box-shadow": "3px 3px 0 0 #000000",
+        "background-color": "#f8d764"
+      }
+    },
+
+    // Badge
     ".badge": {
-      "border": "3px solid #000000",
-      "box-shadow": "3px 3px 0 0 #000000"
+      "border": "2px solid #000000",
+      "box-shadow": "2px 2px 0 0 #000000",
+      "height": "1.75rem",
+      "border-radius": "6px",
     },
     ".badge-neutral": {
       "background-color": "#F5F0E6",
@@ -67,43 +86,68 @@ const pixelLight = {
       "background-color": "#FFD43B",
       "color": "#000000"
     },
+
+    // Input
     ".input": {
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "background-color": "#FFFFFF",
       "box-shadow": "3px 3px 0 0 #000000",
+      "border-radius": "8px",
       "&:focus": {
         "outline": "none",
         "border-color": "#000000"
       }
     },
+
+    // Search input
+    ".search-input": {
+      "border-top-left-radius": "8px",
+      "border-bottom-left-radius": "8px",
+      "border-top-right-radius": "0",
+      "border-bottom-right-radius": "0",
+    },
+
+    // Textarea
     ".textarea": {
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "background-color": "#FFFFFF",
       "box-shadow": "3px 3px 0 0 #000000",
+      "border-radius": "8px",
       "&:focus": {
         "outline": "none",
         "border-color": "#000000"
       }
     },
+
+    // Alert
     ".alert": {
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
       "background-color": "#FFD43B",
       "color": "#000000"
     },
+
+    // Avatar
     ".avatar": {
-      "border": "3px solid #000000"
+      "border": "2px solid #000000"
     },
+
+    // Collapse
     ".collapse": {
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000"
     },
+
+    // Pixel Box
     ".pixel-box": {
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
       "background-color": "#FFFFFF",
+      "border-radius": "8px",
       "padding": "1rem",
     },
+
+    // Pixel Switch
     ".pixel-switch": {
       "position": "relative",
       "display": "inline-flex",
@@ -111,21 +155,23 @@ const pixelLight = {
       "width": "3.5rem",
       "flex-shrink": "0",
       "cursor": "pointer",
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "background-color": "#FFFFFF",
       "transition": "background-color 0.2s",
-      "box-shadow": "3px 3px 0 0 #000000",
+      "box-shadow": "2px 2px 0 0 #000000",
+      "border-radius": "6px",
       "&[data-checked=true]": {
         "background-color": "#FFD43B",
       }
     },
     ".pixel-switch-button": {
       "position": "absolute",
-      "top": "2px",
-      "left": "2px",
+      "top": "3px",
+      "left": "3px",
       "height": "calc(2rem - 10px)",
       "width": "calc(2rem - 10px)",
       "background-color": "#000000",
+      "border-radius": "4px",
       "transition": "transform 0.2s",
       "border": "2px solid #000000",
       "&[data-checked=true]": {
@@ -137,11 +183,14 @@ const pixelLight = {
       "width": "100%",
       "border-collapse": "separate",
       "border-spacing": "0",
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
       "background-color": "#FFFFFF",
+      "border-radius": "8px",
       "& thead": {
         "background-color": "#FFD43B",
+        "border-top-left-radius": "8px",
+        "border-top-right-radius": "8px",
         "border-bottom": "3px solid #000000",
       },
       "& th": {
@@ -185,7 +234,7 @@ const pixelLight = {
       // 边框模式
       "&.pixel-table-bordered": {
         "& th, & td": {
-          "border": "3px solid #000000"
+          "border": "2px solid #000000"
         }
       }
     },
@@ -193,14 +242,14 @@ const pixelLight = {
     ".pixel-table-container": {
       "width": "100%",
       "overflow-x": "auto",
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
     },
 
     ".pixel-card": {
       "position": "relative",
       "background-color": "#FFFFFF",
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
       "transition": "transform 0.2s, box-shadow 0.2s",
       "&:hover": {
@@ -282,7 +331,7 @@ const pixelLight = {
     // 进度条样式
     ".progress": {
       "height": "1.5rem",
-      "border": "3px solid #000000",
+      "border": "2px solid #000000",
       "background-color": "#FFFFFF",
       "box-shadow": "3px 3px 0 0 #000000",
       "&::-webkit-progress-bar": {
