@@ -7,6 +7,7 @@ import { ReferralCodeModalProps, ReferrerData } from '../../types/types';
 import { LOCAL_STORAGE_MY_REFERRAL_CODE, NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
 import AlertBox from '../common/AlertBox';
+import { ModalTopBar } from '../common/ModalTopBar';
 
 export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     isOpen,
@@ -139,21 +140,81 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box relative">
-                <button
-                    className="btn btn-circle btn-sm absolute right-2 top-2"
-                    onClick={onClose}
-                >
-                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>
-                </button>
-                <h3 className="font-bold text-lg mb-4">Activate Unique Referral Code(URC)</h3>
-                <div className="space-y-4">
-                    {referralData ? (
-                        <div className="space-y-2">
-                            <p className="">
-                                Here's your URC for {token.tokenData?.tokenSymbol}
-                            </p>
-                            <div className="flex justify-between items-center">
+            <div className="modal-box relative p-3">
+                <ModalTopBar title="My Referral Code" onClose={onClose} />
+                <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">
+                    <div className="space-y-4">
+                        {referralData ? (
+                            <div className="space-y-2">
+                                <p className="">
+                                    Here's your URC for {token.tokenData?.tokenSymbol}
+                                </p>
+                                <div className="flex justify-between items-center">
+                                    <input
+                                        type="text"
+                                        value={myReferrerCode}
+                                        onChange={(e) => setMyReferrerCode(e.target.value)}
+                                        // className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
+                                        className='input w-full'
+                                        placeholder="Enter your favourite name as URC"
+                                    />
+                                    <button
+                                        className="btn btn-circle btn-sm btn-ghost ml-2"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(myReferrerCode);
+                                            toast.success('URC copied to clipboard!');
+                                        }}
+                                        disabled={loading}
+                                    >
+                                        <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2h11v2H6v13H4V2zm4 4h12v16H8V6zm2 2v12h8V8h-8z" fill="currentColor"/> </svg>
+                                    </button>
+                                </div>
+                                <AlertBox title="Attention" message="The URC code is stored locally, please remember it when you change device!" />
+
+                                <p className="">Current used count (Max: {referralUsageMaxCount})</p>
+                                <div className="pixel-box bg-base-200 p-2 break-all">
+                                    {referralData.usageCount}
+                                </div>
+                                <p className="">Active URC time</p>
+                                <div className="pixel-box bg-base-200 p-2 break-all">
+                                    {new Date(Number(referralData.activeTimestamp) * 1000).toLocaleString()}
+                                </div>
+                                <p className="">Re-active URC time</p>
+                                <div className="pixel-box bg-base-200 p-2 break-all">
+                                    {new Date(Number(referralData.activeTimestamp) * 1000 + referrerResetIntervalSeconds * 1000).toLocaleString()}
+                                </div>
+
+                                {myReferrerCode && 
+                                <div className="">
+                                    <p className="mb-2">Your personal link</p>
+                                    <div className="flex gap-2">
+                                        <div className="pixel-box bg-base-200 p-2 break-all flex-1">
+                                            {window.location.origin}/token/{token.tokenData?.mint}/{myReferrerCode}
+                                        </div>
+                                    </div>
+                                </div>}
+                                <button
+                                    className="btn btn-primary w-full text-primary-content"
+                                    onClick={handleCopyLink}
+                                    disabled={loading}
+                                >
+                                    Copy the link and share to your friends
+                                </button>
+
+                                {(new Date()).getTime() - Number(referralData.activeTimestamp) * 1000 > referrerResetIntervalSeconds * 1000 && <div className="space-y-2">
+                                    {/* <div className="divider"></div> */}
+                                    <button
+                                        className={`btn btn-secondary w-full mt-3`}
+                                        onClick={handleReactiveCode}
+                                        disabled={loading}
+                                    >
+                                        Reactive URC
+                                    </button>
+                                </div>}
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                <p>Enter your favourite name as a Unique Referral Code(URC) for {token.tokenData?.tokenSymbol}</p>
                                 <input
                                     type="text"
                                     value={myReferrerCode}
@@ -162,84 +223,17 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                     className='input w-full'
                                     placeholder="Enter your favourite name as URC"
                                 />
+                                <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
                                 <button
-                                    className="btn btn-circle btn-sm btn-ghost ml-2"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(myReferrerCode);
-                                        toast.success('URC copied to clipboard!');
-                                    }}
-                                    disabled={loading}
+                                    className={`btn btn-primary w-full mt-3`}
+                                    onClick={handleGetCode}
                                 >
-                                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2h11v2H6v13H4V2zm4 4h12v16H8V6zm2 2v12h8V8h-8z" fill="currentColor"/> </svg>
+                                    Get URC
                                 </button>
                             </div>
-                            <AlertBox title="Attention" message="The URC code is stored locally, please remember it when you change device!" />
-
-                            <p className="">Current used count (Max: {referralUsageMaxCount})</p>
-                            <div className="pixel-box bg-base-200 p-2 break-all">
-                                {referralData.usageCount}
-                            </div>
-                            <p className="">Active URC time</p>
-                            <div className="pixel-box bg-base-200 p-2 break-all">
-                                {new Date(Number(referralData.activeTimestamp) * 1000).toLocaleString()}
-                            </div>
-                            <p className="">Re-active URC time</p>
-                            <div className="pixel-box bg-base-200 p-2 break-all">
-                                {new Date(Number(referralData.activeTimestamp) * 1000 + referrerResetIntervalSeconds * 1000).toLocaleString()}
-                            </div>
-
-                            {myReferrerCode && 
-                            <div className="">
-                                <p className="mb-2">Your personal link</p>
-                                <div className="flex gap-2">
-                                    <div className="pixel-box bg-base-200 p-2 break-all flex-1">
-                                        {window.location.origin}/token/{token.tokenData?.mint}/{myReferrerCode}
-                                    </div>
-                                </div>
-                            </div>}
-                            <button
-                                className="btn btn-primary w-full text-primary-content"
-                                onClick={handleCopyLink}
-                                disabled={loading}
-                            >
-                                Copy the link and share to your friends
-                            </button>
-
-                            {(new Date()).getTime() - Number(referralData.activeTimestamp) * 1000 > referrerResetIntervalSeconds * 1000 && <div className="space-y-2">
-                                {/* <div className="divider"></div> */}
-                                <button
-                                    className={`btn btn-secondary w-full mt-3`}
-                                    onClick={handleReactiveCode}
-                                    disabled={loading}
-                                >
-                                    Reactive URC
-                                </button>
-                            </div>}
-                        </div>
-                    ) : (
-                        <div className="space-y-2">
-                            <p>Enter your favourite name as a Unique Referral Code(URC) for {token.tokenData?.tokenSymbol}</p>
-                            <input
-                                type="text"
-                                value={myReferrerCode}
-                                onChange={(e) => setMyReferrerCode(e.target.value)}
-                                // className={`w-full px-3 py-2 bg-base-300 border-2 border-base-300 hover:border-2 hover:border-dashed rounded-lg hover:border-primary transition-colors focus:outline-none focus:border-primary focus:border-2 bg-base-100 ${myReferrerCode ? 'border-base-content' : ''}`}
-                                className='input w-full'
-                                placeholder="Enter your favourite name as URC"
-                            />
-                            <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
-                            <button
-                                className={`btn btn-primary w-full mt-3`}
-                                onClick={handleGetCode}
-                            >
-                                Get URC
-                            </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
-            <div className="modal-backdrop" onClick={onClose}>
-                <button className="cursor-default">Close</button>
             </div>
         </div>
     );

@@ -6,6 +6,8 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { formatPrice, formatTimestamp } from '../../utils/format';
 import { Pagination } from '../common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
+import { ErrorBox } from '../common/ErrorBox';
+import { ModalTopBar } from '../common/ModalTopBar';
 
 interface ReferralBonusDetailModalProps {
     isOpen: boolean;
@@ -44,11 +46,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
     );
 
     if (error) return (
-        <div className="modal modal-open">
-            <div className="modal-box">
-                <div className="text-error">Error: {error.message}</div>
-            </div>
-        </div>
+        <ErrorBox title="Error" message={error.message} />
     );
 
     const paginatedEntities = data.mintTokenEntities.slice(
@@ -71,14 +69,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
     return (
         <div className="modal modal-open">
             <div className="modal-box w-11/12 max-w-5xl">
-                <button 
-                    className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" 
-                    onClick={handleClose}
-                >
-                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>
-                </button>
-                <h3 className="font-bold text-lg mb-4">Referral Bonus Details</h3>
-                
+                <ModalTopBar title={`Referral Bonus Details`} onClose={onClose} />                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div className="pixel-card">
                         <div className="pixel-card-body">

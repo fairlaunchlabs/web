@@ -8,6 +8,7 @@ import { NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
 import { BN_LAMPORTS_PER_SOL, formatPrice, getFeeValue, numberStringToBN } from '../../utils/format';
 import { AddressDisplay } from '../common/AddressDisplay';
+import { ModalTopBar } from '../common/ModalTopBar';
 
 interface MintModalProps {
     isOpen: boolean;
@@ -152,114 +153,110 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box relative">
-                <button
-                    className="btn btn-circle btn-sm absolute right-2 top-2"
-                    onClick={onClose}
-                >
-                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>
-                </button>
-                <h3 className="text-heading text-lg mb-4">Mint {token.tokenSymbol}</h3>
-                <div className="space-y-4">
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Unique Referral Code(URC)</span>
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Enter referral code"
-                            className="input input-bordered w-full"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            disabled={loading}
-                        />
-                    </div>
-                    {code &&
-                    <div className="pixel-box mt-4 space-y-2 bg-base-200 p-4">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">Current fee</span>
-                            <span className="text-medium">{
-                                isValidCode ?
-                                    (parseInt(token.feeRate) / LAMPORTS_PER_SOL).toFixed(4) + " SOL"
-                                    : '-'
-                                }
-                            </span>
+            <div className="modal-box relative p-3">
+                <ModalTopBar title={`Mint ${token.tokenSymbol}`} onClose={onClose} />
+                <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">
+                    <div className="space-y-4">
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Unique Referral Code(URC)</span>
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter referral code"
+                                className="input input-bordered w-full"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                disabled={loading}
+                            />
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">Current mint size</span>
-                            <span className="text-medium">{
-                                isValidCode ? 
-                                    (parseFloat(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toFixed(4) + " " + token.tokenSymbol
-                                    : '-'
-                                }
-                            </span>
+                        {code &&
+                        <div className="pixel-box mt-4 space-y-2 bg-base-200 p-4">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">Current fee</span>
+                                <span className="text-medium">{
+                                    isValidCode ?
+                                        (parseInt(token.feeRate) / LAMPORTS_PER_SOL).toFixed(4) + " SOL"
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">Current mint size</span>
+                                <span className="text-medium">{
+                                    isValidCode ? 
+                                        (parseFloat(token.mintSizeEpoch) / LAMPORTS_PER_SOL).toFixed(4) + " " + token.tokenSymbol
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">Current price</span>
+                                <span className="text-medium">{
+                                    isValidCode ? 
+                                        formatPrice(parseFloat(token.feeRate) / parseFloat(token.mintSizeEpoch))  + " SOL"
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">URC provider</span>
+                                <span className="text-medium">{
+                                    isValidCode ?
+                                        <AddressDisplay address={referralData?.referrerMain?.toBase58() as string} />
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">URC provider balance</span>
+                                <span className="text-medium">{
+                                    isValidCode && referralData ? 
+                                        referralData.tokenBalance?.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">URC usage count</span>
+                                <span className="text-medium">{
+                                    isValidCode ? referralData?.usageCount : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">Bonus to URC provider</span>
+                                <span>{
+                                    isValidCode ?
+                                        formatPrice(parseInt(referralData?.urcProviderBonus?.toString() || '0') / LAMPORTS_PER_SOL) + " SOL"
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">Discount of URC</span>
+                                <span className="text-medium text-success">-{isValidCode && (100 - Number(referralData?.acturalPay) / parseInt(token.feeRate) * 100).toFixed(2) + "%"}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm text-medium border-t border-base-300 pt-2 mt-2">
+                                <span>Actual pay</span>
+                                <span>{
+                                    isValidCode ? 
+                                        formatPrice(parseInt(referralData?.acturalPay?.toString() || '0') / LAMPORTS_PER_SOL) + " SOL"
+                                        : '-'
+                                    }
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">Current price</span>
-                            <span className="text-medium">{
-                                isValidCode ? 
-                                    formatPrice(parseFloat(token.feeRate) / parseFloat(token.mintSizeEpoch))  + " SOL"
-                                    : '-'
-                                }
-                            </span>
+                        }
+                        <div className="space-y-2">
+                            <button 
+                                className={`btn btn-primary w-full`}
+                                onClick={handleMint}
+                                disabled={loading || !isValidCode || !code}
+                            >
+                                {loading ? 'Processing...' : 'Mint'}
+                            </button>
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">URC provider</span>
-                            <span className="text-medium">{
-                                isValidCode ?
-                                    <AddressDisplay address={referralData?.referrerMain?.toBase58() as string} />
-                                    : '-'
-                                }
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">URC provider balance</span>
-                            <span className="text-medium">{
-                                isValidCode && referralData ? 
-                                    referralData.tokenBalance?.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + token.tokenSymbol
-                                    : '-'
-                                }
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">URC usage count</span>
-                            <span className="text-medium">{
-                                isValidCode ? referralData?.usageCount : '-'
-                                }
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">Bonus to URC provider</span>
-                            <span>{
-                                isValidCode ?
-                                    formatPrice(parseInt(referralData?.urcProviderBonus?.toString() || '0') / LAMPORTS_PER_SOL) + " SOL"
-                                    : '-'
-                                }
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-base-content/70">Discount of URC</span>
-                            <span className="text-medium text-success">-{isValidCode && (100 - Number(referralData?.acturalPay) / parseInt(token.feeRate) * 100).toFixed(2) + "%"}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm text-medium border-t border-base-300 pt-2 mt-2">
-                            <span>Actual pay</span>
-                            <span>{
-                                isValidCode ? 
-                                    formatPrice(parseInt(referralData?.acturalPay?.toString() || '0') / LAMPORTS_PER_SOL) + " SOL"
-                                    : '-'
-                                }
-                            </span>
-                        </div>
-                    </div>
-                    }
-                    <div className="space-y-2">
-                        <button 
-                            className={`btn btn-primary w-full`}
-                            onClick={handleMint}
-                            disabled={loading || !isValidCode || !code}
-                        >
-                            {loading ? 'Processing...' : 'Mint'}
-                        </button>
                     </div>
                 </div>
             </div>

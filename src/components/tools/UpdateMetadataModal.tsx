@@ -11,6 +11,7 @@ import { FaUpload } from 'react-icons/fa';
 import { HeaderImageUpload } from './HeaderImageUpload';
 import AlertBox from '../common/AlertBox';
 import { useDeviceType } from '../../utils/contexts';
+import { ModalTopBar } from '../common/ModalTopBar';
 
 interface UpdateMetadataModalProps {
     isOpen: boolean;
@@ -118,177 +119,172 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box relative max-w-2xl">
-                <button
-                    className="btn btn-circle btn-sm absolute right-2 top-2"
-                    onClick={onClose}
-                >
-                    <svg className='w-4 h-4' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>
-                </button>
-                <h3 className="font-bold text-lg mb-4">Update Token Metadata</h3>
-                
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Token Logo and Basic Info */}
-                    <div className="pixel-box flex items-center space-x-6 bg-base-200/50 p-4">
-                        <div className="w-16 h-16 flex-shrink-0">
-                            <TokenImage
-                                imageUrl={token.tokenMetadata?.image as string}
-                                name={token.tokenName}
-                                launchTimestamp={Number(token.metadataTimestamp)}
+            <div className="modal-box relative p-3">
+                <ModalTopBar title={`Update Token Metadata`} onClose={onClose} />            
+                <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Token Logo and Basic Info */}
+                        <div className="pixel-box flex items-center space-x-6 bg-base-200/50 p-4">
+                            <div className="w-16 h-16 flex-shrink-0">
+                                <TokenImage
+                                    imageUrl={token.tokenMetadata?.image as string}
+                                    name={token.tokenName}
+                                    launchTimestamp={Number(token.metadataTimestamp)}
+                                />
+                            </div>
+                            <div className="flex-1 min-w-0 space-y-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="badge badge-md badge-secondary px-3">{token.tokenSymbol}</h4>
+                                    <div className="text-base truncate ml-3">{token.tokenName}</div>
+                                </div>
+                                <div className="text-sm text-base-content/70">
+                                    <span className="font-pixel">
+                                        <AddressDisplay address={token.mint} showCharacters={isMobile ? 5 : 10}/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Header Image Upload */}
+                        <div className="mb-6">
+                            <HeaderImageUpload
+                                onImageChange={(file) => setHeaderImage(file)}
+                                currentHeader={token.tokenMetadata?.header}
                             />
                         </div>
-                        <div className="flex-1 min-w-0 space-y-3">
-                            <div className="flex items-center gap-2 mb-1">
-                                <h4 className="badge badge-md badge-secondary px-3">{token.tokenSymbol}</h4>
-                                <div className="text-base truncate ml-3">{token.tokenName}</div>
-                            </div>
-                            <div className="text-sm text-base-content/70">
-                                <span className="font-pixel">
-                                    <AddressDisplay address={token.mint} showCharacters={isMobile ? 5 : 10}/>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Header Image Upload */}
-                    <div className="mb-6">
-                        <HeaderImageUpload
-                            onImageChange={(file) => setHeaderImage(file)}
-                            currentHeader={token.tokenMetadata?.header}
-                        />
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                        <label className="label">
-                            <span className="label-text font-semibold">Description</span>
-                        </label>
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="pixel-textarea textarea-bordered w-full h-24"
-                            placeholder="Enter token description..."
-                        />
-                    </div>
-
-                    {/* Social Information */}
-                    <div className="space-y-4">
-                        <h4 className="font-semibold">Social Information</h4>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Website */}
-                            <div>
-                                <label className="label">
-                                    <span className="label-text">Website</span>
-                                </label>
-                                <input
-                                    type="url"
-                                    value={website}
-                                    onChange={(e) => setWebsite(e.target.value)}
-                                    className="input input-bordered w-full"
-                                    placeholder="https://"
-                                />
-                            </div>
-
-                            {/* Twitter */}
-                            <div>
-                                <label className="label">
-                                    <span className="label-text">X(Twitter)</span>
-                                </label>
-                                <input
-                                    type="url"
-                                    value={twitter}
-                                    onChange={(e) => setTwitter(e.target.value)}
-                                    className="input input-bordered w-full"
-                                    placeholder="https://x.com/"
-                                />
-                            </div>
-
-                            {/* Discord */}
-                            <div>
-                                <label className="label">
-                                    <span className="label-text">Discord</span>
-                                </label>
-                                <input
-                                    type="url"
-                                    value={discord}
-                                    onChange={(e) => setDiscord(e.target.value)}
-                                    className="input input-bordered w-full"
-                                    placeholder="https://discord.gg/"
-                                />
-                            </div>
-
-                            {/* Telegram */}
-                            <div>
-                                <label className="label">
-                                    <span className="label-text">Telegram</span>
-                                </label>
-                                <input
-                                    type="url"
-                                    value={telegram}
-                                    onChange={(e) => setTelegram(e.target.value)}
-                                    className="input input-bordered w-full"
-                                    placeholder="https://t.me/"
-                                />
-                            </div>
-
-                            {/* GitHub */}
-                            <div>
-                                <label className="label">
-                                    <span className="label-text">GitHub</span>
-                                </label>
-                                <input
-                                    type="url"
-                                    value={github}
-                                    onChange={(e) => setGithub(e.target.value)}
-                                    className="input input-bordered w-full"
-                                    placeholder="https://github.com/"
-                                />
-                            </div>
-
-                            {/* Medium */}
-                            <div>
-                                <label className="label">
-                                    <span className="label-text">Medium</span>
-                                </label>
-                                <input
-                                    type="url"
-                                    value={medium}
-                                    onChange={(e) => setMedium(e.target.value)}
-                                    className="input input-bordered w-full"
-                                    placeholder="https://medium.com/"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="space-y-4">
-                        <AlertBox title='Warning!' message='Updating token metadata will cost 0.1 SOL as a transaction fee.' />
-
-                        <div className="form-control">
-                            <label className="label cursor-pointer justify-start gap-3">
-                                <input 
-                                    type="checkbox" 
-                                    className="checkbox checkbox-warning" 
-                                    checked={isConfirmed}
-                                    onChange={(e) => setIsConfirmed(e.target.checked)}
-                                />
-                                <span className="label-text">I understand and agree to pay 0.1 SOL for updating the token metadata</span>
+                        {/* Description */}
+                        <div>
+                            <label className="label">
+                                <span className="label-text font-semibold">Description</span>
                             </label>
+                            <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="pixel-textarea textarea-bordered w-full h-24"
+                                placeholder="Enter token description..."
+                            />
                         </div>
 
-                        <div className="modal-action">
-                            <button
-                                type="submit"
-                                className={`btn btn-primary`}
-                                disabled={loading || !isConfirmed}
-                            >
-                                {loading ? 'Updating...' : 'Update Metadata'}
-                            </button>
+                        {/* Social Information */}
+                        <div className="space-y-4">
+                            <h4 className="font-semibold">Social Information</h4>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Website */}
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text">Website</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={website}
+                                        onChange={(e) => setWebsite(e.target.value)}
+                                        className="input input-bordered w-full"
+                                        placeholder="https://"
+                                    />
+                                </div>
+
+                                {/* Twitter */}
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text">X(Twitter)</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={twitter}
+                                        onChange={(e) => setTwitter(e.target.value)}
+                                        className="input input-bordered w-full"
+                                        placeholder="https://x.com/"
+                                    />
+                                </div>
+
+                                {/* Discord */}
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text">Discord</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={discord}
+                                        onChange={(e) => setDiscord(e.target.value)}
+                                        className="input input-bordered w-full"
+                                        placeholder="https://discord.gg/"
+                                    />
+                                </div>
+
+                                {/* Telegram */}
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text">Telegram</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={telegram}
+                                        onChange={(e) => setTelegram(e.target.value)}
+                                        className="input input-bordered w-full"
+                                        placeholder="https://t.me/"
+                                    />
+                                </div>
+
+                                {/* GitHub */}
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text">GitHub</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={github}
+                                        onChange={(e) => setGithub(e.target.value)}
+                                        className="input input-bordered w-full"
+                                        placeholder="https://github.com/"
+                                    />
+                                </div>
+
+                                {/* Medium */}
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text">Medium</span>
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={medium}
+                                        onChange={(e) => setMedium(e.target.value)}
+                                        className="input input-bordered w-full"
+                                        placeholder="https://medium.com/"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </form>
+
+                        {/* Submit Button */}
+                        <div className="space-y-4">
+                            <AlertBox title='Warning!' message='Updating token metadata will cost 0.1 SOL as a transaction fee.' />
+
+                            <div className="form-control">
+                                <label className="label cursor-pointer justify-start gap-3">
+                                    <input 
+                                        type="checkbox" 
+                                        className="checkbox checkbox-warning" 
+                                        checked={isConfirmed}
+                                        onChange={(e) => setIsConfirmed(e.target.checked)}
+                                    />
+                                    <span className="label-text">I understand and agree to pay 0.1 SOL for updating the token metadata</span>
+                                </label>
+                            </div>
+
+                            <div className="modal-action">
+                                <button
+                                    type="submit"
+                                    className={`btn btn-primary`}
+                                    disabled={loading || !isConfirmed}
+                                >
+                                    {loading ? 'Updating...' : 'Update Metadata'}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
             <div className="modal-backdrop" onClick={onClose}></div>
         </div>
