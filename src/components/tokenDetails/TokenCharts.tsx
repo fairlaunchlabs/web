@@ -55,7 +55,10 @@ const timeFrameDatas = {
     },
 }
 
-export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
+export const TokenCharts: React.FC<TokenChartsProps> = ({
+    token,
+    height,
+ }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const [timeFrame, setTimeFrame] = useState<TimeFrame>('5min');
     const [isLineChart, setIsLineChart] = useState(true);
@@ -134,7 +137,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
                 },
             },
             width: chartRef.clientWidth,
-            height: 560,
+            height: height,
             leftPriceScale: {
                 visible: false,
                 borderColor: '#2B2B43',
@@ -543,9 +546,9 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({ token }) => {
 
     return (
         <div className="mt-6">
+            <h2 className="text-xl font-semibold text-base-content">Mint Cost</h2>
             <div className="pixel-box bg-base-200 p-6">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-base-content">Mint Cost</h2>
                     <div className="flex items-center space-x-2">
                         <button 
                             className="btn btn-sm btn-secondary"

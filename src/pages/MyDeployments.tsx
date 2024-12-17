@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { queryMyDeployments } from "../utils/graphql";
 import { ErrorBox } from "../components/common/ErrorBox";
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { InitiazlizedTokenData } from "../types/types";
+import { InitiazlizedTokenData, TokenMetadataIPFS } from "../types/types";
 import { fetchTokenMetadataMap } from "../utils/web3";
 import { TokenImage } from "../components/mintTokens/TokenImage";
 import { AddressDisplay } from "../components/common/AddressDisplay";
@@ -13,6 +13,8 @@ import { Pagination } from "../components/common/Pagination";
 import { PAGE_SIZE_OPTIONS } from "../config/constants";
 import { useNavigate } from "react-router-dom";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { useDeviceType } from "../utils/contexts";
+import { MyDeploymentCard } from "../components/tools/MyDeploymentCard";
 
 export type MyDeploymentsProps = {
     expanded: boolean;
@@ -31,6 +33,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
     const navigate = useNavigate();
+    const { isMobile } = useDeviceType();
 
     const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryMyDeployments, {
         variables: {
@@ -73,7 +76,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                         <ErrorBox title={`Error loading tokens. Please try again later.`} message={initialError.message}/>
                     </div>
                 ) : initialData?.initializeTokenEventEntities?.length > 0 ? (
-                    <>
+                    !isMobile ? (<div>
                         <div className="flex justify-end mb-4">
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-base-content">Rows per page:</span>
@@ -91,7 +94,6 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                 </select>
                             </div>
                         </div>
-                        {/* <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl pixel-table-container"> */}
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
@@ -154,7 +156,6 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                     ))}
                                 </tbody>
                             </table>
-                        {/* </div> */}
                         <div className="mt-4">
                             <Pagination
                                 currentPage={currentPage}
@@ -165,7 +166,16 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                 hasMore={(currentPage * pageSize) < totalCount}
                             />
                         </div>
-                    </>
+                    </div>) : (
+                    <div>
+                        {initialData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => 
+                            <MyDeploymentCard
+                                key={token.id}
+                                token={token}
+                                metadata={tokenMetadataMap[token.mint as string]?.tokenMetadata}
+                            />)}
+                    </div>
+                    )
                 ) : (
                     <div className="text-center py-10">
                         <p className="text-gray-500">No deployments found</p>

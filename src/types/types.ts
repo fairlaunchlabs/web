@@ -344,6 +344,7 @@ export type RefundModalProps = {
 
 export type TokenChartsProps = {
     token: InitiazlizedTokenData;
+    height: number;
 }
 
 export type TokenHoldersProps = {
@@ -438,4 +439,9 @@ export type ReferralData = {
     tokenBalance?: number | null;
     acturalPay?: BN;
     urcProviderBonus?: BN;
+}
+
+export type TokenHeroProps = {
+    token: InitiazlizedTokenData;
+    metadata: TokenMetadataIPFS;
 }

@@ -38,6 +38,34 @@ export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
 export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
+export const tooltip = {
+    currentEra: "The current era number in the token's lifecycle",
+    currentEpoch: "The current epoch number within the current era",
+    mintFee: "Fee required to mint tokens",
+    currentMintSize: "Current amount of tokens that can be minted in this epoch",
+    currentMinted: "Total amount of tokens that have been minted so far",
+    targetSupply: "Target token supply to be reached by the specified era",
+    mintSpeed: "Rate at which tokens are minted per epoch",
+    deployAt: "Timestamp when the token was deployed",
+    deployingTx: "Transaction hash of the deployment transaction",
+    deployer: "Address of the token deployer",
+    tokenAddress: "The token's contract address on Solana",
+    liquidityVaultSOL: "Vault address holding SOL liquidity",
+    liquidityVaultToken: "Vault address holding token liquidity",
+    targetEras: "Number of eras to reach the target supply",
+    startTimeOfCurrentEpoch: "When the current epoch started",
+    liquidityTokensRatio: "Percentage of tokens allocated for liquidity",
+    maxSupply: "Maximum possible token supply",
+    targetMintTime: "Target time duration for minting tokens",
+    reduceRatioPerEra: "Percentage by which the mint size reduces each era",
+    targetMinimumFee: "Minimum total fee required to reach target supply",
+    epochesPerEra: "Number of epochs in each era",
+    currentMintFee: "Current mint fee",
+    currentReferralFee: "Current referral fee",
+    difficultyOfCurrentEpoch: "Difficulty of current epoch",
+    difficultyOfLastEpoch: "Difficulty of last epoch"
+}
+
 export const DARK_THEME = 'skypixel';
 export const LIGHT_THEME = 'pixel';
 

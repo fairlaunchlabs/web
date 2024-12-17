@@ -7,9 +7,9 @@ import { TokenInfo } from '../components/tokenDetails/TokenInfo';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
 import { TokenMintTransactions } from '../components/tokenDetails/TokenMintTransactions';
 import { TokenHolders } from '../components/tokenDetails/TokenHolders';
-import { ShareButton } from '../components/common/ShareButton';
 import { TokenRefundTransactions } from '../components/tokenDetails/TokenRefundTransactions';
 import { ErrorBox } from '../components/common/ErrorBox';
+import { useDeviceType } from '../utils/contexts';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     const { tokenMintAddress, referrerCode } = useParams();
@@ -22,6 +22,8 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
         },
         fetchPolicy: 'network-only'
     });
+
+    const { isMobile } = useDeviceType();
 
     if (loading) {
         return (
@@ -78,12 +80,12 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     }
 
     return (
-        <div className={`container mx-auto py-8 mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`container mx-auto py-6 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             <div className="md:max-w-6xl mx-auto space-y-6">
                 <TokenInfo token={token as InitiazlizedTokenData} referrerCode={referrerCode} />
                 {hasStarted && (
                 <div>
-                    <TokenCharts token={token as InitiazlizedTokenData} />
+                    <TokenCharts token={token as InitiazlizedTokenData} height={isMobile ? 360: 560} />
                     <TokenHolders token={token as InitiazlizedTokenData} />
                     <TokenMintTransactions token={token as InitiazlizedTokenData} />
                     <TokenRefundTransactions token={token as InitiazlizedTokenData} />

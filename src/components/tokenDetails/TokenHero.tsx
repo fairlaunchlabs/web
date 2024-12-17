@@ -1,13 +1,9 @@
 import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from "../../config/constants";
-import { InitiazlizedTokenData, TokenMetadataIPFS } from "../../types/types";
+import { TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
 import { addressToColor } from "../../utils/format";
+import { ShareButton } from "../common/ShareButton";
 import { RenderSocialIcons } from "../mintTokens/RenderSocialIcons";
 import { TokenImage } from "../mintTokens/TokenImage";
-
-type TokenHeroProps = {
-    token: InitiazlizedTokenData;
-    metadata: TokenMetadataIPFS;
-}
 
 export const TokenHero: React.FC<TokenHeroProps> = ({
     token,
@@ -51,15 +47,16 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
                         </p>
                     </div>
                 </div>
+                <div className="flex justify-between mt-3">
+                    <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
+                    <ShareButton token={token} />
+                </div>
                 {metadata?.description && (
                 <div className='bg-black/60 rounded-lg px-3 py-2 mt-2'>
                     <p className="pixel-text mt-1 text-white text-lg [text-shadow:2px_2px_0_#000000]">
                         {metadata?.description}
                     </p>
                 </div>)}
-                <div className="mt-3 [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">
-                    <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
-                </div>
             </div>
         </div>
     </div>

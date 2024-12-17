@@ -59,6 +59,13 @@ export const calculateMaxSupply = (epochesPerEra: string, initialTargetMintSizeP
     return epochesPerEraNum * initialTargetMintSizePerEpochNum / (1 - reduceRatioNum);
 };
 
+export const getMintSpeed = (targetSecondsPerEpoch: string, initialTargetMintSizePerEpoch: string, initialMintSize: string) => {
+    return Number(targetSecondsPerEpoch) / Number(initialTargetMintSizePerEpoch) * Number(initialMintSize);
+}
+export const getMintedSupply = (supply: string, liquidityTokensRatio: string) => {
+    return numberStringToBN(supply).sub(numberStringToBN(supply).mul(numberStringToBN(liquidityTokensRatio)).div(BN_HUNDRED)).div(BN_LAMPORTS_PER_SOL).toNumber();
+}
+
 export const calculateTotalSupplyToTargetEras = (
     epochesPerEra: string,
     initialTargetMintSizePerEpoch: string,

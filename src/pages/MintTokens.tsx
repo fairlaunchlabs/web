@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, useEffect, useMemo } from 'react';
+import React, { useState, KeyboardEvent, useEffect } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '../utils/graphql';
 import { TokenCard } from '../components/mintTokens/TokenCard';
@@ -30,6 +30,14 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         setSearchHistory(newHistory);
         localStorage.setItem('search_history', JSON.stringify(newHistory));
     };
+
+    // 初始加载数据
+    // const { loading: initialLoading, error: initialError, data: initialData } = useQuery(queryInitializeTokenEvent, {
+    //     variables: {
+    //         skip: 0,
+    //         first: 5
+    //     }
+    // });
 
     // 搜索查询
     const [searchTokens, { loading: searchLoading, error: searchError, data: searchData }] = useLazyQuery(queryInitializeTokenEventBySearch, {
@@ -80,18 +88,9 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         );
     };
 
-    const sortedTokens = useMemo(() => {
-        if (!searchData?.initializeTokenEventEntities) return [];
-        return [...searchData.initializeTokenEventEntities].sort((a, b) => {
-            const aValue = parseInt(a.difficultyCoefficientEpoch || '0');
-            const bValue = parseInt(b.difficultyCoefficientEpoch || '0');
-            return bValue - aValue; // 降序排序
-        });
-    }, [searchData]);
-
     // Get the display data based on search mode
     const displayData = {
-        initializeTokenEventEntities: filterTokens({ initializeTokenEventEntities: sortedTokens })
+        initializeTokenEventEntities: filterTokens(searchData)
     };
 
     // 合并错误和加载状态
