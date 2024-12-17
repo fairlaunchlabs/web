@@ -54,9 +54,9 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     };
 
     return (
-        <div className={`space-y-6 p-6 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
-            <h2 className="text-2xl text-center font-bold">Validate URC</h2>
-            <div className="max-w-5xl mx-auto w-full flex flex-col gap-4">
+        <div className={`space-y-6 md:p-6 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
+            <div className="md:max-w-5xl mx-auto w-full flex flex-col gap-4">
+                <h2 className="card-title">Validate URC</h2>
                 <div className="join w-full">
                     <div className='relative join-item flex-1'>
                     <input

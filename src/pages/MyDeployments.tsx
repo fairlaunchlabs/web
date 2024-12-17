@@ -67,7 +67,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     return (
         <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             <div className="w-full md:max-w-6xl mx-auto mb-3 md:mb-20">
-                <h2 className="card-title mb-4">My Deployments</h2>
+                <h2 className="card-title mb-4 md:mb-0">My Deployments</h2>
                 {loading ? (
                     <div className="flex justify-center">
                         <span className="loading loading-spinner loading-lg"></span>
