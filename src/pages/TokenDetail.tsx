@@ -10,6 +10,7 @@ import { TokenHolders } from '../components/tokenDetails/TokenHolders';
 import { TokenRefundTransactions } from '../components/tokenDetails/TokenRefundTransactions';
 import { ErrorBox } from '../components/common/ErrorBox';
 import { useDeviceType } from '../utils/contexts';
+import { SEARCH_CACHE_ITEMS } from '../config/constants';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     const { tokenMintAddress, referrerCode } = useParams();
@@ -24,6 +25,15 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     });
 
     const { isMobile } = useDeviceType();
+
+    const saveToHistory = (term: string) => {
+        const history = localStorage.getItem('search_history');
+        if(history) {
+            const historyArray = JSON.parse(history);
+            const newHistory = [term, ...historyArray.filter((item: string) => item !== term)].slice(0, SEARCH_CACHE_ITEMS);
+            localStorage.setItem('search_history', JSON.stringify(newHistory));
+        }
+    };
 
     if (loading) {
         return (
@@ -78,6 +88,8 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
             </div>
         );
     }
+
+    saveToHistory((token as InitiazlizedTokenData).tokenSymbol as string);
 
     return (
         <div className={`container mx-auto py-6 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>

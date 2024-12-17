@@ -5,7 +5,7 @@ import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
 import { ErrorBox } from '../components/common/ErrorBox';
 import { filterTokens, formatAddress } from '../utils/format';
-import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS } from '../config/constants';
+import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS, SEARCH_CACHE_ITEMS } from '../config/constants';
 import { TokenCardMobile } from '../components/mintTokens/TokenCardMobile';
 
 export const Discover: React.FC<MintTokensProps> = ({
@@ -25,7 +25,7 @@ export const Discover: React.FC<MintTokensProps> = ({
 
     // Save search term to history
     const saveToHistory = (term: string) => {
-        const newHistory = [term, ...searchHistory.filter(item => item !== term)].slice(0, 5);
+        const newHistory = [term, ...searchHistory.filter(item => item !== term)].slice(0, SEARCH_CACHE_ITEMS);
         setSearchHistory(newHistory);
         localStorage.setItem('search_history', JSON.stringify(newHistory));
     };

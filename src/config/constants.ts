@@ -84,6 +84,7 @@ export const BADGE_TEXT_COLORS = ["black", "white", "white", "black", "black", "
 export const DEPRECATED_SYMBOLS = [
     "", //"ar5", "ar4", "ar3", "aaa785",// "test#111", "test#121"
 ]
+export const SEARCH_CACHE_ITEMS = 10;
 
 export const DEPRECATED_MINTS = ["",
     // 因为开发过程中，有些代币数据出错，过滤后内测

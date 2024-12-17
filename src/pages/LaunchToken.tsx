@@ -263,7 +263,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     return (
         <div className={`mx-auto mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             <div className="flex flex-col lg:flex-row lg:justify-center lg:items-start lg:gap-8">
-                <form onSubmit={handleSubmit} className="w-full lg:w-[480px] space-y-4 p-4">
+                <form onSubmit={handleSubmit} className="w-full lg:w-[480px] space-y-4 md:p-4">
                     <div className="">
                         <label htmlFor="name" className="block text-sm font-medium mb-1">
                             Name
