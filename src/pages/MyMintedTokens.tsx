@@ -7,14 +7,16 @@ import { InitiazlizedTokenData, MyAccountProps, TokenListItem, TokenMetadataIPFS
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
 import { fetchMetadata } from '../utils/web3';
-import { BN_LAMPORTS_PER_SOL, BN_ZERO, numberStringToBN } from '../utils/format';
+import { BN_LAMPORTS_PER_SOL, BN_ZERO, filterTokenListItem, filterTokens, numberStringToBN } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
 import { RefundModal } from '../components/myAccount/RefundModal';
 import { Pagination } from '../components/common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../config/constants';
+import { useDeviceType } from '../utils/contexts';
+import { MyMintedTokenCard } from '../components/myAccount/MyMintedTokenCard';
 
-export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
+export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     const { connection } = useConnection();
     const { publicKey } = useWallet();
     const navigate = useNavigate();
@@ -29,6 +31,8 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
 
+    const { isMobile } = useDeviceType();
+    
     const { data: myTokensData, loading: loadingTokens } = useQuery(queryMyTokenList, {
         variables: {
             owner: publicKey?.toBase58() || '',
@@ -36,14 +40,6 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
             first: pageSize
         },
         skip: !publicKey,
-        onCompleted: (data) => {
-            if (data?.tokenAccountEntities) {
-                const mints = data.tokenAccountEntities.map((token: TokenListItem) => token.mint);
-                setSearchMints(mints);
-                setTokenList(data.tokenAccountEntities);
-                setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.tokenAccountEntities?.length ?? 0)));
-            }
-        }
     });
 
     const { data: tokenDetailsData, loading: loadingDetails } = useQuery(queryTokensByMints, {
@@ -79,17 +75,21 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
 
     useEffect(() => {
         if (myTokensData?.holdersEntities) {
-            const mints = myTokensData.holdersEntities.map((token:any) => token.mint);
+            const tokensAfterFilter = filterTokenListItem(myTokensData?.holdersEntities);
+            const mints = tokensAfterFilter.map((token: TokenListItem) => token.mint);
             setSearchMints(mints);
-            setTokenList(myTokensData.holdersEntities);
+            setTokenList(tokensAfterFilter);
+            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (mints.length ?? 0)));
         }
     }, [myTokensData]);
 
     useEffect(() => {
-        if (tokenDetailsData?.initializeTokenEventEntities) {
+        const tokenEventEntities = filterTokens(tokenDetailsData?.initializeTokenEventEntities);
+
+        if (tokenEventEntities) {
             const updatedTokenList = tokenList.map(token => ({
                 ...token,
-                tokenData: tokenDetailsData.initializeTokenEventEntities.find(
+                tokenData: tokenEventEntities.find(
                     (event: InitiazlizedTokenData) => event.mint === token.mint
                 )
             }));
@@ -103,7 +103,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                         setTokenList(currentList => 
                             currentList.map(t => 
                                 t.mint === token.mint 
-                                    ? { ...t, imageUrl: data?.image }
+                                    ? { ...t, metadata: data as TokenMetadataIPFS }
                                     : t
                             )
                         );
@@ -135,7 +135,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
 
     return (
         <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="w-full max-w-6xl px-4 mb-20">
+            <div className="w-full md:max-w-6xl md:px-4 md:mb-20 mb-3">
                 <h2 className="card-title mb-4">My Tokens</h2>
                 {loadingTokens || loadingDetails ? (
                     <div className="flex justify-center">
@@ -143,7 +143,7 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                     </div>
                 ) : tokenList.filter(token => numberStringToBN(token.amount).gt(BN_ZERO)).length === 0 ? (
                     <p>No tokens found</p>
-                ) : (
+                ) : !isMobile ? (
                     <>
                         <div className="flex justify-end mb-4">
                             <div className="flex items-center gap-2">
@@ -162,7 +162,6 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                 </select>
                             </div>
                         </div>
-                        {/* <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl"> */}
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
@@ -179,9 +178,9 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                                         .map((token: TokenListItem) => (
                                         <tr key={token.mint} className="hover">
                                             <td className="text-left">
-                                                {token.imageUrl && (
+                                                {token.metadata?.image && (
                                                     <TokenImage
-                                                        imageUrl={token.imageUrl}
+                                                        imageUrl={token.metadata?.image}
                                                         name={token.tokenData?.tokenName || 'Unknown'}
                                                         launchTimestamp={Number(token.tokenData?.metadataTimestamp) || 0}
                                                         size={48}
@@ -248,7 +247,21 @@ export const MyAccount: FC<MyAccountProps> = ({ expanded }) => {
                             />
                         </div>
                     </>
-                )}
+                ) : (
+                    <>
+                    {tokenList.filter(token => numberStringToBN(token.amount).gt(BN_ZERO)).map((token: TokenListItem) => 
+                        <MyMintedTokenCard 
+                            key={token.mint} 
+                            token={token} 
+                            onRefund={handleRefund}
+                            onCode={(token) => {
+                                setSelectedTokenForReferral(token);
+                                setIsReferralModalOpen(true);
+                            }}
+                        />)}
+                    </>
+                )
+                }
             </div>
             {selectedTokenForReferral && (
                 <ReferralCodeModal

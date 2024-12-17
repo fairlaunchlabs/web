@@ -82,5 +82,51 @@ export const BADGE_BG_COLORS = [
 ]
 export const BADGE_TEXT_COLORS = ["black", "white", "white", "black", "black", "white", "black", "black", "white"]
 export const DEPRECATED_SYMBOLS = [
-    "ar5", "ar4", "ar3", "aaa785"
+    "", //"ar5", "ar4", "ar3", "aaa785",// "test#111", "test#121"
+]
+
+export const DEPRECATED_MINTS = ["",
+    // 因为开发过程中，有些代币数据出错，过滤后内测
+    "a1RtFfJgH2wQUt72cRWeMQqJCFn6qymp8QDjyoPzbmY", // test#111
+    "BcVMtH5Tc4ekR9BnxAFL6uPaJBZQeKKmgFeYrqSe7Zc1", // test#121
+    "73YJ8Gxvm5N1VconSNL8dipABi6BkT3c5xC8XF2BPdcP",
+    "JDeza664hxRov5kXAkWVFcR7JtsMEUjnzLW4faRFE2eV",
+    "71BkhUHSjtyssaH8m7HW5UcGEcPVBHsUzuARDFAFe71B",
+    "12iwqAyzWD6ua1ivarRjtxGLR52PnHBdAE1U3iLyqVe9",
+    "1111TKQcUkdeMxmyjcEUg4mQTP2nAjZne9iMUQv3FS",
+    "1111MyBmtkJzkkMJLLZoocaGvxoeA9y5UNXCv6HmEC",
+    "1111cvM1ztWds2kzjiWQTQpeyQAqa1gZyBAow93drd",
+    "z3Vtzhjm1kJrkdPtJmbK9TAvL9MZetKu6pZsCbSUnry",
+    "Hs5aBja677PYcL9YfN36eYc6rxFxTJWVbrEgEaxw6dAx",
+    "FzvXGefXYJERmRNKTAd5oqme2RYxGYcvkLZWfoPey18P",
+    "5Hz6LenDBdGMi1NyCmdrkKGnzMxYs4PSQiXbyE4rGRGB",
+    "E1CyuqSQzBEYruAAY1hncv6xjbRRtenBBbUQzMYS6jQK",
+    "Anas5k8xzQmacKLrpaeFLzSgXUu2J3kiaDxc8EMV8uWk",
+    "BovZ9CiQb4dw6vnGiPvH7TsFvV5Qafrgr82T9pFMFeLM",
+    "71BkhUHSjtyssaH8m7HW5UcGEcPVBHsUzuARDFAFe71B",
+    "AKtYDRYPWFicpdzpiUXLvcLRb6TtdNoxeBBSA8aJvWmT",
+    "67U8f2KnyTZi1CPv9SNxScNdNqT6dYEJN2NWywiMw5Z2",
+    "CaYL2mEPo5U9nkh6zXLJYdW7PvVVh8qNtfUxwvS3UDh7",
+    "JDeza664hxRov5kXAkWVFcR7JtsMEUjnzLW4faRFE2eV",
+    "Hs5aBja677PYcL9YfN36eYc6rxFxTJWVbrEgEaxw6dAx",
+    "ENnDTpxNnNmXPKDyi7LusiNpMZn7xNQNJupC9SzVSwnR",
+    "CH6cHYv5nEnCWzzoj82CriiHSZrTPfGSYWH86GgFHrCB",
+    "3bbRb2RbJUHk5wvVJStvXgaAFMU3RvueKczeCwH4cXmY",
+    "34m1U3oCVtNoYM7yhvsLNkS2HQuPE6CkcgwCg1dEcUh7",
+    "CChbuzbwfocSn4UKej27CYwTr5auz5eFbTiyc8bMcQA",
+    "dXBo4c1BHVRAQwNabs6Buv3W7dUBGGG45KdsZMFQyYa",
+    "6PSqJF6PuCmSroL6TZXpx8WLtts8r6PcCD9x1JUTXJpk",
+    "EnVxZb2oTAuYX7V2DCWCyM9asZkFLriqFBPwTeJqeSjU",
+    "5sbGbhogNXqNoqQQqick5WXNXkZHVigw2AtXadFEmV7J",
+    "DNB73R85aDjGmQAMdpzjRT29Nn2WKZ2qdptqqdAFPGaN",
+    "DUBgJ2yCeYXaiiSh975Z7uxmAMfSzjSQGkLtgi533MEc",
+    "3UfhtzWX7qBu79QTnjRJ8dfYbcgJNEUkUMEr1FsCnXUn",
+    "EbFJTTCU8xM4WXsEXG6dwvmwGjMqxecgguo4YFPYvJPV",
+    "2dXWvsG7LQkc1wXrNucD2hNxDV43WorXVrFwxWDn432m",
+    "BksbP1wXfx2PRyKGsv2s67woXHWUnVB6JiZBMaSJxj3q",
+    "9XaYxB9RjpSCh46gJ7FTCD9QCmXX7nSJzBXNDkuSS697",
+    "7NVeNNgSwM9nRPhDbsyDTVw2RLb3yivvVeKq9AwWuj33",
+    "DtAXH1BJEUsCpF1JryD64raSU5D9U87Eb43WxVYrHye6",
+    "6gkpJykcNGGTZAiw5QgiFbzqe5sxkJEBvaQP5Kvxctno",
+    "GjEZuomwVSy2U78bwX63Gof8k8B7zNBt8c65kaMUaxEf"
 ]

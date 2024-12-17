@@ -22,7 +22,7 @@ import { menuItems } from './config/menu';
 import { TokenDetail } from './pages/TokenDetail';
 import { APP_NAME } from './config/constants';
 import { Providers } from './utils/contexts';
-import { MintTokens } from './pages/MintTokens';
+import { Discover } from './pages/Discover';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -91,7 +91,7 @@ const AppContent = () => {
                     <div className="flex-1 p-4 md:p-8 pb-20">
                         <Routes>
                             <Route path="/" element={getActiveComponent()} />
-                            <Route path="/home" element={<MintTokens expanded={expanded} />} />
+                            <Route path="/home" element={<Discover expanded={expanded} />} />
                             <Route path="/:selectedMenuItem" element={getActiveComponent()} />
                             <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />

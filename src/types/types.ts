@@ -237,7 +237,8 @@ export type TokenListItem = {
     mint: string;
     amount: string;
     tokenData?: InitiazlizedTokenData;
-    imageUrl?: string;
+    metadata?: TokenMetadataIPFS | undefined;
+    // imageUrl?: string;
 }
 
 export type HolderData = {
@@ -404,10 +405,10 @@ export type SetRefererCodeEntity = {
     referralAccount: string;
     referrerAta: string;
     referrerMain: string;
-    usageCount: number;
     activeTimestamp: number;
-    codeHash: string;
-    tokenBalance: number | null;
+    usageCount?: number;
+    codeHash?: string;
+    tokenBalance?: number | null;
 }
 
 export type OnChainReferralData = {

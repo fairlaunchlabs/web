@@ -2,7 +2,7 @@ import React from 'react';
 // import { Balance } from '../pages/Balance';
 // import { TransactionHistory } from '../pages/TransactionHistory';
 // import { TokenAccounts } from '../pages/TokenAccounts';
-import { MintTokens } from '../pages/MintTokens';
+import { Discover } from '../pages/Discover';
 import { 
     CreateMarketId, 
     CreateLiquidityPool, 
@@ -28,7 +28,7 @@ import {
     MdAddBox,
     MdRemoveCircleOutline
 } from 'react-icons/md';
-import { MyAccount } from '../pages/MyAccount';
+import { MyMintedTokens } from '../pages/MyMintedTokens';
 import { LaunchTokenForm } from '../pages/LaunchToken';
 import { MenuItem } from '../types/types';
 import { CheckURC } from '../components/tools/CheckURC';
@@ -44,7 +44,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         id: 'mint-tokens', 
         label: 'Discover', // Mint or mine tokens
         icon: <svg className='w-5 h-5' xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"> <path d="M13 2h-2v4h2V2Zm2 6H9v2H7v4h2v4h6v-4h2v-4h-2V8Zm0 2v4h-2v2h-2v-2H9v-4h6ZM9 20h6v2H9v-2Zm14-9v2h-4v-2h4ZM5 13v-2H1v2h4Zm12-7h2v2h-2V6Zm2 0h2V4h-2v2ZM5 6h2v2H5V6Zm0 0V4H3v2h2Z" /> </svg>,
-        component: <MintTokens expanded={expended} /> 
+        component: <Discover expanded={expended} /> 
     },
     { 
         id: 'launch-token', 
@@ -56,7 +56,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         id: 'my-account', 
         label: 'My mint tokens', // My token list
         icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M18 3H2v18h18v-4h2V7h-2V3h-2zm0 14v2H4V5h14v2h-8v10h8zm2-2h-8V9h8v6zm-4-4h-2v2h2v-2z" fill="currentColor"/> </svg>,
-        component: <MyAccount expanded={expended} /> 
+        component: <MyMintedTokens expanded={expended} /> 
     },
     {
         id: `tools`,

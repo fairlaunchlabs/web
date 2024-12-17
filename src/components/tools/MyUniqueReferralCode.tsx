@@ -13,6 +13,9 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { ErrorBox } from '../common/ErrorBox';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { ReferralBonusDetailModal } from './ReferralBonusDetailModal';
+import { useDeviceType } from '../../utils/contexts';
+import { MyUniqueReferralCodeCard } from './MyUniqueReferralCodeCard';
+import { filterRefererCode } from '../../utils/format';
 
 export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
@@ -26,7 +29,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     const [selectedBonusMint, setSelectedBonusMint] = useState<string | null>(null);
     const [totalBonus, setTotalBonus] = useState(0);
     const [loadingMetadata, setLoadingMetadata] = useState(false);
-
+    const { isMobile } = useDeviceType();
+    
     const { loading: urcLoading, error: urcError, data: urcData, refetch: refetchUrc } = useQuery(querySetRefererCodeEntitiesByOwner, {
         variables: {
             owner: wallet?.publicKey.toBase58(),
@@ -39,7 +43,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
         }
     });
 
-    const mints = urcData?.setRefererCodeEventEntities?.map((token:any) => token.mint);
+    const mints = filterRefererCode(urcData?.setRefererCodeEventEntities).map((token:any) => token.mint);
     const { loading: tokenLoading, error: tokenError, data: tokenData } = useQuery(queryTokensByMints, {
         variables: {
             mints: mints,
@@ -137,8 +141,8 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     }
 
     return (
-        <div className={`space-y-6 p-6 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="max-w-6xl mx-auto flex flex-col gap-4 mb-20">
+        <div className={`space-y-6 md:p-6 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <div className="max-w-6xl mx-auto mb-5 md:mb-20">
                 <h2 className="card-title mb-4">My URCs(Unique Referral Codes)</h2>
                 {urcLoading || tokenLoading || loadingMetadata ? (
                     <div className="flex justify-center">
@@ -148,7 +152,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                     <ErrorBox title="Error loading URCs" message={urcError.message} />
                 ) : urcData?.setRefererCodeEventEntities?.length === 0 ? (
                     <p>No URCs found</p>
-                ) : (
+                ) : !isMobile ? (
                     <>
                         <div className="flex justify-end mb-4">
                             <div className="flex items-center gap-2">
@@ -246,8 +250,22 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                 hasMore={(currentPage * pageSize) < totalCount}
                             />
                         </div>
+                    </>)
+                  : (
+                    <>
+                    {tokenData?.initializeTokenEventEntities?.map((item: InitiazlizedTokenData) => (
+                        <MyUniqueReferralCodeCard
+                            key={item.id}
+                            token={item}
+                            metadata={tokenMetadataMap[item.mint]?.tokenMetadata}
+                            bonus={bonusByMint[item.mint] === undefined ? 0 : Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL}
+                            onGetURC={handleGetURC}
+                            onBonusDetail={handleOpenBonusDetail}
+                        />
+                    ))}
                     </>
-                )}
+                  )
+                }
             </div>
             {selectedToken && (
                 <ReferralCodeModal

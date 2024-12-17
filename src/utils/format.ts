@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { UTCTimestamp } from "lightweight-charts";
-import { MintData } from "../types/types";
-import { BADGE_BG_COLORS } from "../config/constants";
+import { InitiazlizedTokenData, MintData, SetRefererCodeEntity, TokenListItem } from "../types/types";
+import { BADGE_BG_COLORS, DEPRECATED_MINTS, DEPRECATED_SYMBOLS } from "../config/constants";
 
 export const formatAddress = (address: string, showCharacters = 4): string => {
     if (!address) return '';
@@ -295,3 +295,26 @@ export const addressToColor = (address: string): string => {
     const colors = BADGE_BG_COLORS[number - 1];
     return colors;
 };
+
+// Filter out deprecated tokens
+export const filterTokens = (data: InitiazlizedTokenData[]) => {
+    if (!data) return [];
+    return data.filter(
+        (token: InitiazlizedTokenData) => !DEPRECATED_MINTS.includes(token.mint)
+    );
+};
+
+
+export const filterTokenListItem = (data: TokenListItem[]) => {
+    if (!data) return [];
+    return data.filter(
+        (token: TokenListItem) => !DEPRECATED_MINTS.includes(token.mint)
+    );
+};
+
+export const filterRefererCode = (data: SetRefererCodeEntity[]) => {
+    if (!data) return [];
+    return data.filter(
+        (code: SetRefererCodeEntity) => !DEPRECATED_MINTS.includes(code.mint)
+    );
+};  

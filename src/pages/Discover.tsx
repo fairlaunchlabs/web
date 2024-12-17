@@ -4,11 +4,11 @@ import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '..
 import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
 import { ErrorBox } from '../components/common/ErrorBox';
-import { formatAddress } from '../utils/format';
+import { filterTokens, formatAddress } from '../utils/format';
 import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS } from '../config/constants';
 import { TokenCardMobile } from '../components/mintTokens/TokenCardMobile';
 
-export const MintTokens: React.FC<MintTokensProps> = ({
+export const Discover: React.FC<MintTokensProps> = ({
     expanded
 }) => {
     const [searchInput, setSearchInput] = useState('');
@@ -79,17 +79,9 @@ export const MintTokens: React.FC<MintTokensProps> = ({
         });
     };
 
-    // Filter out deprecated tokens
-    const filterTokens = (data: any) => {
-        if (!data?.initializeTokenEventEntities) return [];
-        return data.initializeTokenEventEntities.filter(
-            (token: InitiazlizedTokenData) => !DEPRECATED_SYMBOLS.includes(token.tokenSymbol)
-        );
-    };
-
     // Get the display data based on search mode
     const displayData = {
-        initializeTokenEventEntities: filterTokens(searchData)
+        initializeTokenEventEntities: filterTokens(searchData?.initializeTokenEventEntities || []),
     };
 
     // 合并错误和加载状态

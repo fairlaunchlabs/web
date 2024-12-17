@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useDeviceType } from "../utils/contexts";
 import { MyDeploymentCard } from "../components/tools/MyDeploymentCard";
+import { filterTokens } from "../utils/format";
 
 export type MyDeploymentsProps = {
     expanded: boolean;
@@ -29,8 +30,8 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
+    const [dataAfterFilter, setDataAfterFilter] = useState<InitiazlizedTokenData[]>([]);
     
-    const { connection } = useConnection();
     const wallet = useAnchorWallet();
     const navigate = useNavigate();
     const { isMobile } = useDeviceType();
@@ -42,15 +43,15 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
             first: pageSize,
         },
         skip: !wallet,
-        onCompleted: (data) => {
-            setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.initializeTokenEventEntities?.length ?? 0)));
-        }
     });
 
     useEffect(() => {
-        if (initialData?.initializeTokenEventEntities) {
+        const _dataAfterFilter = filterTokens(initialData?.initializeTokenEventEntities);
+        setDataAfterFilter(_dataAfterFilter);
+        setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (_dataAfterFilter?.length ?? 0)));
+        if (_dataAfterFilter) {
             setLoadingMetadata(true);
-            fetchTokenMetadataMap(initialData.initializeTokenEventEntities).then((updatedMap) => {
+            fetchTokenMetadataMap(_dataAfterFilter).then((updatedMap) => {
                 setLoadingMetadata(false);
                 setTokenMetadataMap(updatedMap);
             });
@@ -75,7 +76,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                     <div className="w-full">
                         <ErrorBox title={`Error loading tokens. Please try again later.`} message={initialError.message}/>
                     </div>
-                ) : initialData?.initializeTokenEventEntities?.length > 0 ? (
+                ) : dataAfterFilter?.length > 0 ? (
                     !isMobile ? (<div>
                         <div className="flex justify-end mb-4">
                             <div className="flex items-center gap-2">
@@ -105,7 +106,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {initialData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => (
+                                    {dataAfterFilter.map((token: InitiazlizedTokenData) => (
                                         <tr key={token.id} className="hover">
                                             <td className="text-center cursor-pointer" onClick={() => handleClick(token.mint)}>
                                                 <div className="">
@@ -168,7 +169,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                         </div>
                     </div>) : (
                     <div>
-                        {initialData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => 
+                        {dataAfterFilter.map((token: InitiazlizedTokenData) => 
                             <MyDeploymentCard
                                 key={token.id}
                                 token={token}
