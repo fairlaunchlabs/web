@@ -46,7 +46,7 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
     };
 
     return (
-        <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative" onClick={handleClick}>
+        <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative">
             {token.metadata?.header && (
                 <div 
                     className="absolute inset-0 bg-cover bg-center opacity-30" 
@@ -91,19 +91,13 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
                         </div>
                         <div className="flex gap-2 justify-end mt-4">
                             <button 
-                                className="btn btn-sm btn-primary"
-                                onClick={handleGetMore}
-                            >
-                                Get more
-                            </button>
-                            <button 
                                 className="btn btn-sm btn-error"
                                 onClick={handleRefund}
                             >
                                 Refund
                             </button>
                             <button 
-                                className="btn btn-sm btn-success"
+                                className="btn btn-sm btn-primary"
                                 onClick={handleCode}
                             >
                                 Code
@@ -113,6 +107,12 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 Thaw
+                            </button>
+                            <button 
+                                className="btn btn-sm btn-success"
+                                onClick={handleGetMore}
+                            >
+                                View
                             </button>
                         </div>
                     </div>

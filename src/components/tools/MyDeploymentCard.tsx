@@ -47,7 +47,7 @@ export const MyDeploymentCard: FC<MyDeploymentCardProps> = ({
     };
 
     return (
-        <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative" onClick={handleClick}>
+        <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative">
             {metadata?.header && (
                 <div 
                     className="absolute inset-0 bg-cover bg-center opacity-30" 
@@ -96,6 +96,12 @@ export const MyDeploymentCard: FC<MyDeploymentCardProps> = ({
                                 onClick={handleUpdateMetadata}
                             >
                                 Update Metadata
+                            </button>
+                            <button 
+                                className="btn btn-sm btn-success"
+                                onClick={handleClick}
+                            >
+                                View
                             </button>
                         </div>
                     </div>
