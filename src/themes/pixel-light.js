@@ -95,7 +95,7 @@ const pixelLight = {
     // Badge
     ".badge": {
       "border": "2px solid #000000",
-      "box-shadow": "2px 2px 0 0 #000000",
+      "box-shadow": "1px 1px 0 0 #000000",
       "height": "1.75rem",
       "border-radius": "6px",
     },

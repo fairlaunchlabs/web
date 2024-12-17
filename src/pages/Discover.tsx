@@ -107,7 +107,7 @@ export const Discover: React.FC<MintTokensProps> = ({
     return (
         <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:p-4 md:mb-10 mb-5`}>
             {/* Search Bar */}
-            <div className="md:max-w-6xl mx-auto md:mb-12">
+            <div className="md:max-w-6xl mx-auto mb-3 md:mb-12">
                 <div className="join w-full mb-2">
                     <div className="relative join-item flex-1">
                         <input

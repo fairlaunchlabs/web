@@ -53,7 +53,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         component: <LaunchTokenForm expanded={expended} /> 
     },
     { 
-        id: 'my-account', 
+        id: 'my-minted-tokens', 
         label: 'My mint tokens', // My token list
         icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M18 3H2v18h18v-4h2V7h-2V3h-2zm0 14v2H4V5h14v2h-8v10h8zm2-2h-8V9h8v6zm-4-4h-2v2h2v-2z" fill="currentColor"/> </svg>,
         component: <MyMintedTokens expanded={expended} /> 
@@ -65,19 +65,19 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         component: null,
         subItems: [
             {
-                id: 'tools-check-urc',
+                id: 'check-urc',
                 label: 'Validate URC', // validate code
                 icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M8 6h8v2H8V6zm-4 4V8h4v2H4zm-2 2v-2h2v2H2zm0 2v-2H0v2h2zm2 2H2v-2h2v2zm4 2H4v-2h4v2zm8 0v2H8v-2h8zm4-2v2h-4v-2h4zm2-2v2h-2v-2h2zm0-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm0 0V8h-4v2h4zm-10 1h4v4h-4v-4z" fill="currentColor"/> </svg>,
                 component: <CheckURC expanded={expended} />
             },
             {
-                id: 'tools-my-urc',
+                id: 'my-urc',
                 label: 'My URC', // my URC code list
                 icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M8 5h2v2H8V5zM6 7h2v2H6V7zM4 9h2v2H4V9zm-2 2h2v2H2v-2zm2 2h2v2H4v-2zm2 2h2v2H6v-2zm2 2h2v2H8v-2zm8-12h-2v2h2V5zm2 2h-2v2h2V7zm2 2h-2v2h2V9zm2 2h-2v2h2v-2zm-2 2h-2v2h2v-2zm-2 2h-2v2h2v-2zm-2 2h-2v2h2v-2z" fill="currentColor"/> </svg>,
                 component: <MyUniqueReferralCode expanded={expended} />
             },
             {
-                id: 'tools-my-deployed',
+                id: 'my-deployments',
                 label: 'My Deployment',
                 icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 4h6v8H2V4h2zm4 6V6H4v4h4zm14-4H12v2h10V6zm0 4H12v2h10v-2zm0 4v2H2v-2h20zm0 6v-2H2v2h20z" fill="currentColor"/> </svg>,
                 component: <MyDeployments expanded={expended} />
@@ -149,7 +149,7 @@ export const menuItems = (expended: boolean): MenuItem[] => [
         ]
     },
     {
-        id: 'gpt',
+        id: 'ask-ai',
         label: 'Ask AI', // Here you can ask ChatGPT everything about this platform
         icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M2 5h2v2H2V5zm4 4H4V7h2v2zm2 0H6v2H4v2H2v6h20v-6h-2v-2h-2V9h2V7h2V5h-2v2h-2v2h-2V7H8v2zm0 0h8v2h2v2h2v4H4v-4h2v-2h2V9zm2 4H8v2h2v-2zm4 0h2v2h-2v-2z" fill="currentColor"/> </svg>,
         component: <AskAI expanded={expended} />

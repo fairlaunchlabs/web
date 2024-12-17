@@ -40,6 +40,8 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
             first: pageSize
         },
         skip: !publicKey,
+        fetchPolicy: 'network-only',
+        nextFetchPolicy: 'cache-first'
     });
 
     const { data: tokenDetailsData, loading: loadingDetails } = useQuery(queryTokensByMints, {
@@ -48,7 +50,9 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
             skip: 0,
             first: 100
         },
-        skip: searchMints.length === 0
+        skip: searchMints.length === 0,
+        fetchPolicy: 'network-only',
+        nextFetchPolicy: 'cache-first'
     });
 
     useEffect(() => {
@@ -134,8 +138,8 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     }
 
     return (
-        <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="w-full md:max-w-6xl md:px-4 md:mb-20 mb-3">
+        <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`} key={publicKey?.toBase58()}>
+            <div className="w-full md:max-w-6xl mx-auto md:mb-20 mb-3">
                 <h2 className="card-title mb-4">My Tokens</h2>
                 {loadingTokens || loadingDetails ? (
                     <div className="flex justify-center">

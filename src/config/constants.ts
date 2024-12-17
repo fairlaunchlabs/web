@@ -128,5 +128,11 @@ export const DEPRECATED_MINTS = ["",
     "7NVeNNgSwM9nRPhDbsyDTVw2RLb3yivvVeKq9AwWuj33",
     "DtAXH1BJEUsCpF1JryD64raSU5D9U87Eb43WxVYrHye6",
     "6gkpJykcNGGTZAiw5QgiFbzqe5sxkJEBvaQP5Kvxctno",
-    "GjEZuomwVSy2U78bwX63Gof8k8B7zNBt8c65kaMUaxEf"
+    "GjEZuomwVSy2U78bwX63Gof8k8B7zNBt8c65kaMUaxEf",
+    "z8rcrKDATyEWtghNksJWNqdfEpqncDhjfDbWRfJyEkg", // ar#11
+    "EE4XNz6ban3x2Lt3hai1cAptchsgpygEV9BdKQKTXksg", // ar#12
+    "AGnY6Ygok6aLuBQJB9nRGg7giag4M7qRPaJE8bwKv9dT", 
+    "7g4MXbfN8SMC4uLwMXmfK7inqgahhmoRoBuZDrw8SawY", // ar2
+    "7DLEqhREmQzagdDvNbmbikUubH2NMxGXLDRwt2BfAQAF", // ar8
+    "3Bpy2NuzNKhhKVyiLabKvWtdoFiKCaUrkarXjifj1fa1", // ar13
 ]

@@ -30,11 +30,12 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     const hasStarted = !token.startTimestamp || Number(token.startTimestamp) <= Math.floor(Date.now() / 1000);
 
     return (
-        <div className="w-full space-y-4">
+        <div className="w-full space-y-0">
+            <div className='mb-4'>
             {isMobile ? 
                 <TokenHeroMobile token={token} metadata={metadata as TokenMetadataIPFS} /> 
               : <TokenHero token={token} metadata={metadata as TokenMetadataIPFS} />}
-
+            </div>
             <div className="pixel-box">
                 {isMobile ? 
                     <TokenInfoDataMobile token={token} metadata={metadata as TokenMetadataIPFS} hasStarted={hasStarted} />

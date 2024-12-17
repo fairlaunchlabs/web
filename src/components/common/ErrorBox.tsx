@@ -1,7 +1,7 @@
 
 export const ErrorBox = ({ title, message }: { title: string; message: string | undefined }) => {
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="md:max-w-6xl mx-auto">
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
             <div className="flex">
                 <div className="flex-shrink-0">

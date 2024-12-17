@@ -21,8 +21,18 @@ import { Footer } from './components/common/Footer';
 import { menuItems } from './config/menu';
 import { TokenDetail } from './pages/TokenDetail';
 import { APP_NAME } from './config/constants';
-import { Providers } from './utils/contexts';
+import { Providers, useDeviceType } from './utils/contexts';
 import { Discover } from './pages/Discover';
+import { MyMintedTokens } from './pages/MyMintedTokens';
+import { MyDeployments } from './pages/MyDeployments';
+import { AskAI } from './pages/AskAI';
+import { SocialDeveloper } from './pages/SocialDeveloper';
+import { SocialURCProvider } from './pages/SocialURCProvider';
+import { SocialValueManager } from './pages/SocialValueManager';
+import { LaunchTokenForm } from './pages/LaunchToken';
+import { AddLiquidity, BurnLPTokens, CreateLiquidityPool, CreateMarketId, RemoveLiquidity } from './pages/TokenManagement';
+import { CheckURC } from './components/tools/CheckURC';
+import { MyUniqueReferralCode } from './components/tools/MyUniqueReferralCode';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -33,6 +43,7 @@ const AppContent = () => {
     const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
         return localStorage.getItem('selectedMenuItem') || 'balance';
     });
+    const {isMobile} = useDeviceType();
 
     useEffect(() => {
         localStorage.setItem('selectedMenuItem', selectedMenuItem);
@@ -90,16 +101,29 @@ const AppContent = () => {
                     {/* 内容区域 */}
                     <div className="flex-1 p-4 md:p-8 pb-20">
                         <Routes>
-                            <Route path="/" element={getActiveComponent()} />
-                            <Route path="/home" element={<Discover expanded={expanded} />} />
-                            <Route path="/:selectedMenuItem" element={getActiveComponent()} />
+                            <Route path="/" element={<Discover expanded={expanded} />} />
+                            <Route path="/mint-tokens" element={<Discover expanded={expanded} />} />
+                            <Route path="/launch-token" element={<LaunchTokenForm expanded={expanded} />} />
+                            <Route path="/my-minted-tokens" element={<MyMintedTokens expanded={expanded} />} />
+                            <Route path="/my-deployments" element={<MyDeployments expanded={expanded} />} />
+                            <Route path="/create-market-id" element={<CreateMarketId />} />
+                            <Route path="/create-liquidity-pool" element={<CreateLiquidityPool />} />
+                            <Route path="/add-liquidity" element={<AddLiquidity />} />
+                            <Route path="/remove-liquidity" element={<RemoveLiquidity />} />
+                            <Route path="/burn-lp-tokens" element={<BurnLPTokens />} />
+                            <Route path="/check-urc" element={<CheckURC expanded={expanded} />} />
+                            <Route path="/my-urc" element={<MyUniqueReferralCode expanded={expanded} />} />
+                            <Route path="/ask-ai" element={<AskAI expanded={expanded} />} />
+                            <Route path="/social-developer" element={<SocialDeveloper expanded={expanded} />} />
+                            <Route path="/social-urc-provider" element={<SocialURCProvider expanded={expanded} />} />
+                            <Route path="/social-value-manager" element={<SocialValueManager expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />
                         </Routes>
                     </div>
                 </div>
                 <Toaster 
-                    position="bottom-right"
+                    position={isMobile ? "top-center" : "bottom-right"}
                     toastOptions={{
                         duration: 5000,
                     }}
