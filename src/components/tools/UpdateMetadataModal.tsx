@@ -10,6 +10,7 @@ import { NETWORK, SCANURL } from '../../config/constants';
 import { FaUpload } from 'react-icons/fa';
 import { HeaderImageUpload } from './HeaderImageUpload';
 import AlertBox from '../common/AlertBox';
+import { useDeviceType } from '../../utils/contexts';
 
 interface UpdateMetadataModalProps {
     isOpen: boolean;
@@ -33,7 +34,8 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
     const [isConfirmed, setIsConfirmed] = useState(false);
     const [headerImage, setHeaderImage] = useState<File | null>(null);
     const [headerPreview, setHeaderPreview] = useState<string>('');
-
+    const { isMobile } = useDeviceType();
+    
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
 
@@ -142,7 +144,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                             </div>
                             <div className="text-sm text-base-content/70">
                                 <span className="font-pixel">
-                                    <AddressDisplay address={token.mint} showCharacters={10}/>
+                                    <AddressDisplay address={token.mint} showCharacters={isMobile ? 5 : 10}/>
                                 </span>
                             </div>
                         </div>

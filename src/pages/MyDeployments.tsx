@@ -65,7 +65,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
 
     return (
         <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-            <div className="w-full max-w-6xl px-4 mb-20">
+            <div className="w-full md:max-w-6xl mb:px-4 mb-3 md:mb-20">
                 <h2 className="card-title mb-4">My Deployments</h2>
                 {loading ? (
                     <div className="flex justify-center">
@@ -173,6 +173,9 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                 key={token.id}
                                 token={token}
                                 metadata={tokenMetadataMap[token.mint as string]?.tokenMetadata}
+                                setIsUpdateModalOpen={setIsUpdateModalOpen}
+                                setIsCloseModalOpen={setIsCloseModalOpen}
+                                setSelectedToken={setSelectedToken}
                             />)}
                     </div>
                     )

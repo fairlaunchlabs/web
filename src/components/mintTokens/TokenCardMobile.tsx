@@ -3,12 +3,9 @@ import { TokenCardMobileProps, TokenMetadataIPFS } from '../../types/types';
 import { TokenImage } from './TokenImage';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useNavigate } from 'react-router-dom';
-import { RenderSocialIcons } from './RenderSocialIcons';
 import { fetchMetadata } from '../../utils/web3';
 import { 
     calculateMaxSupply, 
-    calculateTargetMintTime,
-    calculateMinTotalFee,
 } from '../../utils/format';
 
 export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {

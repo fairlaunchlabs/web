@@ -1,7 +1,6 @@
 import React, { useState, KeyboardEvent, useEffect } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '../utils/graphql';
-import { TokenCard } from '../components/mintTokens/TokenCard';
 import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
 import { ErrorBox } from '../components/common/ErrorBox';
@@ -114,9 +113,9 @@ export const MintTokens: React.FC<MintTokensProps> = ({
     }
 
     return (
-        <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:px-8 md:py-6 pl-5 pr-4 py-6 mb-20`}>
+        <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:p-4 md:mb-10 mb-5`}>
             {/* Search Bar */}
-            <div className="max-w-6xl mx-auto mb-12">
+            <div className="md:max-w-6xl mx-auto md:mb-12">
                 <div className="join w-full mb-2">
                     <div className="relative join-item flex-1">
                         <input
