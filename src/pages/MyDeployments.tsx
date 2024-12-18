@@ -113,7 +113,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                     <TokenImage 
                                                         imageUrl={tokenMetadataMap[token.mint]?.tokenMetadata?.image || ''}
                                                         name={token.tokenName}
-                                                        launchTimestamp={Number(token.metadataTimestamp)}
+                                                        metadataTimestamp={Number(token.metadataTimestamp)}
                                                         size={48}
                                                         className="w-12 h-12"
                                                     />

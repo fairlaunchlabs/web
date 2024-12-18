@@ -7,6 +7,7 @@ import { fetchMetadata } from '../../utils/web3';
 import { 
     calculateMaxSupply, 
 } from '../../utils/format';
+import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
 
 export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {
     const navigate = useNavigate();
@@ -64,21 +65,13 @@ export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {
             className="pixel-box p-4 cursor-pointer relative overflow-hidden"
             onClick={handleCardClick}
         >
-            {metadata?.header && (
-                <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-30" 
-                    style={{ 
-                        backgroundImage: `url(${metadata.header})`,
-                        filter: 'blur(2px)'
-                    }}
-                />
-            )}
+            {metadata?.header && <TokenBackgroundImage imageUrl={metadata.header} metadataTimestamp={Number(token.metadataTimestamp)} />}
             <div className="relative z-10 flex items-start gap-4">
                 <div className="flex flex-col items-center">
                     <TokenImage
                         imageUrl={metadata?.image as string}
                         name={token.tokenName}
-                        launchTimestamp={Number(token.metadataTimestamp)}
+                        metadataTimestamp={Number(token.metadataTimestamp)}
                         className="w-12 h-12"
                     />
                     <div className='mt-6 text-sm'>Price</div>

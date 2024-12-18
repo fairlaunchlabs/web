@@ -144,7 +144,7 @@ export type RefundTokenData = {
 export type TokenImageProps = {
     imageUrl: string | null;
     name: string;
-    launchTimestamp: number;
+    metadataTimestamp: number;
     size?: number;
     className?: string;
 }

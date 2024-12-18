@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from "../../config/constants";
 import { TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
+import { fetchImageFromUrlOrCache } from "../../utils/db";
 import { addressToColor } from "../../utils/format";
 import { ShareButton } from "../common/ShareButton";
 import { RenderSocialIcons } from "../mintTokens/RenderSocialIcons";
@@ -9,13 +11,43 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
     token,
     metadata
 }) => {
+    const [retryCount, setRetryCount] = useState(0);
+    const [imageData, setImageData] = useState("");
+
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
+        if (metadata?.header) {
+            fetchImageFromUrlOrCache(metadata?.header, Number(token?.metadataTimestamp)).then((blobUrl) => {
+                setImageData(blobUrl as string);
+                setRetryCount(0);
+            }).catch((error) => {
+                if (retryCount < 3) {
+                    const backoffTime = Math.pow(2, retryCount) * 1000;
+                    setTimeout(() => {
+                        setRetryCount(prev => prev + 1);
+                    }, backoffTime);
+                }
+            });
+        }
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+            if (imageData) {
+                URL.revokeObjectURL(imageData);
+            }
+        };
+    }, [metadata?.header, retryCount]);
+
     return (
         <div className="-ml-4 -mt-10 -mr-4 relative">
             {/* Background Image with Blur */}
             <div className="relative w-full aspect-[3/2] overflow-hidden">
-                {metadata && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
+                {metadata && imageData !== "" && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
                     <img
-                        src={metadata.header}
+                        src={imageData}
                         alt="Token Header"
                         className="w-full h-full object-cover blur-xs opacity-80"
                         style={{ padding: 0 }}
@@ -41,7 +73,7 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
                             <TokenImage
                                 imageUrl={metadata?.image as string} 
                                 name={metadata?.name as string} 
-                                launchTimestamp={Number(token.metadataTimestamp)}
+                                metadataTimestamp={Number(token.metadataTimestamp)}
                                 size={72} 
                                 className="rounded-full ring-2 ring-white shadow-xl" 
                             />

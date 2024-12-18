@@ -129,7 +129,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                 <TokenImage
                                     imageUrl={token.tokenMetadata?.image as string}
                                     name={token.tokenName}
-                                    launchTimestamp={Number(token.metadataTimestamp)}
+                                    metadataTimestamp={Number(token.metadataTimestamp)}
                                 />
                             </div>
                             <div className="flex-1 min-w-0 space-y-3">

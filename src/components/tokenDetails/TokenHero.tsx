@@ -1,20 +1,52 @@
+import { useEffect, useState } from "react";
 import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from "../../config/constants";
 import { TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
 import { addressToColor } from "../../utils/format";
 import { ShareButton } from "../common/ShareButton";
 import { RenderSocialIcons } from "../mintTokens/RenderSocialIcons";
 import { TokenImage } from "../mintTokens/TokenImage";
+import { fetchImageFromUrlOrCache } from "../../utils/db";
 
 export const TokenHero: React.FC<TokenHeroProps> = ({
     token,
     metadata
 }) => {
+    const [retryCount, setRetryCount] = useState(0);
+    const [imageData, setImageData] = useState("");
+
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
+        if (metadata?.header) {
+            fetchImageFromUrlOrCache(metadata?.header, Number(token?.metadataTimestamp)).then((blobUrl) => {
+                setImageData(blobUrl as string);
+                setRetryCount(0);
+            }).catch((error) => {
+                if (retryCount < 3) {
+                    const backoffTime = Math.pow(2, retryCount) * 1000;
+                    setTimeout(() => {
+                        setRetryCount(prev => prev + 1);
+                    }, backoffTime);
+                }
+            });
+        }
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+            if (imageData) {
+                URL.revokeObjectURL(imageData);
+            }
+        };
+    }, [metadata?.header, retryCount]);
+
     return (
         <div className="w-full relative">
         {/* Background Image */}
-        {metadata && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
+        {metadata && imageData !== "" && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
             <img
-                src={metadata.header}
+                src={imageData}
                 alt="Token Header"
                 className="pixel-box w-full h-auto aspect-[3/1] object-cover"
                 style={{ padding: 0}}
@@ -30,7 +62,7 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
                 <TokenImage
                     imageUrl={metadata?.image as string} 
                     name={metadata?.name as string} 
-                    launchTimestamp={Number(token.metadataTimestamp)}
+                    metadataTimestamp={Number(token.metadataTimestamp)}
                     size={96} 
                     className="rounded-full ring-4 ring-white shadow-xl" />
             </div>

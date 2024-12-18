@@ -5,6 +5,8 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { useNavigate } from 'react-router-dom';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { formatTimestamp } from '../../utils/format';
+import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
+import { useDeviceType } from '../../utils/contexts';
 
 type MyDeploymentCardProps = {
     token: InitiazlizedTokenData;
@@ -22,7 +24,7 @@ export const MyDeploymentCard: FC<MyDeploymentCardProps> = ({
     setIsUpdateModalOpen,
 }) => {
     const navigate = useNavigate();
-
+    
     const handleClick = () => {
         navigate(`/token/${token.mint}`);
     };
@@ -48,62 +50,59 @@ export const MyDeploymentCard: FC<MyDeploymentCardProps> = ({
 
     return (
         <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative">
-            {metadata?.header && (
-                <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-30" 
-                    style={{ 
-                        backgroundImage: `url(${metadata.header})`,
-                        filter: 'blur(2px)'
-                    }}
-                />
-            )}
-            <div className="relative z-10">
-                <div className="flex items-center gap-4">
+            {metadata?.header && <TokenBackgroundImage imageUrl={metadata.header} metadataTimestamp={Number(token.metadataTimestamp)} />}
+            <div className="relative z-10 flex items-start gap-4">
+                <div className='flex flex-col items-center'>
                     {metadata?.image &&
                     <TokenImage 
                         imageUrl={metadata?.image} 
                         name={metadata?.name || token.tokenSymbol} 
-                        launchTimestamp={Number(token.metadataTimestamp)}
-                        size={48}
-                        className="rounded-lg"
+                        metadataTimestamp={Number(token.metadataTimestamp)}
+                        className="w-12 h-12"
                     />}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-lg font-semibold truncate">
-                                {metadata?.name || token.tokenSymbol}
-                            </h3>
-                            <span className="text-sm text-base-content/60 mt-1">
-                                {formatTimestamp(Number(token.timestamp))}
-                            </span>
-                        </div>
-                        <div className="mt-1">
-                            <AddressDisplay address={token.mint} />
-                        </div>
-                        <div className="mt-1">
-                            Supply: {(Number(token.supply) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}
-                        </div>
-                        <div className="flex gap-2 justify-end mt-2">
-                            {token.supply === "0" && (
-                                <button 
-                                    className="btn btn-sm btn-error"
-                                    onClick={handleCloseToken}
-                                >
-                                    Close Mint
-                                </button>
-                            )}
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                        <h3 className="badge badge-md badge-secondary">{metadata?.symbol || token.tokenSymbol}</h3>
+                        <span className="text-sm">{token?.tokenName || metadata?.name}</span>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                        <div className="text-sm mt-0.5 opacity-70">Mint:</div>
+                        <AddressDisplay address={token.mint} showCharacters={5} />
+                    </div>
+                    <div className="space-y-1">
+                        <div className="flex gap-2">
+                            <div className="text-sm mt-0.5 opacity-70">Supply:</div>
+                            {(Number(token.supply) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}                            </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <div className="flex gap-2">
+                            <div className="text-sm mt-0.5 opacity-70">At:</div>
+                            {formatTimestamp(Number(token.metadataTimestamp))}                            </div>
+                    </div>
+                    <div className="flex gap-2 justify-end mt-2">
+                        {token.supply === "0" && (
                             <button 
-                                className="btn btn-sm btn-primary"
-                                onClick={handleUpdateMetadata}
+                                className="btn btn-sm btn-error"
+                                onClick={handleCloseToken}
                             >
-                                Update Metadata
+                                Close Mint
                             </button>
-                            <button 
-                                className="btn btn-sm btn-success"
-                                onClick={handleClick}
-                            >
-                                View
-                            </button>
-                        </div>
+                        )}
+                        <button 
+                            className="btn btn-sm btn-primary"
+                            onClick={handleUpdateMetadata}
+                        >
+                            Update Metadata
+                        </button>
+                        <button 
+                            className="btn btn-sm btn-success"
+                            onClick={handleClick}
+                        >
+                            View
+                        </button>
                     </div>
                 </div>
             </div>

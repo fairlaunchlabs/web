@@ -186,7 +186,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                                     <TokenImage
                                                         imageUrl={token.metadata?.image}
                                                         name={token.tokenData?.tokenName || 'Unknown'}
-                                                        launchTimestamp={Number(token.tokenData?.metadataTimestamp) || 0}
+                                                        metadataTimestamp={Number(token.tokenData?.metadataTimestamp) || 0}
                                                         size={48}
                                                         className="w-12 h-12 rounded-full"
                                                     />

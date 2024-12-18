@@ -5,6 +5,7 @@ import { AddressDisplay } from '../common/AddressDisplay';
 import { useNavigate } from 'react-router-dom';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useDeviceType } from '../../utils/contexts';
+import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
 
 interface MyUniqueReferralCodeCardProps {
     token: InitiazlizedTokenData;
@@ -43,68 +44,57 @@ export const MyUniqueReferralCodeCard: FC<MyUniqueReferralCodeCardProps> = ({
 
     return (
         <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative">
-            {metadata?.header && (
-                <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-30" 
-                    style={{ 
-                        backgroundImage: `url(${metadata.header})`,
-                        filter: 'blur(2px)'
-                    }}
-                />
-            )}
-            <div className="relative z-10">
-                <div className="flex items-start gap-4">
-                    <div className="flex flex-col items-center">
-                        {metadata?.image && 
-                        <TokenImage 
-                            imageUrl={metadata?.image} 
-                            name={metadata?.name || token.tokenSymbol} 
-                            launchTimestamp={Number(token.metadataTimestamp)}
-                            size={48}
-                            className="rounded-lg"
-                        />}
-                        <div className="mt-1 text-sm opacity-70">Bonus</div>
-                        <div className="font-semibold">{bonus.toFixed(4)} SOL</div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <h3 className="badge badge-md badge-secondary">{token.tokenSymbol}</h3>
-                                    <span className="text-sm">{metadata?.name}</span>
+            {metadata?.header && <TokenBackgroundImage imageUrl={metadata.header} metadataTimestamp={Number(token.metadataTimestamp)} />}
+            <div className="relative z-10 flex items-start gap-4">
+                <div className="flex flex-col items-center">
+                    {metadata?.image && 
+                    <TokenImage 
+                        imageUrl={metadata?.image} 
+                        name={metadata?.name || token.tokenSymbol} 
+                        metadataTimestamp={Number(token.metadataTimestamp)}
+                        className="w-12 h-12"
+                    />}
+                    <div className="mt-1 text-sm opacity-70">Bonus</div>
+                    <div className="font-semibold">{bonus.toFixed(4)} SOL</div>
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <h3 className="badge badge-md badge-secondary">{token.tokenSymbol}</h3>
+                                <span className="text-sm">{metadata?.name}</span>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex gap-2">
+                                    <div className="text-sm mt-0.5 opacity-70">Mint:</div>
+                                    <AddressDisplay address={token.mint} showCharacters={isMobile ? 5 : 10} />
                                 </div>
-                                <div className="space-y-1">
-                                    <div className="flex gap-2">
-                                        <div className="text-sm mt-0.5 opacity-70">Mint:</div>
-                                        <AddressDisplay address={token.mint} showCharacters={isMobile ? 5 : 10} />
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <div className="text-sm mt-0.5 opacity-70">Dev:</div>
-                                        <AddressDisplay address={token.admin} showCharacters={isMobile ? 5 : 10} />
-                                    </div>
+                                <div className="flex gap-2">
+                                    <div className="text-sm mt-0.5 opacity-70">Dev:</div>
+                                    <AddressDisplay address={token.admin} showCharacters={isMobile ? 5 : 10} />
                                 </div>
                             </div>
                         </div>
-                        <div className="flex gap-2 justify-end mt-4">
-                            <button 
-                                className="btn btn-sm btn-primary"
-                                onClick={handleGetURC}
-                            >
-                                Code Detail
-                            </button>
-                            <button 
-                                className="btn btn-sm btn-secondary"
-                                onClick={handleBonusDetail}
-                            >
-                                Bonus Detail
-                            </button>
-                            <button 
-                                className="btn btn-sm btn-success"
-                                onClick={handleClick}
-                            >
-                                View
-                            </button>
-                        </div>
+                    </div>
+                    <div className="flex gap-2 justify-end mt-6">
+                        <button 
+                            className="btn btn-sm btn-primary"
+                            onClick={handleGetURC}
+                        >
+                            Code Detail
+                        </button>
+                        <button 
+                            className="btn btn-sm btn-secondary"
+                            onClick={handleBonusDetail}
+                        >
+                            Bonus Detail
+                        </button>
+                        <button 
+                            className="btn btn-sm btn-success"
+                            onClick={handleClick}
+                        >
+                            View
+                        </button>
                     </div>
                 </div>
             </div>

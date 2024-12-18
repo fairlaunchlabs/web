@@ -86,6 +86,12 @@ export const DEPRECATED_SYMBOLS = [
 ]
 export const SEARCH_CACHE_ITEMS = 10;
 
+export const INDEX_DB_NAME = 'POM_IMAGE_CACHE';
+export const STORE_NAME_IMAGE = 'token_images';
+export const INDEX_DB_VERSION = 1;
+
+export const CACHE_DURATION = 60 * 24 * 60 * 60 * 1000; // 60 days
+
 export const DEPRECATED_MINTS = ["",
     // 因为开发过程中，有些代币数据出错，过滤后内测
     "a1RtFfJgH2wQUt72cRWeMQqJCFn6qymp8QDjyoPzbmY", // test#111
