@@ -1,5 +1,16 @@
 import { PublicKey } from '@solana/web3.js';
 
+export const DEFAULT_PARAMS = { // must be same as program default params
+    targetEras: '1',
+    epochesPerEra: '250',
+    targetSecondsPerEpoch: '10000',
+    reduceRatio: '75',
+    initialMintSize: '10000000000000',
+    initialTargetMintSizePerEpoch: '1000000000000000',
+    feeRate: '10000000',
+    liquidityTokensRatio: '10',
+}
+
 export const APP_NAME = 'flipflop';
 export const FAIR_MINT_PROGRAM_ID = 'CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
@@ -34,7 +45,7 @@ export const ARWEAVE_GATEWAY_URL = "https://arweave.net";
 export const ARSEEDING_GATEWAY_URL = "https://arseed.web3infra.dev";
 export const ARWEAVE_DEFAULT_SYNC_TIME = 2 * 60 * 60;
 
-export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
 export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 

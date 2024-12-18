@@ -1510,70 +1510,6 @@
       ]
     },
     {
-      "name": "reset_config_data",
-      "discriminator": [
-        198,
-        180,
-        69,
-        197,
-        9,
-        214,
-        70,
-        30
-      ],
-      "accounts": [
-        {
-          "name": "mint"
-        },
-        {
-          "name": "config_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "admin",
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "init_config_data",
-          "type": {
-            "defined": {
-              "name": "InitializeTokenConfigData"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "set_referrer_code",
       "discriminator": [
         129,
@@ -2885,6 +2821,11 @@
       "code": 6083,
       "name": "PayerAmountTooLow",
       "msg": "Payer amount too low"
+    },
+    {
+      "code": 6084,
+      "name": "ConfigSupplyNotMatchMintSupply",
+      "msg": "Config supply not match mint supply"
     }
   ],
   "types": [
@@ -3484,6 +3425,10 @@
           {
             "name": "is_processing",
             "type": "bool"
+          },
+          {
+            "name": "vault_tokens",
+            "type": "u64"
           }
         ]
       }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AdvancedSettingsProps } from '../../types/types';
+import AlertBox from '../common/AlertBox';
 
 export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
     targetEras,
@@ -158,6 +159,11 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                     placeholder="Enter liquidity tokens ratio"
                 />
             </div>
+
+            <AlertBox 
+                title="Info"
+                message="Default params are popular and suggested, if you want to customize params, 0.15 SOL will be charged"
+            />
         </div>
     );
 };

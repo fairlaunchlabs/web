@@ -96,6 +96,10 @@ export const createTokenOnChain = async (
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
 
+        console.log("Config", Object.fromEntries(
+            Object.entries(config).map(([key, value]) => [key, value.toString()])
+        ));
+
         const tx = await program.methods
             .initializeToken(metadata, config as any)
             .accounts(initializeTokenAccounts)
@@ -888,7 +892,7 @@ export const updateMetaData = async (
         });
 
         // const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
-        const metadataUrl = await uploadToArweave(metadataFile); // ######
+        const metadataUrl = await uploadToArweave(metadataFile, 'metadata'); // ######
         console.log("metadataUrl", metadataUrl);
         const metadata: TokenMetadata = {
             symbol: token.tokenSymbol,
@@ -916,9 +920,12 @@ export const updateMetaData = async (
     }
 };
 
-export const uploadToArweave = async (file: File, contentType: string = 'multipart/form-data'): Promise<string> => {
+// action: 'avatar' ｜ 'banner' | 'metadata'
+export const uploadToArweave = async (file: File, action: string = 'avatar', contentType: string = 'multipart/form-data'): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('action', action);
+
     try {
         const url = `${ARWEAVE_API_URL}/upload`;
         const response = await axios.post(url, formData, {

@@ -8,18 +8,17 @@ import { AdvancedSettings } from '../components/launchToken/AdvancedSettings';
 import { ToggleSwitch } from '../components/common/ToggleSwitch';
 import { TokenImageUpload } from '../components/launchToken/TokenImageUpload';
 import toast from 'react-hot-toast';
-import { ARWEAVE_API_URL, ARWEAVE_GATEWAY_URL, MAX_AVATAR_FILE_SIZE, NETWORK, SCANURL, VALID_IMAGE_TYPES } from '../config/constants';
+import { DEFAULT_PARAMS, MAX_AVATAR_FILE_SIZE, NETWORK, SCANURL, VALID_IMAGE_TYPES } from '../config/constants';
 import { ToastBox } from '../components/common/ToastBox';
-import { numberStringToBN } from '../utils/format';
+import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../utils/format';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import axios from 'axios';
+import { BN } from '@coral-xyz/anchor';
 
 export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
     const [name, setName] = useState('');
     const [symbol, setSymbol] = useState('');
     const [imageUrl, setImageUrl] = useState('');
-    // const [imageCid, setImageCid] = useState('');
     const [description, setDescription] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
@@ -38,17 +37,18 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     const [medium, setMedium] = useState('');
 
     // 高级设置状态
-    const [targetEras, setTargetEras] = useState('1');
-    const [epochesPerEra, setEpochesPerEra] = useState('250');
-    const [targetSecondsPerEpoch, setTargetSecondsPerEpoch] = useState('10000');
-    const [reduceRatio, setReduceRatio] = useState('75');
-    const [displayInitialMintSize, setDisplayInitialMintSize] = useState('10000');
-    const [initialMintSize, setInitialMintSize] = useState('10000000000000');
-    const [displayInitialTargetMintSizePerEpoch, setDisplayInitialTargetMintSizePerEpoch] = useState('1000000');
-    const [initialTargetMintSizePerEpoch, setInitialTargetMintSizePerEpoch] = useState('1000000000000000');
-    const [displayFeeRate, setDisplayFeeRate] = useState('0.005');
-    const [feeRate, setFeeRate] = useState('5000000');
-    const [liquidityTokensRatio, setLiquidityTokensRatio] = useState('10');
+    const [targetEras, setTargetEras] = useState(DEFAULT_PARAMS.targetEras);
+    const [epochesPerEra, setEpochesPerEra] = useState(DEFAULT_PARAMS.epochesPerEra);
+    const [targetSecondsPerEpoch, setTargetSecondsPerEpoch] = useState(DEFAULT_PARAMS.targetSecondsPerEpoch);
+    const [reduceRatio, setReduceRatio] = useState(DEFAULT_PARAMS.reduceRatio);
+    const [displayInitialMintSize, setDisplayInitialMintSize] = useState(
+        (new BN(DEFAULT_PARAMS.initialMintSize)).div(BN_LAMPORTS_PER_SOL).toString()
+    );
+    const [displayInitialTargetMintSizePerEpoch, setDisplayInitialTargetMintSizePerEpoch] = useState(
+        (new BN(DEFAULT_PARAMS.initialTargetMintSizePerEpoch)).div(BN_LAMPORTS_PER_SOL).toString()
+    );
+    const [displayFeeRate, setDisplayFeeRate] = useState((Number(DEFAULT_PARAMS.feeRate) / LAMPORTS_PER_SOL).toString());
+    const [liquidityTokensRatio, setLiquidityTokensRatio] = useState(DEFAULT_PARAMS.liquidityTokensRatio);
 
     const [startImmediately, setStartImmediately] = useState(true);
     const [startTime, setStartTime] = useState<string>('');
@@ -70,7 +70,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
 
         // Check file size (4MB = 4 * 1024 * 1024 bytes)
         if (file.size > MAX_AVATAR_FILE_SIZE) {
-            setError('Image size must be less than 250K');
+            setError(`Image size must be less than ${MAX_AVATAR_FILE_SIZE / 1024}K`);
             return false;
         }
 
@@ -95,7 +95,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         }
 
         try {
-            const arweaveUrl = await uploadToArweave(file); // ######
+            const arweaveUrl = await uploadToArweave(file, 'avatar'); // ######
             // const arweaveUrl = "https://arweave.net/zYjcUg1xkcKIryig0nuhJbpUSRHwIjXuqyuWY6kglm4"; // pic
             setImageUrl(arweaveUrl);
         } catch (err) {
@@ -146,7 +146,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 type: 'application/json'
             });
 
-            const metadataUrl = await uploadToArweave(metadataFile); // ######
+            const metadataUrl = await uploadToArweave(metadataFile, 'metadata'); // ######
             // const metadataUrl = "https://arweave.net/UEuuJkHW3rgw4tcmlL_9loURN3Hc3YVYs_m7e5rngww"; // metadata
             console.log('Metadata uploaded to Arweave:', metadataUrl);
 
@@ -166,8 +166,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 epochesPerEra: numberStringToBN(epochesPerEra),
                 targetSecondsPerEpoch: numberStringToBN(targetSecondsPerEpoch),
                 reduceRatio: numberStringToBN(reduceRatio),
-                initialMintSize: numberStringToBN(displayInitialMintSize + "000000000"),
-                initialTargetMintSizePerEpoch: numberStringToBN(displayInitialTargetMintSizePerEpoch + "000000000"),
+                initialMintSize: numberStringToBN(displayInitialMintSize).mul(BN_LAMPORTS_PER_SOL),
+                initialTargetMintSizePerEpoch: numberStringToBN(displayInitialTargetMintSizePerEpoch).mul(BN_LAMPORTS_PER_SOL),
                 feeRate: numberStringToBN((Number(displayFeeRate) * LAMPORTS_PER_SOL).toString()),
                 liquidityTokensRatio: numberStringToBN(liquidityTokensRatio),
                 startTimestamp: numberStringToBN(startTimestamp.toString()),
@@ -399,6 +399,9 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                             />
                         )}
                     </div>
+                    {error && (
+                        <div className="text-error text-sm mt-1">{error}</div>
+                    )}
 
                     <button
                         type="submit"
@@ -422,8 +425,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                         targetSecondsPerEpoch={targetSecondsPerEpoch}
                         reduceRatio={reduceRatio}
                         displayInitialTargetMintSizePerEpoch={displayInitialTargetMintSizePerEpoch}
-                        initialMintSize={initialMintSize}
-                        feeRate={feeRate}
+                        initialMintSize={(new BN(displayInitialMintSize)).mul(BN_LAMPORTS_PER_SOL).toString()}
+                        feeRate={(Number(displayFeeRate) * LAMPORTS_PER_SOL).toString()}
                         liquidityTokensRatio={liquidityTokensRatio}
                         symbol={symbol}
                     />
