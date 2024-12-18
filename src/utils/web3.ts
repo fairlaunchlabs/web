@@ -14,6 +14,7 @@ import { FairMintToken } from '../types/fair_mint_token';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import axios from 'axios';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { fetchMetadataFromUrlOrCache } from './db';
 
 const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     const provider = new AnchorProvider(
@@ -729,22 +730,11 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
         if (!token.tokenUri) return null;
         // Check if the URI is an Arweave URL
         if (token.tokenUri.startsWith(ARWEAVE_GATEWAY_URL)) {
-            let url = generateArweaveUrl(Number(token.metadataTimestamp), extractArweaveHash(token.tokenUri));
-            const response = await axios.get(url);
-
-            return {
-                name: response.data.name,
-                symbol: response.data.symbol,
-                description: response.data.description,
-                image: generateArweaveUrl(Number(token.metadataTimestamp), extractArweaveHash(response.data.image)),
-                header: generateArweaveUrl(Number(token.metadataTimestamp), extractArweaveHash(response.data.header)),
-                extensions: response.data.extensions,
-            } as TokenMetadataIPFS
+            return await fetchMetadataFromUrlOrCache(token.tokenUri, Number(token.metadataTimestamp));
         }
         
-        // Fallback to IPFS for backward compatibility
+        // Deprecated
         if (token.tokenUri.startsWith('ipfs://') || token.tokenUri.startsWith('https://gateway.pinata.cloud')) {
-            // Deprecated
             // 忽略之前通过IPFS保存的metadata和图片
             // const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
             // return response.data as TokenMetadataIPFS;

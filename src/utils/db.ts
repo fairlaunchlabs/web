@@ -1,6 +1,7 @@
 import axios from "axios";
 import { CACHE_DURATION, INDEX_DB_NAME, INDEX_DB_VERSION, STORE_NAME_IMAGE } from "../config/constants";
 import { checkAvailableArweaveItemId, extractArweaveHash, generateArweaveUrl } from "./web3";
+import { TokenMetadataIPFS } from "../types/types";
 
 export const arrayBufferToBlob = (buffer: ArrayBuffer, type: string): Blob => {
     return new Blob([buffer], { type });
@@ -53,7 +54,7 @@ export const openDB = (): Promise<IDBDatabase> => {
     });
 };
 
-export const getCachedImage = async (url: string): Promise<ArrayBuffer | null> => {
+export const getCachedData = async (url: string): Promise<ArrayBuffer | null> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
@@ -87,7 +88,7 @@ export const getCachedImage = async (url: string): Promise<ArrayBuffer | null> =
     }
 };
 
-export const setCachedImage = async (url: string, data: ArrayBuffer): Promise<void> => {
+export const setCachedData = async (url: string, data: any): Promise<void> => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
@@ -122,7 +123,7 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
             throw new Error('Invalid Arweave id');
         }
         // Try to get from cache first
-        const cachedImage = await getCachedImage(itemId);
+        const cachedImage = await getCachedData(itemId);
         if (cachedImage) {
             const blobUrl = createBlobUrl(cachedImage);
             console.log('Using cached image', itemId);
@@ -150,11 +151,51 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
         }
 
         // Cache the image data
-        await setCachedImage(itemId, imageBuffer);
+        await setCachedData(itemId, imageBuffer);
 
         // Create blob URL with detected image type
         const blobUrl = createBlobUrl(imageBuffer, imageType);
         return blobUrl;
+    } catch (err) {
+        throw new Error(err instanceof Error ? err.message : 'Unknown error');
+    }
+};
+
+export const fetchMetadataFromUrlOrCache = async (tokenUri: string, metadataTimestamp: number) => {
+    try {
+        // Extract CID and validate
+        const itemId = extractArweaveHash(tokenUri as string);
+        if (!itemId || !checkAvailableArweaveItemId(itemId)) {
+            throw new Error('Invalid Arweave id');
+        }
+
+        const cachedMetadata = await getCachedData(itemId);
+        if (cachedMetadata) {
+            const blobUrl = cachedMetadata as TokenMetadataIPFS;
+            console.log('Using cached metadata', itemId);
+            return blobUrl;
+        }
+
+        let url = generateArweaveUrl(metadataTimestamp, itemId);
+
+        const response = await axios.get(url);
+
+        if (!response?.data) {
+            throw new Error('Failed to fetch image');
+        }
+
+        const data = {
+            name: response.data.name,
+            symbol: response.data.symbol,
+            description: response.data.description,
+            image: generateArweaveUrl(Number(metadataTimestamp), extractArweaveHash(response.data.image)),
+            header: generateArweaveUrl(Number(metadataTimestamp), extractArweaveHash(response.data.header)),
+            extensions: response.data.extensions,
+        } as TokenMetadataIPFS
+
+        // Cache the image data
+        await setCachedData(itemId, data);
+        return data;
     } catch (err) {
         throw new Error(err instanceof Error ? err.message : 'Unknown error');
     }
