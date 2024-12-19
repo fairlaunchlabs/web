@@ -120,31 +120,31 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 id: 'create-market-id',
                 label: 'Create Market ID',
                 icon: <MdAddBox className="w-5 h-5" />,
-                component: <CreateMarketId />
+                component: <CreateMarketId expanded={expended} />
             },
             {
                 id: 'create-liquidity-pool',
                 label: 'Create Pool',
                 icon: <MdPool className="w-5 h-5" />,
-                component: <CreateLiquidityPool />
+                component: <CreateLiquidityPool expanded={expended} />
             },
             {
                 id: 'add-liquidity',
                 label: 'Add Liquidity',
                 icon: <MdAddBox className="w-5 h-5" />,
-                component: <AddLiquidity />
+                component: <AddLiquidity expanded={expended} />
             },
             {
                 id: 'remove-liquidity',
                 label: 'Remove Liquidity',
                 icon: <MdRemoveCircleOutline className="w-5 h-5" />,
-                component: <RemoveLiquidity />
+                component: <RemoveLiquidity expanded={expended} />
             },
             {
                 id: 'burn-lp-tokens',
                 label: 'Burn LP Tokens',
                 icon: <MdLocalFireDepartment className="w-5 h-5" />,
-                component: <BurnLPTokens />
+                component: <BurnLPTokens expanded={expended} />
             }
         ]
     },

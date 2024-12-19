@@ -398,6 +398,10 @@ export type CheckURCProps = {
     expanded: boolean;
 }
 
+export type CommonPageProps = {
+    expanded: boolean;
+}
+
 export type SetRefererCodeEntity = {
     id?: string;
     mint: string;

@@ -1,56 +1,59 @@
-import React from 'react';
+import React, { FC } from 'react';
+import { PageHeader } from '../components/common/PageHeader';
+import { CommonPageProps } from '../types/types';
 
-export const CreateMarketId: React.FC = () => {
+export const CreateMarketId: FC<CommonPageProps> = ({
+    expanded
+}) => {
     return (
-        <div className="card bg-base-200 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Create Market ID</h2>
-                <p>Market ID creation functionality will be implemented here.</p>
-            </div>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Create Market ID" bgImage='/bg/group1/7.jpg' />
+            <p>Market ID creation functionality will be implemented here.</p>
+        </div>
+    )
+
+};
+
+export const CreateLiquidityPool: FC<CommonPageProps> = ({
+    expanded
+}) => {
+    return (
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Create Liquidity Pool" bgImage='/bg/group1/8.jpg' />
+            <p>Liquidity pool creation functionality will be implemented here.</p>
         </div>
     );
 };
 
-export const CreateLiquidityPool: React.FC = () => {
+export const AddLiquidity: FC<CommonPageProps> = ({
+    expanded
+}) => {
     return (
-        <div className="card bg-base-200 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Create Liquidity Pool</h2>
-                <p>Liquidity pool creation functionality will be implemented here.</p>
-            </div>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Add Liquidity" bgImage='/bg/group1/9.jpg' />
+            <p>Add liquidity functionality will be implemented here.</p>
         </div>
     );
 };
 
-export const AddLiquidity: React.FC = () => {
+export const RemoveLiquidity: FC<CommonPageProps> = ({
+    expanded
+}) => {
     return (
-        <div className="card bg-base-200 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Add Liquidity</h2>
-                <p>Add liquidity functionality will be implemented here.</p>
-            </div>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Remove Liquidity" bgImage='/bg/group1/10.jpg' />
+            <p>Remove liquidity functionality will be implemented here</p>
         </div>
     );
 };
 
-export const RemoveLiquidity: React.FC = () => {
+export const BurnLPTokens: FC<CommonPageProps> = ({
+    expanded
+}) => {
     return (
-        <div className="card bg-base-200 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Remove Liquidity</h2>
-                <p>Remove liquidity functionality will be implemented here.</p>
-            </div>
-        </div>
-    );
-};
-
-export const BurnLPTokens: React.FC = () => {
-    return (
-        <div className="card bg-base-200 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Burn LP Tokens</h2>
-                <p>LP token burning functionality will be implemented here.</p>
-            </div>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Burn LP Tokens" bgImage='/bg/group1/11.jpg' />
+            <p>LP token burning functionality will be implemented here.</p>
         </div>
     );
 };

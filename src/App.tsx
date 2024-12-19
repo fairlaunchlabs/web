@@ -106,11 +106,11 @@ const AppContent = () => {
                             <Route path="/launch-token" element={<LaunchTokenForm expanded={expanded} />} />
                             <Route path="/my-minted-tokens" element={<MyMintedTokens expanded={expanded} />} />
                             <Route path="/my-deployments" element={<MyDeployments expanded={expanded} />} />
-                            <Route path="/create-market-id" element={<CreateMarketId />} />
-                            <Route path="/create-liquidity-pool" element={<CreateLiquidityPool />} />
-                            <Route path="/add-liquidity" element={<AddLiquidity />} />
-                            <Route path="/remove-liquidity" element={<RemoveLiquidity />} />
-                            <Route path="/burn-lp-tokens" element={<BurnLPTokens />} />
+                            <Route path="/create-market-id" element={<CreateMarketId expanded={expanded} />} />
+                            <Route path="/create-liquidity-pool" element={<CreateLiquidityPool expanded={expanded} />} />
+                            <Route path="/add-liquidity" element={<AddLiquidity expanded={expanded} />} />
+                            <Route path="/remove-liquidity" element={<RemoveLiquidity expanded={expanded} />} />
+                            <Route path="/burn-lp-tokens" element={<BurnLPTokens expanded={expanded} />} />
                             <Route path="/check-urc" element={<CheckURC expanded={expanded} />} />
                             <Route path="/my-urc" element={<MyUniqueReferralCode expanded={expanded} />} />
                             <Route path="/ask-ai" element={<AskAI expanded={expanded} />} />

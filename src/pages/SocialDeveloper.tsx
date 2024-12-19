@@ -1,14 +1,13 @@
+import { PageHeader } from "../components/common/PageHeader";
 
 export type SocialDeployerProps = {
     expanded: boolean;
 }
 export const SocialDeveloper: React.FC<SocialDeployerProps> = ({ expanded }) => {
     return (
-        <div className={`card bg-base-200 shadow-xl ${expanded ? 'ml-64' : 'ml-20'}`}>
-            <div className="card-body">
-                <h2 className="card-title">Social Deploy</h2>
-                <p>Social deploy functionality will be implemented here.</p>
-            </div>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Developer" bgImage='/bg/group1/23.jpg' />
+            <p>Social developer functionality will be implemented here.</p>
         </div>
     );
 };
