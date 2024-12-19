@@ -18,7 +18,7 @@ export const SocialInformation: React.FC<SocialInformationProps> = ({
     onMediumChange,
 }) => {
     return (
-        <div className="space-y-4 p-4">
+        <div className="space-y-4 md:space-y-6">
             <div>
                 <label htmlFor="description" className="text-label mb-1">
                     Description

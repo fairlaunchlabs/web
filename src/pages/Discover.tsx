@@ -7,6 +7,7 @@ import { ErrorBox } from '../components/common/ErrorBox';
 import { filterTokens, formatAddress } from '../utils/format';
 import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS, SEARCH_CACHE_ITEMS } from '../config/constants';
 import { TokenCardMobile } from '../components/mintTokens/TokenCardMobile';
+import { PageHeader } from '../components/common/PageHeader';
 
 export const Discover: React.FC<MintTokensProps> = ({
     expanded
@@ -105,8 +106,9 @@ export const Discover: React.FC<MintTokensProps> = ({
     }
 
     return (
-        <div className={`${expanded ? 'md:ml-64' : 'md:ml-20'} md:p-4 md:mb-10 mb-5`}>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             {/* Search Bar */}
+            <PageHeader title="Discover" bgImage='/bg/group1/1.jpg' />
             <div className="md:max-w-6xl mx-auto mb-3 md:mb-12">
                 <div className="join w-full mb-2">
                     <div className="relative join-item flex-1">

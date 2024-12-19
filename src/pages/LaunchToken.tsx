@@ -13,6 +13,7 @@ import { ToastBox } from '../components/common/ToastBox';
 import { BN_LAMPORTS_PER_SOL, numberStringToBN } from '../utils/format';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
+import { PageHeader } from '../components/common/PageHeader';
 
 export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
@@ -261,7 +262,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     };
 
     return (
-        <div className={`mx-auto mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="Launch Token" bgImage='/bg/group1/2.jpg' />
             <div className="flex flex-col lg:flex-row lg:justify-center lg:items-start lg:gap-8">
                 <form onSubmit={handleSubmit} className="w-full lg:w-[480px] space-y-4 md:p-4">
                     <div className="">

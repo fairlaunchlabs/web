@@ -15,6 +15,7 @@ import { Pagination } from '../components/common/Pagination';
 import { PAGE_SIZE_OPTIONS } from '../config/constants';
 import { useDeviceType } from '../utils/contexts';
 import { MyMintedTokenCard } from '../components/myAccount/MyMintedTokenCard';
+import { PageHeader } from '../components/common/PageHeader';
 
 export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     const { connection } = useConnection();
@@ -138,9 +139,9 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     }
 
     return (
-        <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`} key={publicKey?.toBase58()}>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`} key={publicKey?.toBase58()}>
+            <PageHeader title="My Tokens" bgImage='/bg/group1/3.jpg' />
             <div className="w-full md:max-w-6xl mx-auto md:mb-20 mb-3">
-                <h2 className="card-title mb-4 md:mb-0">My Tokens</h2>
                 {loadingTokens || loadingDetails ? (
                     <div className="flex justify-center">
                         <span className="loading loading-spinner loading-lg"></span>

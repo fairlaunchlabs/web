@@ -6,6 +6,7 @@ import { getReferralDataByCodeHash, getReferrerCodeHash, getTokenBalance } from 
 import { AddressDisplay } from '../common/AddressDisplay';
 import { CheckURCProps, SetRefererCodeEntity } from '../../types/types';
 import { FaSearch } from 'react-icons/fa';
+import { PageHeader } from '../common/PageHeader';
 
 export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     const { connection } = useConnection();
@@ -54,9 +55,9 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     };
 
     return (
-        <div className={`space-y-6 md:p-6 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
+        <div className={`space-y-0 md:p-4 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
+            <PageHeader title="Check URC" bgImage='/bg/group1/6.jpg' />
             <div className="md:max-w-5xl mx-auto w-full flex flex-col gap-4">
-                <h2 className="card-title">Validate URC</h2>
                 <div className="join w-full">
                     <div className='relative join-item flex-1'>
                     <input

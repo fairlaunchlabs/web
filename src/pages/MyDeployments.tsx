@@ -16,6 +16,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useDeviceType } from "../utils/contexts";
 import { MyDeploymentCard } from "../components/tools/MyDeploymentCard";
 import { filterTokens } from "../utils/format";
+import { PageHeader } from "../components/common/PageHeader";
 
 export type MyDeploymentsProps = {
     expanded: boolean;
@@ -65,9 +66,9 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     const loading = initialLoading || metadataLoading;
 
     return (
-        <div className={`flex flex-col items-center ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="My Deployments" bgImage='/bg/group1/4.jpg' />
             <div className="w-full md:max-w-6xl mx-auto mb-3 md:mb-20">
-                <h2 className="card-title mb-4 md:mb-0">My Deployments</h2>
                 {loading ? (
                     <div className="flex justify-center">
                         <span className="loading loading-spinner loading-lg"></span>

@@ -52,6 +52,10 @@ export const createTokenOnChain = async (
             ],
             program.programId
         );
+        const mintAccountInfo = await connection.getAccountInfo(mintPda);
+        if (mintAccountInfo) {
+            throw new Error('Token already exists');
+        }
 
         const [configPda] = PublicKey.findProgramAddressSync(
             [
@@ -61,13 +65,10 @@ export const createTokenOnChain = async (
             program.programId
         );
 
-        const [mintStatePda] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from(MINT_STATE_SEED),
-                mintPda.toBuffer()
-            ],
-            program.programId
-        );
+        const configAccountInfo = await connection.getAccountInfo(configPda);
+        if (configAccountInfo) {
+            throw new Error('Config account already exists');
+        }
 
         const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
             [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
@@ -88,7 +89,6 @@ export const createTokenOnChain = async (
             metadata: metadataPda,
             payer: wallet.publicKey,
             configAccount: configPda,
-            mintStateAccount: mintStatePda,
             rent: SYSVAR_RENT_PUBKEY,
             systemProgram: SystemProgram.programId,
             systemConfigAccount: systemConfigAccountPda,

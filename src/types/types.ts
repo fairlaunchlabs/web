@@ -50,7 +50,6 @@ export type InitializeTokenAccounts = {
     metadata: PublicKey;
     payer: PublicKey;
     configAccount: PublicKey;
-    mintStateAccount: PublicKey;
     rent: PublicKey;
     systemProgram: PublicKey;
     systemConfigAccount: PublicKey;

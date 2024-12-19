@@ -16,6 +16,7 @@ import { ReferralBonusDetailModal } from './ReferralBonusDetailModal';
 import { useDeviceType } from '../../utils/contexts';
 import { MyUniqueReferralCodeCard } from './MyUniqueReferralCodeCard';
 import { filterRefererCode } from '../../utils/format';
+import { PageHeader } from '../common/PageHeader';
 
 export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }) => {
     const wallet = useAnchorWallet();
@@ -141,9 +142,9 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     }
 
     return (
-        <div className={`space-y-0 md:p-6 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+            <PageHeader title="My URCs(Unique Referral Codes)" bgImage='/bg/group1/5.jpg' />
             <div className="md:max-w-6xl mx-auto mb-3 md:mb-20">
-                <h2 className="card-title mb-4 md:mb-0">My URCs(Unique Referral Codes)</h2>
                 {urcLoading || tokenLoading || loadingMetadata ? (
                     <div className="flex justify-center">
                         <span className="loading loading-spinner loading-lg"></span>

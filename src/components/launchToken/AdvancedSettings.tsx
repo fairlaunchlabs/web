@@ -21,7 +21,7 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
     onLiquidityTokensRatioChange,
 }) => {
     return (
-        <div className="space-y-6 mt-4" >
+        <div className="space-y-4 md:space-y-6" >
             <div>
                 <label htmlFor="targetEras" className="block text-sm font-medium mb-1">
                     Target Eras
