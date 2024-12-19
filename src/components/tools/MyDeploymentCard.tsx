@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { formatTimestamp } from '../../utils/format';
 import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
-import { useDeviceType } from '../../utils/contexts';
 
 type MyDeploymentCardProps = {
     token: InitiazlizedTokenData;
@@ -66,7 +65,7 @@ export const MyDeploymentCard: FC<MyDeploymentCardProps> = ({
                         <h3 className="badge badge-md badge-secondary">{metadata?.symbol || token.tokenSymbol}</h3>
                         <span className="text-sm">{token?.tokenName || metadata?.name}</span>
                     </div>
-                    
+
                     <div className="flex gap-2">
                         <div className="text-sm mt-0.5 opacity-70">Mint:</div>
                         <AddressDisplay address={token.mint} showCharacters={5} />

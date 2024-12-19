@@ -21,7 +21,7 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
 
             // Check file type
             if (!VALID_IMAGE_TYPES.includes(file.type)) {
-                setError('Only PNG, JPG and GIF files are allowed');
+                setError('Only PNG, JPG, WEBP and GIF files are allowed');
                 resolve(false);
                 return;
             }
@@ -150,7 +150,7 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                             <span className="font-medium text-primary">Click to upload</span> or drag and drop
                         </div>
                         <p className="text-xs text-base-content">
-                            PNG, JPG, GIF up to {MAX_AVATAR_FILE_SIZE / 1024 / 1024} MB (must be square)
+                            PNG, JPG, GIF, WEBP up to {MAX_AVATAR_FILE_SIZE / 1024 / 1024} MB (must be square)
                         </p>
                     </div>
                 )}

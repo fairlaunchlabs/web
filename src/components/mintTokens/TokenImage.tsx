@@ -62,7 +62,7 @@ export const TokenImage: React.FC<TokenImageProps> = ({
                 style={{ width: size, height: size }}
                 title={error}
             >
-                <span className="text-red-500">!</span>
+                <span className="text-red-500">N/A</span>
             </div>
         );
     }

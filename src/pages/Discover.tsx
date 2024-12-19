@@ -106,7 +106,7 @@ export const Discover: React.FC<MintTokensProps> = ({
     }
 
     return (
-        <div className={`space-y-0 md:p-4 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+        <div className={`space-y-0 md:p-4 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
             {/* Search Bar */}
             <PageHeader title="Discover" bgImage='/bg/group1/1.jpg' />
             <div className="md:max-w-6xl mx-auto mb-3 md:mb-12">

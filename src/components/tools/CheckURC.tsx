@@ -55,7 +55,7 @@ export const CheckURC: FC<CheckURCProps> = ({ expanded }) => {
     };
 
     return (
-        <div className={`space-y-0 md:p-4 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
+        <div className={`space-y-0 md:p-4 md:mb-20 ${expanded ? "md:ml-64" : "md:ml-20"}`}>
             <PageHeader title="Check URC" bgImage='/bg/group1/6.jpg' />
             <div className="md:max-w-5xl mx-auto w-full flex flex-col gap-4">
                 <div className="join w-full">

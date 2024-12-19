@@ -149,7 +149,7 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                             <span className="font-medium text-primary">Click to upload</span> or drag and drop
                         </div>
                         <p className="text-xs text-base-content">
-                            PNG, JPG, GIF up to {MAX_HEADER_FILE_SIZE / 1024 / 1024} MB (must be square)
+                            PNG, JPG, GIF, WEBP up to {MAX_HEADER_FILE_SIZE / 1024 / 1024} MB (must be square)
                         </p>
                     </div>
                 )}

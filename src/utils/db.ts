@@ -14,7 +14,7 @@ export const createBlobUrl = (data: ArrayBuffer | Blob, type: string = 'image/pn
 
 export const detectImageType = (buffer: Buffer): string | null => {
     // 检查文件头部字节来判断图片类型
-    const header = buffer.slice(0, 4);
+    const header = buffer.slice(0, 12);
     
     // JPEG signature: FF D8 FF
     if (header[0] === 0xFF && header[1] === 0xD8 && header[2] === 0xFF) {
@@ -29,6 +29,14 @@ export const detectImageType = (buffer: Buffer): string | null => {
     // GIF signature: 47 49 46 38
     if (header[0] === 0x47 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x38) {
         return 'image/gif';
+    }
+
+    // WebP signature: 52 49 46 46 (RIFF) + 4 bytes size + 57 45 42 50 (WEBP)
+    if (
+        header[0] === 0x52 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x46 &&
+        header[8] === 0x57 && header[9] === 0x45 && header[10] === 0x42 && header[11] === 0x50
+    ) {
+        return 'image/webp';
     }
     
     // 如果无法识别，返回null
