@@ -156,5 +156,5 @@ export const DEPRECATED_MINTS = ["",
     "3Bpy2NuzNKhhKVyiLabKvWtdoFiKCaUrkarXjifj1fa1", // ar13
     "3H7KdnkdKQT3d1f8MNe88YqHugVLMvcd8NGZ5X11gbi2",
     "3roWmSiXNTrPpQN4WHw4VmyMdTXB3o3neiyz49vpQz9Y",
-    "AYQdPkXSuK2ZTbMJVrWjRSiVx8P7Rmcvfht2oWhEodFT"
+    "AYQdPkXSuK2ZTbMJVrWjRSiVx8P7Rmcvfht2oWhEodFT",
 ]
