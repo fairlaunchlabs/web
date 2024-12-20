@@ -157,4 +157,7 @@ export const DEPRECATED_MINTS = ["",
     "3H7KdnkdKQT3d1f8MNe88YqHugVLMvcd8NGZ5X11gbi2",
     "3roWmSiXNTrPpQN4WHw4VmyMdTXB3o3neiyz49vpQz9Y",
     "AYQdPkXSuK2ZTbMJVrWjRSiVx8P7Rmcvfht2oWhEodFT",
+    "11113EaN2XNNh4HtS3QAUVDR3jZ4Rtm6c4d2K8Ntw8M",
+    "1111va2ct5CvdtqamxnxY91X2ZAwhfMf17zJT8Yx6n",
+    "7dDNDeDk6QCA51tD3hcPSUMWJQwVwnWnGECbiwCwdKZC",
 ]

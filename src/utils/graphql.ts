@@ -1,12 +1,12 @@
 import { gql } from '@apollo/client';
 
 export const queryInitializeTokenEvent = gql`
-query GetInitializedTokenEvents($skip: Int!, $first: Int!) {
+query GetInitializedTokenEvents($orderBy: String!, $skip: Int!, $first: Int!) {
     initializeTokenEventEntities(
         where: { status: 1 }
         skip: $skip
         first: $first
-        orderBy: tokenId
+        orderBy: $orderBy
         orderDirection: desc
     ) {
         id

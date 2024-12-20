@@ -66,6 +66,44 @@
   }
 }
 
+/* 滚动动画 */
+.scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.scroll-content {
+  display: flex;
+  animation: scroll 20s linear infinite;
+  width: max-content;
+}
+
+.scroll-content.paused {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* 隐藏滚动条 */
+.scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-wrapper {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
