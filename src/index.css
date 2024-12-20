@@ -27,37 +27,42 @@
 /* 基础样式 */
 @layer base {
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-thick;
+    font-family: "Retro Pixel Thick", cursive;
+    letter-spacing: 0.05em;
   }
   
   body {
-    @apply font-pixel;
+    font-family: "Retro Pixel Cute Mono", monospace;
     margin: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-}
+};
 
 /* 通用字体类 */
 @layer components {
   .text-label {
-    @apply text-sm font-pixel;
+    font-size: 0.875rem;
+    font-family: "Retro Pixel Cute Mono", monospace;
   }
   
   .text-value {
-    @apply font-pixel;
+    font-family: "Retro Pixel Cute Mono", monospace;
   }
   
   .text-heading {
-    @apply font-heading tracking-thick;
+    font-family: "Retro Pixel Thick", cursive;
+    letter-spacing: 0.05em;
   }
   
   .text-bold {
-    @apply font-pixel font-bold;
+    font-family: "Retro Pixel Cute Mono", monospace;
+    font-weight: 700;
   }
   
   .text-medium {
-    @apply font-pixel font-medium;
+    font-family: "Retro Pixel Cute Mono", monospace;
+    font-weight: 500;
   }
 }
 
