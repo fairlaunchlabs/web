@@ -48,8 +48,8 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
         <div className="space-y-3">
             <div className="space-y-2">
                 <DataBlock 
-                    label="Current Era/Epoch" 
-                    value={`Era ${token.currentEra} / Epoch ${token.currentEpoch}`}
+                    label="Current Milestone/Checkpoint" 
+                    value={`MS ${token.currentEra} / CP ${token.currentEpoch}`}
                     tooltip={tooltip.currentEra}
                 />
                 <DataBlock 
@@ -89,7 +89,7 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
                         tooltip={tooltip.currentMintSize}
                     />
                     <DataBlock 
-                        label={`Target Supply (Era:${token.targetEras})`} 
+                        label={`Target Supply (MS:${token.targetEras})`} 
                         value={`${totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${metadata?.symbol}`}
                         tooltip={tooltip.targetSupply}
                     />
@@ -124,12 +124,12 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
                         tooltip={tooltip.liquidityVaultToken}
                     />
                     <DataBlock 
-                        label="Taget Eras" 
+                        label="Taget Milestones" 
                         value={token.targetEras}
                         tooltip={tooltip.targetEras}
                     />
                     <DataBlock 
-                        label="Start time of current epoch" 
+                        label="Start time of current checkpoint" 
                         value={new Date(Number(token.startTimestampEpoch) * 1000).toLocaleString()}
                         tooltip={tooltip.startTimeOfCurrentEpoch}
                     />
@@ -149,7 +149,7 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
                         tooltip={tooltip.targetMintTime}
                     />
                     <DataBlock 
-                        label="Reduce Ratio per Era" 
+                        label="Reduce Ratio per Milestone" 
                         value={token.reduceRatio + "%"}
                         tooltip={tooltip.reduceRatioPerEra}
                     />
@@ -165,7 +165,7 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
                         tooltip={tooltip.targetMinimumFee}
                     />
                     <DataBlock 
-                        label="Epoches per Era" 
+                        label="Checkpoints per Milestone" 
                         value={token.epochesPerEra}
                         tooltip={tooltip.epochesPerEra}
                     />
@@ -180,12 +180,12 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
                         tooltip={tooltip.currentReferralFee}
                     />
                     <DataBlock 
-                        label="Difficulty of current epoch" 
+                        label="Difficulty of current checkpoint" 
                         value={parseFloat(token.difficultyCoefficientEpoch).toFixed(4)}
                         tooltip={tooltip.difficultyOfCurrentEpoch}
                     />
                     <DataBlock 
-                        label="Difficulty of Last epoch" 
+                        label="Difficulty of Last checkpoint" 
                         value={parseFloat(token.lastDifficultyCoefficientEpoch).toFixed(4)}
                         tooltip={tooltip.difficultyOfLastEpoch}
                     />
@@ -209,7 +209,7 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
 
             {hasStarted && (
                 <div>
-                    <h3 className="text-base-content">Minted tokens to target mint size of current epoch</h3>
+                    <h3 className="text-base-content">Minted tokens to target mint size of current checkpoint</h3>
                     <div className="text-sm font-medium mb-1 text-base-content">
                     {(numberStringToBN(token.quantityMintedEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(numberStringToBN(token.targetMintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                     </div>

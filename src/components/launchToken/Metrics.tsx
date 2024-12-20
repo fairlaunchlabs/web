@@ -43,7 +43,7 @@ export const Metrics: React.FC<MetricsProps> = ({
         // 检查是否费用过高（例如超过1000 SOL）
         const isFeeTooHigh = maxTotalFee > 1000;
 
-        // 计算Initial liquidity to target era
+        // 计算Initial liquidity to target milestone
         const liquidityTokensRatioNum = parseFloat(liquidityTokensRatio) || 0;
         const initialLiquidityToTargetEra = epochesPerEraNum * initialTargetMintSizePerEpochNum * liquidityTokensRatioNum / 100 * (1 - Math.pow(reduceRatioNum / 100, targetErasNum)) / 
             (1 - reduceRatioNum / 100) / (1 - liquidityTokensRatioNum / 100);
@@ -81,11 +81,11 @@ export const Metrics: React.FC<MetricsProps> = ({
                 <p className="font-medium text-base-content">{calculateMetrics().maxSupply} {symbol}</p>
             </div>
             <div>
-                <p className="text-sm text-base-content/70 mb-1">Total Supply to Target Eras</p>
+                <p className="text-sm text-base-content/70 mb-1">Total Supply to Target Milestone</p>
                 <p className="font-medium text-base-content">{calculateMetrics().totalsupplyToTargetEras} {symbol}</p>
             </div>
             <div>
-                <p className="text-sm text-base-content/70 mb-1">Percent of Max Supply to Target Eras</p>
+                <p className="text-sm text-base-content/70 mb-1">Percent of Max Supply to Target Milestone</p>
                 <p className="font-medium text-base-content">{calculateMetrics().percentToTargetEras}%</p>
             </div>
             <div>
@@ -110,7 +110,7 @@ export const Metrics: React.FC<MetricsProps> = ({
                 </div>
             </div>
             <div>
-                <p className="text-sm text-base-content/70 mb-1">Initial Liquidity to Target Era</p>
+                <p className="text-sm text-base-content/70 mb-1">Initial Liquidity to Target Milestone</p>
                 <p className="font-medium text-base-content">{calculateMetrics().initialLiquidityToTargetEra} {symbol} ({calculateMetrics().initialLiquidityToTargetEraPercent}%)</p>
             </div>
             <div>

@@ -222,15 +222,15 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         }
 
         if (epochesPerEraNum <= 0) {
-            return { isValid: false, error: 'Epoches per era must be greater than 0' };
+            return { isValid: false, error: 'Checkpoints per milestone must be greater than 0' };
         }
 
         if (targetErasNum <= 0) {
-            return { isValid: false, error: 'Target eras must be greater than 0' };
+            return { isValid: false, error: 'Target milestones must be greater than 0' };
         }
 
         if (targetSecondsPerEpochNum <= 0) {
-            return { isValid: false, error: 'Target seconds per epoch must be greater than 0' };
+            return { isValid: false, error: 'Target seconds per checkpoint must be greater than 0' };
         }
 
         if (initialMintSizeNum <= 0) {
@@ -238,11 +238,11 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         }
 
         if (initialTargetMintSizePerEpochNum <= 0) {
-            return { isValid: false, error: 'Initial target mint size per epoch must be greater than 0' };
+            return { isValid: false, error: 'Initial target mint size per checkpoint must be greater than 0' };
         }
 
         if (initialTargetMintSizePerEpochNum < initialMintSizeNum * 10) {
-            return { isValid: false, error: 'Initial target mint size per epoch must be at least 10 times the initial mint size' };
+            return { isValid: false, error: 'Initial target mint size per checkpoint must be at least 10 times the initial mint size' };
         }
 
         return { isValid: true, error: '' };

@@ -8,7 +8,6 @@ import { filterTokens, formatAddress } from '../utils/format';
 import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS, SEARCH_CACHE_ITEMS } from '../config/constants';
 import { TokenCardMobile } from '../components/mintTokens/TokenCardMobile';
 import { PageHeader } from '../components/common/PageHeader';
-import { orderBy } from 'lodash';
 import { TokenCardSimple } from '../components/mintTokens/TokenCardSimple';
 import { useDeviceType } from '../utils/contexts';
 
@@ -96,16 +95,16 @@ export const Discover: React.FC<MintTokensProps> = ({
     };
 
     // 合并错误和加载状态
-    const loading = searchLoading;
-    const error = searchError;
+    const loading = searchLoading || initialLoading;
+    const error = searchError || initialError;
 
-    // if (loading) {
-    //     return (
-    //         <div className={`flex justify-center items-center min-h-[200px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
-    //             <span className="loading loading-spinner loading-lg"></span>
-    //         </div>
-    //     );
-    // }
+    if (loading) {
+        return (
+            <div className={`flex justify-center items-center min-h-[200px] ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
+                <span className="loading loading-spinner loading-lg"></span>
+            </div>
+        );
+    }
 
     if (error) {
         return (

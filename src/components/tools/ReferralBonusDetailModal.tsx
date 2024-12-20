@@ -115,7 +115,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                                 <th>Transaction ID</th>
                                 <th>Minter</th>
                                 <th>Time</th>
-                                <th>Epoch</th>
+                                <th>Checkpoint</th>
                                 <th>Referrer Fee</th>
                             </tr>
                         </thead>

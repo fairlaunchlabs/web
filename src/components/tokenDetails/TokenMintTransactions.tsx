@@ -101,7 +101,7 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
                             <th>Minter</th>
                             <th>Transaction</th>
                             <th>Time</th>
-                            <th>Era (Epoch)</th>
+                            <th>Milestone (Checkpoint)</th>
                             <th>Mint Size</th>
                         </tr>
                     </thead>

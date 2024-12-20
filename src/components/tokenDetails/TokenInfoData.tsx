@@ -45,12 +45,12 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
         <div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <DataBlock 
-                    label="Current Era" 
+                    label="Current Milestone" 
                     value={token.currentEra} 
                     tooltip={tooltip.currentEra}
                 />
                 <DataBlock 
-                    label="Current Epoch" 
+                    label="Current Checkpoint" 
                     value={token.currentEpoch}
                     tooltip={tooltip.currentEpoch}
                 />
@@ -70,7 +70,7 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                     tooltip={tooltip.currentMinted}
                 />
                 <DataBlock 
-                    label={`Target Supply (Era:${token.targetEras})`} 
+                    label={`Target Supply (MS:${token.targetEras})`} 
                     value={totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + metadata?.symbol}
                     tooltip={tooltip.targetSupply}
                 />
@@ -110,12 +110,12 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                     tooltip={tooltip.liquidityVaultToken}
                 />
                 <DataBlock 
-                    label="Taget Eras" 
+                    label="Taget Milestones" 
                     value={token.targetEras}
                     tooltip={tooltip.targetEras}
                 />
                 <DataBlock 
-                    label="Start time of current epoch" 
+                    label="Start time of current checkpoint" 
                     value={new Date(Number(token.startTimestampEpoch) * 1000).toLocaleString()}
                     tooltip={tooltip.startTimeOfCurrentEpoch}
                 />
@@ -135,7 +135,7 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                     tooltip={tooltip.targetMintTime}
                 />
                 <DataBlock 
-                    label="Reduce Ratio per Era" 
+                    label="Reduce Ratio per Milestone" 
                     value={token.reduceRatio + "%"}
                     tooltip={tooltip.reduceRatioPerEra}
                 />
@@ -151,7 +151,7 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                     tooltip={tooltip.targetMinimumFee}
                 />
                 <DataBlock 
-                    label="Epoches per Era" 
+                    label="Checkpoints per Milestone" 
                     value={token.epochesPerEra}
                     tooltip={tooltip.epochesPerEra}
                 />
@@ -166,12 +166,12 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                     tooltip={tooltip.currentReferralFee}
                 />
                 <DataBlock 
-                    label="Difficulty of current epoch" 
+                    label="Difficulty of current checkpoint" 
                     value={parseFloat(token.difficultyCoefficientEpoch).toFixed(4)}
                     tooltip={tooltip.difficultyOfCurrentEpoch}
                 />
                 <DataBlock 
-                    label="Difficulty of Last epoch" 
+                    label="Difficulty of Last checkpoint" 
                     value={parseFloat(token.lastDifficultyCoefficientEpoch).toFixed(4)}
                     tooltip={tooltip.difficultyOfLastEpoch}
                 />
@@ -193,7 +193,7 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                 </div>
 
                 <div className="mt-8">
-                    <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current epoch</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current checkpoint</h3>
                     <div className="text-sm font-medium mb-1 text-base-content">
                     {(numberStringToBN(token.quantityMintedEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(numberStringToBN(token.targetMintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                     </div>
