@@ -1,4 +1,5 @@
-const pixelLight = require("./src/themes/pixel-light.js");
+const path = require('path');
+const pixelLight = require(path.join(__dirname, 'src/themes/pixel-light.js'));
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -29,11 +30,7 @@ module.exports = {
       {
         pixel: pixelLight,
       },
-      // {
-      //   skypixel: pixelOrange,
-      // },
     ],
-    // darkTheme: "skypixel",
     base: true,
     styled: true,
     utils: true,

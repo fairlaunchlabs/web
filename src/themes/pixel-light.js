@@ -435,4 +435,5 @@ const pixelLight = {
     },
   };
 
-export default pixelLight;
+// export default pixelLight;
+module.exports = pixelLight;
