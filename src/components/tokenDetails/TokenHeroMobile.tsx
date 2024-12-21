@@ -59,7 +59,7 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
                     />
                 )}
                 {/* Optional: Add a subtle overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40" />
+                {/* <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40" /> */}
             </div>
             
             {/* Content Overlay - 左对齐布局 */}
@@ -84,7 +84,7 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
                             <div className="badge badge-lg text-xl badge-secondary">
                                 {metadata?.symbol}
                             </div>
-                            <div className="text-white text-xl mt-2 ml-2 [text-shadow:2px_2px_0_#000000]">
+                            <div className="text-white text-md mt-2 [text-shadow:2px_2px_0_#000000] bg-black/60 px-3 rounded-md">
                                 {metadata?.name}
                             </div>
                         </div>

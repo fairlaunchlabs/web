@@ -38,16 +38,12 @@ export const Discover: React.FC<MintTokensProps> = ({
     // 初始加载数据
     const { loading: initialLoading, error: initialError, data: latestData } = useQuery(queryInitializeTokenEvent, {
         variables: {
-            skip: 0,
-            first: 50, // TODO ######
             orderBy: 'timestamp',
         }
     });
 
     const { loading: hotLoading, error: hotError, data: hotData } = useQuery(queryHotInitializeTokenEvent, {
         variables: {
-            skip: 0,
-            first: 150, // TODO ###### 主网需要调小，因为测试网中有大量错误mint地址需要过滤
             orderBy: 'difficultyCoefficientEpoch',
         }
     });
@@ -192,9 +188,9 @@ export const Discover: React.FC<MintTokensProps> = ({
                 )} */}
 
                 {/* Latest Tokens */}
-                <div className={`bg-base-200 -ml-4 -mr-4 pb-4`}>
+                
                 {latestDisplayData.initializeTokenEventEntities.length > 0 && (
-                    <>
+                    <div className={`${isMobile && "bg-base-200 -ml-4 -mr-4 pb-4"}`}>
                         <h2 className="text-xl mt-6 ml-4 pt-1">Latest Tokens</h2>
                         {isMobile ? (
                             <ScrollCards tokens={latestDisplayData.initializeTokenEventEntities} />
@@ -205,9 +201,8 @@ export const Discover: React.FC<MintTokensProps> = ({
                                 )}
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
-                </div>
 
                 {/* Hottest Tokens */}
                 {filteredHotTokens.length > 0 && (

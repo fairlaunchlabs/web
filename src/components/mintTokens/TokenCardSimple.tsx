@@ -7,6 +7,7 @@ import { fetchMetadata } from '../../utils/web3';
 import { 
     calculateMaxSupply, 
 } from '../../utils/format';
+import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
 
 export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number }) => {
     const navigate = useNavigate();
@@ -60,6 +61,7 @@ export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number 
             className={`pixel-box p-4 cursor-pointer relative overflow-hidden 'w-38'`}
             onClick={handleCardClick}
         >
+            {metadata?.header && <TokenBackgroundImage imageUrl={metadata.header} metadataTimestamp={Number(token.metadataTimestamp)} />}
             <div className="flex flex-col items-center gap-2">
                 <TokenImage
                     imageUrl={metadata?.image as string}

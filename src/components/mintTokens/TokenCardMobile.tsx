@@ -75,7 +75,7 @@ export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {
                         className="w-12 h-12"
                     />
                     <div className='mt-6 text-sm'>Price</div>
-                    <span className="badge badge-lg badge-accent mt-1">+{(originalCost / currentCost - 1) * 100}%</span>
+                    <span className="badge badge-lg badge-accent mt-1">+{((currentCost / originalCost - 1) * 100).toFixed(2)}%</span>
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">

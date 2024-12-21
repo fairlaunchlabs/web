@@ -1,11 +1,10 @@
 import { gql } from '@apollo/client';
 
 export const queryInitializeTokenEvent = gql`
-query GetInitializedTokenEvents($orderBy: String!, $skip: Int!, $first: Int!) {
+query GetInitializedTokenEvents($orderBy: String!) {
     initializeTokenEventEntities(
         where: { status: 1 }
-        skip: $skip
-        first: $first
+        first: 50
         orderBy: $orderBy
         orderDirection: desc
     ) {
@@ -49,11 +48,11 @@ query GetInitializedTokenEvents($orderBy: String!, $skip: Int!, $first: Int!) {
 }`;
 
 export const queryHotInitializeTokenEvent = gql`
-query QueryHotInitializeTokenEvent($first: Int!, $skip: Int!, $orderBy: String!) {
+query QueryHotInitializeTokenEvent($orderBy: String!) {
     initializeTokenEventEntities(
         where: { status: 1 }
-        skip: $skip
-        first: $first
+        first: 100 
+        # 需要优化 ######
         orderBy: $orderBy
         orderDirection: desc
     ) {
