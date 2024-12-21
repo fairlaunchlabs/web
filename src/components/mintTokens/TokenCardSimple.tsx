@@ -9,7 +9,7 @@ import {
 } from '../../utils/format';
 import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
 
-export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number }) => {
+export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number, type }) => {
     const navigate = useNavigate();
     const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
 
@@ -68,6 +68,8 @@ export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number 
                     name={token.tokenName}
                     metadataTimestamp={Number(token.metadataTimestamp)}
                     className="w-12 h-12"
+                    size={type === 'static' ? 80 : 110}
+                    round={type === 'static'}
                 />
                 <div className="flex items-center gap-2">
                     <div className="badge badge-md badge-secondary">{token.tokenSymbol}</div>

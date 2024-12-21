@@ -7,7 +7,8 @@ export const TokenImage: React.FC<TokenImageProps> = ({
     name,
     metadataTimestamp,
     size = 64, 
-    className = ''
+    className = '',
+    round = true
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export const TokenImage: React.FC<TokenImageProps> = ({
         <img
             src={imageData}
             alt={name || 'Token'}
-            className={`pixel-avatar ${className}`}
+            className={`${round ? 'pixel-avatar-round' : 'pixel-avatar'} ${className}`}
             style={{ width: size, height: size }}
             loading="lazy"
             onError={() => {

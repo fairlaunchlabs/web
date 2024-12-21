@@ -211,14 +211,14 @@ export const Discover: React.FC<MintTokensProps> = ({
                         {isMobile ? (
                             <div className="grid grid-cols-2 gap-4 p-1">
                             {filteredHotTokens.map((token: InitiazlizedTokenData, index: number) => 
-                                <TokenCardSimple key={token.tokenId} token={token} number={index + 1} /> 
+                                <TokenCardSimple key={token.tokenId} token={token} number={index + 1} type="static" /> 
                             )}
                         </div>
                         
                         ) : (
                             <div className="grid grid-cols-3 gap-4 p-1">
                                 {filteredHotTokens.map((token: InitiazlizedTokenData, index: number) => 
-                                    <TokenCardMobile key={token.tokenId} token={token} number={index + 1} /> 
+                                    <TokenCardMobile key={token.tokenId} token={token} number={index + 1} type="static" /> 
                                 )}
                             </div>
                         )}

@@ -26,7 +26,7 @@ export const ScrollCards: FC<ScrollCardsProps> = ({ tokens }) => {
                     {tokens.map((token: InitiazlizedTokenData) => 
                         // with should be TokenCardSimple width - 2, for example: TokenCardSimple width is 38, here should be 36
                         <div key={token.tokenId} className="flex-none w-36">
-                            <TokenCardSimple token={token} />
+                            <TokenCardSimple token={token} type="scroll" />
                         </div>
                     )}
                 </div>

@@ -160,9 +160,15 @@ const pixelLight = {
     },
 
     // Avatar
-    ".pixel-avatar": {
+    ".pixel-avatar-round": {
       "border": "2px solid #000",
       "border-radius": "100%",
+      "box-shadow": "2px 2px 0 0 #333",
+    },
+
+    ".pixel-avatar": {
+      "border": "2px solid #000",
+      "border-radius": "8px",
       "box-shadow": "2px 2px 0 0 #333",
     },
 

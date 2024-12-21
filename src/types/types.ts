@@ -146,6 +146,7 @@ export type TokenImageProps = {
     metadataTimestamp: number;
     size?: number;
     className?: string;
+    round?: boolean;
 }
 
 export type AddressDisplayProps = {
@@ -197,6 +198,7 @@ export type TokenCardProps = {
 export type TokenCardMobileProps = {
     token: InitiazlizedTokenData;
     number?: number;
+    type?: "static" | "scroll";
 }
 
 export type TokenFormData = {
