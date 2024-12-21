@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { InitiazlizedTokenData, ReferralData } from '../../types/types';
-import { getReferralDataByCodeHash, getReferrerCodeHash, getTokenBalance, mintToken } from '../../utils/web3';
+import { getReferralDataByCodeHash, getReferrerCodeHash, getSystemConfig, getTokenBalance, mintToken } from '../../utils/web3';
 import toast from 'react-hot-toast';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
@@ -24,6 +24,8 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
     const [loading, setLoading] = useState(false);
     const [referralData, setReferralData] = useState<ReferralData>();
     const [isValidCode, setIsValidCode] = useState(false);
+    const [referralUsageMaxCount, setReferralUsageMaxCount] = useState(0);
+    const [usageCountOk, setUsageCountOk] = useState(true);
 
     const fetchReferralData = async (inputCode: string) => {
         if (!wallet || !inputCode) {
@@ -45,24 +47,33 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
             if(result.data === null || result.data === undefined) {
                 setIsValidCode(false);
                 setReferralData(undefined);
-                return;
+                throw new Error('Referral data not found');
             }
             const ataBalance = await getTokenBalance(result.data.referrerAta, connection) as number;
 
-            console.log(
-                numberStringToBN(token.feeRate),
-                parseFloat(token.difficultyCoefficientEpoch),
-                numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
-                numberStringToBN(token.supply),
-            )
-            console.log("===1===");
+            // ###### 
+            getSystemConfig(wallet, connection).then((data) => {
+                if (data?.success && data.data) {
+                    setReferralUsageMaxCount(data.data.systemConfigData.referralUsageMaxCount as number);
+                } else {
+                    setIsValidCode(false);
+                    setReferralData(undefined);
+                    throw new Error(data.message);
+                }
+            });
+
+            // console.log(
+            //     numberStringToBN(token.feeRate),
+            //     parseFloat(token.difficultyCoefficientEpoch),
+            //     numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
+            //     numberStringToBN(token.supply),
+            // )
             const [acturalPay, urcProviderBonus] = getFeeValue(
                 numberStringToBN(token.feeRate),
                 parseFloat(token.difficultyCoefficientEpoch),
                 numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
                 numberStringToBN(token.supply),
             )
-            console.log("===2===");
             setReferralData({
                 ...result.data,
                 tokenBalance: ataBalance,
@@ -90,6 +101,13 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
         return () => clearTimeout(debounceTimeout);
     }, [code, wallet, connection]);
 
+    useEffect(() => {
+        if (referralData?.usageCount && referralUsageMaxCount > 0) {
+            setUsageCountOk(referralData.usageCount < referralUsageMaxCount);
+        } else {
+            setUsageCountOk(false);
+        }
+    }, [referralData, referralUsageMaxCount]);
     // const close = () => {
     //     setLoading(false);
     //     setTimeout(() => {
@@ -140,7 +158,9 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                 setLoading(false);
                 // close();
             } else {
-                toast.error(result.message as string);
+                if (result.message !== "Error: ") toast.error(result.message as string, {
+                    id: toastId,
+                });
                 setLoading(false);
             }
         } catch (error: any) {
@@ -153,7 +173,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box relative p-3">
+            <div className="modal-box pixel-box relative p-3">
                 <ModalTopBar title={`Mint ${token.tokenSymbol}`} onClose={onClose} />
                 <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">
                     <div className="space-y-4">
@@ -167,7 +187,6 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                                 className="input input-bordered w-full"
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
-                                disabled={loading}
                             />
                         </div>
                         {code &&
@@ -219,10 +238,15 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">URC usage count</span>
-                                <span className="text-medium">{
-                                    isValidCode ? referralData?.usageCount : '-'
-                                    }
-                                </span>
+                                {isValidCode ? 
+                                <div className='flex items-center gap-2 text-medium'>
+                                    {referralData?.usageCount}
+                                    {usageCountOk ? 
+                                        <svg className='w-4 h-4 text-black bg-success border-2 border-black rounded-full' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M18 6h2v2h-2V6zm-2 4V8h2v2h-2zm-2 2v-2h2v2h-2zm-2 2h2v-2h-2v2zm-2 2h2v-2h-2v2zm-2 0v2h2v-2H8zm-2-2h2v2H6v-2zm0 0H4v-2h2v2z" fill="currentColor"/> </svg> 
+                                        : 
+                                        <svg className='w-4 h-4 text-white bg-error border-2 border-black rounded-full' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/> </svg>}
+                                </div>
+                                : '-'}
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">Bonus to URC provider</span>
@@ -235,7 +259,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">Discount of URC</span>
-                                <span className="text-medium text-success">-{isValidCode && (100 - Number(referralData?.acturalPay) / parseInt(token.feeRate) * 100).toFixed(2) + "%"}</span>
+                                <span className="text-medium text-error">-{isValidCode && (100 - Number(referralData?.acturalPay) / parseInt(token.feeRate) * 100).toFixed(2) + "%"}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm text-medium border-t border-base-300 pt-2 mt-2">
                                 <span>Actual pay</span>
@@ -252,7 +276,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
                             <button 
                                 className={`btn btn-primary w-full`}
                                 onClick={handleMint}
-                                disabled={loading || !isValidCode || !code}
+                                disabled={loading || !isValidCode || !code || !usageCountOk}
                             >
                                 {loading ? 'Processing...' : 'Mint'}
                             </button>

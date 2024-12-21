@@ -119,7 +119,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box relative p-3">
+            <div className="modal-box pixel-box relative p-3">
                 <ModalTopBar title={`Update Token Metadata`} onClose={onClose} />            
                 <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">
                     <form onSubmit={handleSubmit} className="space-y-6">

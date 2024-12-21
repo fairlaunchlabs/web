@@ -30,7 +30,7 @@ const pixelLight = {
     "success": "#2FFF2F",
     "warning": "#FFD43B",
     "error": "#FF4911",
-
+    
     // 按钮
     ".btn": {
       "border": "2px solid #000000",

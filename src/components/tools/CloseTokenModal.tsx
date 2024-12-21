@@ -67,7 +67,7 @@ export const CloseTokenModal: FC<CloseTokenModalProps> = ({ isOpen, onClose, tok
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box relative p-3">
+            <div className="modal-box pixel-box relative p-3">
                 <ModalTopBar title={`Close Token`} onClose={onClose} />    
                 <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">            
                     <div className="space-y-4">

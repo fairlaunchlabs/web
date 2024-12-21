@@ -181,7 +181,7 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
             <div>
                 {/* 进度条 */}
                 <div className="mt-8">
-                    <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target supply</h3>
+                    <h3 className="text-xl mb-4 text-base-content">Progress for minted to target supply</h3>
                     <div className="text-sm font-medium mb-1 text-base-content">
                     {mintedSupply.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentage.toFixed(2)}%)
                     </div>
@@ -193,7 +193,7 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
                 </div>
 
                 <div className="mt-8">
-                    <h3 className="text-xl font-semibold mb-4 text-base-content">Progress for minted to target mint size of current checkpoint</h3>
+                    <h3 className="text-xl mb-4 text-base-content">Progress for minted to target mint size of current checkpoint</h3>
                     <div className="text-sm font-medium mb-1 text-base-content">
                     {(numberStringToBN(token.quantityMintedEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} / {(numberStringToBN(token.targetMintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} ({progressPercentageOfEpoch.toFixed(2)}%)
                     </div>

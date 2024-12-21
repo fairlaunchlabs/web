@@ -39,7 +39,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
 
     if (loading) return (
         <div className="modal modal-open">
-            <div className="modal-box flex justify-center items-center">
+            <div className="modal-box pixel-box flex justify-center items-center">
                 <span className="loading loading-spinner loading-lg"></span>
             </div>
         </div>
@@ -68,7 +68,7 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box w-11/12 max-w-5xl">
+            <div className="modal-box pixel-box w-11/12 max-w-5xl">
                 <ModalTopBar title={`Referral Bonus Details`} onClose={onClose} />                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div className="pixel-card">

@@ -110,7 +110,7 @@ export const DataBlock:FC<DataBlockProps> = ({label, value, tooltip}) => {
     return (
         <div className="space-y-0">
             <div className="relative">
-                <h3 className="font-semibold text-base-content inline-flex items-center gap-1">
+                <h3 className="text-base-content inline-flex items-center gap-1">
                     {label}
                     {tooltip && (
                         <>
