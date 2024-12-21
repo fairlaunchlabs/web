@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
                 className={`btn`}
                 onClick={(e) => {
                     e.preventDefault();
-                    window.location.href = '/home';
+                    window.location.href = '/discover';
                 }}
             >
                 <Logo />

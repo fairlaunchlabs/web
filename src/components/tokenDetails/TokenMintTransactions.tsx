@@ -7,13 +7,15 @@ import { Pagination } from '../common/Pagination';
 import { BN_HUNDRED, BN_LAMPORTS_PER_SOL, numberStringToBN } from '../../utils/format';
 import { PAGE_SIZE_OPTIONS } from '../../config/constants';
 import { ErrorBox } from '../common/ErrorBox';
+import { useDeviceType } from '../../utils/contexts';
 
 export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ token }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-
+    const { isMobile } = useDeviceType();
+    
     const { data, loading, error, refetch } = useQuery(queryTokenMintTransactions, {
         variables: {
             mint: token.mint,
@@ -98,21 +100,25 @@ export const TokenMintTransactions: React.FC<TokenMintTransactionsProps> = ({ to
                 <table className="pixel-table w-full">
                     <thead>
                         <tr>
-                            <th>Minter</th>
-                            <th>Transaction</th>
-                            <th>Time</th>
-                            <th>Milestone (Checkpoint)</th>
-                            <th>Mint Size</th>
+                            <th className="">Minter</th>
+                            <th className="">Transaction</th>
+                            <th className="">Time</th>
+                            {!isMobile && <>
+                                <th className="">Milestone (Checkpoint)</th>
+                                <th className="">Mint Size</th>
+                            </>}
                         </tr>
                     </thead>
                     <tbody>
                         {data ? data.mintTokenEntities.map((tx: MintTransactionData) => (
                             <tr key={tx.txId}>
-                                <td><AddressDisplay address={tx.sender} /></td>
-                                <td><AddressDisplay address={tx.txId} type="tx" /></td>
-                                <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
-                                <td>{tx.currentEra} ({tx.currentEpoch})</td>
-                                <td>{(numberStringToBN(tx.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</td>
+                                <td className=""><AddressDisplay address={tx.sender} /></td>
+                                <td className=""><AddressDisplay address={tx.txId} type="tx" /></td>
+                                <td className="">{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
+                                {!isMobile && <>
+                                    <td className="">{tx.currentEra} ({tx.currentEpoch})</td>
+                                    <td className="">{(numberStringToBN(tx.mintSizeEpoch).mul(BN_HUNDRED).div(BN_LAMPORTS_PER_SOL).toNumber() / 100).toLocaleString(undefined, { maximumFractionDigits: 2 })} {token.tokenSymbol}</td>
+                                </>}
                             </tr>
                         )) : Array.from({ length: pageSize }, (_, index) => (
                             <tr key={`placeholder-${index}`} className="opacity-50">

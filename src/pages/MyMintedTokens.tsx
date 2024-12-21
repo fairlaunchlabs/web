@@ -170,11 +170,11 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-left">Image</th>
-                                        <th className="text-left">Name & Symbol</th>
-                                        <th className="text-left">Mint Address</th>
-                                        <th className="text-right">Balance</th>
-                                        <th className="text-center">Actions</th>
+                                        <th className=" text-left">Image</th>
+                                        <th className=" text-left">Name & Symbol</th>
+                                        <th className=" text-left">Mint Address</th>
+                                        <th className=" text-right">Balance</th>
+                                        <th className=" text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -182,7 +182,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                         .filter(token => numberStringToBN(token.amount).gt(BN_ZERO))
                                         .map((token: TokenListItem) => (
                                         <tr key={token.mint} className="hover">
-                                            <td className="text-left">
+                                            <td className=" text-left">
                                                 {token.metadata?.image && (
                                                     <TokenImage
                                                         imageUrl={token.metadata?.image}
@@ -193,17 +193,17 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                                     />
                                                 )}
                                             </td>
-                                            <td className="text-left">
+                                            <td className=" text-left">
                                                 <div className="font-bold">{token.tokenData?.tokenName || 'Unknown'}</div>
                                                 <div className="text-sm opacity-50">{token.tokenData?.tokenSymbol || 'Unknown'}</div>
                                             </td>
-                                            <td className="text-left">
+                                            <td className=" text-left">
                                                 <AddressDisplay address={token.mint} />
                                             </td>
-                                            <td className="text-right">
+                                            <td className=" text-right">
                                                 {(numberStringToBN(token.amount).div(BN_LAMPORTS_PER_SOL)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                             </td>
-                                            <td>
+                                            <td className=" text-center">
                                                 <div className="flex gap-2 justify-end">
                                                     <button 
                                                         className="btn btn-sm btn-primary"

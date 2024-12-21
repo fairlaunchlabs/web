@@ -102,7 +102,7 @@ const AppContent = () => {
                     <div className="flex-1 p-4 md:p-8 pb-20">
                         <Routes>
                             <Route path="/" element={<Discover expanded={expanded} />} />
-                            <Route path="/mint-tokens" element={<Discover expanded={expanded} />} />
+                            <Route path="/discover" element={<Discover expanded={expanded} />} />
                             <Route path="/launch-token" element={<LaunchTokenForm expanded={expanded} />} />
                             <Route path="/my-minted-tokens" element={<MyMintedTokens expanded={expanded} />} />
                             <Route path="/my-deployments" element={<MyDeployments expanded={expanded} />} />

@@ -6,7 +6,7 @@ const pixelLight = {
 
     // 次要颜色
     "secondary": "#FF00F5",      // 次要颜色背景
-    "secondary-focus": "##D303CC",
+    "secondary-focus": "#D303CC",
     "secondary-content": "#FFFFFF",
 
     // 强调色
@@ -233,7 +233,8 @@ const pixelLight = {
         "color": "#000000",
         "font-weight": "600",
         "text-align": "left",
-        "padding": "1rem",
+        "padding": "0.5rem",
+        "white-space": "nowrap",
         "border-bottom": "2px solid #000000",
         "border-right": "2px solid #000000",
         "&:last-child": {
@@ -241,28 +242,31 @@ const pixelLight = {
         }
       },
       "& td": {
-        "padding": "1rem",
+        "padding": "0.5rem",
         "border-bottom": "2px solid #000000",
         "border-right": "2px solid #000000",
+        "white-space": "nowrap",
         "&:last-child": {
           "border-right": "none"
         }
       },
       "& tbody tr": {
         "transition": "background-color 0.2s",
+        "white-space": "nowrap",
         "&:hover": {
           "background-color": "#E3A018",
           "color": "#000000"
         },
         "&:last-child td": {
-          "border-bottom": "none"
+          "border-bottom": "none",
+          "white-space": "nowrap",
         }
       },
 
       // 紧凑模式
       "&.pixel-table-compact": {
         "& th, & td": {
-          "padding": "0.5rem"
+          "padding": "0.25rem"
         }
       },
       // 斑马条纹

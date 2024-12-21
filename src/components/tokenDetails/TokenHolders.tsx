@@ -74,10 +74,10 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
                 <table className="pixel-table w-full">
                     <thead>
                         <tr>
-                            <th>Rank</th>
-                            <th>Holder</th>
-                            <th>Balance</th>
-                            <th>Percentage</th>
+                            <th className="">Rank</th>
+                            <th className="">Holder</th>
+                            <th className="">Balance</th>
+                            <th className="">Percentage</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -89,10 +89,10 @@ export const TokenHolders: React.FC<TokenHoldersProps> = ({ token }) => {
                             const percentage = balance / totalSupply / 100;
                             return (
                                 <tr key={holder.owner + index}>
-                                    <td>{(currentPage - 1) * pageSize + index + 1}</td>
-                                    <td><AddressDisplay address={holder.owner} /></td>
-                                    <td>{balance.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                                    <td>{(percentage * 10000).toFixed(2)}%</td>
+                                    <td className="">{(currentPage - 1) * pageSize + index + 1}</td>
+                                    <td className=""><AddressDisplay address={holder.owner} /></td>
+                                    <td className="">{balance.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                    <td className="">{(percentage * 10000).toFixed(2)}%</td>
                                 </tr>
                             );
                         })}

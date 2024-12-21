@@ -137,7 +137,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({
                 },
             },
             width: chartRef.clientWidth,
-            height: height,
+            height,
             leftPriceScale: {
                 visible: false,
                 borderColor: '#2B2B43',
@@ -315,7 +315,7 @@ export const TokenCharts: React.FC<TokenChartsProps> = ({
         if (chart.current && chartContainerRef.current) {
             chart.current.applyOptions({
                 width: chartContainerRef.current.clientWidth,
-                height: 560,
+                height,
             });
         }
     };

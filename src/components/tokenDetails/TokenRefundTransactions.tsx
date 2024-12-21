@@ -96,21 +96,21 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
                 <table className="pixel-table w-full">
                     <thead>
                         <tr>
-                            <th>Refunder</th>
-                            <th>Transaction</th>
-                            <th>Time</th>
-                            <th>Refund SOL</th>
-                            <th>Burned (User+Vault)</th>
+                            <th className="">Refunder</th>
+                            <th className="">Transaction</th>
+                            <th className="">Time</th>
+                            <th className="">Refund SOL</th>
+                            <th className="">Burned (User+Vault)</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data ? data.refundEventEntities.map((tx: RefundTransactionData) => (
                             <tr key={tx.txId}>
-                                <td><AddressDisplay address={tx.sender} /></td>
-                                <td><AddressDisplay address={tx.txId} type="tx" /></td>
-                                <td>{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
-                                <td>{Number(tx.refundAmountIncludingFee) / LAMPORTS_PER_SOL}</td>
-                                <td>{numberStringToBN(tx.burnAmountFromUser).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()} + {numberStringToBN(tx.burnAmountFromVault).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()}</td>
+                                <td className=""><AddressDisplay address={tx.sender} /></td>
+                                <td className=""><AddressDisplay address={tx.txId} type="tx" /></td>
+                                <td className="">{new Date(Number(tx.timestamp) * 1000).toLocaleString()}</td>
+                                <td className="">{Number(tx.refundAmountIncludingFee) / LAMPORTS_PER_SOL}</td>
+                                <td className="">{numberStringToBN(tx.burnAmountFromUser).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()} + {numberStringToBN(tx.burnAmountFromVault).div(BN_LAMPORTS_PER_SOL).toNumber().toLocaleString()}</td>
                             </tr>
                         )) : Array.from({ length: pageSize }, (_, index) => (
                             <tr key={`placeholder-${index}`} className="opacity-50">

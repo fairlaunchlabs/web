@@ -176,12 +176,12 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-center"></th>
-                                        <th className="text-left">Symbol & Name</th>
-                                        <th className="text-left">Mint Address</th>
-                                        <th className="text-left">Developer</th>
-                                        <th className="text-right">Bonus</th>
-                                        <th className="text-center">Actions</th>
+                                        <th className="text-center "></th>
+                                        <th className="text-left ">Symbol & Name</th>
+                                        <th className="text-left ">Mint Address</th>
+                                        <th className="text-left ">Developer</th>
+                                        <th className="text-right ">Bonus</th>
+                                        <th className="text-center ">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -189,7 +189,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                         const metadata = tokenMetadataMap[item.mint];
                                         return (
                                             <tr key={item.id} className="hover">
-                                                <td className="cursor-pointer" onClick={() => handleTokenClick(item)}>
+                                                <td className="cursor-pointer " onClick={() => handleTokenClick(item)}>
                                                     <div className="flex items-center space-x-2">
                                                         <div className='mr-2'>
                                                             {metadata?.tokenMetadata?.image && 
@@ -203,16 +203,16 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td className="">
                                                     <div>
                                                         <div className="font-bold">{metadata?.tokenSymbol || item.mint}</div>
                                                         <div className="text-sm opacity-50">{metadata?.tokenName}</div>
                                                     </div>
                                                 </td>
-                                                <td><AddressDisplay address={item.mint} /></td>
-                                                <td><AddressDisplay address={item.admin} /></td>
+                                                <td className=""><AddressDisplay address={item.mint} /></td>
+                                                <td className=""><AddressDisplay address={item.admin} /></td>
                                                 <td>{bonusByMint[item.mint] === undefined ? "0" : (Number(bonusByMint[item.mint]) / LAMPORTS_PER_SOL).toFixed(4)} SOL</td>
-                                                <td className='text-right'>
+                                                <td className='text-right '>
                                                     <div className="flex gap-2 justify-end">
                                                         <button
                                                             className="btn btn-sm btn-primary mr-2"

@@ -99,17 +99,17 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                             <table className="pixel-table w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-center"></th>
-                                        <th className="text-left">Symbol & Name</th>
-                                        <th className="text-left">Mint Address</th>
-                                        <th className="text-right">Supply</th>
-                                        <th className="text-center">Actions</th>
+                                        <th className=" text-center"></th>
+                                        <th className=" text-left">Symbol & Name</th>
+                                        <th className=" text-left">Mint Address</th>
+                                        <th className=" text-right">Supply</th>
+                                        <th className=" text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {dataAfterFilter.map((token: InitiazlizedTokenData) => (
                                         <tr key={token.id} className="hover">
-                                            <td className="text-center cursor-pointer" onClick={() => handleClick(token.mint)}>
+                                            <td className=" text-center cursor-pointer" onClick={() => handleClick(token.mint)}>
                                                 <div className="">
                                                     <TokenImage 
                                                         imageUrl={tokenMetadataMap[token.mint]?.tokenMetadata?.image || ''}
@@ -120,17 +120,17 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                     />
                                                 </div>
                                             </td>
-                                            <td className="text-left cursor-pointer" onClick={() => handleClick(token.mint)}>
+                                            <td className=" text-left cursor-pointer" onClick={() => handleClick(token.mint)}>
                                                 <div className="font-bold">{token.tokenSymbol}</div>
                                                 <div className="text-sm opacity-50">{token.tokenName}</div>
                                             </td>
-                                            <td className="text-left">
+                                            <td className=" text-left">
                                                 <AddressDisplay address={token.mint} />
                                             </td>
-                                            <td className="text-right">
+                                            <td className=" text-right">
                                                 {(Number(token.supply) / LAMPORTS_PER_SOL).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
-                                            <td className="text-center">
+                                            <td className=" text-center">
                                                 <div className="flex gap-2 justify-end">
                                                     {token.supply === "0" && (
                                                         <button 

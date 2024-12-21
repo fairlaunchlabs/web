@@ -112,21 +112,21 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
                     <table className="pixel-table w-full">
                         <thead>
                             <tr>
-                                <th>Transaction ID</th>
-                                <th>Minter</th>
-                                <th>Time</th>
-                                <th>Checkpoint</th>
-                                <th>Referrer Fee</th>
+                                <th className=''>Transaction ID</th>
+                                <th className=''>Minter</th>
+                                <th className=''>Time</th>
+                                <th className=''>Checkpoint</th>
+                                <th className=''>Referrer Fee</th>
                             </tr>
                         </thead>
                         <tbody>
                             {paginatedEntities.map((entity: any, index: number) => (
                                 <tr key={index}>
-                                    <td><AddressDisplay address={entity.txId} type='transaction' /></td>
-                                    <td><AddressDisplay address={entity.sender} /></td>
-                                    <td>{formatTimestamp(parseInt(entity.timestamp))}</td>
-                                    <td>{entity.currentEpoch}</td>
-                                    <td>{formatPrice(parseFloat(entity.referrerFee) / LAMPORTS_PER_SOL, 3)} SOL</td>
+                                    <td className=''><AddressDisplay address={entity.txId} type='transaction' /></td>
+                                    <td className=''><AddressDisplay address={entity.sender} /></td>
+                                    <td className=''>{formatTimestamp(parseInt(entity.timestamp))}</td>
+                                    <td className=''>{entity.currentEpoch}</td>
+                                    <td className=''>{formatPrice(parseFloat(entity.referrerFee) / LAMPORTS_PER_SOL, 3)} SOL</td>
                                 </tr>
                             ))}
                         </tbody>
