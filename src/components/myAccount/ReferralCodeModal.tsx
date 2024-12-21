@@ -227,8 +227,9 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                 <button
                                     className={`btn btn-primary w-full mt-3`}
                                     onClick={handleGetCode}
+                                    disabled={loading}
                                 >
-                                    Get URC
+                                    {loading ? 'Getting URC...' : 'Get URC'}
                                 </button>
                             </div>
                         )}

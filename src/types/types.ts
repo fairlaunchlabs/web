@@ -196,6 +196,7 @@ export type TokenCardProps = {
 
 export type TokenCardMobileProps = {
     token: InitiazlizedTokenData;
+    number?: number;
 }
 
 export type TokenFormData = {

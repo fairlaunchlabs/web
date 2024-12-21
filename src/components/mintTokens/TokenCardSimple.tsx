@@ -7,25 +7,20 @@ import { fetchMetadata } from '../../utils/web3';
 import { 
     calculateMaxSupply, 
 } from '../../utils/format';
-import { TokenBackgroundImage } from '../common/TokenBackgroundImage';
 
-export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token }) => {
+export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number }) => {
     const navigate = useNavigate();
     const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
 
     const handleCardClick = () => {
         navigate(`/token/${token.mint}`);
     };
 
     useEffect(() => {
-        setIsLoading(true);
         fetchMetadata(token).then((data) => {
             setMetadata(data);
-            setIsLoading(false);
         }).catch((error) => {
             console.error('Error fetching token metadata:', error);
-            setIsLoading(false);
         }); 
     }, [token.tokenUri]);
 
@@ -62,7 +57,7 @@ export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token }) => {
     }, [token.initialMintSize, feeRateInSol]);
     return (
         <div 
-            className="pixel-box p-4 cursor-pointer relative overflow-hidden w-32"
+            className={`pixel-box p-4 cursor-pointer relative overflow-hidden 'w-38'`}
             onClick={handleCardClick}
         >
             <div className="flex flex-col items-center gap-2">
@@ -74,7 +69,7 @@ export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token }) => {
                 />
                 <div className="flex items-center gap-2">
                     <div className="badge badge-md badge-secondary">{token.tokenSymbol}</div>
-                    <div className="badge badge-md badge-accent">+{(originalCost / currentCost - 1) * 100}%</div>
+                    <div className="badge badge-md badge-accent">+{((currentCost / originalCost - 1) * 100).toFixed(1)}%</div>
                 </div>
                 <div className="flex justify-between w-full">
                     <progress 
@@ -86,6 +81,11 @@ export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token }) => {
                     <div className="text-sm ml-2">{progressPercentage.toFixed(1)}%</div>
                 </div>
             </div>
+            {number && (
+                <div className="absolute top-2 right-2 text-sm font-bold">
+                    #{number}
+                </div>
+            )}
         </div>
     );
 };

@@ -1,24 +1,24 @@
-import React, { useState, KeyboardEvent, useEffect } from 'react';
+import React, { useState, KeyboardEvent, useEffect, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch } from '../utils/graphql';
+import { queryInitializeTokenEvent, queryInitializeTokenEventBySearch, queryHotInitializeTokenEvent } from '../utils/graphql';
 import { InitiazlizedTokenData, MintTokensProps } from '../types/types';
 import { FaSearch } from 'react-icons/fa';
 import { ErrorBox } from '../components/common/ErrorBox';
 import { filterTokens, formatAddress } from '../utils/format';
-import { BADGE_BG_COLORS, BADGE_TEXT_COLORS, DEPRECATED_SYMBOLS, SEARCH_CACHE_ITEMS } from '../config/constants';
+import { BADGE_BG_COLORS, BADGE_TEXT_COLORS , SEARCH_CACHE_ITEMS } from '../config/constants';
 import { TokenCardMobile } from '../components/mintTokens/TokenCardMobile';
 import { PageHeader } from '../components/common/PageHeader';
-import { TokenCardSimple } from '../components/mintTokens/TokenCardSimple';
 import { useDeviceType } from '../utils/contexts';
+import { ScrollCards } from '../components/common/ScrollCards';
+import { TokenCardSimple } from '../components/mintTokens/TokenCardSimple';
 
 export const Discover: React.FC<MintTokensProps> = ({
     expanded
 }) => {
     const [searchInput, setSearchInput] = useState('');
-    const [isSearchMode, setIsSearchMode] = useState(false);
+    // const [isSearchMode, setIsSearchMode] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const { isMobile } = useDeviceType();
-    const [isScrolling, setIsScrolling] = useState(false);
     
     // Load search history on component mount
     useEffect(() => {
@@ -39,10 +39,31 @@ export const Discover: React.FC<MintTokensProps> = ({
     const { loading: initialLoading, error: initialError, data: latestData } = useQuery(queryInitializeTokenEvent, {
         variables: {
             skip: 0,
-            first: 50,
+            first: 50, // TODO ######
             orderBy: 'timestamp',
         }
     });
+
+    const { loading: hotLoading, error: hotError, data: hotData } = useQuery(queryHotInitializeTokenEvent, {
+        variables: {
+            skip: 0,
+            first: 150, // TODO ###### 主网需要调小，因为测试网中有大量错误mint地址需要过滤
+            orderBy: 'difficultyCoefficientEpoch',
+        }
+    });
+
+    const filteredHotTokens = useMemo(() => {
+        if (!hotData?.initializeTokenEventEntities) return [];
+        const result = filterTokens(hotData.initializeTokenEventEntities as InitiazlizedTokenData[])
+            .filter((token: InitiazlizedTokenData)  => 
+                token.currentEra <= token.targetEras
+            )
+            .sort((a: InitiazlizedTokenData, b: InitiazlizedTokenData) => 
+                Number(b.difficultyCoefficientEpoch) - Number(a.difficultyCoefficientEpoch)
+            )
+            .slice(0, 10);
+        return result;
+    }, [hotData]);
 
     // 搜索查询
     const [searchTokens, { loading: searchLoading, error: searchError, data: searchData }] = useLazyQuery(queryInitializeTokenEventBySearch, {
@@ -51,7 +72,7 @@ export const Discover: React.FC<MintTokensProps> = ({
 
     const handleSearch = () => {
         if (searchInput.trim()) {
-            setIsSearchMode(true);
+            // setIsSearchMode(true);
             saveToHistory(searchInput.trim());
             searchTokens({
                 variables: {
@@ -60,9 +81,6 @@ export const Discover: React.FC<MintTokensProps> = ({
                     searchQuery: searchInput.trim()
                 }
             });
-        } else {
-            // 如果搜索框为空，退出搜索模式，显示初始数据
-            setIsSearchMode(false);
         }
     };
 
@@ -74,7 +92,7 @@ export const Discover: React.FC<MintTokensProps> = ({
 
     const handleHistoryClick = (term: string) => {
         setSearchInput(term);
-        setIsSearchMode(true);
+        // setIsSearchMode(true);
         saveToHistory(term);
         searchTokens({
             variables: {
@@ -95,8 +113,8 @@ export const Discover: React.FC<MintTokensProps> = ({
     };
 
     // 合并错误和加载状态
-    const loading = searchLoading || initialLoading;
-    const error = searchError || initialError;
+    const loading = searchLoading || initialLoading || hotLoading;
+    const error = searchError || initialError || hotError;
 
     if (loading) {
         return (
@@ -176,37 +194,9 @@ export const Discover: React.FC<MintTokensProps> = ({
                 {/* Latest Tokens */}
                 {latestDisplayData.initializeTokenEventEntities.length > 0 && (
                     <>
-                        <h2 className="text-2xl mt-6 mb-4">Latest Tokens</h2>
+                        <h2 className="text-xl mt-6">Latest Tokens</h2>
                         {isMobile ? (
-                            <div 
-                                className="scroll-wrapper -mx-4 overflow-hidden"
-                                onMouseDown={() => setIsScrolling(true)}
-                                onTouchStart={() => setIsScrolling(true)}
-                                onMouseUp={() => setIsScrolling(false)}
-                                onTouchEnd={() => setIsScrolling(false)}
-                                onMouseLeave={() => setIsScrolling(false)}
-                            >
-                                <div className={`scroll-content flex py-1 ${isScrolling ? 'paused' : ''}`}>
-                                    <div className="flex gap-5 px-4" style={{ 
-                                        width: `${latestDisplayData.initializeTokenEventEntities.length * 140}px`
-                                    }}>
-                                        {latestDisplayData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => 
-                                            <div key={token.tokenId} className="flex-none w-[120px]">
-                                                <TokenCardSimple token={token} />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-5 px-4" style={{ 
-                                        width: `${latestDisplayData.initializeTokenEventEntities.length * 140}px`
-                                    }}>
-                                        {latestDisplayData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => 
-                                            <div key={`dup-${token.tokenId}`} className="flex-none w-[120px]">
-                                                <TokenCardSimple token={token} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            <ScrollCards tokens={latestDisplayData.initializeTokenEventEntities} />
                         ) : (
                             <div className="grid grid-cols-3 gap-4 p-1">
                                 {latestDisplayData.initializeTokenEventEntities.map((token: InitiazlizedTokenData) => 
@@ -216,6 +206,28 @@ export const Discover: React.FC<MintTokensProps> = ({
                         )}
                     </>
                 )}
+
+                {/* Hottest Tokens */}
+                {filteredHotTokens.length > 0 && (
+                    <>
+                        <h2 className="text-xl mt-6">Hottest Tokens</h2>
+                        {isMobile ? (
+                            <div className="grid grid-cols-2 gap-4 p-1">
+                            {filteredHotTokens.map((token: InitiazlizedTokenData, index: number) => 
+                                <TokenCardSimple key={token.tokenId} token={token} number={index + 1} /> 
+                            )}
+                        </div>
+                        
+                        ) : (
+                            <div className="grid grid-cols-3 gap-4 p-1">
+                                {filteredHotTokens.map((token: InitiazlizedTokenData, index: number) => 
+                                    <TokenCardMobile key={token.tokenId} token={token} number={index + 1} /> 
+                                )}
+                            </div>
+                        )}
+                    </>
+                )}
+
             </div>
 
         </div>

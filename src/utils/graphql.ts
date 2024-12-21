@@ -48,6 +48,54 @@ query GetInitializedTokenEvents($orderBy: String!, $skip: Int!, $first: Int!) {
     }
 }`;
 
+export const queryHotInitializeTokenEvent = gql`
+query QueryHotInitializeTokenEvent($first: Int!, $skip: Int!, $orderBy: String!) {
+    initializeTokenEventEntities(
+        where: { status: 1 }
+        skip: $skip
+        first: $first
+        orderBy: $orderBy
+        orderDirection: desc
+    ) {
+        id
+        currentEra
+        targetEras
+        txId
+        admin
+        tokenId
+        mint
+        configAccount
+        metadataAccount
+        tokenVault
+        timestamp
+        tokenName
+        tokenSymbol
+        tokenUri
+        supply
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
+        epochesPerEra
+        targetSecondsPerEpoch
+        reduceRatio
+        initialMintSize
+        initialTargetMintSizePerEpoch
+        feeRate
+        liquidityTokensRatio
+        startTimestamp
+        status
+        metadataTimestamp
+    }
+}`;
+
 export const queryMyDeployments = gql`
 query GetMyDeployments($wallet: String!, $skip: Int!, $first: Int!) {
     initializeTokenEventEntities(

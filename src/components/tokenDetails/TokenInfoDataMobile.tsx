@@ -49,7 +49,7 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
             <div className="space-y-2">
                 <DataBlock 
                     label="Current Milestone/Checkpoint" 
-                    value={`MS ${token.currentEra} / CP ${token.currentEpoch}`}
+                    value={`Milestone #${token.currentEra} / Checkpoint #${token.currentEpoch}`}
                     tooltip={tooltip.currentEra}
                 />
                 <DataBlock 

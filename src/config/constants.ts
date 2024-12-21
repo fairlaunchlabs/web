@@ -160,4 +160,9 @@ export const DEPRECATED_MINTS = ["",
     "11113EaN2XNNh4HtS3QAUVDR3jZ4Rtm6c4d2K8Ntw8M",
     "1111va2ct5CvdtqamxnxY91X2ZAwhfMf17zJT8Yx6n",
     "7dDNDeDk6QCA51tD3hcPSUMWJQwVwnWnGECbiwCwdKZC",
+    "FW2UB2CncUkmqhU5aC6CVvYPSt5QtCxUgKyWboiG9hTw",
+    "BENeRf1hnix74ZjtFV4NdZsf1rP8Wusv8Wf833Z1BufZ",
+    "7PikqHdFjEPUwDPXeLJQ44JzqVG39Q9Xa4SS19MbsjnT",
+    "5fT6sMNg3bLFzs1SpMbkCbYxnupCR7NkmBAbKs4jceCQ",
+    
 ]
