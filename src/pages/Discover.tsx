@@ -192,9 +192,10 @@ export const Discover: React.FC<MintTokensProps> = ({
                 )} */}
 
                 {/* Latest Tokens */}
+                <div className={`bg-base-200 -ml-4 -mr-4 pb-4`}>
                 {latestDisplayData.initializeTokenEventEntities.length > 0 && (
                     <>
-                        <h2 className="text-xl mt-6">Latest Tokens</h2>
+                        <h2 className="text-xl mt-6 ml-4 pt-1">Latest Tokens</h2>
                         {isMobile ? (
                             <ScrollCards tokens={latestDisplayData.initializeTokenEventEntities} />
                         ) : (
@@ -206,6 +207,7 @@ export const Discover: React.FC<MintTokensProps> = ({
                         )}
                     </>
                 )}
+                </div>
 
                 {/* Hottest Tokens */}
                 {filteredHotTokens.length > 0 && (

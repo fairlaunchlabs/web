@@ -77,7 +77,7 @@
 
 .scroll-content {
   display: flex;
-  animation: scroll 20s linear infinite;
+  animation: scroll 60s linear infinite;
   width: max-content;
 }
 
