@@ -20,7 +20,12 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
     const [referralData, setReferralData] = useState<ReferrerData>();
     const [referrerResetIntervalSeconds, setReferrerResetIntervalSeconds] = useState(0);
     const [referralUsageMaxCount, setReferralUsageMaxCount] = useState(0);
-    const [myReferrerCode, setMyReferrerCode] =  useState<string>(localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58()) !== null ? localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58()) as string : "");
+    const [myReferrerCode, setMyReferrerCode] =  useState<string>(
+        localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58()) !== null ? 
+        localStorage.getItem(LOCAL_STORAGE_MY_REFERRAL_CODE + "_" + token.mint + "_" + wallet?.publicKey.toBase58()) as string 
+        : 
+        token.tokenData?.tokenSymbol + "_" + wallet?.publicKey.toBase58().slice(0, 8) + wallet?.publicKey.toBase58().slice(-8)
+    );
 
     useEffect(() => {
         if (wallet) {
@@ -223,7 +228,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
                                     className='input w-full'
                                     placeholder="Enter your favourite name as URC"
                                 />
-                                <p className='text-error'>This code is stored locally, please remember it when you change device!</p>
+                                <AlertBox title="Attention" message="1- URC code aboved can be modifyed; 2- The URC code is stored locally, please remember it when you change device!" />
                                 <button
                                     className={`btn btn-primary w-full mt-3`}
                                     onClick={handleGetCode}

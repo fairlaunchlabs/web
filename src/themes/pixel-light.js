@@ -153,7 +153,7 @@ const pixelLight = {
     ".pixel-alert": {
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
-      "background-color": "#FFD43B",
+      "background-color": "#FA4007",
       "border-radius": "8px",
       "padding": "1rem",
       "color": "#000000"
