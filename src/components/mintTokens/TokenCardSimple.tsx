@@ -67,9 +67,9 @@ export const TokenCardSimple: React.FC<TokenCardMobileProps> = ({ token, number,
                     imageUrl={metadata?.image as string}
                     name={token.tokenName}
                     metadataTimestamp={Number(token.metadataTimestamp)}
-                    className="w-12 h-12"
-                    size={type === 'static' ? 80 : 110}
-                    round={type === 'static'}
+                    className="w-12 h-12 mb-1"
+                    // size={type === 'static' ? 64 : 110}
+                    // round={type === 'static'}
                 />
                 <div className="flex items-center gap-2">
                     <div className="badge badge-md badge-secondary">{token.tokenSymbol}</div>
