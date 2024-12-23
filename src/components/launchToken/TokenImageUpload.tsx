@@ -118,7 +118,7 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/png,image/jpeg,image/gif"
+                    accept="image/png,image/jpeg,image/gif,image/webp,image/avif"
                     className="hidden"
                     onChange={handleFileInputChange}
                 />
@@ -150,7 +150,7 @@ export const TokenImageUpload: React.FC<TokenImageUploadProps> = ({
                             <span className="font-medium text-primary">Click to upload</span> or drag and drop
                         </div>
                         <p className="text-xs text-base-content">
-                            PNG, JPG, GIF, WEBP up to {MAX_AVATAR_FILE_SIZE / 1024 / 1024} MB (must be square)
+                            PNG, JPG, GIF, WEBP, AVIF up to {MAX_AVATAR_FILE_SIZE / 1024 / 1024} MB (must be square)
                         </p>
                     </div>
                 )}

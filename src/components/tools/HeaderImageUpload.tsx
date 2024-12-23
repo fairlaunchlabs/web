@@ -26,7 +26,7 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
 
             // Check file type
             if (!VALID_IMAGE_TYPES.includes(file.type)) {
-                setError('Only PNG, JPG and GIF files are allowed');
+                setError('Only PNG, JPG, GIF, WEBP and AVIF files are allowed');
                 resolve(false);
                 return;
             }
@@ -106,7 +106,7 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/png,image/jpeg,image/gif"
+                    accept="image/png,image/jpeg,image/gif,image/webp,image/avif"
                     className="hidden"
                     onChange={handleFileInputChange}
                 />
@@ -149,7 +149,7 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                             <span className="font-medium text-primary">Click to upload</span> or drag and drop
                         </div>
                         <p className="text-xs text-base-content">
-                            PNG, JPG, GIF, WEBP up to {MAX_HEADER_FILE_SIZE / 1024 / 1024} MB (must be square)
+                            PNG, JPG, GIF, WEBP, AVIF up to {MAX_HEADER_FILE_SIZE / 1024 / 1024} MB (must be square)
                         </p>
                     </div>
                 )}

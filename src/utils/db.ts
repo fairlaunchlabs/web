@@ -31,12 +31,27 @@ export const detectImageType = (buffer: Buffer): string | null => {
         return 'image/gif';
     }
 
-    // WebP signature: 52 49 46 46 (RIFF) + 4 bytes size + 57 45 42 50 (WEBP)
+    // WEBP signature: 52 49 46 46 XX XX XX XX 57 45 42 50
     if (
         header[0] === 0x52 && header[1] === 0x49 && header[2] === 0x46 && header[3] === 0x46 &&
         header[8] === 0x57 && header[9] === 0x45 && header[10] === 0x42 && header[11] === 0x50
     ) {
         return 'image/webp';
+    }
+
+    // AVIF signature: 
+    // 1. Starts with ftyp
+    // 2. Followed by avif or avis brand
+    if (
+        header[4] === 0x66 && header[5] === 0x74 && header[6] === 0x79 && header[7] === 0x70 &&
+        (
+            // Check for 'avif'
+            (header[8] === 0x61 && header[9] === 0x76 && header[10] === 0x69 && header[11] === 0x66) ||
+            // Check for 'avis'
+            (header[8] === 0x61 && header[9] === 0x76 && header[10] === 0x69 && header[11] === 0x73)
+        )
+    ) {
+        return 'image/avif';
     }
     
     // 如果无法识别，返回null

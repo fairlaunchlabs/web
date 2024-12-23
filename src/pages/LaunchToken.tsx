@@ -65,7 +65,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     const validateImageFile = (file: File): boolean => {
         // Check file type
         if (!VALID_IMAGE_TYPES.includes(file.type)) {
-            setError('Only JPEG, JPG and PNG files are allowed');
+            setError('Only JPEG, JPG, PNG, GIF, WEBP and AVIF files are allowed');
             return false;
         }
 
