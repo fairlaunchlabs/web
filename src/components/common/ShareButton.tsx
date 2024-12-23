@@ -15,7 +15,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token, metadata, input
     const wallet = useAnchorWallet();
     const { connection } = useConnection();
     const [showURCModal, setShowURCModal] = useState(false);
-    const [urcCode, setUrcCode] = useState('');
+    const [urcCode, setUrcCode] = useState(inputCode || '');
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleCopyLink = async () => {
@@ -58,6 +58,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token, metadata, input
                 token as InitiazlizedTokenData, 
                 metadata as TokenMetadataIPFS,
                 discount.data as string,
+                urcCode,
                 currentUrl, 
             );
             // Download image
@@ -78,12 +79,12 @@ export const ShareButton: React.FC<ShareButtonProps> = ({ token, metadata, input
     const handleDownloadImage = async () => {
         if (isGenerating) return;
 
-        if (inputCode === null || inputCode === undefined || inputCode === '') {
+        if (urcCode === null || urcCode === undefined || urcCode === '') {
             setShowURCModal(true);
             return;
         }
 
-        await handleDownloadImageWithCode(inputCode);
+        await handleDownloadImageWithCode(urcCode);
     };
 
     return (

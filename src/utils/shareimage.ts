@@ -189,7 +189,7 @@ const originalCost = (token: InitiazlizedTokenData) => {
     return initialMintSize > 0 ? feeRateInSol / initialMintSize : 0;
 };
 
-export const drawShareImage = async (token: InitiazlizedTokenData, metadata: TokenMetadataIPFS, discount: string, currentUrl: string) => {
+export const drawShareImage = async (token: InitiazlizedTokenData, metadata: TokenMetadataIPFS, discount: string, inputCode: string, currentUrl: string) => {
     // 加载字体
     await loadPixelFonts();
     
@@ -387,7 +387,7 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
     const qrWrapper = document.createElement('div');
     ReactDOM.render(
         React.createElement(QRCodeSVG, {
-            value: currentUrl,
+            value: currentUrl + "/" + inputCode,
             size: 150,
             level: 'L'
         }),
