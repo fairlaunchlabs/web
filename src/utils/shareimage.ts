@@ -5,8 +5,7 @@ import React, { useMemo } from 'react';
 import { APP_NAME } from "../config/constants";
 import { BN_LAMPORTS_PER_SOL, calculateMaxSupply, calculateTargetMintTime, calculateTotalSupplyToTargetEras, formatLargeNumber, formatSeconds, getMintSpeed } from "./format";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import BN from "bn.js";
-import { getReferralDataByCodeHash } from "./web3";
+import { BN } from "@coral-xyz/anchor";
 
 const BOX_WIDTH = 6;
 
