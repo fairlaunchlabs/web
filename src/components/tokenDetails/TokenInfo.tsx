@@ -33,8 +33,8 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
         <div className="w-full space-y-0">
             <div className='mb-4'>
             {isMobile ? 
-                <TokenHeroMobile token={token} metadata={metadata as TokenMetadataIPFS} /> 
-              : <TokenHero token={token} metadata={metadata as TokenMetadataIPFS} />}
+                <TokenHeroMobile token={token} metadata={metadata as TokenMetadataIPFS} referrerCode={referrerCode} /> 
+              : <TokenHero token={token} metadata={metadata as TokenMetadataIPFS} referrerCode={referrerCode} />}
             </div>
             <div className="pixel-box">
                 {isMobile ? 

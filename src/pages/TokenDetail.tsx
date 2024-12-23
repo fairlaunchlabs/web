@@ -8,13 +8,12 @@ import { TokenCharts } from '../components/tokenDetails/TokenCharts';
 import { TokenMintTransactions } from '../components/tokenDetails/TokenMintTransactions';
 import { TokenHolders } from '../components/tokenDetails/TokenHolders';
 import { TokenRefundTransactions } from '../components/tokenDetails/TokenRefundTransactions';
-import { ErrorBox } from '../components/common/ErrorBox';
-import { useDeviceType } from '../utils/contexts';
+import { ErrorBox } from '../components/common/ErrorBox';import { useDeviceType } from '../utils/contexts';
 import { SEARCH_CACHE_ITEMS } from '../config/constants';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     const { tokenMintAddress, referrerCode } = useParams();
-    // console.log('referrerCode', referrerCode);
+    console.log('referrerCode', referrerCode);
     const { loading, error, data } = useQuery(queryInitializeTokenEventBySearch, {
         variables: {
             skip: 0,

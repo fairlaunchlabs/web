@@ -60,7 +60,7 @@ export const tooltip = {
     mintSpeed: "Rate at which tokens are minted per checkpoint",
     deployAt: "Timestamp when the token was deployed",
     deployingTx: "Transaction hash of the deployment transaction",
-    deployer: "Address of the token deployer",
+    deployer: "Address of the token developer",
     tokenAddress: "The token's contract address on Solana",
     liquidityVaultSOL: "Vault address holding SOL liquidity",
     liquidityVaultToken: "Vault address holding token liquidity",
@@ -164,5 +164,5 @@ export const DEPRECATED_MINTS = ["",
     "BENeRf1hnix74ZjtFV4NdZsf1rP8Wusv8Wf833Z1BufZ",
     "7PikqHdFjEPUwDPXeLJQ44JzqVG39Q9Xa4SS19MbsjnT",
     "5fT6sMNg3bLFzs1SpMbkCbYxnupCR7NkmBAbKs4jceCQ",
-    
+
 ]

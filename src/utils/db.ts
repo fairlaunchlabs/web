@@ -123,7 +123,7 @@ export const setCachedData = async (url: string, data: any): Promise<void> => {
     }
 };
 
-export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimestamp: number) => {
+export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimestamp: number): Promise<{blobUrl: string, imageType: string}> => {
     try {
         // Extract CID and validate
         const itemId = extractArweaveHash(imageUrl as string);
@@ -132,10 +132,15 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
         }
         // Try to get from cache first
         const cachedImage = await getCachedData(itemId);
+
         if (cachedImage) {
-            const blobUrl = createBlobUrl(cachedImage);
             console.log('Using cached image', itemId);
-            return blobUrl;
+            const cachedImageType = detectImageType(cachedImage as Buffer);
+            if (!cachedImageType) {
+                throw new Error('Invalid cached image format');
+            }
+            const blobUrl = createBlobUrl(cachedImage);
+            return {blobUrl, imageType: cachedImageType as string};
         }
 
         let url = generateArweaveUrl(metadataTimestamp, itemId);
@@ -163,7 +168,7 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
 
         // Create blob URL with detected image type
         const blobUrl = createBlobUrl(imageBuffer, imageType);
-        return blobUrl;
+        return {blobUrl, imageType};
     } catch (err) {
         throw new Error(err instanceof Error ? err.message : 'Unknown error');
     }

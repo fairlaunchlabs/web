@@ -9,7 +9,8 @@ import { fetchImageFromUrlOrCache } from "../../utils/db";
 
 export const TokenHero: React.FC<TokenHeroProps> = ({
     token,
-    metadata
+    metadata,
+    referrerCode
 }) => {
     const [retryCount, setRetryCount] = useState(0);
     const [imageData, setImageData] = useState("");
@@ -19,8 +20,8 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
         const controller = new AbortController();
 
         if (metadata?.header) {
-            fetchImageFromUrlOrCache(metadata?.header, Number(token?.metadataTimestamp)).then((blobUrl) => {
-                setImageData(blobUrl as string);
+            fetchImageFromUrlOrCache(metadata?.header, Number(token?.metadataTimestamp)).then((imageData) => {
+                setImageData(imageData.blobUrl as string);
                 setRetryCount(0);
             }).catch((error) => {
                 if (retryCount < 3) {
@@ -81,7 +82,7 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
                 </div>
                 <div className="flex justify-between mt-3">
                     <RenderSocialIcons metadata={metadata as TokenMetadataIPFS} />
-                    <ShareButton token={token} />
+                    <ShareButton token={token} metadata={metadata as TokenMetadataIPFS} inputCode={referrerCode} />
                 </div>
                 {metadata?.description && (
                 <div className='bg-black/60 rounded-lg px-3 py-2 mt-2'>

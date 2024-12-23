@@ -51,7 +51,6 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
             }
             const ataBalance = await getTokenBalance(result.data.referrerAta, connection) as number;
 
-            // ###### 
             getSystemConfig(wallet, connection).then((data) => {
                 if (data?.success && data.data) {
                     setReferralUsageMaxCount(data.data.systemConfigData.referralUsageMaxCount as number);

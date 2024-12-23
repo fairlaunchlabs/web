@@ -64,7 +64,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             let headerItemId = '';
             if (headerImage) {
                 try {
-                    headerItemId = await uploadToArweave(headerImage, 'banner'); // ######
+                    headerItemId = await uploadToArweave(headerImage, 'banner');
                 } catch (error) {
                     toast.error('Failed to upload header image');
                     setLoading(false);

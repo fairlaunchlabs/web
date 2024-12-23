@@ -23,8 +23,8 @@ export const TokenImage: React.FC<TokenImageProps> = ({
             if (imageUrl) {
                 setIsLoading(true);
                 setError(null);
-                fetchImageFromUrlOrCache(imageUrl, metadataTimestamp).then((blobUrl) => {
-                    setImageData(blobUrl as string);
+                fetchImageFromUrlOrCache(imageUrl, metadataTimestamp).then((imageData) => {
+                    setImageData(imageData.blobUrl as string);
                     setIsLoading(false);
                     setRetryCount(0);
                 }).catch((error) => {

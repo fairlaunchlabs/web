@@ -15,6 +15,7 @@ import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/
 import axios from 'axios';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { fetchMetadataFromUrlOrCache } from './db';
+import { BN_LAMPORTS_PER_SOL, getFeeValue, numberStringToBN } from './format';
 
 const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     const provider = new AnchorProvider(
@@ -892,7 +893,7 @@ export const updateMetaData = async (
         });
 
         // const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
-        const metadataUrl = await uploadToArweave(metadataFile, 'metadata'); // ######
+        const metadataUrl = await uploadToArweave(metadataFile, 'metadata');
         console.log("metadataUrl", metadataUrl);
         const metadata: TokenMetadata = {
             symbol: token.tokenSymbol,
@@ -1035,3 +1036,53 @@ const processTransaction = async (
         localStorage.removeItem('processing_timestamp');
     }
 }
+
+export const getMintDiscount = async (
+    wallet: AnchorWallet | undefined, 
+    connection: Connection, 
+    token: InitiazlizedTokenData,
+    inputCode?: string
+) => {
+    if (!wallet) {
+        return {
+            success: false,
+            message: 'Please connect wallet',
+        };
+    }
+
+    if (inputCode === null || inputCode === undefined || inputCode === '') {
+        return {
+            success: false,
+            message: 'URC code is not available',
+        };
+    }
+
+    const codeHash = getReferrerCodeHash(wallet, connection, inputCode);
+    const result = await getReferralDataByCodeHash(wallet, connection, codeHash.data as PublicKey);
+    if (!result.success) {
+        return {
+            success: false,
+            message: result.message as string
+        };
+    }
+    if(result.data === null || result.data === undefined) {
+        return {
+            success: false,
+            message: 'Referral data not found',
+        };
+    }
+
+    const ataBalance = await getTokenBalance(result.data.referrerAta, connection) as number;
+
+    const [acturalPay, urcProviderBonus] = getFeeValue(
+        numberStringToBN(token.feeRate),
+        parseFloat(token.difficultyCoefficientEpoch),
+        numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
+        numberStringToBN(token.supply),
+    )
+    const discount = (100 - Number(acturalPay) / parseInt(token.feeRate) * 100).toFixed(2);
+    return {
+        success: true,
+        data: discount
+    };
+};

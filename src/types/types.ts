@@ -294,6 +294,8 @@ export type PaginationProps = {
 
 export type ShareButtonProps = {
     token: InitiazlizedTokenData;
+    metadata: TokenMetadataIPFS;
+    inputCode: string | undefined;
 }
 
 export type ToggleSwitchProps = {
@@ -415,6 +417,7 @@ export type SetRefererCodeEntity = {
     usageCount?: number;
     codeHash?: string;
     tokenBalance?: number | null;
+    isProcessing?: boolean;
 }
 
 export type OnChainReferralData = {
@@ -451,4 +454,5 @@ export type ReferralData = {
 export type TokenHeroProps = {
     token: InitiazlizedTokenData;
     metadata: TokenMetadataIPFS;
+    referrerCode: string | undefined;
 }

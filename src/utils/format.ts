@@ -318,3 +318,18 @@ export const filterRefererCode = (data: SetRefererCodeEntity[]) => {
         (code: SetRefererCodeEntity) => !DEPRECATED_MINTS.includes(code.mint)
     );
 };  
+
+export const formatLargeNumber = (num: number): string => {
+    const billion = 1000000000;
+    const million = 1000000;
+    const thousand = 1000;
+
+    if (num >= billion) {
+        return (num / billion).toFixed(1) + 'B';
+    } else if (num >= million) {
+        return (num / million).toFixed(1) + 'M';
+    } else if (num >= thousand) {
+        return (num / thousand).toFixed(1) + 'K';
+    }
+    return num.toString();
+};

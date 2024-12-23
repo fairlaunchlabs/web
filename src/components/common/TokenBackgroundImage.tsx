@@ -19,9 +19,9 @@ export const TokenBackgroundImage: React.FC<TokenBackgroundImageProps> = ({
         const controller = new AbortController();
         if (imageUrl) {
             setIsLoading(true);
-            fetchImageFromUrlOrCache(imageUrl, metadataTimestamp).then((blobUrl) => {
-                console.log('fetchImageFromUrlOrCache', blobUrl);
-                setImageData(blobUrl as string);
+            fetchImageFromUrlOrCache(imageUrl, metadataTimestamp).then((imageData) => {
+                console.log('fetchImageFromUrlOrCache', imageData);
+                setImageData(imageData.blobUrl as string);
                 setIsLoading(false);
                 setRetryCount(0);
             }).catch((error) => {
