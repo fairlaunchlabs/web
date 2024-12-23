@@ -365,7 +365,7 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
     // 绘制URC折扣
     ctx.font = 'bold 28px RetroPixel';
     ctx.fillStyle = '#ff0000';
-    ctx.fillText(`+${discount}%`, arrowEndX + 15, priceY + 60);
+    ctx.fillText(`-${discount}%`, arrowEndX + 15, priceY + 60);
 
     // 添加URC说明
     ctx.font = '18px RetroPixel';
