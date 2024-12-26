@@ -102,6 +102,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                         <th className=" text-center"></th>
                                         <th className=" text-left">Symbol & Name</th>
                                         <th className=" text-left">Mint Address</th>
+                                        <th className=" text-right">Milestone</th>
                                         <th className=" text-right">Supply</th>
                                         <th className=" text-center">Actions</th>
                                     </tr>
@@ -126,6 +127,9 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                             </td>
                                             <td className=" text-left">
                                                 <AddressDisplay address={token.mint} />
+                                            </td>
+                                            <td className=" text-right">
+                                                {token.currentEra || "0"}
                                             </td>
                                             <td className=" text-right">
                                                 {(Number(token.supply) / LAMPORTS_PER_SOL).toLocaleString(undefined, { minimumFractionDigits: 2 })}

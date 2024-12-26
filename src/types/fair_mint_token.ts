@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/fair_mint_token.json`.
  */
 export type FairMintToken = {
-  "address": "CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4",
+  "address": "3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv",
   "metadata": {
     "name": "fairMintToken",
     "version": "0.1.0",
@@ -401,6 +401,11 @@ export type FairMintToken = {
           "writable": true
         },
         {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
           "name": "mint",
           "writable": true,
           "pda": {
@@ -551,11 +556,6 @@ export type FairMintToken = {
         {
           "name": "systemConfigAccount",
           "writable": true
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
         },
         {
           "name": "rent",
@@ -798,6 +798,13 @@ export type FairMintToken = {
           "name": "systemConfigAccount"
         },
         {
+          "name": "referrerAta"
+        },
+        {
+          "name": "referrerMain",
+          "writable": true
+        },
+        {
           "name": "referralAccount",
           "writable": true,
           "pda": {
@@ -825,13 +832,6 @@ export type FairMintToken = {
               }
             ]
           }
-        },
-        {
-          "name": "referrerAta"
-        },
-        {
-          "name": "referrerMain",
-          "writable": true
         },
         {
           "name": "rent",
@@ -1516,70 +1516,6 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "resetConfigData",
-      "discriminator": [
-        198,
-        180,
-        69,
-        197,
-        9,
-        214,
-        70,
-        30
-      ],
-      "accounts": [
-        {
-          "name": "mint"
-        },
-        {
-          "name": "configAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "admin",
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "initConfigData",
-          "type": {
-            "defined": {
-              "name": "initializeTokenConfigData"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "setReferrerCode",
       "discriminator": [
         129,
@@ -1852,7 +1788,7 @@ export type FairMintToken = {
           }
         },
         {
-          "name": "destination",
+          "name": "tokenAta",
           "writable": true
         },
         {
@@ -2152,6 +2088,14 @@ export type FairMintToken = {
         {
           "name": "referrerResetIntervalSeconds",
           "type": "u64"
+        },
+        {
+          "name": "updateMetadataFee",
+          "type": "u64"
+        },
+        {
+          "name": "customizedDeployFee",
+          "type": "u64"
         }
       ]
     },
@@ -2263,14 +2207,14 @@ export type FairMintToken = {
           }
         },
         {
+          "name": "systemConfigAccount",
+          "writable": true
+        },
+        {
           "name": "protocolFeeAccount",
           "docs": [
             "CHECK the protocol fee account"
           ],
-          "writable": true
-        },
-        {
-          "name": "systemConfigAccount",
           "writable": true
         },
         {
@@ -2539,7 +2483,7 @@ export type FairMintToken = {
     },
     {
       "code": 6013,
-      "name": "notFrozen",
+      "name": "accountIsNotFrozen",
       "msg": "Account is not frozen"
     },
     {
@@ -2891,6 +2835,31 @@ export type FairMintToken = {
       "code": 6083,
       "name": "payerAmountTooLow",
       "msg": "Payer amount too low"
+    },
+    {
+      "code": 6084,
+      "name": "configSupplyNotMatchMintSupply",
+      "msg": "Config supply not match mint supply"
+    },
+    {
+      "code": 6085,
+      "name": "insufficientBalanceForDeployment",
+      "msg": "Insufficient balance for deployment"
+    },
+    {
+      "code": 6086,
+      "name": "sendInitializingFeeFailed",
+      "msg": "Send initializing fee failed"
+    },
+    {
+      "code": 6087,
+      "name": "invalidMintAccount",
+      "msg": "Invalid mint account"
+    },
+    {
+      "code": 6088,
+      "name": "invalidFreezeAuthority",
+      "msg": "Invalid freeze authority"
     }
   ],
   "types": [
@@ -2965,7 +2934,7 @@ export type FairMintToken = {
         "fields": [
           {
             "name": "targetEras",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "epochesPerEra",
@@ -2977,7 +2946,7 @@ export type FairMintToken = {
           },
           {
             "name": "reduceRatio",
-            "type": "u64"
+            "type": "f64"
           },
           {
             "name": "initialMintSize",
@@ -2993,7 +2962,7 @@ export type FairMintToken = {
           },
           {
             "name": "liquidityTokensRatio",
-            "type": "u64"
+            "type": "f64"
           },
           {
             "name": "startTimestamp",
@@ -3250,6 +3219,14 @@ export type FairMintToken = {
           {
             "name": "referrerResetIntervalSeconds",
             "type": "u64"
+          },
+          {
+            "name": "updateMetadataFee",
+            "type": "u64"
+          },
+          {
+            "name": "customizedDeployFee",
+            "type": "u64"
           }
         ]
       }
@@ -3490,6 +3467,10 @@ export type FairMintToken = {
           {
             "name": "isProcessing",
             "type": "bool"
+          },
+          {
+            "name": "vaultTokens",
+            "type": "u64"
           }
         ]
       }

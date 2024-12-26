@@ -82,6 +82,10 @@ export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {
                         <h3 className="badge badge-md badge-secondary">{token.tokenSymbol}</h3>
                         <span className="text-sm">{token.tokenName}</span>
                     </div>
+                    <div className="flex justify-between">
+                        <span className="opacity-70">Milestone:</span>
+                        <span className='font-bold'>#{token.currentEra}</span>
+                    </div>
                     <div className="space-y-0 text-sm">
                         <div className="flex justify-between">
                             <span className="opacity-70">Mint Fee:</span>
@@ -94,10 +98,6 @@ export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {
                         <div className="flex justify-between">
                             <span className="opacity-70">Current Price:</span>
                             <span>{currentCost.toLocaleString(undefined, { maximumFractionDigits: 6 })} SOL</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="opacity-70">Liquidity:</span>
-                            <span>{token.liquidityTokensRatio}%</span>
                         </div>
                         <div>
                             <div className="flex justify-between mb-1">

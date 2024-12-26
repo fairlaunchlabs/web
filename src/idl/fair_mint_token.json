@@ -1,5 +1,5 @@
 {
-  "address": "CqaPF1WtcfJ478mEhTbFJsr37SFoYUqhEhD1BZazCUt4",
+  "address": "3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv",
   "metadata": {
     "name": "fair_mint_token",
     "version": "0.1.0",
@@ -395,6 +395,11 @@
           "writable": true
         },
         {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
           "name": "mint",
           "writable": true,
           "pda": {
@@ -545,11 +550,6 @@
         {
           "name": "system_config_account",
           "writable": true
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
         },
         {
           "name": "rent",
@@ -1782,7 +1782,7 @@
           }
         },
         {
-          "name": "destination",
+          "name": "token_ata",
           "writable": true
         },
         {
@@ -2081,6 +2081,14 @@
         },
         {
           "name": "referrer_reset_interval_seconds",
+          "type": "u64"
+        },
+        {
+          "name": "update_metadata_fee",
+          "type": "u64"
+        },
+        {
+          "name": "customized_deploy_fee",
           "type": "u64"
         }
       ]
@@ -2469,7 +2477,7 @@
     },
     {
       "code": 6013,
-      "name": "NotFrozen",
+      "name": "AccountIsNotFrozen",
       "msg": "Account is not frozen"
     },
     {
@@ -2826,6 +2834,26 @@
       "code": 6084,
       "name": "ConfigSupplyNotMatchMintSupply",
       "msg": "Config supply not match mint supply"
+    },
+    {
+      "code": 6085,
+      "name": "InsufficientBalanceForDeployment",
+      "msg": "Insufficient balance for deployment"
+    },
+    {
+      "code": 6086,
+      "name": "SendInitializingFeeFailed",
+      "msg": "Send initializing fee failed"
+    },
+    {
+      "code": 6087,
+      "name": "InvalidMintAccount",
+      "msg": "Invalid mint account"
+    },
+    {
+      "code": 6088,
+      "name": "InvalidFreezeAuthority",
+      "msg": "Invalid freeze authority"
     }
   ],
   "types": [
@@ -3184,6 +3212,14 @@
           },
           {
             "name": "referrer_reset_interval_seconds",
+            "type": "u64"
+          },
+          {
+            "name": "update_metadata_fee",
+            "type": "u64"
+          },
+          {
+            "name": "customized_deploy_fee",
             "type": "u64"
           }
         ]

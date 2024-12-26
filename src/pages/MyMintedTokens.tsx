@@ -1,12 +1,12 @@
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { FC, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { queryMyTokenList, queryTokensByMints } from '../utils/graphql';
 import { InitiazlizedTokenData, MyAccountProps, TokenListItem, TokenMetadataIPFS } from '../types/types';
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import { TokenImage } from '../components/mintTokens/TokenImage';
-import { fetchMetadata } from '../utils/web3';
+import { fetchMetadata, isFrozen } from '../utils/web3';
 import { BN_LAMPORTS_PER_SOL, BN_ZERO, filterTokenListItem, filterTokens, numberStringToBN } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { ReferralCodeModal } from '../components/myAccount/ReferralCodeModal';
@@ -29,8 +29,9 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     const [selectedTokenForRefund, setSelectedTokenForRefund] = useState<TokenListItem | null>(null);
     const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(20);
     const [totalCount, setTotalCount] = useState(0);
+    const [frozenStates, setFrozenStates] = useState<{ [key: string]: boolean | null }>({});
 
     const { isMobile } = useDeviceType();
     
@@ -80,6 +81,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
 
     useEffect(() => {
         if (myTokensData?.holdersEntities) {
+            console.log('myTokensData', myTokensData?.holdersEntities)
             const tokensAfterFilter = filterTokenListItem(myTokensData?.holdersEntities);
             const mints = tokensAfterFilter.map((token: TokenListItem) => token.mint);
             setSearchMints(mints);
@@ -120,9 +122,29 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
         }
     }, [tokenDetailsData]);
 
+    useEffect(() => {
+        const fetchFrozenStates = async () => {
+            if (!connection || !publicKey || !tokenList) return;
+            
+            const newFrozenStates: { [key: string]: boolean | null } = {};
+            for (const token of tokenList) {
+                const result = await isFrozen(connection, new PublicKey(token.mint), publicKey);
+                newFrozenStates[token.mint] = result;
+            }
+            setFrozenStates(newFrozenStates);
+        };
+
+        fetchFrozenStates();
+    }, [connection, publicKey, tokenList]);
+
     const handleRefund = (token: TokenListItem) => {
         setSelectedTokenForRefund(token);
         setIsRefundModalOpen(true);
+    };
+
+    const handleThaw = (token: TokenListItem) => {
+        // ######
+        console.log('handleThaw', token)
     };
 
     if (!publicKey) {
@@ -173,6 +195,8 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                         <th className=" text-left">Image</th>
                                         <th className=" text-left">Name & Symbol</th>
                                         <th className=" text-left">Mint Address</th>
+                                        <th className=" text-right">Milestone</th>
+                                        <th className=" text-right">Status</th>
                                         <th className=" text-right">Balance</th>
                                         <th className=" text-center">Actions</th>
                                     </tr>
@@ -201,6 +225,16 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                                 <AddressDisplay address={token.mint} />
                                             </td>
                                             <td className=" text-right">
+                                                {token.tokenData?.currentEra || '1'} 
+                                            </td>
+                                            <td className=' text-right'>
+                                                {frozenStates[token.mint] !== undefined ? (frozenStates[token.mint] ? 
+                                                    <svg fill="none" className='w-4 h-4 text-error' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M15 2H9v2H7v4H4v14h16V8h-3V4h-2V2zm0 2v4H9V4h6zm-6 6h9v10H6V10h3zm4 3h-2v4h2v-4z" fill="currentColor"/> </svg> 
+                                                    : 
+                                                    <svg fill="none" className='w-4 h-4 text-success' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M15 2H9v2H7v2h2V4h6v4H4v14h16V8h-3V4h-2V2zm0 8h3v10H6V10h9zm-2 3h-2v4h2v-4z" fill="currentColor"/> </svg>) 
+                                                    : 'Loading...'}
+                                            </td>
+                                            <td className=" text-right">
                                                 {(numberStringToBN(token.amount).div(BN_LAMPORTS_PER_SOL)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                             </td>
                                             <td className=" text-center">
@@ -226,14 +260,13 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                                     >
                                                         Code
                                                     </button>
+                                                    {Number(token.tokenData?.currentEra) > Number(token.tokenData?.targetEras) && frozenStates[token.mint] && (
                                                     <button 
                                                         className="btn btn-sm btn-info"
-                                                        onClick={() => {
-                                                            // TODO: Implement thaw functionality
-                                                        }}
+                                                        onClick={() => handleThaw(token)}
                                                     >
                                                         Thaw
-                                                    </button>
+                                                    </button>)}
                                                 </div>
                                             </td>
                                         </tr>
@@ -257,12 +290,14 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                     {tokenList.filter(token => numberStringToBN(token.amount).gt(BN_ZERO)).map((token: TokenListItem) => 
                         <MyMintedTokenCard 
                             key={token.mint} 
-                            token={token} 
+                            token={token}
+                            isFrozen={frozenStates[token.mint] || false}
                             onRefund={handleRefund}
                             onCode={(token) => {
                                 setSelectedTokenForReferral(token);
                                 setIsReferralModalOpen(true);
                             }}
+                            onThaw={handleThaw}
                         />)}
                     </>
                 )

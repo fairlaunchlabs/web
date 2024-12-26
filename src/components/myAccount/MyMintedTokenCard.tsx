@@ -11,12 +11,16 @@ interface MyMintedTokenCardProps {
     token: TokenListItem;
     onRefund?: (token: TokenListItem) => void;
     onCode?: (token: TokenListItem) => void;
+    onThaw?: (token: TokenListItem) => void;
+    isFrozen?: boolean
 }
 
 export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
     token,
     onRefund,
     onCode,
+    onThaw,
+    isFrozen
 }) => {
     const navigate = useNavigate();
     const { isMobile } = useDeviceType();
@@ -46,6 +50,12 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
         }
     };
 
+    const handleThaw = (e: React.MouseEvent) => {
+        if (onThaw) {
+            handleButtonClick(e, () => onThaw(token));
+        }
+    };
+
     return (
         <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative">
             {token.metadata?.header && <TokenBackgroundImage imageUrl={token.metadata.header} metadataTimestamp={Number(token.tokenData?.metadataTimestamp) || 0} />}
@@ -65,6 +75,10 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
                             <div className="flex items-center gap-2 mb-2">
                                 <h3 className="badge badge-md badge-secondary">{token.tokenData?.tokenSymbol || 'Unknown'}</h3>
                                 <span className="text-sm">{token.tokenData?.tokenName || 'Unknown'}</span>
+                                {isFrozen ? 
+                                <svg fill="none" className='w-5 h-5 text-error' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M15 2H9v2H7v2h2V4h6v4H4v14h16V8h-3V4h-2V2zm0 8h3v10H6V10h9zm-2 3h-2v4h2v-4z" fill="currentColor"/> </svg>
+                                :
+                                <svg fill="none" className='w-5 h-5 text-success' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M15 2H9v2H7v2h2V4h6v4H4v14h16V8h-3V4h-2V2zm0 8h3v10H6V10h9zm-2 3h-2v4h2v-4z" fill="currentColor"/> </svg>}
                             </div>
                             <div className="space-y-1">
                                 <div className="flex gap-2">
@@ -93,12 +107,15 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
                         >
                             Code
                         </button>
+
+                        {Number(token.tokenData?.currentEra) > Number(token.tokenData?.targetEras) && isFrozen && (
                         <button 
                             className="btn btn-sm btn-info"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={handleThaw}
                         >
                             Thaw
-                        </button>
+                        </button>)}
+
                         <button 
                             className="btn btn-sm btn-success"
                             onClick={handleGetMore}

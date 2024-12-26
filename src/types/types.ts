@@ -46,10 +46,12 @@ export type InitializeTokenConfig = {
 }
 
 export type InitializeTokenAccounts = {
+    protocolFeeAccount: PublicKey;
     mint: PublicKey;
     metadata: PublicKey;
     payer: PublicKey;
     configAccount: PublicKey;
+    tokenVaultAta?: PublicKey;
     rent: PublicKey;
     systemProgram: PublicKey;
     systemConfigAccount: PublicKey;
@@ -240,7 +242,6 @@ export type TokenListItem = {
     amount: string;
     tokenData?: InitiazlizedTokenData;
     metadata?: TokenMetadataIPFS | undefined;
-    // imageUrl?: string;
 }
 
 export type HolderData = {

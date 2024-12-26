@@ -13,7 +13,7 @@ import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 import { ASSOCIATED_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import axios from 'axios';
-import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
 import { fetchMetadataFromUrlOrCache } from './db';
 import { BN_LAMPORTS_PER_SOL, getFeeValue, numberStringToBN } from './format';
 
@@ -85,25 +85,45 @@ export const createTokenOnChain = async (
             TOKEN_METADATA_PROGRAM_ID,
           );
         
+        const tokenVaultAta = await getAssociatedTokenAddress( // 初始化config_account对应的ATA账户，接收铸造的代币
+            mintPda,
+            configPda,
+            true
+        );
+        
         const initializeTokenAccounts: InitializeTokenAccounts = {
-            mint: mintPda,
+            protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
+            systemConfigAccount: systemConfigAccountPda,
             metadata: metadataPda,
+            mint: mintPda,
             payer: wallet.publicKey,
             configAccount: configPda,
+            tokenVaultAta,
             rent: SYSVAR_RENT_PUBKEY,
             systemProgram: SystemProgram.programId,
-            systemConfigAccount: systemConfigAccountPda,
             tokenProgram: TOKEN_PROGRAM_ID,
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
 
         console.log("Config", Object.fromEntries(
-            Object.entries(config).map(([key, value]) => [key, value.toString()])
+            Object.entries(initializeTokenAccounts).map(([key, value]) => [key, value.toString()])
         ));
 
         const tx = await program.methods
             .initializeToken(metadata, config as any)
             .accounts(initializeTokenAccounts)
+            .remainingAccounts([
+                {
+                  pubkey: new PublicKey(SYSTEM_DEPLOYER),
+                  isWritable: true,
+                  isSigner: false,
+                },
+                {
+                  pubkey: wallet.publicKey,
+                  isWritable: true,
+                  isSigner: true,
+                }
+              ])        
             .transaction();
         return await processTransaction(tx, connection, wallet, "Create token successfully", {mintAddress: mintPda.toString()});
     } catch (error: any) {
@@ -557,6 +577,24 @@ export const refund = async (
             message: 'Error refunding' + error
         }
     }
+}
+
+export const isFrozen = async (
+    connection: Connection,
+    mint: PublicKey,
+    address: PublicKey,
+): Promise<boolean | null> => {
+    const ata = await getAssociatedTokenAddress(
+        mint,
+        address,
+        false
+    );
+    const ataInfo = await connection.getAccountInfo(ata);
+    if (!ataInfo) {
+        return null;
+    }
+    const accountData = await getAccount(connection, ata);
+    return accountData.isFrozen;
 }
 
 export const mintToken = async (
