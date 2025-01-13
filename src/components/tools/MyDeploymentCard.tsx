@@ -94,7 +94,7 @@ export const MyDeploymentCard: FC<MyDeploymentCardProps> = ({
                             className="btn btn-sm btn-primary"
                             onClick={handleUpdateMetadata}
                         >
-                            Update Metadata
+                            Metadata
                         </button>
                         <button 
                             className="btn btn-sm btn-success"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from "../../config/constants";
+import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL, IRYS_GATEWAY_URL, STORAGE } from "../../config/constants";
 import { TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
 import { fetchImageFromUrlOrCache } from "../../utils/db";
 import { addressToColor } from "../../utils/format";
@@ -42,11 +42,17 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
         };
     }, [metadata?.header, retryCount]);
 
+    const hasImage = () => {
+        if(STORAGE === "arweave") return metadata && imageData !== "" && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" 
+        else if(STORAGE === "irys") return metadata && imageData !== "" && metadata?.header !== IRYS_GATEWAY_URL + "/"
+        else return false
+    }
+
     return (
         <div className="-ml-4 -mt-10 -mr-4 relative">
             {/* Background Image with Blur */}
             <div className="relative w-full aspect-[3/2] overflow-hidden">
-                {metadata && imageData !== "" && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
+                {hasImage() ? (
                     <img
                         src={imageData}
                         alt="Token Header"

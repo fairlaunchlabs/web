@@ -18,7 +18,7 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({
 
     return (
         <div className="flex items-center gap-2">
-            <span className="font-pixel">{formatAddress(address, showCharacters)}</span>
+            <span className="font-pixel">{showCharacters > 0 ? formatAddress(address, showCharacters) : address}</span>
             <button
                 onClick={handleCopy}
                 className="btn-ghost btn-xs p-0 min-h-0 h-auto"

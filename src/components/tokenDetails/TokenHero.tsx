@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL } from "../../config/constants";
+import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL, IRYS_GATEWAY_URL, STORAGE } from "../../config/constants";
 import { TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
 import { addressToColor } from "../../utils/format";
 import { ShareButton } from "../common/ShareButton";
@@ -42,10 +42,17 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
         };
     }, [metadata?.header, retryCount]);
 
+    const hasImage = () => {
+        if(STORAGE === "arweave") return metadata && imageData !== "" && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" 
+        else if(STORAGE === "irys") return metadata && imageData !== "" && metadata?.header !== IRYS_GATEWAY_URL + "/"
+        else return false
+    }
+    
     return (
         <div className="w-full relative">
         {/* Background Image */}
-        {metadata && imageData !== "" && metadata?.header !== ARWEAVE_GATEWAY_URL + "/" && metadata?.header !== ARSEEDING_GATEWAY_URL + "/" ? (
+        {hasImage()
+        ? (
             <img
                 src={imageData}
                 alt="Token Header"

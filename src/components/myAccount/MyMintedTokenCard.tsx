@@ -11,7 +11,7 @@ interface MyMintedTokenCardProps {
     token: TokenListItem;
     onRefund?: (token: TokenListItem) => void;
     onCode?: (token: TokenListItem) => void;
-    onThaw?: (token: TokenListItem) => void;
+    // onThaw?: (token: TokenListItem) => void;
     isFrozen?: boolean
 }
 
@@ -19,7 +19,7 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
     token,
     onRefund,
     onCode,
-    onThaw,
+    // onThaw,
     isFrozen
 }) => {
     const navigate = useNavigate();
@@ -50,11 +50,11 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
         }
     };
 
-    const handleThaw = (e: React.MouseEvent) => {
-        if (onThaw) {
-            handleButtonClick(e, () => onThaw(token));
-        }
-    };
+    // const handleThaw = (e: React.MouseEvent) => {
+    //     if (onThaw) {
+    //         handleButtonClick(e, () => onThaw(token));
+    //     }
+    // };
 
     return (
         <div className="pixel-box mb-4 p-4 cursor-pointer overflow-hidden relative">
@@ -108,13 +108,13 @@ export const MyMintedTokenCard: FC<MyMintedTokenCardProps> = ({
                             Code
                         </button>
 
-                        {Number(token.tokenData?.currentEra) > Number(token.tokenData?.targetEras) && isFrozen && (
+                        {/* {Number(token.tokenData?.currentEra) > Number(token.tokenData?.targetEras) && isFrozen && (
                         <button 
                             className="btn btn-sm btn-info"
                             onClick={handleThaw}
                         >
                             Thaw
-                        </button>)}
+                        </button>)} */}
 
                         <button 
                             className="btn btn-sm btn-success"

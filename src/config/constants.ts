@@ -10,7 +10,7 @@ export const DEFAULT_PARAMS = { // must be same as program default params
     feeRate: '10000000',
     liquidityTokensRatio: '10',
 }
-
+export const STORAGE = "irys" as "irys" | "arweave";
 export const FAIR_MINT_PROGRAM_ID = '3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 export const PROTOCOL_FEE_ACCOUNT = "CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79";
@@ -27,6 +27,8 @@ export const REFUND_SEEDS = "refund";
 export const SYSTEM_CONFIG_SEEDS = "system_config";
 export const REFERRAL_CODE_SEED = "referral_code";
 export const CODE_ACCOUNT_SEEDS = "code_account";
+export const MINT_VAULT_OWNER_SEEDS = "mint-vault-owner";
+export const EXTRA_ACCOUNT_META_LIST = "extra-account-metas";
 
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
 export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
@@ -40,11 +42,13 @@ export const LOCAL_STORAGE_HISTORY_CACHE_PREFIX = 'mint_history_';
 export const LOCAL_STORAGE_HISTORY_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24小时的缓存时间
 
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
-// export const ARWEAVE_API_URL = "http://localhost:8000/arweave"; // DEVELOPMENT
-export const ARWEAVE_API_URL = "https://flipflop-api.vercel.app/arweave"; // PRODUCTION
+// export const UPLOAD_API_URL = "http://localhost:8000/arweave"; // DEVELOPMENT
+export const UPLOAD_API_URL = STORAGE === "arweave" ? "https://flipflop-api.vercel.app/arweave" : "https://flipflop-api.vercel.app/irys"; // PRODUCTION
 export const ARWEAVE_GATEWAY_URL = "https://arweave.net";
 export const ARSEEDING_GATEWAY_URL = "https://arseed.web3infra.dev";
 export const ARWEAVE_DEFAULT_SYNC_TIME = 2 * 60 * 60;
+
+export const IRYS_GATEWAY_URL = "https://gateway.irys.xyz";
 
 export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
 export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
@@ -93,9 +97,6 @@ export const BADGE_BG_COLORS = [
     "#9723C9"
 ]
 export const BADGE_TEXT_COLORS = ["black", "white", "white", "black", "black", "white", "black", "black", "white"]
-export const DEPRECATED_SYMBOLS = [
-    "", //"ar5", "ar4", "ar3", "aaa785",// "test#111", "test#121"
-]
 export const SEARCH_CACHE_ITEMS = 10;
 
 export const INDEX_DB_NAME = 'POM_IMAGE_CACHE';
@@ -105,64 +106,6 @@ export const INDEX_DB_VERSION = 1;
 export const CACHE_DURATION = 60 * 24 * 60 * 60 * 1000; // 60 days
 
 export const DEPRECATED_MINTS = ["",
-    // 因为开发过程中，有些代币数据出错，过滤后内测
     "6wNFdBEFXyhRtY7ZoDxy9CE9H9ktxpgzsjraP8bpo6VC",
-    // "BcVMtH5Tc4ekR9BnxAFL6uPaJBZQeKKmgFeYrqSe7Zc1", // test#121
-    // "73YJ8Gxvm5N1VconSNL8dipABi6BkT3c5xC8XF2BPdcP",
-    // "JDeza664hxRov5kXAkWVFcR7JtsMEUjnzLW4faRFE2eV",
-    // "71BkhUHSjtyssaH8m7HW5UcGEcPVBHsUzuARDFAFe71B",
-    // "12iwqAyzWD6ua1ivarRjtxGLR52PnHBdAE1U3iLyqVe9",
-    // "1111TKQcUkdeMxmyjcEUg4mQTP2nAjZne9iMUQv3FS",
-    // "1111MyBmtkJzkkMJLLZoocaGvxoeA9y5UNXCv6HmEC",
-    // "1111cvM1ztWds2kzjiWQTQpeyQAqa1gZyBAow93drd",
-    // "z3Vtzhjm1kJrkdPtJmbK9TAvL9MZetKu6pZsCbSUnry",
-    // "Hs5aBja677PYcL9YfN36eYc6rxFxTJWVbrEgEaxw6dAx",
-    // "FzvXGefXYJERmRNKTAd5oqme2RYxGYcvkLZWfoPey18P",
-    // "5Hz6LenDBdGMi1NyCmdrkKGnzMxYs4PSQiXbyE4rGRGB",
-    // "E1CyuqSQzBEYruAAY1hncv6xjbRRtenBBbUQzMYS6jQK",
-    // "Anas5k8xzQmacKLrpaeFLzSgXUu2J3kiaDxc8EMV8uWk",
-    // "BovZ9CiQb4dw6vnGiPvH7TsFvV5Qafrgr82T9pFMFeLM",
-    // "71BkhUHSjtyssaH8m7HW5UcGEcPVBHsUzuARDFAFe71B",
-    // "AKtYDRYPWFicpdzpiUXLvcLRb6TtdNoxeBBSA8aJvWmT",
-    // "67U8f2KnyTZi1CPv9SNxScNdNqT6dYEJN2NWywiMw5Z2",
-    // "CaYL2mEPo5U9nkh6zXLJYdW7PvVVh8qNtfUxwvS3UDh7",
-    // "JDeza664hxRov5kXAkWVFcR7JtsMEUjnzLW4faRFE2eV",
-    // "Hs5aBja677PYcL9YfN36eYc6rxFxTJWVbrEgEaxw6dAx",
-    // "ENnDTpxNnNmXPKDyi7LusiNpMZn7xNQNJupC9SzVSwnR",
-    // "CH6cHYv5nEnCWzzoj82CriiHSZrTPfGSYWH86GgFHrCB",
-    // "3bbRb2RbJUHk5wvVJStvXgaAFMU3RvueKczeCwH4cXmY",
-    // "34m1U3oCVtNoYM7yhvsLNkS2HQuPE6CkcgwCg1dEcUh7",
-    // "CChbuzbwfocSn4UKej27CYwTr5auz5eFbTiyc8bMcQA",
-    // "dXBo4c1BHVRAQwNabs6Buv3W7dUBGGG45KdsZMFQyYa",
-    // "6PSqJF6PuCmSroL6TZXpx8WLtts8r6PcCD9x1JUTXJpk",
-    // "EnVxZb2oTAuYX7V2DCWCyM9asZkFLriqFBPwTeJqeSjU",
-    // "5sbGbhogNXqNoqQQqick5WXNXkZHVigw2AtXadFEmV7J",
-    // "DNB73R85aDjGmQAMdpzjRT29Nn2WKZ2qdptqqdAFPGaN",
-    // "DUBgJ2yCeYXaiiSh975Z7uxmAMfSzjSQGkLtgi533MEc",
-    // "3UfhtzWX7qBu79QTnjRJ8dfYbcgJNEUkUMEr1FsCnXUn",
-    // "EbFJTTCU8xM4WXsEXG6dwvmwGjMqxecgguo4YFPYvJPV",
-    // "2dXWvsG7LQkc1wXrNucD2hNxDV43WorXVrFwxWDn432m",
-    // "BksbP1wXfx2PRyKGsv2s67woXHWUnVB6JiZBMaSJxj3q",
-    // "9XaYxB9RjpSCh46gJ7FTCD9QCmXX7nSJzBXNDkuSS697",
-    // "7NVeNNgSwM9nRPhDbsyDTVw2RLb3yivvVeKq9AwWuj33",
-    // "DtAXH1BJEUsCpF1JryD64raSU5D9U87Eb43WxVYrHye6",
-    // "6gkpJykcNGGTZAiw5QgiFbzqe5sxkJEBvaQP5Kvxctno",
-    // "GjEZuomwVSy2U78bwX63Gof8k8B7zNBt8c65kaMUaxEf",
-    // "z8rcrKDATyEWtghNksJWNqdfEpqncDhjfDbWRfJyEkg", // ar#11
-    // "EE4XNz6ban3x2Lt3hai1cAptchsgpygEV9BdKQKTXksg", // ar#12
-    // "AGnY6Ygok6aLuBQJB9nRGg7giag4M7qRPaJE8bwKv9dT", 
-    // "7g4MXbfN8SMC4uLwMXmfK7inqgahhmoRoBuZDrw8SawY", // ar2
-    // "7DLEqhREmQzagdDvNbmbikUubH2NMxGXLDRwt2BfAQAF", // ar8
-    // "3Bpy2NuzNKhhKVyiLabKvWtdoFiKCaUrkarXjifj1fa1", // ar13
-    // "3H7KdnkdKQT3d1f8MNe88YqHugVLMvcd8NGZ5X11gbi2",
-    // "3roWmSiXNTrPpQN4WHw4VmyMdTXB3o3neiyz49vpQz9Y",
-    // "AYQdPkXSuK2ZTbMJVrWjRSiVx8P7Rmcvfht2oWhEodFT",
-    // "11113EaN2XNNh4HtS3QAUVDR3jZ4Rtm6c4d2K8Ntw8M",
-    // "1111va2ct5CvdtqamxnxY91X2ZAwhfMf17zJT8Yx6n",
-    // "7dDNDeDk6QCA51tD3hcPSUMWJQwVwnWnGECbiwCwdKZC",
-    // "FW2UB2CncUkmqhU5aC6CVvYPSt5QtCxUgKyWboiG9hTw",
-    // "BENeRf1hnix74ZjtFV4NdZsf1rP8Wusv8Wf833Z1BufZ",
-    // "7PikqHdFjEPUwDPXeLJQ44JzqVG39Q9Xa4SS19MbsjnT",
-    // "5fT6sMNg3bLFzs1SpMbkCbYxnupCR7NkmBAbKs4jceCQ",
-
+    
 ]

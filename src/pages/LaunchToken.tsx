@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
-import { createTokenOnChain, uploadToArweave } from '../utils/web3';
+import { createTokenOnChain, uploadToStorage } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Metrics } from '../components/launchToken/Metrics';
@@ -96,9 +96,10 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         }
 
         try {
-            const arweaveUrl = await uploadToArweave(file, 'avatar');
+            const imageUrl = await uploadToStorage(file, 'avatar');
             // const arweaveUrl = "https://arweave.net/zYjcUg1xkcKIryig0nuhJbpUSRHwIjXuqyuWY6kglm4"; // pic
-            setImageUrl(arweaveUrl);
+            console.log('Image uploaded to Storage:', imageUrl);
+            setImageUrl(imageUrl);
         } catch (err) {
             setError('Failed to upload image: ' + (err instanceof Error ? err.message : String(err)));
         } finally {
@@ -147,9 +148,9 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 type: 'application/json'
             });
 
-            const metadataUrl = await uploadToArweave(metadataFile, 'metadata');
+            const metadataUrl = await uploadToStorage(metadataFile, 'metadata');
             // const metadataUrl = "https://arweave.net/UEuuJkHW3rgw4tcmlL_9loURN3Hc3YVYs_m7e5rngww"; // metadata
-            console.log('Metadata uploaded to Arweave:', metadataUrl);
+            console.log('Metadata uploaded to Storage:', metadataUrl);
 
             const tokenMetadata: TokenMetadata = {
                 name,

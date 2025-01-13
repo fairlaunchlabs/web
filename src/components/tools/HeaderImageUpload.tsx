@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL, MAX_HEADER_FILE_SIZE, VALID_IMAGE_TYPES } from '../../config/constants';
+import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL, IRYS_GATEWAY_URL, MAX_HEADER_FILE_SIZE, STORAGE, VALID_IMAGE_TYPES } from '../../config/constants';
 
 interface HeaderImageUploadProps {
     onImageChange: (file: File | null) => void;
@@ -91,6 +91,12 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
         }
     };
 
+    const hasImage = () => {
+        if(STORAGE === "arweave") return currentHeader && currentHeader !== ARWEAVE_GATEWAY_URL + "/" && currentHeader !== ARSEEDING_GATEWAY_URL + "/" 
+        else if(STORAGE === "irys") return currentHeader && currentHeader !== IRYS_GATEWAY_URL + "/"
+        else return false
+    }
+
     return (
         <div className="space-y-2">
             <label className="label">
@@ -131,7 +137,7 @@ export const HeaderImageUpload: React.FC<HeaderImageUploadProps> = ({
                             </svg>
                         </button>
                     </div>
-                ) : currentHeader && currentHeader !== ARWEAVE_GATEWAY_URL + "/" && currentHeader !== ARSEEDING_GATEWAY_URL + "/" ? (
+                ) : hasImage() ? (
                     <div className="pixel-box relative">
                         <img
                             src={`${currentHeader}`}

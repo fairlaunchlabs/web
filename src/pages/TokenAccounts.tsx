@@ -1,5 +1,5 @@
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { useEffect, useState } from 'react';
 import { TokenAccount } from '../types/types';
 import { NETWORK, SCANURL } from '../config/constants';
@@ -15,7 +15,7 @@ export const TokenAccounts = () => {
         const getTokenAccounts = async () => {
             try {
                 const accounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
-                    programId: TOKEN_PROGRAM_ID,
+                    programId: TOKEN_2022_PROGRAM_ID,
                 });
 
                 const tokens = accounts.value.map((account) => {

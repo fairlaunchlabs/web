@@ -1,6 +1,6 @@
 import axios from "axios";
-import { CACHE_DURATION, INDEX_DB_NAME, INDEX_DB_VERSION, STORE_NAME_IMAGE } from "../config/constants";
-import { checkAvailableArweaveItemId, extractArweaveHash, generateArweaveUrl } from "./web3";
+import { CACHE_DURATION, INDEX_DB_NAME, INDEX_DB_VERSION, STORAGE, STORE_NAME_IMAGE } from "../config/constants";
+import { checkAvailableArweaveItemId, checkAvailableIrysItemId, extractArweaveHash, extractIrysHash, generateArweaveUrl, generateIrysUrl } from "./web3";
 import { TokenMetadataIPFS } from "../types/types";
 
 export const arrayBufferToBlob = (buffer: ArrayBuffer, type: string): Blob => {
@@ -141,15 +141,20 @@ export const setCachedData = async (url: string, data: any): Promise<void> => {
 export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimestamp: number): Promise<{blobUrl: string, imageType: string}> => {
     try {
         // Extract CID and validate
-        const itemId = extractArweaveHash(imageUrl as string);
-        if (!itemId || !checkAvailableArweaveItemId(itemId)) {
-            throw new Error('Invalid Arweave id');
+        let itemId = "";
+        if (STORAGE === "arweave") itemId = extractArweaveHash(imageUrl as string);
+        else if (STORAGE === "irys") itemId = extractIrysHash(imageUrl as string);
+        if (!itemId 
+            || (STORAGE === "arweave" && !checkAvailableArweaveItemId(itemId))
+            || (STORAGE === "irys" && !checkAvailableIrysItemId(itemId))
+        ) {
+            throw new Error('Invalid Item id');
         }
         // Try to get from cache first
         const cachedImage = await getCachedData(itemId);
 
         if (cachedImage) {
-            console.log('Using cached image', itemId);
+            // console.log('Using cached image', itemId);
             const cachedImageType = detectImageType(cachedImage as Buffer);
             if (!cachedImageType) {
                 throw new Error('Invalid cached image format');
@@ -158,7 +163,7 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
             return {blobUrl, imageType: cachedImageType as string};
         }
 
-        let url = generateArweaveUrl(metadataTimestamp, itemId);
+        let url = STORAGE === "arweave" ? generateArweaveUrl(metadataTimestamp, itemId) : generateIrysUrl(metadataTimestamp, itemId);
 
         // 获取二进制图片数据
         const imageResponse = await axios.get(url, {
@@ -192,11 +197,14 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
 export const fetchMetadataFromUrlOrCache = async (tokenUri: string, metadataTimestamp: number) => {
     try {
         // Extract CID and validate
-        const itemId = extractArweaveHash(tokenUri as string);
-        if (!itemId || !checkAvailableArweaveItemId(itemId)) {
-            throw new Error('Invalid Arweave id');
+        let itemId = "";
+        if(STORAGE === "arweave") itemId = extractArweaveHash(tokenUri as string);
+        else if(STORAGE === "irys") itemId = extractIrysHash(tokenUri as string);
+        if (!itemId 
+            || (STORAGE === "arweave" && !checkAvailableArweaveItemId(itemId)) 
+            || (STORAGE === "irys" && !checkAvailableIrysItemId(itemId))) {
+            throw new Error('Invalid item id');
         }
-
         const cachedMetadata = await getCachedData(itemId);
         if (cachedMetadata) {
             const blobUrl = cachedMetadata as TokenMetadataIPFS;
@@ -204,8 +212,7 @@ export const fetchMetadataFromUrlOrCache = async (tokenUri: string, metadataTime
             return blobUrl;
         }
 
-        let url = generateArweaveUrl(metadataTimestamp, itemId);
-
+        let url = STORAGE === "arweave" ? generateArweaveUrl(metadataTimestamp, itemId) : generateIrysUrl(metadataTimestamp, itemId);
         const response = await axios.get(url);
 
         if (!response?.data) {
@@ -216,10 +223,11 @@ export const fetchMetadataFromUrlOrCache = async (tokenUri: string, metadataTime
             name: response.data.name,
             symbol: response.data.symbol,
             description: response.data.description,
-            image: generateArweaveUrl(Number(metadataTimestamp), extractArweaveHash(response.data.image)),
-            header: generateArweaveUrl(Number(metadataTimestamp), extractArweaveHash(response.data.header)),
+            image: STORAGE === "arweave" ? generateArweaveUrl(Number(metadataTimestamp), extractArweaveHash(response.data.image)) : generateIrysUrl(Number(metadataTimestamp), extractIrysHash(response.data.image)),
+            header: STORAGE === "arweave" ? generateArweaveUrl(Number(metadataTimestamp), extractArweaveHash(response.data.header)) : generateIrysUrl(Number(metadataTimestamp), extractIrysHash(response.data.header)),
             extensions: response.data.extensions,
         } as TokenMetadataIPFS
+        console.log("data", data)
 
         // Cache the image data
         await setCachedData(itemId, data);

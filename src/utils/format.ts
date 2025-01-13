@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { UTCTimestamp } from "lightweight-charts";
 import { InitiazlizedTokenData, MintData, SetRefererCodeEntity, TokenListItem } from "../types/types";
-import { BADGE_BG_COLORS, DEPRECATED_MINTS, DEPRECATED_SYMBOLS } from "../config/constants";
+import { BADGE_BG_COLORS, DEPRECATED_MINTS } from "../config/constants";
 
 export const formatAddress = (address: string, showCharacters = 4): string => {
     if (!address) return '';

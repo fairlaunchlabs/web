@@ -457,3 +457,47 @@ export type TokenHeroProps = {
     metadata: TokenMetadataIPFS;
     referrerCode: string | undefined;
 }
+
+export type MetadataAccouontData = {
+    key: number;
+    updateAuthority: PublicKey;
+    mint: PublicKey;
+    data: {
+      name: string;
+      symbol: string;
+      uri: string;
+      sellerFeeBasisPoints: number;
+      creators: {
+        address: PublicKey;
+        verified: boolean;
+        share: number;
+      }[];
+    };
+    isMutable: boolean;
+    collection: {
+      key: string;
+      verified: boolean;
+    } | null;
+  };
+
+export type TokenMetadata2022 = {
+    updateAuthority: string;
+    mint: string;
+    name: string;
+    symbol: string;
+    uri: string;
+    additionalMetadata: [];
+    authority: string;
+    metadataAddress: string;    
+}
+
+export type MintExtentionType = "transferHook" | "metadataPointer" | "tokenMetadata";
+export type MintExtentionData = {
+    extension: MintExtentionType;
+    state: any;
+}
+
+export type TransferHookState = {
+    authority: string | null;
+    programId: string | null;
+}

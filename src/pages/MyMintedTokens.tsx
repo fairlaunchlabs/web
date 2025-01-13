@@ -1,4 +1,4 @@
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { FC, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
@@ -16,10 +16,11 @@ import { PAGE_SIZE_OPTIONS } from '../config/constants';
 import { useDeviceType } from '../utils/contexts';
 import { MyMintedTokenCard } from '../components/myAccount/MyMintedTokenCard';
 import { PageHeader } from '../components/common/PageHeader';
+import toast from 'react-hot-toast';
 
 export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     const { connection } = useConnection();
-    const { publicKey } = useWallet();
+    const wallet = useAnchorWallet();
     const navigate = useNavigate();
     const [balance, setBalance] = useState(0);
     const [tokenList, setTokenList] = useState<TokenListItem[]>([]);
@@ -37,11 +38,11 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     
     const { data: myTokensData, loading: loadingTokens } = useQuery(queryMyTokenList, {
         variables: {
-            owner: publicKey?.toBase58() || '',
+            owner: wallet?.publicKey?.toBase58() || '',
             skip: (currentPage - 1) * pageSize,
             first: pageSize
         },
-        skip: !publicKey,
+        skip: !wallet?.publicKey,
         fetchPolicy: 'network-only',
         nextFetchPolicy: 'cache-first'
     });
@@ -58,11 +59,11 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     });
 
     useEffect(() => {
-        if (!publicKey) return;
+        if (!wallet?.publicKey) return;
 
         const getBalance = async () => {
             try {
-                const balance = await connection.getBalance(publicKey);
+                const balance = await connection.getBalance(wallet?.publicKey);
                 setBalance(balance / LAMPORTS_PER_SOL);
             } catch (e) {
                 console.error('Error getting balance:', e);
@@ -70,14 +71,14 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
         };
 
         getBalance();
-        const id = connection.onAccountChange(publicKey, (account) => {
+        const id = connection.onAccountChange(wallet.publicKey, (account) => {
             setBalance(account.lamports / LAMPORTS_PER_SOL);
         });
 
         return () => {
             connection.removeAccountChangeListener(id);
         };
-    }, [connection, publicKey]);
+    }, [connection, wallet?.publicKey]);
 
     useEffect(() => {
         if (myTokensData?.holdersEntities) {
@@ -124,30 +125,34 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
 
     useEffect(() => {
         const fetchFrozenStates = async () => {
-            if (!connection || !publicKey || !tokenList) return;
+            if (!connection || !wallet?.publicKey || !tokenList) return;
             
             const newFrozenStates: { [key: string]: boolean | null } = {};
             for (const token of tokenList) {
-                const result = await isFrozen(connection, new PublicKey(token.mint), publicKey);
-                newFrozenStates[token.mint] = result;
+                const _isFrozen = await isFrozen(connection, new PublicKey(token.mint));
+                if (_isFrozen.success) newFrozenStates[token.mint] = _isFrozen.data;
             }
             setFrozenStates(newFrozenStates);
         };
 
         fetchFrozenStates();
-    }, [connection, publicKey, tokenList]);
+    }, [connection, wallet?.publicKey, tokenList]);
 
     const handleRefund = (token: TokenListItem) => {
         setSelectedTokenForRefund(token);
         setIsRefundModalOpen(true);
     };
 
-    const handleThaw = (token: TokenListItem) => {
-        // ######
-        console.log('handleThaw', token)
-    };
+    // const handleThaw = async (token: TokenListItem) => {
+    //     const result = await thawTokens(wallet, connection, token.tokenData as InitiazlizedTokenData);
+    //     if (!result?.success) {
+    //         toast.error(result.message as string);
+    //         return;
+    //     }
+    //     toast.success('Tokens thawed successfully');
+    // };
 
-    if (!publicKey) {
+    if (!wallet?.publicKey) {
         return (
             <div className='flex justify-center items-center'>
                 <div className="card w-96 bg-base-100 shadow-xl">
@@ -161,7 +166,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
     }
 
     return (
-        <div className={`space-y-0 md:p-4 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`} key={publicKey?.toBase58()}>
+        <div className={`space-y-0 md:p-4 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`} key={wallet?.publicKey?.toBase58()}>
             <PageHeader title="My Tokens" bgImage='/bg/group1/3.jpg' />
             <div className="w-full md:max-w-6xl mx-auto md:mb-20 mb-3">
                 {loadingTokens || loadingDetails ? (
@@ -260,13 +265,13 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                                     >
                                                         Code
                                                     </button>
-                                                    {Number(token.tokenData?.currentEra) > Number(token.tokenData?.targetEras) && frozenStates[token.mint] && (
+                                                    {/* {Number(token.tokenData?.currentEra) > Number(token.tokenData?.targetEras) && frozenStates[token.mint] && (
                                                     <button 
                                                         className="btn btn-sm btn-info"
                                                         onClick={() => handleThaw(token)}
                                                     >
                                                         Thaw
-                                                    </button>)}
+                                                    </button>)} */}
                                                 </div>
                                             </td>
                                         </tr>
@@ -297,7 +302,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                 setSelectedTokenForReferral(token);
                                 setIsReferralModalOpen(true);
                             }}
-                            onThaw={handleThaw}
+                            // onThaw={handleThaw}
                         />)}
                     </>
                 )

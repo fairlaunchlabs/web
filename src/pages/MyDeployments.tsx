@@ -4,7 +4,7 @@ import { queryMyDeployments } from "../utils/graphql";
 import { ErrorBox } from "../components/common/ErrorBox";
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { InitiazlizedTokenData, TokenMetadataIPFS } from "../types/types";
-import { fetchTokenMetadataMap } from "../utils/web3";
+import { fetchTokenMetadataMap, getExtensions } from "../utils/web3";
 import { TokenImage } from "../components/mintTokens/TokenImage";
 import { AddressDisplay } from "../components/common/AddressDisplay";
 import { CloseTokenModal } from "../components/tools/CloseTokenModal";
@@ -17,6 +17,7 @@ import { useDeviceType } from "../utils/contexts";
 import { MyDeploymentCard } from "../components/tools/MyDeploymentCard";
 import { filterTokens } from "../utils/format";
 import { PageHeader } from "../components/common/PageHeader";
+import { UpdateAuthoritiesModal } from "../components/tools/UpdateAuthoritiesModal";
 
 export type MyDeploymentsProps = {
     expanded: boolean;
@@ -28,12 +29,14 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
     const [selectedToken, setSelectedToken] = useState<InitiazlizedTokenData | null>(null);
     const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [updateAuthoritiesOpen, setUpdateAuthoritiesOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
     const [dataAfterFilter, setDataAfterFilter] = useState<InitiazlizedTokenData[]>([]);
     
     const wallet = useAnchorWallet();
+    const { connection } = useConnection();
     const navigate = useNavigate();
     const { isMobile } = useDeviceType();
 
@@ -57,6 +60,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                 setTokenMetadataMap(updatedMap);
             });
         }
+        console.log(_dataAfterFilter[0]);
     }, [initialData]);
 
     const handleClick = (mint: string) => {
@@ -154,7 +158,16 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                                                             setIsUpdateModalOpen(true);
                                                         }}
                                                     >
-                                                        Update Metadata
+                                                        Metadata
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-sm btn-secondary"
+                                                        onClick={() => {
+                                                            setSelectedToken(token);
+                                                            setUpdateAuthoritiesOpen(true)
+                                                        }}
+                                                    >
+                                                        Authorities
                                                     </button>
                                                 </div>
                                             </td>
@@ -202,6 +215,15 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
                     isOpen={isUpdateModalOpen}
                     onClose={() => {
                         setIsUpdateModalOpen(false);
+                        setSelectedToken(null);
+                    }}
+                    token={tokenMetadataMap[selectedToken?.mint as string]}
+                />
+
+                <UpdateAuthoritiesModal
+                    isOpen={updateAuthoritiesOpen}
+                    onClose={() => {
+                        setUpdateAuthoritiesOpen(false);
                         setSelectedToken(null);
                     }}
                     token={tokenMetadataMap[selectedToken?.mint as string]}

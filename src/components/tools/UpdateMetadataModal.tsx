@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { TokenImage } from '../mintTokens/TokenImage';
-import { InitiazlizedTokenData } from '../../types/types';
+import { InitiazlizedTokenData, TokenMetadata2022 } from '../../types/types';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import toast from 'react-hot-toast';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { updateMetaData, uploadToArweave } from '../../utils/web3';
+import { getMetadataAccountData2022, updateMetaData, uploadToStorage } from '../../utils/web3';
 import { ToastBox } from '../common/ToastBox';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { FaUpload } from 'react-icons/fa';
@@ -12,6 +12,8 @@ import { HeaderImageUpload } from './HeaderImageUpload';
 import AlertBox from '../common/AlertBox';
 import { useDeviceType } from '../../utils/contexts';
 import { ModalTopBar } from '../common/ModalTopBar';
+import { PublicKey } from '@solana/web3.js';
+import { UriDisplay } from '../common/UriDisplay';
 
 interface UpdateMetadataModalProps {
     isOpen: boolean;
@@ -36,7 +38,8 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
     const [headerImage, setHeaderImage] = useState<File | null>(null);
     const [headerPreview, setHeaderPreview] = useState<string>('');
     const { isMobile } = useDeviceType();
-    
+    const [metadataMutable, setMetadataMutable] = useState(false);
+
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
 
@@ -52,9 +55,18 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             // Reset header image preview when token changes
             setHeaderPreview('');
             setHeaderImage(null);
+
+            // get token mutable status
+            getMetadataAccountData2022(connection, new PublicKey(token.metadataAccount)).then((metadata) => {
+                if (!metadata.success) {
+                    toast.error(metadata.message as string);
+                }
+                const metadataData = metadata.data as TokenMetadata2022;
+                setMetadataMutable(metadataData.updateAuthority !== null);
+            })
         }
     }, [token, token?.tokenMetadata, token?.tokenMetadata?.extensions]);
-
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -64,7 +76,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             let headerItemId = '';
             if (headerImage) {
                 try {
-                    headerItemId = await uploadToArweave(headerImage, 'banner');
+                    headerItemId = await uploadToStorage(headerImage, 'banner');
                 } catch (error) {
                     toast.error('Failed to upload header image');
                     setLoading(false);
@@ -120,7 +132,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
     return (
         <div className="modal modal-open">
             <div className="modal-box pixel-box relative p-3">
-                <ModalTopBar title={`Update Token Metadata`} onClose={onClose} />            
+                <ModalTopBar title={`Token Metadata`} onClose={onClose} />            
                 <div className="max-h-[calc(100vh-12rem)] overflow-y-auto p-1">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Token Logo and Basic Info */}
@@ -137,9 +149,15 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                     <h4 className="badge badge-md badge-secondary px-3">{token.tokenSymbol}</h4>
                                     <div className="text-base truncate ml-3">{token.tokenName}</div>
                                 </div>
-                                <div className="text-sm text-base-content/70">
+                                <div className="flex gap-2 text-sm text-base-content/70">
+                                    <span className="font-semibold">Mint:</span>
                                     <span className="font-pixel">
                                         <AddressDisplay address={token.mint} showCharacters={isMobile ? 5 : 10}/>
+                                    </span>
+                                </div>
+                                <div className="flex gap-2 text-sm text-base-content/70">
+                                    <span className="font-semibold">
+                                        <UriDisplay uri={token.tokenUri} text={"Metadata"} showCharacters={0} />
                                     </span>
                                 </div>
                             </div>
@@ -258,6 +276,7 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                         </div>
 
                         {/* Submit Button */}
+                        {metadataMutable ? (
                         <div className="space-y-4">
                             <AlertBox title='Warning!' message='Updating token metadata will cost 0.1 SOL as a transaction fee.' />
 
@@ -279,10 +298,16 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
                                     className={`btn btn-primary`}
                                     disabled={loading || !isConfirmed}
                                 >
-                                    {loading ? 'Updating...' : 'Update Metadata'}
+                                    {loading ? 'Updating...' : 'Metadata'}
                                 </button>
                             </div>
                         </div>
+                        ): (
+                        <div className="space-y-4">
+                            <AlertBox title='Warning!' message='Token metadata is immutable.' />
+                        </div>
+                        )}
+
                     </form>
                 </div>
             </div>

@@ -14,116 +14,16 @@ export type FairMintToken = {
   },
   "instructions": [
     {
-      "name": "burnTokensFromVault",
+      "name": "closeToken2022",
       "discriminator": [
-        102,
-        130,
-        14,
-        130,
-        44,
-        134,
-        59,
-        156
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "tokenName"
-              },
-              {
-                "kind": "arg",
-                "path": "tokenSymbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "configAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenVault",
-          "writable": true
-        },
-        {
-          "name": "sender",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenName",
-          "type": "string"
-        },
-        {
-          "name": "tokenSymbol",
-          "type": "string"
-        },
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "closeToken",
-      "discriminator": [
-        26,
-        74,
-        236,
-        151,
-        104,
-        64,
-        183,
-        249
+        89,
+        52,
+        49,
+        139,
+        76,
+        85,
+        232,
+        72
       ],
       "accounts": [
         {
@@ -195,7 +95,7 @@ export type FairMintToken = {
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "systemProgram",
@@ -208,113 +108,6 @@ export type FairMintToken = {
         {
           "name": "rent",
           "address": "SysvarRent111111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenName",
-          "type": "string"
-        },
-        {
-          "name": "tokenSymbol",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "initializeLiquidityPool",
-      "discriminator": [
-        155,
-        18,
-        138,
-        107,
-        111,
-        23,
-        178,
-        178
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "tokenName"
-              },
-              {
-                "kind": "arg",
-                "path": "tokenSymbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "configAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenVault",
-          "writable": true
-        },
-        {
-          "name": "protocolFeeAccount",
-          "docs": [
-            "CHECK the protocol fee account"
-          ],
-          "writable": true
-        },
-        {
-          "name": "systemConfigAccount",
-          "writable": true
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
       "args": [
@@ -384,22 +177,18 @@ export type FairMintToken = {
       "args": []
     },
     {
-      "name": "initializeToken",
+      "name": "initializeToken2022",
       "discriminator": [
-        38,
-        209,
-        150,
-        50,
-        190,
-        117,
-        16,
-        54
+        227,
+        246,
+        101,
+        208,
+        137,
+        241,
+        156,
+        220
       ],
       "accounts": [
-        {
-          "name": "metadata",
-          "writable": true
-        },
         {
           "name": "payer",
           "writable": true,
@@ -464,94 +253,51 @@ export type FairMintToken = {
           }
         },
         {
-          "name": "tokenVault",
+          "name": "mintTokenVaultOwner",
           "writable": true,
           "pda": {
             "seeds": [
               {
-                "kind": "account",
-                "path": "configAccount"
-              },
-              {
                 "kind": "const",
                 "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
+                  109,
+                  105,
+                  110,
+                  116,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  45,
+                  111,
+                  119,
+                  110,
                   101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
+                  114
                 ]
               },
               {
                 "kind": "account",
                 "path": "mint"
               }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
+            ]
           }
+        },
+        {
+          "name": "tokenVault",
+          "docs": [
+            "CHECK"
+          ],
+          "writable": true
+        },
+        {
+          "name": "mintTokenVault",
+          "docs": [
+            "CHECK"
+          ],
+          "writable": true
         },
         {
           "name": "systemConfigAccount",
@@ -567,15 +313,17 @@ export type FairMintToken = {
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "tokenMetadataProgram",
-          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "transferHookProgramId",
+          "docs": [
+            "CHECK"
+          ]
         }
       ],
       "args": [
@@ -598,16 +346,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "mintTokens",
+      "name": "mintTokens2022",
       "discriminator": [
-        59,
-        132,
-        24,
-        246,
-        122,
-        39,
-        8,
-        243
+        94,
+        195,
+        118,
+        110,
+        254,
+        241,
+        250,
+        254
       ],
       "accounts": [
         {
@@ -650,41 +398,8 @@ export type FairMintToken = {
                 "path": "user"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "tokenProgram"
               },
               {
                 "kind": "account",
@@ -791,7 +506,46 @@ export type FairMintToken = {
           }
         },
         {
+          "name": "mintTokenVaultOwner",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  45,
+                  111,
+                  119,
+                  110,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
           "name": "tokenVault",
+          "writable": true
+        },
+        {
+          "name": "mintTokenVault",
+          "docs": [
+            "CHECK"
+          ],
           "writable": true
         },
         {
@@ -834,12 +588,15 @@ export type FairMintToken = {
           }
         },
         {
+          "name": "extraAccountMetaList"
+        },
+        {
           "name": "rent",
           "address": "SysvarRent111111111111111111111111111111111"
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "systemProgram",
@@ -848,6 +605,9 @@ export type FairMintToken = {
         {
           "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "programId"
         }
       ],
       "args": [
@@ -1374,16 +1134,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "refund",
+      "name": "refund2022",
       "discriminator": [
-        2,
-        96,
-        183,
-        251,
-        63,
-        208,
-        46,
-        46
+        84,
+        117,
+        225,
+        155,
+        137,
+        111,
+        145,
+        128
       ],
       "accounts": [
         {
@@ -1497,7 +1257,7 @@ export type FairMintToken = {
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "systemProgram",
@@ -1516,18 +1276,113 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "setReferrerCode",
+      "name": "revokeTransferHook2022",
       "discriminator": [
-        129,
-        47,
-        113,
-        211,
-        151,
-        134,
-        156,
-        250
+        168,
+        184,
+        36,
+        150,
+        185,
+        112,
+        24,
+        4
       ],
       "accounts": [
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenName"
+              },
+              {
+                "kind": "arg",
+                "path": "tokenSymbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "configAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenName",
+          "type": "string"
+        },
+        {
+          "name": "tokenSymbol",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "revokeUpdateMetadataAuthority2022",
+      "discriminator": [
+        118,
+        172,
+        28,
+        253,
+        18,
+        178,
+        230,
+        14
+      ],
+      "accounts": [
+        {
+          "name": "metadata",
+          "writable": true
+        },
         {
           "name": "mint",
           "pda": {
@@ -1558,44 +1413,107 @@ export type FairMintToken = {
           }
         },
         {
-          "name": "referralAccount",
-          "writable": true,
+          "name": "configAccount",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  114,
-                  101,
+                  99,
+                  111,
+                  110,
                   102,
-                  101,
-                  114,
-                  114,
+                  105,
+                  103,
+                  95,
+                  100,
                   97,
-                  108
+                  116,
+                  97
                 ]
               },
               {
                 "kind": "account",
                 "path": "mint"
-              },
-              {
-                "kind": "account",
-                "path": "payer"
               }
             ]
           }
         },
         {
-          "name": "configAccount"
+          "name": "payer",
+          "writable": true,
+          "signer": true
         },
         {
-          "name": "systemConfigAccount"
+          "name": "systemConfigAccount",
+          "writable": true
         },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenName",
+          "type": "string"
+        },
+        {
+          "name": "tokenSymbol",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "setReferrerCode2022",
+      "discriminator": [
+        107,
+        62,
+        59,
+        113,
+        71,
+        113,
+        236,
+        108
+      ],
+      "accounts": [
         {
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenName"
+              },
+              {
+                "kind": "arg",
+                "path": "tokenSymbol"
+              }
+            ]
+          }
         },
         {
           "name": "referrerAta",
@@ -1607,41 +1525,8 @@ export type FairMintToken = {
                 "path": "payer"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "tokenProgram"
               },
               {
                 "kind": "account",
@@ -1688,6 +1573,41 @@ export type FairMintToken = {
           }
         },
         {
+          "name": "referralAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  102,
+                  101,
+                  114,
+                  114,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "configAccount"
+        },
+        {
+          "name": "systemConfigAccount"
+        },
+        {
           "name": "codeAccount",
           "writable": true,
           "pda": {
@@ -1722,7 +1642,7 @@ export type FairMintToken = {
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
           "name": "associatedTokenProgram",
@@ -1741,277 +1661,6 @@ export type FairMintToken = {
         {
           "name": "codeHash",
           "type": "bytes"
-        }
-      ]
-    },
-    {
-      "name": "thawTokens",
-      "discriminator": [
-        213,
-        203,
-        119,
-        211,
-        114,
-        41,
-        205,
-        220
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "tokenName"
-              },
-              {
-                "kind": "arg",
-                "path": "tokenSymbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenAta",
-          "writable": true
-        },
-        {
-          "name": "configAccount",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenName",
-          "type": "string"
-        },
-        {
-          "name": "tokenSymbol",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "transferTokens",
-      "discriminator": [
-        54,
-        180,
-        238,
-        175,
-        74,
-        85,
-        126,
-        188
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "tokenName"
-              },
-              {
-                "kind": "arg",
-                "path": "tokenSymbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "source",
-          "writable": true
-        },
-        {
-          "name": "destination",
-          "writable": true
-        },
-        {
-          "name": "sender",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "configAccount"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenName",
-          "type": "string"
-        },
-        {
-          "name": "tokenSymbol",
-          "type": "string"
-        },
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "transferTokensFromVault",
-      "discriminator": [
-        81,
-        253,
-        152,
-        193,
-        254,
-        180,
-        186,
-        237
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "tokenName"
-              },
-              {
-                "kind": "arg",
-                "path": "tokenSymbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "destination",
-          "writable": true
-        },
-        {
-          "name": "configAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "tokenVault",
-          "writable": true
-        },
-        {
-          "name": "sender",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenName",
-          "type": "string"
-        },
-        {
-          "name": "tokenSymbol",
-          "type": "string"
-        },
-        {
-          "name": "amount",
-          "type": "u64"
         }
       ]
     },
@@ -2100,18 +1749,22 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "updateTokenMetadata",
+      "name": "updateTokenMetadata2022",
       "discriminator": [
-        243,
-        6,
-        8,
-        23,
-        126,
-        181,
-        251,
-        158
+        168,
+        52,
+        210,
+        161,
+        50,
+        196,
+        246,
+        145
       ],
       "accounts": [
+        {
+          "name": "metadata",
+          "writable": true
+        },
         {
           "name": "mint",
           "pda": {
@@ -2174,39 +1827,6 @@ export type FairMintToken = {
           "signer": true
         },
         {
-          "name": "metadata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  116,
-                  97,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "tokenMetadataProgram"
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ],
-            "program": {
-              "kind": "account",
-              "path": "tokenMetadataProgram"
-            }
-          }
-        },
-        {
           "name": "systemConfigAccount",
           "writable": true
         },
@@ -2223,11 +1843,7 @@ export type FairMintToken = {
         },
         {
           "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "tokenMetadataProgram",
-          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         }
       ],
       "args": [
@@ -2254,6 +1870,19 @@ export type FairMintToken = {
         133,
         135,
         33
+      ]
+    },
+    {
+      "name": "mintTokenVaultOwnerData",
+      "discriminator": [
+        201,
+        247,
+        16,
+        90,
+        132,
+        226,
+        213,
+        74
       ]
     },
     {
@@ -2324,6 +1953,19 @@ export type FairMintToken = {
       ]
     },
     {
+      "name": "freezeTokenEvent",
+      "discriminator": [
+        82,
+        18,
+        159,
+        89,
+        129,
+        1,
+        145,
+        83
+      ]
+    },
+    {
       "name": "initializeLiquidityPoolEvent",
       "discriminator": [
         40,
@@ -2389,16 +2031,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "thawTokensEvent",
+      "name": "thawTokenEvent",
       "discriminator": [
-        188,
-        44,
-        120,
-        199,
-        148,
-        39,
-        154,
-        13
+        50,
+        242,
+        230,
+        113,
+        49,
+        117,
+        236,
+        112
       ]
     },
     {
@@ -2860,6 +2502,71 @@ export type FairMintToken = {
       "code": 6088,
       "name": "invalidFreezeAuthority",
       "msg": "Invalid freeze authority"
+    },
+    {
+      "code": 6089,
+      "name": "invalidMintAuthority",
+      "msg": "Invalid mint authority"
+    },
+    {
+      "code": 6090,
+      "name": "invalidTokenProgram",
+      "msg": "Invalid token program"
+    },
+    {
+      "code": 6091,
+      "name": "refundOnlyAllowedInTargetEras",
+      "msg": "Refund only allowed in target eras"
+    },
+    {
+      "code": 6092,
+      "name": "revokeFreezeAuthorityNotApplied",
+      "msg": "Revoke freeze authority not applied"
+    },
+    {
+      "code": 6093,
+      "name": "revokeFreezeAuthorityApplied",
+      "msg": "Revoke freeze authority applied"
+    },
+    {
+      "code": 6094,
+      "name": "invalidMetadataAccount",
+      "msg": "Invalid metadata account"
+    },
+    {
+      "code": 6095,
+      "name": "invalidMasterEditionAccount",
+      "msg": "Invalid master edition account"
+    },
+    {
+      "code": 6096,
+      "name": "isNotCurrentlyTransferring",
+      "msg": "The token is not currently transferring"
+    },
+    {
+      "code": 6097,
+      "name": "amountTooBig",
+      "msg": "The amount is too big"
+    },
+    {
+      "code": 6098,
+      "name": "invalidMintTokenVaultAccount",
+      "msg": "Invalid mint token vault account"
+    },
+    {
+      "code": 6099,
+      "name": "wrongProgramId",
+      "msg": "Wrong program id"
+    },
+    {
+      "code": 6100,
+      "name": "mintTokenVaultOwnerAlreadyInitialized",
+      "msg": "Mint token vault owner already initialized"
+    },
+    {
+      "code": 6101,
+      "name": "invalidMintVaultOwner",
+      "msg": "Invalid mint vault owner"
     }
   ],
   "types": [
@@ -2890,6 +2597,26 @@ export type FairMintToken = {
         "fields": [
           {
             "name": "referralAccount",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "freezeTokenEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "destination",
+            "type": "pubkey"
+          },
+          {
+            "name": "configAccount",
             "type": "pubkey"
           }
         ]
@@ -3027,6 +2754,10 @@ export type FairMintToken = {
                 "name": "tokenMintState"
               }
             }
+          },
+          {
+            "name": "mintTokenVault",
+            "type": "pubkey"
           }
         ]
       }
@@ -3087,6 +2818,18 @@ export type FairMintToken = {
           {
             "name": "referrerFee",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mintTokenVaultOwnerData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
           }
         ]
       }
@@ -3232,7 +2975,7 @@ export type FairMintToken = {
       }
     },
     {
-      "name": "thawTokensEvent",
+      "name": "thawTokenEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3247,10 +2990,6 @@ export type FairMintToken = {
           {
             "name": "configAccount",
             "type": "pubkey"
-          },
-          {
-            "name": "tokenProgram",
-            "type": "pubkey"
           }
         ]
       }
@@ -3260,6 +2999,18 @@ export type FairMintToken = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "targetEras",
+            "type": "u32"
+          },
+          {
+            "name": "mintStateData",
+            "type": {
+              "defined": {
+                "name": "tokenMintState"
+              }
+            }
+          },
           {
             "name": "admin",
             "type": "pubkey"
@@ -3275,10 +3026,6 @@ export type FairMintToken = {
           {
             "name": "maxSupply",
             "type": "u64"
-          },
-          {
-            "name": "targetEras",
-            "type": "u32"
           },
           {
             "name": "epochesPerEra",
@@ -3309,12 +3056,8 @@ export type FairMintToken = {
             "type": "pubkey"
           },
           {
-            "name": "mintStateData",
-            "type": {
-              "defined": {
-                "name": "tokenMintState"
-              }
-            }
+            "name": "mintTokenVault",
+            "type": "pubkey"
           },
           {
             "name": "startTimestamp",
