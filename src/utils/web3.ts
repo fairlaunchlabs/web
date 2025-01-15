@@ -136,7 +136,7 @@ export const createTokenOnChain = async (
         }
 
         const instructionInitializeToken = await program.methods
-            .initializeToken2022(metadata, config as any)
+            .initializeToken(metadata, config as any)
             .accounts(contextInitializeTokenAccounts)
             .remainingAccounts([
                 {
@@ -152,7 +152,7 @@ export const createTokenOnChain = async (
               ])
             .instruction();
         
-        // ###### initializeTransferHook
+        // initializeTransferHook
         const instructionInitializeTransferHook = await transferHookProgram.methods // ==> instruction #4
             .initializeExtraAccountMetaList()
             .accounts(contextInitializeTransferHook)
@@ -313,7 +313,7 @@ export const reactiveReferrerCode = async (
         // do the tranasaction
         // console.log("codeHash.data.toBuffer()", codeHash.data.toBuffer());
         const tx = await program.methods
-            .setReferrerCode2022(tokenName, tokenSymbol, codeHash.data.toBuffer())
+            .setReferrerCode(tokenName, tokenSymbol, codeHash.data.toBuffer())
             .accounts(setReferrerCodeAccounts)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Reactive referrer code successfully", {referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58()});
@@ -422,7 +422,7 @@ export const setReferrerCode = async (
     try {
         // console.log(tokenName, tokenSymbol, codeHash.data.toBuffer());
         const tx = await program.methods
-            .setReferrerCode2022(tokenName, tokenSymbol, codeHash.data.toBuffer())
+            .setReferrerCode(tokenName, tokenSymbol, codeHash.data.toBuffer())
             .accounts(setReferrerCodeAccounts)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Set referrer code successfully", {referralAccount: referralAccountPda.toBase58()});
@@ -607,7 +607,7 @@ export const refund = async (
     };
     try {
         const tx = await program.methods
-            .refund2022(token.tokenName, token.tokenSymbol)
+            .refund(token.tokenName, token.tokenSymbol)
             .accounts(refundAccounts)
             .transaction()
         return await processTransaction(tx, connection, wallet, "Refund successfully", {mint: token.mint});
@@ -783,7 +783,7 @@ export const mintToken = async (
     };
 
     const tx = await program.methods
-        .mintTokens2022(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
+        .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
         .accounts(mintAccounts)
         .transaction();
     return await processTransaction(tx, connection, wallet, "Mint successfully", {mint: token.mint});
@@ -965,7 +965,7 @@ export const closeToken = async (
         };
 
         const tx = await program.methods
-            .closeToken2022(token.tokenName, token.tokenSymbol)
+            .closeToken(token.tokenName, token.tokenSymbol)
             .accounts(context)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Close token successfully", {mint: token.mint});
@@ -1066,7 +1066,7 @@ export const updateMetaData = async (
         }
       
         const tx = await program.methods
-            .updateTokenMetadata2022(metadata)
+            .updateTokenMetadata(metadata)
             .accounts(context)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Update token metadata successfully", {mint: token.mint});
@@ -1113,7 +1113,7 @@ export const revokeMetadataUpdateAuthority = async (
         };
 
         const tx = await program.methods
-            .revokeUpdateMetadataAuthority2022(token.tokenName as string, token.tokenSymbol as string)
+            .revokeUpdateMetadataAuthority(token.tokenName as string, token.tokenSymbol as string)
             .accounts(context)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Drop metadata update authority successfully", {mint: token.mint});
@@ -1146,7 +1146,7 @@ export const revokeTransferHook = async (
         };
 
         const tx = await program.methods
-            .revokeTransferHook2022(token.tokenName as string, token.tokenSymbol as string)
+            .revokeTransferHook(token.tokenName as string, token.tokenSymbol as string)
             .accounts(context)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Drop transfer hook successfully", {mint: token.mint});

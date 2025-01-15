@@ -14,16 +14,16 @@ export type FairMintToken = {
   },
   "instructions": [
     {
-      "name": "closeToken2022",
+      "name": "closeToken",
       "discriminator": [
-        89,
-        52,
-        49,
-        139,
-        76,
-        85,
-        232,
-        72
+        26,
+        74,
+        236,
+        151,
+        104,
+        64,
+        183,
+        249
       ],
       "accounts": [
         {
@@ -177,16 +177,16 @@ export type FairMintToken = {
       "args": []
     },
     {
-      "name": "initializeToken2022",
+      "name": "initializeToken",
       "discriminator": [
-        227,
-        246,
-        101,
-        208,
-        137,
-        241,
-        156,
-        220
+        38,
+        209,
+        150,
+        50,
+        190,
+        117,
+        16,
+        54
       ],
       "accounts": [
         {
@@ -346,16 +346,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "mintTokens2022",
+      "name": "mintTokens",
       "discriminator": [
-        94,
-        195,
-        118,
-        110,
-        254,
-        241,
-        250,
-        254
+        59,
+        132,
+        24,
+        246,
+        122,
+        39,
+        8,
+        243
       ],
       "accounts": [
         {
@@ -626,94 +626,6 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "proxyDeposit",
-      "docs": [
-        "deposit instruction"
-      ],
-      "discriminator": [
-        99,
-        49,
-        91,
-        137,
-        172,
-        25,
-        207,
-        21
-      ],
-      "accounts": [
-        {
-          "name": "ammProgram"
-        },
-        {
-          "name": "amm",
-          "writable": true
-        },
-        {
-          "name": "ammAuthority"
-        },
-        {
-          "name": "ammOpenOrders"
-        },
-        {
-          "name": "ammTargetOrders",
-          "writable": true
-        },
-        {
-          "name": "ammLpMint",
-          "writable": true
-        },
-        {
-          "name": "ammCoinVault",
-          "writable": true
-        },
-        {
-          "name": "ammPcVault",
-          "writable": true
-        },
-        {
-          "name": "market"
-        },
-        {
-          "name": "marketEventQueue"
-        },
-        {
-          "name": "userTokenCoin",
-          "writable": true
-        },
-        {
-          "name": "userTokenPc",
-          "writable": true
-        },
-        {
-          "name": "userTokenLp",
-          "writable": true
-        },
-        {
-          "name": "userOwner",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "maxCoinAmount",
-          "type": "u64"
-        },
-        {
-          "name": "maxPcAmount",
-          "type": "u64"
-        },
-        {
-          "name": "baseSide",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "proxyInitialize",
       "docs": [
         "Initiazlize a swap pool"
@@ -730,420 +642,315 @@ export type FairMintToken = {
       ],
       "accounts": [
         {
-          "name": "ammProgram"
+          "name": "cpSwapProgram",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
         },
         {
-          "name": "amm",
-          "writable": true
-        },
-        {
-          "name": "ammAuthority"
-        },
-        {
-          "name": "ammOpenOrders",
-          "writable": true
-        },
-        {
-          "name": "ammLpMint",
-          "writable": true
-        },
-        {
-          "name": "ammCoinMint"
-        },
-        {
-          "name": "ammPcMint"
-        },
-        {
-          "name": "ammCoinVault",
-          "writable": true
-        },
-        {
-          "name": "ammPcVault",
-          "writable": true
-        },
-        {
-          "name": "ammTargetOrders",
-          "writable": true
-        },
-        {
-          "name": "ammConfig"
-        },
-        {
-          "name": "createFeeDestination",
-          "writable": true
-        },
-        {
-          "name": "marketProgram",
-          "address": "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX"
-        },
-        {
-          "name": "market"
-        },
-        {
-          "name": "userWallet",
+          "name": "creator",
+          "docs": [
+            "Address paying to create the pool. Can be anyone"
+          ],
           "writable": true,
           "signer": true
         },
         {
-          "name": "userTokenCoin",
+          "name": "ammConfig",
+          "docs": [
+            "Which config the pool belongs to."
+          ]
+        },
+        {
+          "name": "authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  110,
+                  100,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  95,
+                  115,
+                  101,
+                  101,
+                  100
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "poolState",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ammConfig"
+              },
+              {
+                "kind": "account",
+                "path": "token0Mint"
+              },
+              {
+                "kind": "account",
+                "path": "token1Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token0Mint",
+          "docs": [
+            "Token_0 mint, the key must smaller then token_1 mint."
+          ]
+        },
+        {
+          "name": "token1Mint",
+          "docs": [
+            "Token_1 mint, the key must grater then token_0 mint."
+          ]
+        },
+        {
+          "name": "lpMint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "poolState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creatorToken0",
+          "docs": [
+            "payer token0 account"
+          ],
           "writable": true
         },
         {
-          "name": "userTokenPc",
+          "name": "creatorToken1",
+          "docs": [
+            "creator token1 account"
+          ],
           "writable": true
         },
         {
-          "name": "userTokenLp",
+          "name": "creatorLpToken",
           "writable": true
+        },
+        {
+          "name": "token0Vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "poolState"
+              },
+              {
+                "kind": "account",
+                "path": "token0Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token1Vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "poolState"
+              },
+              {
+                "kind": "account",
+                "path": "token1Mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "createPoolFee",
+          "docs": [
+            "create pool fee account"
+          ],
+          "writable": true,
+          "address": "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8"
+        },
+        {
+          "name": "observationState",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  98,
+                  115,
+                  101,
+                  114,
+                  118,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "poolState"
+              }
+            ]
+          }
         },
         {
           "name": "tokenProgram",
+          "docs": [
+            "Program to create mint account and mint tokens"
+          ],
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
+          "name": "token0Program",
+          "docs": [
+            "Spl token program or token program 2022"
+          ]
+        },
+        {
+          "name": "token1Program",
+          "docs": [
+            "Spl token program or token program 2022"
+          ]
+        },
+        {
           "name": "associatedTokenProgram",
+          "docs": [
+            "Program to create an ATA for receiving position NFT"
+          ],
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "systemProgram",
+          "docs": [
+            "To create a new program account"
+          ],
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "sysvarRent",
+          "name": "rent",
+          "docs": [
+            "Sysvar for program account"
+          ],
           "address": "SysvarRent111111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "nonce",
-          "type": "u8"
+          "name": "initAmount0",
+          "type": "u64"
+        },
+        {
+          "name": "initAmount1",
+          "type": "u64"
         },
         {
           "name": "openTime",
           "type": "u64"
-        },
-        {
-          "name": "initPcAmount",
-          "type": "u64"
-        },
-        {
-          "name": "initCoinAmount",
-          "type": "u64"
         }
       ]
     },
     {
-      "name": "proxySwapBaseIn",
-      "docs": [
-        "swap_base_in instruction"
-      ],
+      "name": "refund",
       "discriminator": [
-        250,
-        174,
-        212,
-        217,
-        47,
-        84,
-        212,
-        231
-      ],
-      "accounts": [
-        {
-          "name": "ammProgram"
-        },
-        {
-          "name": "amm",
-          "writable": true
-        },
-        {
-          "name": "ammAuthority"
-        },
-        {
-          "name": "ammOpenOrders",
-          "writable": true
-        },
-        {
-          "name": "ammCoinVault",
-          "writable": true
-        },
-        {
-          "name": "ammPcVault",
-          "writable": true
-        },
-        {
-          "name": "marketProgram"
-        },
-        {
-          "name": "market",
-          "writable": true
-        },
-        {
-          "name": "marketBids",
-          "writable": true
-        },
-        {
-          "name": "marketAsks",
-          "writable": true
-        },
-        {
-          "name": "marketEventQueue",
-          "writable": true
-        },
-        {
-          "name": "marketCoinVault",
-          "writable": true
-        },
-        {
-          "name": "marketPcVault",
-          "writable": true
-        },
-        {
-          "name": "marketVaultSigner",
-          "writable": true
-        },
-        {
-          "name": "userTokenSource",
-          "writable": true
-        },
-        {
-          "name": "userTokenDestination",
-          "writable": true
-        },
-        {
-          "name": "userSourceOwner",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "amountIn",
-          "type": "u64"
-        },
-        {
-          "name": "minimumAmountOut",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "proxySwapBaseOut",
-      "docs": [
-        "swap_base_out instruction"
-      ],
-      "discriminator": [
-        194,
-        15,
-        252,
-        249,
-        72,
-        54,
-        250,
-        85
-      ],
-      "accounts": [
-        {
-          "name": "ammProgram"
-        },
-        {
-          "name": "amm",
-          "writable": true
-        },
-        {
-          "name": "ammAuthority"
-        },
-        {
-          "name": "ammOpenOrders",
-          "writable": true
-        },
-        {
-          "name": "ammCoinVault",
-          "writable": true
-        },
-        {
-          "name": "ammPcVault",
-          "writable": true
-        },
-        {
-          "name": "marketProgram"
-        },
-        {
-          "name": "market",
-          "writable": true
-        },
-        {
-          "name": "marketBids",
-          "writable": true
-        },
-        {
-          "name": "marketAsks",
-          "writable": true
-        },
-        {
-          "name": "marketEventQueue",
-          "writable": true
-        },
-        {
-          "name": "marketCoinVault",
-          "writable": true
-        },
-        {
-          "name": "marketPcVault",
-          "writable": true
-        },
-        {
-          "name": "marketVaultSigner",
-          "writable": true
-        },
-        {
-          "name": "userTokenSource",
-          "writable": true
-        },
-        {
-          "name": "userTokenDestination",
-          "writable": true
-        },
-        {
-          "name": "userSourceOwner",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "maxAmountIn",
-          "type": "u64"
-        },
-        {
-          "name": "amountOut",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "proxyWithdraw",
-      "docs": [
-        "withdraw instruction"
-      ],
-      "discriminator": [
-        118,
-        12,
-        163,
-        77,
-        70,
-        15,
-        67,
-        252
-      ],
-      "accounts": [
-        {
-          "name": "ammProgram"
-        },
-        {
-          "name": "amm",
-          "writable": true
-        },
-        {
-          "name": "ammAuthority"
-        },
-        {
-          "name": "ammOpenOrders",
-          "writable": true
-        },
-        {
-          "name": "ammTargetOrders",
-          "writable": true
-        },
-        {
-          "name": "ammLpMint",
-          "writable": true
-        },
-        {
-          "name": "ammCoinVault",
-          "writable": true
-        },
-        {
-          "name": "ammPcVault",
-          "writable": true
-        },
-        {
-          "name": "marketProgram"
-        },
-        {
-          "name": "market",
-          "writable": true
-        },
-        {
-          "name": "marketCoinVault",
-          "writable": true
-        },
-        {
-          "name": "marketPcVault",
-          "writable": true
-        },
-        {
-          "name": "marketVaultSigner"
-        },
-        {
-          "name": "userTokenLp",
-          "writable": true
-        },
-        {
-          "name": "userTokenCoin",
-          "writable": true
-        },
-        {
-          "name": "userTokenPc",
-          "writable": true
-        },
-        {
-          "name": "userOwner",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "marketEventQ",
-          "writable": true
-        },
-        {
-          "name": "marketBids",
-          "writable": true
-        },
-        {
-          "name": "marketAsks",
-          "writable": true
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "refund2022",
-      "discriminator": [
-        84,
-        117,
-        225,
-        155,
-        137,
-        111,
-        145,
-        128
+        2,
+        96,
+        183,
+        251,
+        63,
+        208,
+        46,
+        46
       ],
       "accounts": [
         {
@@ -1276,16 +1083,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "revokeTransferHook2022",
+      "name": "revokeTransferHook",
       "discriminator": [
-        168,
-        184,
-        36,
-        150,
-        185,
-        112,
-        24,
-        4
+        142,
+        96,
+        140,
+        21,
+        230,
+        237,
+        142,
+        14
       ],
       "accounts": [
         {
@@ -1367,16 +1174,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "revokeUpdateMetadataAuthority2022",
+      "name": "revokeUpdateMetadataAuthority",
       "discriminator": [
-        118,
-        172,
-        28,
-        253,
-        18,
-        178,
+        16,
         230,
-        14
+        0,
+        225,
+        47,
+        138,
+        113,
+        90
       ],
       "accounts": [
         {
@@ -1469,16 +1276,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "setReferrerCode2022",
+      "name": "setReferrerCode",
       "discriminator": [
-        107,
-        62,
-        59,
+        129,
+        47,
         113,
-        71,
-        113,
-        236,
-        108
+        211,
+        151,
+        134,
+        156,
+        250
       ],
       "accounts": [
         {
@@ -1749,16 +1556,16 @@ export type FairMintToken = {
       ]
     },
     {
-      "name": "updateTokenMetadata2022",
+      "name": "updateTokenMetadata",
       "discriminator": [
-        168,
-        52,
-        210,
-        161,
-        50,
-        196,
-        246,
-        145
+        243,
+        6,
+        8,
+        23,
+        126,
+        181,
+        251,
+        158
       ],
       "accounts": [
         {
@@ -1859,6 +1666,19 @@ export type FairMintToken = {
     }
   ],
   "accounts": [
+    {
+      "name": "ammConfig",
+      "discriminator": [
+        218,
+        244,
+        33,
+        104,
+        203,
+        203,
+        43,
+        111
+      ]
+    },
     {
       "name": "codeAccountData",
       "discriminator": [
@@ -2570,6 +2390,92 @@ export type FairMintToken = {
     }
   ],
   "types": [
+    {
+      "name": "ammConfig",
+      "docs": [
+        "Holds the current owner of the factory"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "docs": [
+              "Bump to identify PDA"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "disableCreatePool",
+            "docs": [
+              "Status to control if new pool can be create"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "index",
+            "docs": [
+              "Config index"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "tradeFeeRate",
+            "docs": [
+              "The trade fee, denominated in hundredths of a bip (10^-6)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocolFeeRate",
+            "docs": [
+              "The protocol fee"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "fundFeeRate",
+            "docs": [
+              "The fund fee, denominated in hundredths of a bip (10^-6)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "createPoolFee",
+            "docs": [
+              "Fee for create a new pool"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocolOwner",
+            "docs": [
+              "Address of the protocol fee owner"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "fundOwner",
+            "docs": [
+              "Address of the fund fee owner"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "padding",
+            "docs": [
+              "padding"
+            ],
+            "type": {
+              "array": [
+                "u64",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "closeTokenEvent",
       "type": {
