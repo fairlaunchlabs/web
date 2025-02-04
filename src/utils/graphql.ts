@@ -44,6 +44,9 @@ query GetInitializedTokenEvents($orderBy: String!) {
         startTimestamp
         status
         metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
     }
 }`;
 
@@ -92,6 +95,9 @@ query QueryHotInitializeTokenEvent($orderBy: String!) {
         startTimestamp
         status
         metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
     }
 }`;
 
@@ -140,6 +146,60 @@ query GetMyDeployments($wallet: String!, $skip: Int!, $first: Int!) {
         startTimestamp
         status
         metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
+    }
+}`;
+
+export const queryMyDelegatedTokens = gql`
+query GetMyDelegatedTokens($wallet: String!, $skip: Int!, $first: Int!) {
+    initializeTokenEventEntities(
+        where: { valueManager: $wallet, status: 1 }
+        skip: $skip
+        first: $first
+        orderBy: timestamp
+        orderDirection: desc
+    ) {
+        id
+        txId
+        admin
+        tokenId
+        mint
+        configAccount
+        metadataAccount
+        tokenVault
+        timestamp
+        tokenName
+        tokenSymbol
+        tokenUri
+        supply
+        currentEra
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
+        targetEras
+        epochesPerEra
+        targetSecondsPerEpoch
+        reduceRatio
+        initialMintSize
+        initialTargetMintSizePerEpoch
+        feeRate
+        liquidityTokensRatio
+        startTimestamp
+        status
+        metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
     }
 }`;
 
@@ -200,6 +260,9 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
         startTimestamp
         status
         metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
     }
 }`;
 
@@ -333,6 +396,9 @@ query GetTokensByMints($skip: Int!, $first: Int!, $mints: [String!]) {
         startTimestamp
         status
         metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
     }
 }`;
 
@@ -388,5 +454,75 @@ query GetTotalReferrerBonusSum($mints: [String]!, $referrerMain: String!) {
     ) {
         mint
         referrerFee
+    }
+}`;
+
+export const queryTrades = gql`
+query GetTrades($mint: String!, $skip: Int!, $first: Int!) {
+    proxySwapBaseEventEntities(
+        skip: $skip
+        first: $first
+        where: { tokenMint: $mint }
+        orderBy: blockTimestamp
+        orderDirection: desc
+    ) {
+        id
+        txId
+        tokenMint
+        tokenName
+        tokenSymbol
+        action
+        baseMint
+        priceMint
+        baseAmount
+        priceAmount
+        poolState
+        blockTimestamp
+    }
+}`;
+
+export const queryLiquidities = gql`
+query GetLiquidities($mint: String!, $skip: Int!, $first: Int!) {
+    proxyLiquidityEventEntities(
+        skip: $skip
+        first: $first
+        where: { tokenMint: $mint }
+        orderBy: blockTimestamp
+        orderDirection: desc
+    ) {
+        id
+        txId
+        tokenMint
+        tokenName
+        tokenSymbol
+        action
+        token0Mint
+        token1Mint
+        token0Amount
+        token1Amount
+        poolState
+        lpMint
+        lpAmount
+        blockTimestamp
+    }
+}`;
+
+export const queryBurnLp = gql`
+query GetBurnLp($mint: String!, $skip: Int!, $first: Int!) {
+    proxyBurnLpTokensEventEntities(
+        skip: $skip
+        first: $first
+        where: {tokenMint: $mint}
+        orderBy: blockTimestamp
+        orderDirection: desc
+    ) {
+        id
+        txId
+        tokenMint
+        tokenName
+        tokenSymbol
+        lpMint
+        lpAmount
+        blockTimestamp
     }
 }`;

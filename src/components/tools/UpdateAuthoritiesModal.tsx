@@ -3,9 +3,11 @@ import { InitiazlizedTokenData, TokenMetadata2022 } from '../../types/types';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import toast from 'react-hot-toast';
 import { ModalTopBar } from '../common/ModalTopBar';
-import { revokeMetadataUpdateAuthority, getMetadataAccountData2022, isFrozen, revokeTransferHook } from '../../utils/web3';
+import { revokeMetadataUpdateAuthority, getMetadataAccountData2022, delegateValueManager } from '../../utils/web3';
 import { PublicKey } from '@solana/web3.js';
 import AlertBox from '../common/AlertBox';
+import { NETWORK, SCANURL } from '../../config/constants';
+import { ToastBox } from '../common/ToastBox';
 
 interface UpdateAuthoritiesModalProps {
     isOpen: boolean;
@@ -21,17 +23,18 @@ export const UpdateAuthoritiesModal: React.FC<UpdateAuthoritiesModalProps> = ({
     const [loading, setLoading] = useState(false);
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
-    const [freezeStatus, setFreezeStatus] = useState(true);
+    // const [freezeStatus, setFreezeStatus] = useState(true);
     const [metadataMutable, setMetadataMutable] = useState(false);
+    const [valueManager, setValueManager] = useState("");
 
     useEffect(() => {
         const fetchAuthorities = async () => {
             if (isOpen && token.mint) {
                 try {
                     // Get freeze status
-                    const _isFrozen = await isFrozen(connection, new PublicKey(token.mint));
-                    if (!_isFrozen.success) setFreezeStatus(_isFrozen.data);
-
+                    // const _isFrozen = await isFrozen(connection, new PublicKey(token.mint));
+                    // if (!_isFrozen.success) setFreezeStatus(_isFrozen.data);
+                    setValueManager(token.valueManager);
                     // Get metadata update authority
                     await getMetadataAuthority();
                 } catch (error) {
@@ -44,25 +47,25 @@ export const UpdateAuthoritiesModal: React.FC<UpdateAuthoritiesModalProps> = ({
         fetchAuthorities();
     }, [isOpen, token, connection]);
 
-    const handleRevokeTransferHook = async () => {
-        setLoading(true);
-        try {
-            const result = await revokeTransferHook(wallet, connection, token);
-            if (!result.success) {
-                throw new Error(result.message);
-            }
-            toast.success('Successfully gave up transfer hook');
-            // Refresh the authorities
-            const _isFrozen = await isFrozen(connection, new PublicKey(token.mint));
-            if (_isFrozen.success) setFreezeStatus(_isFrozen.data);
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to give up transfer hook');
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const handleRevokeTransferHook = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const result = await revokeTransferHook(wallet, connection, token);
+    //         if (!result.success) {
+    //             throw new Error(result.message);
+    //         }
+    //         toast.success('Successfully gave up transfer hook');
+    //         // Refresh the authorities
+    //         const _isFrozen = await isFrozen(connection, new PublicKey(token.mint));
+    //         if (_isFrozen.success) setFreezeStatus(_isFrozen.data);
+    //     } catch (error: any) {
+    //         toast.error(error.message || 'Failed to give up transfer hook');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
-    const handleGiveupMetadataAuthority = async () => {
+    const handleRevokeMetadataAuthority = async () => {
         setLoading(true);
         try {
             const result = await revokeMetadataUpdateAuthority(wallet, connection, token);
@@ -88,6 +91,36 @@ export const UpdateAuthoritiesModal: React.FC<UpdateAuthoritiesModalProps> = ({
         }
     }
 
+    const handleDelegateValueManager = async () => {
+        setLoading(true);
+        const toastId = toast.loading('Delegating value manager...', {
+            style: {
+                background: 'var(--fallback-b1,oklch(var(--b1)))',
+                color: 'var(--fallback-bc,oklch(var(--bc)))',
+            },
+        });
+        try {
+            const result = await delegateValueManager(wallet, connection, token, valueManager);
+            if (!result.success) {
+                throw new Error(result.message);
+            }
+            toast.success(
+                <ToastBox
+                    url={`${SCANURL}/tx/${result.data?.tx}?cluster=${NETWORK}`}
+                    urlText="View transaction"
+                    title="Value manager delegated successfully!"
+                />,
+                {
+                    id: toastId,
+                }
+            );
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to delegate value manager');
+        } finally {
+            setLoading(false);
+        }
+    }
+
     if (!isOpen) return null;
 
     return (
@@ -95,7 +128,7 @@ export const UpdateAuthoritiesModal: React.FC<UpdateAuthoritiesModalProps> = ({
             <div className="modal-box pixel-box relative p-3">
                 <ModalTopBar title="Update Authorities" onClose={onClose} />
                 <div className="flex flex-col gap-4 mt-4">
-                    <div className="text-sm">
+                    {/* <div className="text-sm">
                         <p>Transfer Hook: {freezeStatus ? 'Forbidden transaction' : 'Allowed transaction'}</p>
                         <p>Current milestone: {token.currentEra}</p>
                         <p>Target milestone: {token.targetEras}</p>
@@ -107,17 +140,42 @@ export const UpdateAuthoritiesModal: React.FC<UpdateAuthoritiesModalProps> = ({
                         className="btn w-full btn-primary"
                     >
                         Revoke Transfer Freeze
-                    </button>
+                    </button> */}
                     <div className="text-sm">
                         <p>Metadata Mutable: {metadataMutable ? 'Mutable' : 'Immutable'}</p>
                     </div>
                     <button
-                        onClick={handleGiveupMetadataAuthority}
+                        onClick={handleRevokeMetadataAuthority}
                         disabled={loading || !metadataMutable}
                         className="btn w-full btn-primary"
                     >
                         Giveup Metadata Update Authority
                     </button>
+
+                    <AlertBox message={`You can delegate a value manager to manage your token liquidity after target era is reached!`} title={'Alert'} />
+                    <div className="text-sm">
+                        <p className="mb-2">
+                            Value manager
+                        </p>
+                        <div className="flex justify-between items-center">
+                            <input
+                                type="text"
+                                value={valueManager}
+                                onChange={(e) => setValueManager(e.target.value)}
+                                className='input w-full'
+                                placeholder="Enter your value manager account"
+                            />
+                        </div>
+
+
+                    </div>
+                    <button
+                        onClick={handleDelegateValueManager}
+                        className="btn w-full btn-primary"
+                    >
+                        Delegate Value Manager
+                    </button>
+
                 </div>
             </div>
         </div>

@@ -201,7 +201,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                         <th className=" text-left">Name & Symbol</th>
                                         <th className=" text-left">Mint Address</th>
                                         <th className=" text-right">Milestone</th>
-                                        <th className=" text-right">Status</th>
+                                        {/* <th className=" text-right">Status</th> */}
                                         <th className=" text-right">Balance</th>
                                         <th className=" text-center">Actions</th>
                                     </tr>
@@ -232,13 +232,13 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
                                             <td className=" text-right">
                                                 {token.tokenData?.currentEra || '1'} 
                                             </td>
-                                            <td className=' text-right'>
+                                            {/* <td className=' text-right'>
                                                 {frozenStates[token.mint] !== undefined ? (frozenStates[token.mint] ? 
                                                     <svg fill="none" className='w-4 h-4 text-error' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M15 2H9v2H7v4H4v14h16V8h-3V4h-2V2zm0 2v4H9V4h6zm-6 6h9v10H6V10h3zm4 3h-2v4h2v-4z" fill="currentColor"/> </svg> 
                                                     : 
                                                     <svg fill="none" className='w-4 h-4 text-success' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M15 2H9v2H7v2h2V4h6v4H4v14h16V8h-3V4h-2V2zm0 8h3v10H6V10h9zm-2 3h-2v4h2v-4z" fill="currentColor"/> </svg>) 
                                                     : 'Loading...'}
-                                            </td>
+                                            </td> */}
                                             <td className=" text-right">
                                                 {(numberStringToBN(token.amount).div(BN_LAMPORTS_PER_SOL)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                             </td>

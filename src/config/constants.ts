@@ -11,7 +11,8 @@ export const DEFAULT_PARAMS = { // must be same as program default params
     liquidityTokensRatio: '10',
 }
 export const STORAGE = "irys" as "irys" | "arweave";
-export const FAIR_MINT_PROGRAM_ID = '3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv';
+// export const FAIR_MINT_PROGRAM_ID = '3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv';
+export const FAIR_MINT_PROGRAM_ID = '8GM2N7qQjzMyhqewu8jpDgzUh2BJbtBxSY1WzSFeFm6U';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
 export const PROTOCOL_FEE_ACCOUNT = "CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79";
 
@@ -29,6 +30,19 @@ export const REFERRAL_CODE_SEED = "referral_code";
 export const CODE_ACCOUNT_SEEDS = "code_account";
 export const MINT_VAULT_OWNER_SEEDS = "mint-vault-owner";
 export const EXTRA_ACCOUNT_META_LIST = "extra-account-metas";
+export const cpSwapProgram = new PublicKey("CPMDWBwJDtYax9qW7AyRuVC19Cc4L4Vcy4n2BHAbHkCW"); // devnet
+export const cpSwapConfigAddress = new PublicKey("9zSzfkYy6awexsHvmggeH36pfVUdDGyCcwmjT3AQPBj6"); // find address on devnet
+export const createPoolFeeReceive = new PublicKey("G11FKBRaAkHAKuLCgLM6K6NUc9rTjPAznRCjZifrTQe2"); // find address on devnet
+
+// export const cpSwapProgram = new PublicKey("2v2i1n5tHdvaepZo6LjzzFnGRbj4bwTBrev88PHVdeiS"); // localnet deploy cpmm
+// export const cpSwapConfigAddress = new PublicKey("9tebm8DNMyyQYtNyTWdEmVYPgH1riB5qMurRiNM3NQD7"); // localnet deploy cpmm
+// export const createPoolFeeReceive = new PublicKey("G11FKBRaAkHAKuLCgLM6K6NUc9rTjPAznRCjZifrTQe2"); // localnet deploy cpmm
+
+// export const cpSwapProgram = new PublicKey("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"); // mainnet
+// export const cpSwapConfigAddress = new PublicKey("D4FPEruKEHrG5TenZ2mpDGEfu1iUvTiqBxvpU8HLBvC2"); // mainnet
+// export const createPoolFeeReceive = new PublicKey("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8"); // mainnet
+
+export const memoProgram = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
 export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
@@ -106,6 +120,6 @@ export const INDEX_DB_VERSION = 1;
 export const CACHE_DURATION = 60 * 24 * 60 * 60 * 1000; // 60 days
 
 export const DEPRECATED_MINTS = ["",
-    "6wNFdBEFXyhRtY7ZoDxy9CE9H9ktxpgzsjraP8bpo6VC",
+    "BitJngSe2MFQNnuBiA6bajRyZoFp7pkXYnBjVKMJMiCv",
     
 ]

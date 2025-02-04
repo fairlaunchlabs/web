@@ -1,5 +1,5 @@
 {
-  "address": "3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv",
+  "address": "8GM2N7qQjzMyhqewu8jpDgzUh2BJbtBxSY1WzSFeFm6U",
   "metadata": {
     "name": "fair_mint_token",
     "version": "0.1.0",
@@ -8,7 +8,107 @@
   },
   "instructions": [
     {
+      "name": "claim_tokens",
+      "docs": [
+        "Claim tokens"
+      ],
+      "discriminator": [
+        108,
+        216,
+        210,
+        231,
+        0,
+        212,
+        42,
+        64
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipent_ata",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "close_token",
+      "docs": [
+        "Close token"
+      ],
       "discriminator": [
         26,
         74,
@@ -116,7 +216,108 @@
       ]
     },
     {
+      "name": "delegate_value_manager",
+      "docs": [
+        "Delegate value manager"
+      ],
+      "discriminator": [
+        65,
+        71,
+        81,
+        199,
+        83,
+        64,
+        181,
+        167
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "new_value_manager",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "initialize_system",
+      "docs": [
+        "Initialize system"
+      ],
       "discriminator": [
         50,
         173,
@@ -172,6 +373,9 @@
     },
     {
       "name": "initialize_token",
+      "docs": [
+        "Initialize token"
+      ],
       "discriminator": [
         38,
         209,
@@ -247,54 +451,22 @@
           }
         },
         {
-          "name": "mint_token_vault_owner",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  45,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  45,
-                  111,
-                  119,
-                  110,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
           "name": "token_vault",
-          "docs": [
-            "CHECK"
-          ],
           "writable": true
         },
         {
-          "name": "mint_token_vault",
-          "docs": [
-            "CHECK"
-          ],
+          "name": "wsol_mint"
+        },
+        {
+          "name": "wsol_vault",
           "writable": true
         },
         {
           "name": "system_config_account",
+          "writable": true
+        },
+        {
+          "name": "protocol_fee_account",
           "writable": true
         },
         {
@@ -310,14 +482,12 @@
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+          "name": "legacy_token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "transfer_hook_program_id",
-          "docs": [
-            "CHECK"
-          ]
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
@@ -341,6 +511,9 @@
     },
     {
       "name": "mint_tokens",
+      "docs": [
+        "Mint tokens"
+      ],
       "discriminator": [
         59,
         132,
@@ -500,46 +673,11 @@
           }
         },
         {
-          "name": "mint_token_vault_owner",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  45,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  45,
-                  111,
-                  119,
-                  110,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
           "name": "token_vault",
           "writable": true
         },
         {
-          "name": "mint_token_vault",
-          "docs": [
-            "CHECK"
-          ],
+          "name": "wsol_vault",
           "writable": true
         },
         {
@@ -582,9 +720,6 @@
           }
         },
         {
-          "name": "extra_account_meta_list"
-        },
-        {
           "name": "rent",
           "address": "SysvarRent111111111111111111111111111111111"
         },
@@ -593,15 +728,16 @@
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
+          "name": "legacy_token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         },
         {
           "name": "associated_token_program",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
-          "name": "program_id"
         }
       ],
       "args": [
@@ -616,6 +752,380 @@
         {
           "name": "code_hash",
           "type": "bytes"
+        }
+      ]
+    },
+    {
+      "name": "proxy_burn_lp_tokens",
+      "docs": [
+        "Burn lp tokens"
+      ],
+      "discriminator": [
+        215,
+        41,
+        48,
+        70,
+        81,
+        221,
+        246,
+        105
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "token mint"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_lp_token",
+          "docs": [
+            "Owner lp tokan account - config account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "lp_mint",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "proxy_deposit",
+      "docs": [
+        "deposit instruction"
+      ],
+      "discriminator": [
+        99,
+        49,
+        91,
+        137,
+        172,
+        25,
+        207,
+        21
+      ],
+      "accounts": [
+        {
+          "name": "cp_swap_program",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+        },
+        {
+          "name": "owner",
+          "docs": [
+            "Pays to mint the position"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "Token mint"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "docs": [
+            "Config account"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  110,
+                  100,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  95,
+                  115,
+                  101,
+                  101,
+                  100
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
+          }
+        },
+        {
+          "name": "pool_state",
+          "docs": [
+            "pool state"
+          ],
+          "writable": true
+        },
+        {
+          "name": "owner_lp_token",
+          "docs": [
+            "Owner lp tokan account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_0_account",
+          "docs": [
+            "The payer's token account for token_0"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_1_account",
+          "docs": [
+            "The payer's token account for token_1"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_0_vault",
+          "docs": [
+            "The address that holds pool tokens for token_0"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_1_vault",
+          "docs": [
+            "The address that holds pool tokens for token_1"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "docs": [
+            "token Program"
+          ],
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "token_program_2022",
+          "docs": [
+            "Token program 2022"
+          ],
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "vault_0_mint",
+          "docs": [
+            "The mint of token_0 vault"
+          ]
+        },
+        {
+          "name": "vault_1_mint",
+          "docs": [
+            "The mint of token_1 vault"
+          ]
+        },
+        {
+          "name": "lp_mint",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "lp_token_amount",
+          "type": "u64"
+        },
+        {
+          "name": "maximum_token_0_amount",
+          "type": "u64"
+        },
+        {
+          "name": "maximum_token_1_amount",
+          "type": "u64"
         }
       ]
     },
@@ -642,10 +1152,70 @@
         {
           "name": "creator",
           "docs": [
-            "Address paying to create the pool. Can be anyone"
+            "Address paying to create the pool. Can be only the value manager(defaule value manager is the creator of the mint)"
           ],
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "docs": [
+            "POM config account"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
         },
         {
           "name": "amm_config",
@@ -689,7 +1259,44 @@
                   100
                 ]
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
           }
         },
         {
@@ -718,7 +1325,44 @@
                 "kind": "account",
                 "path": "token_1_mint"
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
           }
         },
         {
@@ -759,7 +1403,44 @@
                 "kind": "account",
                 "path": "pool_state"
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
           }
         },
         {
@@ -808,7 +1489,44 @@
                 "kind": "account",
                 "path": "token_0_mint"
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
           }
         },
         {
@@ -839,7 +1557,44 @@
                 "kind": "account",
                 "path": "token_1_mint"
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
           }
         },
         {
@@ -875,7 +1630,44 @@
                 "kind": "account",
                 "path": "pool_state"
               }
-            ]
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
           }
         },
         {
@@ -921,6 +1713,14 @@
       ],
       "args": [
         {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
           "name": "init_amount_0",
           "type": "u64"
         },
@@ -935,7 +1735,795 @@
       ]
     },
     {
+      "name": "proxy_swap_base_in",
+      "docs": [
+        "swap_base_in instruction"
+      ],
+      "discriminator": [
+        250,
+        174,
+        212,
+        217,
+        47,
+        84,
+        212,
+        231
+      ],
+      "accounts": [
+        {
+          "name": "cp_swap_program",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+        },
+        {
+          "name": "payer",
+          "docs": [
+            "The user performing the swap"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "Token mint"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "docs": [
+            "Config account"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  110,
+                  100,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  95,
+                  115,
+                  101,
+                  101,
+                  100
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
+          }
+        },
+        {
+          "name": "amm_config",
+          "docs": [
+            "The factory state to read protocol fees"
+          ]
+        },
+        {
+          "name": "pool_state",
+          "docs": [
+            "pool state"
+          ],
+          "writable": true
+        },
+        {
+          "name": "input_token_account",
+          "docs": [
+            "The user token account for input token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "output_token_account",
+          "docs": [
+            "The user token account for output token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "input_vault",
+          "docs": [
+            "The vault token account for input token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "output_vault",
+          "docs": [
+            "The vault token account for output token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "input_token_program",
+          "docs": [
+            "SPL program for input token transfers"
+          ]
+        },
+        {
+          "name": "output_token_program",
+          "docs": [
+            "SPL program for output token transfers"
+          ]
+        },
+        {
+          "name": "input_token_mint",
+          "docs": [
+            "The mint of input token"
+          ]
+        },
+        {
+          "name": "output_token_mint",
+          "docs": [
+            "The mint of output token"
+          ]
+        },
+        {
+          "name": "observation_state",
+          "docs": [
+            "The program account for the most recent oracle observation"
+          ],
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "amount_in",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_amount_out",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "proxy_swap_base_out",
+      "docs": [
+        "swap_base_out instruction"
+      ],
+      "discriminator": [
+        194,
+        15,
+        252,
+        249,
+        72,
+        54,
+        250,
+        85
+      ],
+      "accounts": [
+        {
+          "name": "cp_swap_program",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+        },
+        {
+          "name": "payer",
+          "docs": [
+            "The user performing the swap"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "Token mint"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "docs": [
+            "Config account"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  110,
+                  100,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  95,
+                  115,
+                  101,
+                  101,
+                  100
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
+          }
+        },
+        {
+          "name": "amm_config",
+          "docs": [
+            "The factory state to read protocol fees"
+          ]
+        },
+        {
+          "name": "pool_state",
+          "docs": [
+            "pool state"
+          ],
+          "writable": true
+        },
+        {
+          "name": "input_token_account",
+          "docs": [
+            "The user token account for input token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "output_token_account",
+          "docs": [
+            "The user token account for output token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "input_vault",
+          "docs": [
+            "The vault token account for input token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "output_vault",
+          "docs": [
+            "The vault token account for output token"
+          ],
+          "writable": true
+        },
+        {
+          "name": "input_token_program",
+          "docs": [
+            "SPL program for input token transfers"
+          ]
+        },
+        {
+          "name": "output_token_program",
+          "docs": [
+            "SPL program for output token transfers"
+          ]
+        },
+        {
+          "name": "input_token_mint",
+          "docs": [
+            "The mint of input token"
+          ]
+        },
+        {
+          "name": "output_token_mint",
+          "docs": [
+            "The mint of output token"
+          ]
+        },
+        {
+          "name": "observation_state",
+          "docs": [
+            "The program account for the most recent oracle observation"
+          ],
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "max_amount_in",
+          "type": "u64"
+        },
+        {
+          "name": "amount_out",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "proxy_withdraw",
+      "docs": [
+        "withdraw instruction"
+      ],
+      "discriminator": [
+        118,
+        12,
+        163,
+        77,
+        70,
+        15,
+        67,
+        252
+      ],
+      "accounts": [
+        {
+          "name": "cp_swap_program",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+        },
+        {
+          "name": "owner",
+          "docs": [
+            "Pays to mint the position"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "Token mint"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "docs": [
+            "Config account"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  97,
+                  110,
+                  100,
+                  95,
+                  108,
+                  112,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  95,
+                  115,
+                  101,
+                  101,
+                  100
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                169,
+                42,
+                90,
+                139,
+                79,
+                41,
+                89,
+                82,
+                132,
+                37,
+                80,
+                170,
+                147,
+                253,
+                91,
+                149,
+                181,
+                172,
+                230,
+                168,
+                235,
+                146,
+                12,
+                147,
+                148,
+                46,
+                67,
+                105,
+                12,
+                32,
+                236,
+                115
+              ]
+            }
+          }
+        },
+        {
+          "name": "pool_state",
+          "docs": [
+            "pool state"
+          ],
+          "writable": true
+        },
+        {
+          "name": "owner_lp_token",
+          "docs": [
+            "Owner lp token account"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_0_account",
+          "docs": [
+            "The owner's token account for receive token_0"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_1_account",
+          "docs": [
+            "The owner's token account for receive token_1"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_0_vault",
+          "docs": [
+            "The address that holds pool tokens for token_0"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_1_vault",
+          "docs": [
+            "The address that holds pool tokens for token_1"
+          ],
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "docs": [
+            "token Program"
+          ],
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "token_program_2022",
+          "docs": [
+            "Token program 2022"
+          ],
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "vault_0_mint",
+          "docs": [
+            "The mint of token_0 vault"
+          ]
+        },
+        {
+          "name": "vault_1_mint",
+          "docs": [
+            "The mint of token_1 vault"
+          ]
+        },
+        {
+          "name": "lp_mint",
+          "writable": true
+        },
+        {
+          "name": "memo_program",
+          "docs": [
+            "memo program"
+          ],
+          "address": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "lp_token_amount",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_token_0_amount",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_token_1_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "refund",
+      "docs": [
+        "Refund"
+      ],
       "discriminator": [
         2,
         96,
@@ -1041,10 +2629,18 @@
           "writable": true
         },
         {
-          "name": "protocol_fee_account",
-          "docs": [
-            "CHECK the protocol fee account"
-          ],
+          "name": "wsol_vault",
+          "writable": true
+        },
+        {
+          "name": "payer_wsol_vault",
+          "writable": true
+        },
+        {
+          "name": "protocol_fee_account"
+        },
+        {
+          "name": "protocol_wsol_vault",
           "writable": true
         },
         {
@@ -1061,95 +2657,8 @@
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "token_name",
-          "type": "string"
-        },
-        {
-          "name": "token_symbol",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "revoke_transfer_hook",
-      "discriminator": [
-        142,
-        96,
-        140,
-        21,
-        230,
-        237,
-        142,
-        14
-      ],
-      "accounts": [
-        {
-          "name": "mint",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "token_name"
-              },
-              {
-                "kind": "arg",
-                "path": "token_symbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "config_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "token_program",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+          "name": "legacy_token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
           "name": "system_program",
@@ -1169,6 +2678,9 @@
     },
     {
       "name": "revoke_update_metadata_authority",
+      "docs": [
+        "Revoke update token2022 metadata authority"
+      ],
       "discriminator": [
         16,
         230,
@@ -1271,6 +2783,9 @@
     },
     {
       "name": "set_referrer_code",
+      "docs": [
+        "Set referrer code"
+      ],
       "discriminator": [
         129,
         47,
@@ -1318,60 +2833,7 @@
         },
         {
           "name": "referrer_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "payer"
-              },
-              {
-                "kind": "account",
-                "path": "token_program"
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "writable": true
         },
         {
           "name": "referral_account",
@@ -1467,6 +2929,9 @@
     },
     {
       "name": "update_system",
+      "docs": [
+        "Update system"
+      ],
       "discriminator": [
         63,
         147,
@@ -1551,6 +3016,9 @@
     },
     {
       "name": "update_token_metadata",
+      "docs": [
+        "Update token metadata"
+      ],
       "discriminator": [
         243,
         6,
@@ -1687,16 +3155,29 @@
       ]
     },
     {
-      "name": "MintTokenVaultOwnerData",
+      "name": "ObservationState",
       "discriminator": [
-        201,
+        122,
+        174,
+        197,
+        53,
+        129,
+        9,
+        165,
+        132
+      ]
+    },
+    {
+      "name": "PoolState",
+      "discriminator": [
         247,
-        16,
-        90,
-        132,
-        226,
-        213,
-        74
+        237,
+        227,
+        245,
+        215,
+        195,
+        222,
+        70
       ]
     },
     {
@@ -1777,19 +3258,6 @@
         1,
         145,
         83
-      ]
-    },
-    {
-      "name": "InitializeLiquidityPoolEvent",
-      "discriminator": [
-        40,
-        247,
-        136,
-        40,
-        244,
-        33,
-        51,
-        51
       ]
     },
     {
@@ -2114,273 +3582,308 @@
     },
     {
       "code": 6048,
+      "name": "InvalidWsolVault",
+      "msg": "Invalid wsol vault"
+    },
+    {
+      "code": 6049,
+      "name": "InvalidWsolMint",
+      "msg": "Invalid wsol mint"
+    },
+    {
+      "code": 6050,
       "name": "InvalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
     },
     {
-      "code": 6049,
+      "code": 6051,
       "name": "MintNotStarted",
       "msg": "Mint has not started"
     },
     {
-      "code": 6050,
+      "code": 6052,
       "name": "WrongReferrerCode",
       "msg": "Wrong referrer account"
     },
     {
-      "code": 6051,
+      "code": 6053,
       "name": "WrongCodeHash",
       "msg": "Wrong code hash"
     },
     {
-      "code": 6052,
+      "code": 6054,
       "name": "WrongMintAddress",
       "msg": "Wrong mint address"
     },
     {
-      "code": 6053,
+      "code": 6055,
       "name": "MintHasStarted",
       "msg": "Mint has started"
     },
     {
-      "code": 6054,
+      "code": 6056,
       "name": "InvalidTokenMint",
       "msg": "Invalid token mint"
     },
     {
-      "code": 6055,
+      "code": 6057,
       "name": "InvalidTokenOwner",
       "msg": "Invalid token owner"
     },
     {
-      "code": 6056,
+      "code": 6058,
       "name": "TokenHasDelegate",
       "msg": "Token has delegate"
     },
     {
-      "code": 6057,
+      "code": 6059,
       "name": "NumericOverflow",
       "msg": "Numeric overflow"
     },
     {
-      "code": 6058,
+      "code": 6060,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6059,
+      "code": 6061,
       "name": "AmountConversionError",
       "msg": "Amount conversion error"
     },
     {
-      "code": 6060,
+      "code": 6062,
       "name": "BurnOperationFailed",
       "msg": "Burn operation failed"
     },
     {
-      "code": 6061,
+      "code": 6063,
       "name": "RefundInProgress",
       "msg": "Refund in progress"
     },
     {
-      "code": 6062,
+      "code": 6064,
       "name": "AountConversionError",
       "msg": "Amount conversion error"
     },
     {
-      "code": 6063,
+      "code": 6065,
       "name": "DivideByZero",
       "msg": "Division by zero"
     },
     {
-      "code": 6064,
+      "code": 6066,
       "name": "InvalidRatio",
       "msg": "Invalid ratio value"
     },
     {
-      "code": 6065,
+      "code": 6067,
       "name": "PrecisionError",
       "msg": "Calculation precision error"
     },
     {
-      "code": 6066,
+      "code": 6068,
       "name": "AmountExceedsMaximum",
       "msg": "Amount exceeds maximum allowed"
     },
     {
-      "code": 6067,
+      "code": 6069,
       "name": "TransferFailed",
       "msg": "Transfer failed"
     },
     {
-      "code": 6068,
+      "code": 6070,
       "name": "ExceedMaxU64",
       "msg": "Exceed max u64"
     },
     {
-      "code": 6069,
+      "code": 6071,
       "name": "ReferrerMainAccountEmpty",
       "msg": "Referrer main account empty"
     },
     {
-      "code": 6070,
+      "code": 6072,
       "name": "PayerMustSign",
       "msg": "Payer must sign"
     },
     {
-      "code": 6071,
+      "code": 6073,
       "name": "InvalidPayerAccount",
       "msg": "Invalid payer account"
     },
     {
-      "code": 6072,
+      "code": 6074,
       "name": "InvalidCodeHash",
       "msg": "Invalid code hash"
     },
     {
-      "code": 6073,
+      "code": 6075,
       "name": "InvalidResetInterval",
       "msg": "Invalid reset interval"
     },
     {
-      "code": 6074,
+      "code": 6076,
       "name": "TokenAlreadyInitialized",
       "msg": "Token already initialized"
     },
     {
-      "code": 6075,
+      "code": 6077,
       "name": "InvalidTokenName",
       "msg": "Invalid token name"
     },
     {
-      "code": 6076,
+      "code": 6078,
       "name": "InvalidTokenSymbol",
       "msg": "Invalid token symbol"
     },
     {
-      "code": 6077,
+      "code": 6079,
       "name": "InvalidTokenUri",
       "msg": "Invalid token uri"
     },
     {
-      "code": 6078,
+      "code": 6080,
       "name": "MetadataAlreadyInitialized",
       "msg": "Metadata already initialized"
     },
     {
-      "code": 6079,
+      "code": 6081,
       "name": "InvalidProtocolFeeRate",
       "msg": "Invalid protocol fee rate, max 50000 which is 50%"
     },
     {
-      "code": 6080,
+      "code": 6082,
       "name": "InvalidRefundFeeRate",
       "msg": "Invalid refund fee rate, max 50000 which is 50%"
     },
     {
-      "code": 6081,
+      "code": 6083,
       "name": "MintInProgress",
       "msg": "Mint in progress"
     },
     {
-      "code": 6082,
+      "code": 6084,
       "name": "SetReferrerCodeProcess",
       "msg": "Set referrer code processing"
     },
     {
-      "code": 6083,
+      "code": 6085,
       "name": "PayerAmountTooLow",
       "msg": "Payer amount too low"
     },
     {
-      "code": 6084,
+      "code": 6086,
       "name": "ConfigSupplyNotMatchMintSupply",
       "msg": "Config supply not match mint supply"
     },
     {
-      "code": 6085,
+      "code": 6087,
       "name": "InsufficientBalanceForDeployment",
       "msg": "Insufficient balance for deployment"
     },
     {
-      "code": 6086,
+      "code": 6088,
       "name": "SendInitializingFeeFailed",
       "msg": "Send initializing fee failed"
     },
     {
-      "code": 6087,
+      "code": 6089,
       "name": "InvalidMintAccount",
       "msg": "Invalid mint account"
     },
     {
-      "code": 6088,
+      "code": 6090,
       "name": "InvalidFreezeAuthority",
       "msg": "Invalid freeze authority"
     },
     {
-      "code": 6089,
+      "code": 6091,
       "name": "InvalidMintAuthority",
       "msg": "Invalid mint authority"
     },
     {
-      "code": 6090,
+      "code": 6092,
       "name": "InvalidTokenProgram",
       "msg": "Invalid token program"
     },
     {
-      "code": 6091,
+      "code": 6093,
       "name": "RefundOnlyAllowedInTargetEras",
       "msg": "Refund only allowed in target eras"
     },
     {
-      "code": 6092,
+      "code": 6094,
       "name": "RevokeFreezeAuthorityNotApplied",
       "msg": "Revoke freeze authority not applied"
     },
     {
-      "code": 6093,
+      "code": 6095,
       "name": "RevokeFreezeAuthorityApplied",
       "msg": "Revoke freeze authority applied"
     },
     {
-      "code": 6094,
+      "code": 6096,
       "name": "InvalidMetadataAccount",
       "msg": "Invalid metadata account"
     },
     {
-      "code": 6095,
+      "code": 6097,
       "name": "InvalidMasterEditionAccount",
       "msg": "Invalid master edition account"
     },
     {
-      "code": 6096,
+      "code": 6098,
       "name": "IsNotCurrentlyTransferring",
       "msg": "The token is not currently transferring"
     },
     {
-      "code": 6097,
+      "code": 6099,
       "name": "AmountTooBig",
       "msg": "The amount is too big"
     },
     {
-      "code": 6098,
+      "code": 6100,
       "name": "InvalidMintTokenVaultAccount",
       "msg": "Invalid mint token vault account"
     },
     {
-      "code": 6099,
+      "code": 6101,
       "name": "WrongProgramId",
       "msg": "Wrong program id"
     },
     {
-      "code": 6100,
+      "code": 6102,
       "name": "MintTokenVaultOwnerAlreadyInitialized",
       "msg": "Mint token vault owner already initialized"
     },
     {
-      "code": 6101,
+      "code": 6103,
       "name": "InvalidMintVaultOwner",
       "msg": "Invalid mint vault owner"
+    },
+    {
+      "code": 6104,
+      "name": "GraduateFrozenPeriodNotOver",
+      "msg": "Graduate frozen period not over, need to wait 2 epochs after target era arrived!"
+    },
+    {
+      "code": 6105,
+      "name": "OnlyValueManagerAllowed",
+      "msg": "Only value manager allowed"
+    },
+    {
+      "code": 6106,
+      "name": "InvalidMint",
+      "msg": "Invalid mint"
+    },
+    {
+      "code": 6107,
+      "name": "InvalidValueManager",
+      "msg": "Invalid value manager"
+    },
+    {
+      "code": 6108,
+      "name": "InvalidProtocolFeeAccount",
+      "msg": "Invalid protocol fee account"
     }
   ],
   "types": [
@@ -2523,38 +4026,6 @@
       }
     },
     {
-      "name": "InitializeLiquidityPoolEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "mint",
-            "type": "pubkey"
-          },
-          {
-            "name": "config_account",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_vault",
-            "type": "pubkey"
-          },
-          {
-            "name": "protocol_fee_account",
-            "type": "pubkey"
-          },
-          {
-            "name": "payer",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_program",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
       "name": "InitializeTokenConfigData",
       "type": {
         "kind": "struct",
@@ -2656,7 +4127,11 @@
             }
           },
           {
-            "name": "mint_token_vault",
+            "name": "value_manager",
+            "type": "pubkey"
+          },
+          {
+            "name": "wsol_vault",
             "type": "pubkey"
           }
         ]
@@ -2718,18 +4193,264 @@
           {
             "name": "referrer_fee",
             "type": "u64"
+          },
+          {
+            "name": "wsol_vault",
+            "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "MintTokenVaultOwnerData",
+      "name": "Observation",
+      "docs": [
+        "The element of observations in ObservationState"
+      ],
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c",
+        "packed": true
+      },
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "mint",
+            "name": "block_timestamp",
+            "docs": [
+              "The block timestamp of the observation"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "cumulative_token_0_price_x32",
+            "docs": [
+              "the cumulative of token0 price during the duration time, Q32.32, the remaining 64 bit for overflow"
+            ],
+            "type": "u128"
+          },
+          {
+            "name": "cumulative_token_1_price_x32",
+            "docs": [
+              "the cumulative of token1 price during the duration time, Q32.32, the remaining 64 bit for overflow"
+            ],
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ObservationState",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c",
+        "packed": true
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initialized",
+            "docs": [
+              "Whether the ObservationState is initialized"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "observation_index",
+            "docs": [
+              "the most-recently updated index of the observations array"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "pool_id",
             "type": "pubkey"
+          },
+          {
+            "name": "observations",
+            "docs": [
+              "observation array"
+            ],
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "Observation"
+                  }
+                },
+                100
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "docs": [
+              "padding for feature update"
+            ],
+            "type": {
+              "array": [
+                "u64",
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolState",
+      "serialization": "bytemuckunsafe",
+      "repr": {
+        "kind": "c",
+        "packed": true
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amm_config",
+            "docs": [
+              "Which config the pool belongs"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_creator",
+            "docs": [
+              "pool creator"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "token_0_vault",
+            "docs": [
+              "Token A"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "token_1_vault",
+            "docs": [
+              "Token B"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "lp_mint",
+            "docs": [
+              "Pool tokens are issued when A or B tokens are deposited.",
+              "Pool tokens can be withdrawn back to the original A or B token."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "token_0_mint",
+            "docs": [
+              "Mint information for token A"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "token_1_mint",
+            "docs": [
+              "Mint information for token B"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "token_0_program",
+            "docs": [
+              "token_0 program"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "token_1_program",
+            "docs": [
+              "token_1 program"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "observation_key",
+            "docs": [
+              "observation account to store oracle data"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "auth_bump",
+            "type": "u8"
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Bitwise representation of the state of the pool",
+              "bit0, 1: disable deposit(vaule is 1), 0: normal",
+              "bit1, 1: disable withdraw(vaule is 2), 0: normal",
+              "bit2, 1: disable swap(vaule is 4), 0: normal"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "lp_mint_decimals",
+            "type": "u8"
+          },
+          {
+            "name": "mint_0_decimals",
+            "docs": [
+              "mint0 and mint1 decimals"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "mint_1_decimals",
+            "type": "u8"
+          },
+          {
+            "name": "lp_supply",
+            "docs": [
+              "lp mint supply"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fees_token_0",
+            "docs": [
+              "The amounts of token_0 and token_1 that are owed to the liquidity provider."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fees_token_1",
+            "type": "u64"
+          },
+          {
+            "name": "fund_fees_token_0",
+            "type": "u64"
+          },
+          {
+            "name": "fund_fees_token_1",
+            "type": "u64"
+          },
+          {
+            "name": "open_time",
+            "docs": [
+              "The timestamp allowed for swap in the pool."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "docs": [
+              "padding for future updates"
+            ],
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
           }
         ]
       }
@@ -2956,6 +4677,10 @@
             "type": "pubkey"
           },
           {
+            "name": "wsol_vault",
+            "type": "pubkey"
+          },
+          {
             "name": "mint_token_vault",
             "type": "pubkey"
           },
@@ -2966,6 +4691,10 @@
           {
             "name": "is_processing",
             "type": "bool"
+          },
+          {
+            "name": "value_manager",
+            "type": "pubkey"
           }
         ]
       }
@@ -3046,6 +4775,10 @@
           {
             "name": "total_tokens",
             "type": "u64"
+          },
+          {
+            "name": "graduate_epoch",
+            "type": "u32"
           }
         ]
       }

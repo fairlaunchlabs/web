@@ -1,32 +1,9 @@
-import React from 'react';
-// import { Balance } from '../pages/Balance';
-// import { TransactionHistory } from '../pages/TransactionHistory';
-// import { TokenAccounts } from '../pages/TokenAccounts';
 import { Discover } from '../pages/Discover';
 import { 
-    CreateMarketId, 
-    CreateLiquidityPool, 
-    AddLiquidity, 
-    RemoveLiquidity, 
-    BurnLPTokens 
-} from '../pages/TokenManagement';
-import { 
-    MdSmartToy, 
-    MdQrCode, 
-    MdGroups, 
-    MdCurrencyExchange,
-    MdLocalFireDepartment,
-    MdRocketLaunch,
-    MdOutlineEnergySavingsLeaf,
-    MdAccountBalanceWallet,
     MdQrCodeScanner,
-    MdBadge,
-    MdEngineering,
-    MdSupportAgent,
-    MdAccountBalance,
     MdPool,
     MdAddBox,
-    MdRemoveCircleOutline
+    MdOutlineRealEstateAgent,
 } from 'react-icons/md';
 import { MyMintedTokens } from '../pages/MyMintedTokens';
 import { LaunchTokenForm } from '../pages/LaunchToken';
@@ -38,6 +15,10 @@ import { SocialDeveloper } from '../pages/SocialDeveloper';
 import { SocialURCProvider } from '../pages/SocialURCProvider';
 import { SocialValueManager } from '../pages/SocialValueManager';
 import { MyDeployments } from '../pages/MyDeployments';
+import { CreateLiquidityPool } from '../pages/CreateLiquidityPool';
+import { ManageLiquidity } from '../pages/ManageLiquidity';
+import { ClaimTokens } from '../pages/ClaimTokens';
+import { DelegatedTokens } from '../pages/DelegatedTokens';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
@@ -81,7 +62,40 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 label: 'My Deployment',
                 icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 4h6v8H2V4h2zm4 6V6H4v4h4zm14-4H12v2h10V6zm0 4H12v2h10v-2zm0 4v2H2v-2h20zm0 6v-2H2v2h20z" fill="currentColor"/> </svg>,
                 component: <MyDeployments expanded={expended} />
+            },
+            {
+                id: 'claim-tokens',
+                label: 'Claim Tokens',
+                icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M11 1H9v2h2v2H5v2H3v10h2v2h2v-2H5V7h6v2H9v2h2V9h2V7h2V5h-2V3h-2V1zm8 4h-2v2h2v10h-6v-2h2v-2h-2v2h-2v2H9v2h2v2h2v2h2v-2h-2v-2h6v-2h2V7h-2V5z" fill="currentColor"/> </svg>,
+                component: <ClaimTokens expanded={expended} />
+
             }
+        ]
+    },
+    {
+        id: 'token-management',
+        label: 'Token Management',
+        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M9 2h2v2H9V2zm4 4V4h-2v2H9v2H7v2H5v2H3v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v6h2V12h-2v-2h-2V8h-2V6h-2zm0 0v2h2v2h2v2h2v2H5v-2h2v-2h2V8h2V6h2z" fill="currentColor"/> </svg>,
+        component: null,
+        subItems: [
+            {
+                id: 'my-delegated-tokens',
+                label: 'Delegated tokens',
+                icon: <MdOutlineRealEstateAgent className="w-5 h-5" />,
+                component: <DelegatedTokens expanded={expended} />
+            },
+            {
+                id: 'create-liquidity-pool',
+                label: 'Create Pool',
+                icon: <MdPool className="w-5 h-5" />,
+                component: <CreateLiquidityPool expanded={expended} />
+            },
+            {
+                id: 'manage-liquidity',
+                label: 'Manage Liquidity',
+                icon: <MdAddBox className="w-5 h-5" />,
+                component: <ManageLiquidity expanded={expended} />
+            },
         ]
     },
     {
@@ -107,44 +121,6 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 label: 'Value Manager', // here you can find Value manager to manage the token value
                 icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2H2v8h2V2zm16 0h2v8h-2V2zm-6 6h-4V2H4v2h4v4H4v2h4v4H4v2h4v4H4v2h6v-6h4v6h2v-6h4v-2h-4v-4h4V8h-4V2h-2v6zm-4 6v-4h4v4h-4zM20 2h-4v2h4V2zM2 14h2v8H2v-8zm14 6h4v2h-4v-2zm6-6h-2v8h2v-8z" fill="currentColor"/> </svg>,
                 component: <SocialValueManager expanded={expended} />
-            }
-        ]
-    },
-    {
-        id: 'token-management',
-        label: 'Token Management',
-        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M9 2h2v2H9V2zm4 4V4h-2v2H9v2H7v2H5v2H3v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v6h2V12h-2v-2h-2V8h-2V6h-2zm0 0v2h2v2h2v2h2v2H5v-2h2v-2h2V8h2V6h2z" fill="currentColor"/> </svg>,
-        component: null,
-        subItems: [
-            {
-                id: 'create-market-id',
-                label: 'Create Market ID',
-                icon: <MdAddBox className="w-5 h-5" />,
-                component: <CreateMarketId expanded={expended} />
-            },
-            {
-                id: 'create-liquidity-pool',
-                label: 'Create Pool',
-                icon: <MdPool className="w-5 h-5" />,
-                component: <CreateLiquidityPool expanded={expended} />
-            },
-            {
-                id: 'add-liquidity',
-                label: 'Add Liquidity',
-                icon: <MdAddBox className="w-5 h-5" />,
-                component: <AddLiquidity expanded={expended} />
-            },
-            {
-                id: 'remove-liquidity',
-                label: 'Remove Liquidity',
-                icon: <MdRemoveCircleOutline className="w-5 h-5" />,
-                component: <RemoveLiquidity expanded={expended} />
-            },
-            {
-                id: 'burn-lp-tokens',
-                label: 'Burn LP Tokens',
-                icon: <MdLocalFireDepartment className="w-5 h-5" />,
-                component: <BurnLPTokens expanded={expended} />
             }
         ]
     },

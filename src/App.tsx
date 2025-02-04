@@ -30,9 +30,12 @@ import { SocialDeveloper } from './pages/SocialDeveloper';
 import { SocialURCProvider } from './pages/SocialURCProvider';
 import { SocialValueManager } from './pages/SocialValueManager';
 import { LaunchTokenForm } from './pages/LaunchToken';
-import { AddLiquidity, BurnLPTokens, CreateLiquidityPool, CreateMarketId, RemoveLiquidity } from './pages/TokenManagement';
 import { CheckURC } from './components/tools/CheckURC';
 import { MyUniqueReferralCode } from './components/tools/MyUniqueReferralCode';
+import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
+import { ManageLiquidity } from './pages/ManageLiquidity';
+import { ClaimTokens } from './pages/ClaimTokens';
+import { DelegatedTokens } from './pages/DelegatedTokens';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -106,11 +109,11 @@ const AppContent = () => {
                             <Route path="/launch-token" element={<LaunchTokenForm expanded={expanded} />} />
                             <Route path="/my-minted-tokens" element={<MyMintedTokens expanded={expanded} />} />
                             <Route path="/my-deployments" element={<MyDeployments expanded={expanded} />} />
-                            <Route path="/create-market-id" element={<CreateMarketId expanded={expanded} />} />
+                            <Route path="/my-delegated-tokens" element={<DelegatedTokens expanded={expanded} />} />
                             <Route path="/create-liquidity-pool" element={<CreateLiquidityPool expanded={expanded} />} />
-                            <Route path="/add-liquidity" element={<AddLiquidity expanded={expanded} />} />
-                            <Route path="/remove-liquidity" element={<RemoveLiquidity expanded={expanded} />} />
-                            <Route path="/burn-lp-tokens" element={<BurnLPTokens expanded={expanded} />} />
+                            <Route path="/create-liquidity-pool/:mint" element={<CreateLiquidityPool expanded={expanded} />} />
+                            <Route path="/manage-liquidity/:mint" element={<ManageLiquidity expanded={expanded} />} />
+                            <Route path="/manage-liquidity" element={<ManageLiquidity expanded={expanded} />} />
                             <Route path="/check-urc" element={<CheckURC expanded={expanded} />} />
                             <Route path="/my-urc" element={<MyUniqueReferralCode expanded={expanded} />} />
                             <Route path="/ask-ai" element={<AskAI expanded={expanded} />} />
@@ -119,6 +122,7 @@ const AppContent = () => {
                             <Route path="/social-value-manager" element={<SocialValueManager expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />
+                            <Route path="/claim-tokens" element={<ClaimTokens expanded={expanded} />} />
                         </Routes>
                     </div>
                 </div>

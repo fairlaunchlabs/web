@@ -71,6 +71,9 @@ export type InitiazlizedTokenData = {
     timestamp: string;
     status: number;
     metadataTimestamp: string;
+    valueManager: string;
+    wsolVault: string;
+    graduateEpoch: string;
 
     // TokenMetadata
     tokenName: string;
@@ -501,3 +504,25 @@ export type TransferHookState = {
     authority: string | null;
     programId: string | null;
 }
+
+export type PoolData = {
+    poolAddress: string;
+    cpSwapPoolState: CpSwapPoolStateData;
+    mintIsToken0?: boolean;
+}
+export type CpSwapPoolStateData = {
+    ammConfig: string;
+    poolCreator: string;
+    lpMint: string;
+    token0Vault: string;
+    token1Vault: string;
+    token0Mint: string;
+    token0Program: string;
+    token1Mint: string;
+    token1Program: string;
+    status: number;
+    lpAmount: number;
+    token0Amount: number | null;
+    token1Amount: number | null;
+  }
+  
