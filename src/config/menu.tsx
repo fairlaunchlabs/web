@@ -4,6 +4,7 @@ import {
     MdPool,
     MdAddBox,
     MdOutlineRealEstateAgent,
+    MdOutlineAutoAwesome,
 } from 'react-icons/md';
 import { MyMintedTokens } from '../pages/MyMintedTokens';
 import { LaunchTokenForm } from '../pages/LaunchToken';
@@ -15,10 +16,11 @@ import { SocialDeveloper } from '../pages/SocialDeveloper';
 import { SocialURCProvider } from '../pages/SocialURCProvider';
 import { SocialValueManager } from '../pages/SocialValueManager';
 import { MyDeployments } from '../pages/MyDeployments';
-import { CreateLiquidityPool } from '../pages/CreateLiquidityPool';
+// import { CreateLiquidityPool } from '../pages/CreateLiquidityPool';
 import { ManageLiquidity } from '../pages/ManageLiquidity';
 import { ClaimTokens } from '../pages/ClaimTokens';
 import { DelegatedTokens } from '../pages/DelegatedTokens';
+import { TradingBot } from '../pages/TradingBot';
 
 export const menuItems = (expended: boolean): MenuItem[] => [
     { 
@@ -84,18 +86,24 @@ export const menuItems = (expended: boolean): MenuItem[] => [
                 icon: <MdOutlineRealEstateAgent className="w-5 h-5" />,
                 component: <DelegatedTokens expanded={expended} />
             },
-            {
-                id: 'create-liquidity-pool',
-                label: 'Create Pool',
-                icon: <MdPool className="w-5 h-5" />,
-                component: <CreateLiquidityPool expanded={expended} />
-            },
+            // {
+            //     id: 'create-liquidity-pool',
+            //     label: 'Create Pool',
+            //     icon: <MdPool className="w-5 h-5" />,
+            //     component: <CreateLiquidityPool expanded={expended} />
+            // },
             {
                 id: 'manage-liquidity',
                 label: 'Manage Liquidity',
                 icon: <MdAddBox className="w-5 h-5" />,
                 component: <ManageLiquidity expanded={expended} />
             },
+            {
+                id: 'trading-bot',
+                label: 'Trading Bot',
+                icon: <MdOutlineAutoAwesome className="w-5 h-5" />,
+                component: <TradingBot expanded={expended} />
+            }
         ]
     },
     {

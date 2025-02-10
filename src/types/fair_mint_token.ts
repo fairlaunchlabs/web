@@ -619,6 +619,13 @@ export type FairMintToken = {
           }
         },
         {
+          "name": "destinationWsolAta",
+          "writable": true
+        },
+        {
+          "name": "wsolMint"
+        },
+        {
           "name": "refundAccount",
           "writable": true,
           "pda": {
@@ -684,6 +691,13 @@ export type FairMintToken = {
         },
         {
           "name": "wsolVault",
+          "writable": true
+        },
+        {
+          "name": "protocolFeeAccount"
+        },
+        {
+          "name": "protocolWsolVault",
           "writable": true
         },
         {
@@ -1131,611 +1145,6 @@ export type FairMintToken = {
         },
         {
           "name": "maximumToken1Amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "proxyInitialize",
-      "docs": [
-        "Initiazlize a swap pool"
-      ],
-      "discriminator": [
-        185,
-        41,
-        170,
-        16,
-        237,
-        245,
-        76,
-        134
-      ],
-      "accounts": [
-        {
-          "name": "cpSwapProgram",
-          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
-        },
-        {
-          "name": "creator",
-          "docs": [
-            "Address paying to create the pool. Can be only the value manager(defaule value manager is the creator of the mint)"
-          ],
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "mint",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  105,
-                  114,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "tokenName"
-              },
-              {
-                "kind": "arg",
-                "path": "tokenSymbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "configAccount",
-          "docs": [
-            "POM config account"
-          ],
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103,
-                  95,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
-        },
-        {
-          "name": "ammConfig",
-          "docs": [
-            "Which config the pool belongs to."
-          ]
-        },
-        {
-          "name": "authority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  118,
-                  97,
-                  117,
-                  108,
-                  116,
-                  95,
-                  97,
-                  110,
-                  100,
-                  95,
-                  108,
-                  112,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  97,
-                  117,
-                  116,
-                  104,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                169,
-                42,
-                90,
-                139,
-                79,
-                41,
-                89,
-                82,
-                132,
-                37,
-                80,
-                170,
-                147,
-                253,
-                91,
-                149,
-                181,
-                172,
-                230,
-                168,
-                235,
-                146,
-                12,
-                147,
-                148,
-                46,
-                67,
-                105,
-                12,
-                32,
-                236,
-                115
-              ]
-            }
-          }
-        },
-        {
-          "name": "poolState",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "ammConfig"
-              },
-              {
-                "kind": "account",
-                "path": "token0Mint"
-              },
-              {
-                "kind": "account",
-                "path": "token1Mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                169,
-                42,
-                90,
-                139,
-                79,
-                41,
-                89,
-                82,
-                132,
-                37,
-                80,
-                170,
-                147,
-                253,
-                91,
-                149,
-                181,
-                172,
-                230,
-                168,
-                235,
-                146,
-                12,
-                147,
-                148,
-                46,
-                67,
-                105,
-                12,
-                32,
-                236,
-                115
-              ]
-            }
-          }
-        },
-        {
-          "name": "token0Mint",
-          "docs": [
-            "Token_0 mint, the key must smaller then token_1 mint."
-          ]
-        },
-        {
-          "name": "token1Mint",
-          "docs": [
-            "Token_1 mint, the key must grater then token_0 mint."
-          ]
-        },
-        {
-          "name": "lpMint",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  108,
-                  112,
-                  95,
-                  109,
-                  105,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "poolState"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                169,
-                42,
-                90,
-                139,
-                79,
-                41,
-                89,
-                82,
-                132,
-                37,
-                80,
-                170,
-                147,
-                253,
-                91,
-                149,
-                181,
-                172,
-                230,
-                168,
-                235,
-                146,
-                12,
-                147,
-                148,
-                46,
-                67,
-                105,
-                12,
-                32,
-                236,
-                115
-              ]
-            }
-          }
-        },
-        {
-          "name": "creatorToken0",
-          "docs": [
-            "payer token0 account"
-          ],
-          "writable": true
-        },
-        {
-          "name": "creatorToken1",
-          "docs": [
-            "creator token1 account"
-          ],
-          "writable": true
-        },
-        {
-          "name": "creatorLpToken",
-          "writable": true
-        },
-        {
-          "name": "token0Vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "poolState"
-              },
-              {
-                "kind": "account",
-                "path": "token0Mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                169,
-                42,
-                90,
-                139,
-                79,
-                41,
-                89,
-                82,
-                132,
-                37,
-                80,
-                170,
-                147,
-                253,
-                91,
-                149,
-                181,
-                172,
-                230,
-                168,
-                235,
-                146,
-                12,
-                147,
-                148,
-                46,
-                67,
-                105,
-                12,
-                32,
-                236,
-                115
-              ]
-            }
-          }
-        },
-        {
-          "name": "token1Vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "poolState"
-              },
-              {
-                "kind": "account",
-                "path": "token1Mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                169,
-                42,
-                90,
-                139,
-                79,
-                41,
-                89,
-                82,
-                132,
-                37,
-                80,
-                170,
-                147,
-                253,
-                91,
-                149,
-                181,
-                172,
-                230,
-                168,
-                235,
-                146,
-                12,
-                147,
-                148,
-                46,
-                67,
-                105,
-                12,
-                32,
-                236,
-                115
-              ]
-            }
-          }
-        },
-        {
-          "name": "createPoolFee",
-          "docs": [
-            "create pool fee account"
-          ],
-          "writable": true,
-          "address": "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8"
-        },
-        {
-          "name": "observationState",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  111,
-                  98,
-                  115,
-                  101,
-                  114,
-                  118,
-                  97,
-                  116,
-                  105,
-                  111,
-                  110
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "poolState"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                169,
-                42,
-                90,
-                139,
-                79,
-                41,
-                89,
-                82,
-                132,
-                37,
-                80,
-                170,
-                147,
-                253,
-                91,
-                149,
-                181,
-                172,
-                230,
-                168,
-                235,
-                146,
-                12,
-                147,
-                148,
-                46,
-                67,
-                105,
-                12,
-                32,
-                236,
-                115
-              ]
-            }
-          }
-        },
-        {
-          "name": "tokenProgram",
-          "docs": [
-            "Program to create mint account and mint tokens"
-          ],
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "token0Program",
-          "docs": [
-            "Spl token program or token program 2022"
-          ]
-        },
-        {
-          "name": "token1Program",
-          "docs": [
-            "Spl token program or token program 2022"
-          ]
-        },
-        {
-          "name": "associatedTokenProgram",
-          "docs": [
-            "Program to create an ATA for receiving position NFT"
-          ],
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
-          "name": "systemProgram",
-          "docs": [
-            "To create a new program account"
-          ],
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "rent",
-          "docs": [
-            "Sysvar for program account"
-          ],
-          "address": "SysvarRent111111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "tokenName",
-          "type": "string"
-        },
-        {
-          "name": "tokenSymbol",
-          "type": "string"
-        },
-        {
-          "name": "initAmount0",
-          "type": "u64"
-        },
-        {
-          "name": "initAmount1",
-          "type": "u64"
-        },
-        {
-          "name": "openTime",
           "type": "u64"
         }
       ]
@@ -3348,548 +2757,393 @@ export type FairMintToken = {
   "errors": [
     {
       "code": 6000,
-      "name": "onlyDefaultAdminAllowed",
-      "msg": "Only default admin allowed"
-    },
-    {
-      "code": 6001,
       "name": "onlyAdminAllowed",
       "msg": "Only admin allowed"
     },
     {
-      "code": 6002,
-      "name": "notStarted",
-      "msg": "Minting has not started"
-    },
-    {
-      "code": 6003,
+      "code": 6001,
       "name": "exceedMaxSupply",
       "msg": "Exceed max supply"
     },
     {
-      "code": 6004,
-      "name": "configDataNotSet",
-      "msg": "Config data not set"
-    },
-    {
-      "code": 6005,
-      "name": "overflow",
-      "msg": "overflow"
-    },
-    {
-      "code": 6006,
-      "name": "mintEnd",
-      "msg": "Mint is ended"
-    },
-    {
-      "code": 6007,
-      "name": "onlyOwnerAllowed",
-      "msg": "Only owner allowed"
-    },
-    {
-      "code": 6008,
-      "name": "onlyOwnerAtaAllowed",
-      "msg": "Only owner ATA allowed"
-    },
-    {
-      "code": 6009,
-      "name": "onlyMintAllowed",
-      "msg": "Only mint allowed"
-    },
-    {
-      "code": 6010,
-      "name": "onlyMintAccountAllowed",
-      "msg": "Only mint account allowed"
-    },
-    {
-      "code": 6011,
-      "name": "wrongFeeVault",
-      "msg": "Wrong fee vault"
-    },
-    {
-      "code": 6012,
+      "code": 6002,
       "name": "notEnoughSolToPayFee",
       "msg": "Not enough SOL to pay fee"
     },
     {
-      "code": 6013,
-      "name": "accountIsNotFrozen",
-      "msg": "Account is not frozen"
-    },
-    {
-      "code": 6014,
+      "code": 6003,
       "name": "wrongReferrerAta",
       "msg": "Wrong referrer ATA address"
     },
     {
-      "code": 6015,
-      "name": "referrerCodeNotSet",
-      "msg": "Referrer code not set"
-    },
-    {
-      "code": 6016,
-      "name": "referrerCodeNotAvailable",
-      "msg": "Referrer code not active"
-    },
-    {
-      "code": 6017,
+      "code": 6004,
       "name": "wrongReferrerOwner",
       "msg": "Wrong referrer owner"
     },
     {
-      "code": 6018,
+      "code": 6005,
       "name": "referrerCodeResetFrozen",
       "msg": "Referrer code reset frozen"
     },
     {
-      "code": 6019,
+      "code": 6006,
       "name": "referrerCodeExceedMaxUsage",
       "msg": "Referrer code exceed max usage"
     },
     {
-      "code": 6020,
-      "name": "wrongReferralCode",
-      "msg": "Wrong referral code"
-    },
-    {
-      "code": 6021,
+      "code": 6007,
       "name": "wrongReferrerAtaOwner",
       "msg": "Wrong referrer ATA owner"
     },
     {
-      "code": 6022,
-      "name": "canNotUseYourselfCode",
-      "msg": "Can not use yourself code"
-    },
-    {
-      "code": 6023,
+      "code": 6008,
       "name": "wrongReferrerMainAddress",
       "msg": "Wrong referrer main address"
     },
     {
-      "code": 6024,
+      "code": 6009,
       "name": "referrerAtaNotReady",
       "msg": "Referrer ATA is not ready"
     },
     {
-      "code": 6025,
+      "code": 6010,
       "name": "referrerAtaBalanceNotEnough",
       "msg": "Referrer ATA's balance is not enough"
     },
     {
-      "code": 6026,
-      "name": "deployerReferrerAtaIsReady",
-      "msg": "Deployer Referrer ATA is ready"
-    },
-    {
-      "code": 6027,
+      "code": 6011,
       "name": "wrongTokenProgram",
       "msg": "Wrong token program"
     },
     {
-      "code": 6028,
+      "code": 6012,
       "name": "targetErasNotReached",
       "msg": "Target eras not reached"
     },
     {
-      "code": 6029,
+      "code": 6013,
       "name": "wrongProtocolFeeAccount",
       "msg": "Wrong protocol fee account"
     },
     {
-      "code": 6030,
+      "code": 6014,
       "name": "onlyUserAccountAllowed",
       "msg": "Only user account allowed"
     },
     {
-      "code": 6031,
+      "code": 6015,
       "name": "notEnoughTokensToRefund",
       "msg": "Not enough tokens to refund"
     },
     {
-      "code": 6032,
+      "code": 6016,
       "name": "refundTokensIsZero",
       "msg": "Refund tokens is zero"
     },
     {
-      "code": 6033,
+      "code": 6017,
       "name": "invalidLiquidityTokensRatio",
       "msg": "Invalid liquidity tokens ratio, should be > 0 and <= 50"
     },
     {
-      "code": 6034,
+      "code": 6018,
       "name": "invalidReduceRatio",
       "msg": "Invalid reduce ratio, should be >= 50 and < 100"
     },
     {
-      "code": 6035,
+      "code": 6019,
       "name": "invalidEpochesPerEra",
       "msg": "Invalid epoches per era, should be > 0"
     },
     {
-      "code": 6036,
+      "code": 6020,
       "name": "invalidTargetSecondsPerEpoch",
       "msg": "Invalid target seconds per epoch, should be > 0"
     },
     {
-      "code": 6037,
+      "code": 6021,
       "name": "invalidTargetEras",
       "msg": "Invalid target eras, should be > 0"
     },
     {
-      "code": 6038,
+      "code": 6022,
       "name": "invalidInitialMintSize",
       "msg": "Invalid initial mint size, should be > 0"
     },
     {
-      "code": 6039,
+      "code": 6023,
       "name": "invalidInitialTargetMintSizePerEpoch",
       "msg": "Invalid initial target mint size per epoch, should be > 0"
     },
     {
-      "code": 6040,
+      "code": 6024,
       "name": "initialMintSizeOfEpochTooSmall",
       "msg": "Initial mint size of epoch too small, should be 10 * mint size per minting"
     },
     {
-      "code": 6041,
+      "code": 6025,
       "name": "userBalanceNotEnoughForRefund",
       "msg": "User token balance not enough for refund"
     },
     {
-      "code": 6042,
+      "code": 6026,
       "name": "vaultBalanceNotEnoughForRefund",
       "msg": "Vault token balance not enough for refund"
     },
     {
-      "code": 6043,
+      "code": 6027,
       "name": "onlySystemAdminAllowed",
       "msg": "Only system admin allowed"
     },
     {
-      "code": 6044,
+      "code": 6028,
       "name": "systemAlreadyInitialized",
       "msg": "System already initialized"
     },
     {
-      "code": 6045,
+      "code": 6029,
       "name": "wrongSystemConfigAccount",
       "msg": "Wrong system config account"
     },
     {
-      "code": 6046,
+      "code": 6030,
       "name": "invalidFeeAccount",
       "msg": "Invalid fee account"
     },
     {
-      "code": 6047,
+      "code": 6031,
       "name": "invalidTokenVault",
       "msg": "Invalid token vault"
     },
     {
-      "code": 6048,
+      "code": 6032,
       "name": "invalidWsolVault",
       "msg": "Invalid wsol vault"
     },
     {
-      "code": 6049,
+      "code": 6033,
       "name": "invalidWsolMint",
       "msg": "Invalid wsol mint"
     },
     {
-      "code": 6050,
+      "code": 6034,
       "name": "invalidTokenVaultOwner",
       "msg": "Invalid token vault owner"
     },
     {
-      "code": 6051,
+      "code": 6035,
       "name": "mintNotStarted",
       "msg": "Mint has not started"
     },
     {
-      "code": 6052,
+      "code": 6036,
       "name": "wrongReferrerCode",
       "msg": "Wrong referrer account"
     },
     {
-      "code": 6053,
-      "name": "wrongCodeHash",
-      "msg": "Wrong code hash"
-    },
-    {
-      "code": 6054,
+      "code": 6037,
       "name": "wrongMintAddress",
       "msg": "Wrong mint address"
     },
     {
-      "code": 6055,
+      "code": 6038,
       "name": "mintHasStarted",
       "msg": "Mint has started"
     },
     {
-      "code": 6056,
+      "code": 6039,
       "name": "invalidTokenMint",
       "msg": "Invalid token mint"
     },
     {
-      "code": 6057,
+      "code": 6040,
       "name": "invalidTokenOwner",
       "msg": "Invalid token owner"
     },
     {
-      "code": 6058,
-      "name": "tokenHasDelegate",
-      "msg": "Token has delegate"
-    },
-    {
-      "code": 6059,
+      "code": 6041,
       "name": "numericOverflow",
       "msg": "Numeric overflow"
     },
     {
-      "code": 6060,
+      "code": 6042,
       "name": "insufficientFunds",
       "msg": "Insufficient funds"
     },
     {
-      "code": 6061,
-      "name": "amountConversionError",
-      "msg": "Amount conversion error"
-    },
-    {
-      "code": 6062,
+      "code": 6043,
       "name": "burnOperationFailed",
       "msg": "Burn operation failed"
     },
     {
-      "code": 6063,
+      "code": 6044,
       "name": "refundInProgress",
       "msg": "Refund in progress"
     },
     {
-      "code": 6064,
-      "name": "aountConversionError",
-      "msg": "Amount conversion error"
-    },
-    {
-      "code": 6065,
+      "code": 6045,
       "name": "divideByZero",
       "msg": "Division by zero"
     },
     {
-      "code": 6066,
-      "name": "invalidRatio",
-      "msg": "Invalid ratio value"
-    },
-    {
-      "code": 6067,
-      "name": "precisionError",
-      "msg": "Calculation precision error"
-    },
-    {
-      "code": 6068,
-      "name": "amountExceedsMaximum",
-      "msg": "Amount exceeds maximum allowed"
-    },
-    {
-      "code": 6069,
+      "code": 6046,
       "name": "transferFailed",
       "msg": "Transfer failed"
     },
     {
-      "code": 6070,
-      "name": "exceedMaxU64",
-      "msg": "Exceed max u64"
-    },
-    {
-      "code": 6071,
+      "code": 6047,
       "name": "referrerMainAccountEmpty",
       "msg": "Referrer main account empty"
     },
     {
-      "code": 6072,
+      "code": 6048,
       "name": "payerMustSign",
       "msg": "Payer must sign"
     },
     {
-      "code": 6073,
+      "code": 6049,
       "name": "invalidPayerAccount",
       "msg": "Invalid payer account"
     },
     {
-      "code": 6074,
+      "code": 6050,
       "name": "invalidCodeHash",
       "msg": "Invalid code hash"
     },
     {
-      "code": 6075,
+      "code": 6051,
       "name": "invalidResetInterval",
       "msg": "Invalid reset interval"
     },
     {
-      "code": 6076,
+      "code": 6052,
       "name": "tokenAlreadyInitialized",
       "msg": "Token already initialized"
     },
     {
-      "code": 6077,
+      "code": 6053,
       "name": "invalidTokenName",
       "msg": "Invalid token name"
     },
     {
-      "code": 6078,
+      "code": 6054,
       "name": "invalidTokenSymbol",
       "msg": "Invalid token symbol"
     },
     {
-      "code": 6079,
+      "code": 6055,
       "name": "invalidTokenUri",
       "msg": "Invalid token uri"
     },
     {
-      "code": 6080,
+      "code": 6056,
       "name": "metadataAlreadyInitialized",
       "msg": "Metadata already initialized"
     },
     {
-      "code": 6081,
+      "code": 6057,
       "name": "invalidProtocolFeeRate",
       "msg": "Invalid protocol fee rate, max 50000 which is 50%"
     },
     {
-      "code": 6082,
+      "code": 6058,
       "name": "invalidRefundFeeRate",
       "msg": "Invalid refund fee rate, max 50000 which is 50%"
     },
     {
-      "code": 6083,
+      "code": 6059,
       "name": "mintInProgress",
       "msg": "Mint in progress"
     },
     {
-      "code": 6084,
+      "code": 6060,
       "name": "setReferrerCodeProcess",
       "msg": "Set referrer code processing"
     },
     {
-      "code": 6085,
+      "code": 6061,
       "name": "payerAmountTooLow",
       "msg": "Payer amount too low"
     },
     {
-      "code": 6086,
+      "code": 6062,
       "name": "configSupplyNotMatchMintSupply",
       "msg": "Config supply not match mint supply"
     },
     {
-      "code": 6087,
+      "code": 6063,
       "name": "insufficientBalanceForDeployment",
       "msg": "Insufficient balance for deployment"
     },
     {
-      "code": 6088,
+      "code": 6064,
       "name": "sendInitializingFeeFailed",
       "msg": "Send initializing fee failed"
     },
     {
-      "code": 6089,
+      "code": 6065,
       "name": "invalidMintAccount",
       "msg": "Invalid mint account"
     },
     {
-      "code": 6090,
-      "name": "invalidFreezeAuthority",
-      "msg": "Invalid freeze authority"
-    },
-    {
-      "code": 6091,
-      "name": "invalidMintAuthority",
-      "msg": "Invalid mint authority"
-    },
-    {
-      "code": 6092,
+      "code": 6066,
       "name": "invalidTokenProgram",
       "msg": "Invalid token program"
     },
     {
-      "code": 6093,
+      "code": 6067,
       "name": "refundOnlyAllowedInTargetEras",
       "msg": "Refund only allowed in target eras"
     },
     {
-      "code": 6094,
-      "name": "revokeFreezeAuthorityNotApplied",
-      "msg": "Revoke freeze authority not applied"
-    },
-    {
-      "code": 6095,
-      "name": "revokeFreezeAuthorityApplied",
-      "msg": "Revoke freeze authority applied"
-    },
-    {
-      "code": 6096,
-      "name": "invalidMetadataAccount",
-      "msg": "Invalid metadata account"
-    },
-    {
-      "code": 6097,
-      "name": "invalidMasterEditionAccount",
-      "msg": "Invalid master edition account"
-    },
-    {
-      "code": 6098,
-      "name": "isNotCurrentlyTransferring",
-      "msg": "The token is not currently transferring"
-    },
-    {
-      "code": 6099,
-      "name": "amountTooBig",
-      "msg": "The amount is too big"
-    },
-    {
-      "code": 6100,
-      "name": "invalidMintTokenVaultAccount",
-      "msg": "Invalid mint token vault account"
-    },
-    {
-      "code": 6101,
-      "name": "wrongProgramId",
-      "msg": "Wrong program id"
-    },
-    {
-      "code": 6102,
-      "name": "mintTokenVaultOwnerAlreadyInitialized",
-      "msg": "Mint token vault owner already initialized"
-    },
-    {
-      "code": 6103,
-      "name": "invalidMintVaultOwner",
-      "msg": "Invalid mint vault owner"
-    },
-    {
-      "code": 6104,
+      "code": 6068,
       "name": "graduateFrozenPeriodNotOver",
       "msg": "Graduate frozen period not over, need to wait 2 epochs after target era arrived!"
     },
     {
-      "code": 6105,
+      "code": 6069,
       "name": "onlyValueManagerAllowed",
       "msg": "Only value manager allowed"
     },
     {
-      "code": 6106,
-      "name": "invalidMint",
-      "msg": "Invalid mint"
-    },
-    {
-      "code": 6107,
+      "code": 6070,
       "name": "invalidValueManager",
       "msg": "Invalid value manager"
     },
     {
-      "code": 6108,
+      "code": 6071,
       "name": "invalidProtocolFeeAccount",
       "msg": "Invalid protocol fee account"
+    },
+    {
+      "code": 6072,
+      "name": "invalidRemainingAccounts",
+      "msg": "Invalid remaining accounts"
+    },
+    {
+      "code": 6073,
+      "name": "creatorTokenNotEnoughForInitializePool",
+      "msg": "Creator token not enough for initialize pool"
+    },
+    {
+      "code": 6074,
+      "name": "graduateFeeIsNotEnough",
+      "msg": "Graduate fee is not enough"
+    },
+    {
+      "code": 6075,
+      "name": "invalidDestinationAta",
+      "msg": "Invalid destination ata"
+    },
+    {
+      "code": 6076,
+      "name": "protocolWsolVaultIsIsEmpty",
+      "msg": "Protocol wsol vault is is empty"
+    },
+    {
+      "code": 6077,
+      "name": "invalidMillisecondsPerSlot",
+      "msg": "Invalid milliseconds per slot"
     }
   ],
   "types": [

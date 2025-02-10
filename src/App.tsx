@@ -32,10 +32,11 @@ import { SocialValueManager } from './pages/SocialValueManager';
 import { LaunchTokenForm } from './pages/LaunchToken';
 import { CheckURC } from './components/tools/CheckURC';
 import { MyUniqueReferralCode } from './components/tools/MyUniqueReferralCode';
-import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
+// import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
 import { ManageLiquidity } from './pages/ManageLiquidity';
 import { ClaimTokens } from './pages/ClaimTokens';
 import { DelegatedTokens } from './pages/DelegatedTokens';
+import { TradingBot } from './pages/TradingBot';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -110,10 +111,12 @@ const AppContent = () => {
                             <Route path="/my-minted-tokens" element={<MyMintedTokens expanded={expanded} />} />
                             <Route path="/my-deployments" element={<MyDeployments expanded={expanded} />} />
                             <Route path="/my-delegated-tokens" element={<DelegatedTokens expanded={expanded} />} />
-                            <Route path="/create-liquidity-pool" element={<CreateLiquidityPool expanded={expanded} />} />
-                            <Route path="/create-liquidity-pool/:mint" element={<CreateLiquidityPool expanded={expanded} />} />
+                            {/* <Route path="/create-liquidity-pool" element={<CreateLiquidityPool expanded={expanded} />} />
+                            <Route path="/create-liquidity-pool/:mint" element={<CreateLiquidityPool expanded={expanded} />} /> */}
                             <Route path="/manage-liquidity/:mint" element={<ManageLiquidity expanded={expanded} />} />
                             <Route path="/manage-liquidity" element={<ManageLiquidity expanded={expanded} />} />
+                            <Route path="/trading-bot" element={<TradingBot expanded={expanded} />} />
+                            <Route path="/trading-bot/:mint" element={<TradingBot expanded={expanded} />} />
                             <Route path="/check-urc" element={<CheckURC expanded={expanded} />} />
                             <Route path="/my-urc" element={<MyUniqueReferralCode expanded={expanded} />} />
                             <Route path="/ask-ai" element={<AskAI expanded={expanded} />} />

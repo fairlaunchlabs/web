@@ -7,6 +7,7 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import toast from "react-hot-toast";
 import AlertBox from "../common/AlertBox";
+import { DexStatusBar } from "./DexStatusBar";
 
 type PoolInformationProps = {
   tokenData: InitiazlizedTokenData;
@@ -26,6 +27,8 @@ type PoolInformationProps = {
   setVaultLpTokenBalance: (data: number) => void;
   totalLpToken: number;
   setTotalLpToken: (data: number) => void;
+  isDexOpen: boolean;
+  setIsDexOpen: (data: boolean) => void;
 }
 
 export const PoolInformation: FC<PoolInformationProps> = ({
@@ -45,9 +48,12 @@ export const PoolInformation: FC<PoolInformationProps> = ({
   vaultLpTokenBalance,
   setVaultLpTokenBalance,
   totalLpToken,
-  setTotalLpToken
+  setTotalLpToken,
+  isDexOpen,
+  setIsDexOpen,
 }) => {
   const [poolAddress, setPoolAddress] = useState('');
+  const [openTime, setOpenTime] = useState(0);
 
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -65,6 +71,7 @@ export const PoolInformation: FC<PoolInformationProps> = ({
     getLiquidityPoolData(wallet, connection, tokenData).then((res: ResponseData) => {
       if (res.success) {
         const poolData = res.data as PoolData;
+        setOpenTime(poolData.cpSwapPoolState.openTime);
         setPoolData(poolData);
         const _poolTokenBalance = poolData.cpSwapPoolState.token0Amount as number;
         const _poolSOLBalance = poolData.cpSwapPoolState.token1Amount as number;
@@ -83,6 +90,7 @@ export const PoolInformation: FC<PoolInformationProps> = ({
         getTokenBalanceByMintAndOwner(new PublicKey(poolData.cpSwapPoolState.lpMint as string), new PublicKey(tokenData.configAccount), connection, true, TOKEN_PROGRAM_ID).then(balance => {
           setVaultLpTokenBalance(balance as number);
         })
+        console.log("open time", poolData.cpSwapPoolState.openTime);
       } else {
         toast.error(res.message as string);
       }
@@ -112,7 +120,7 @@ export const PoolInformation: FC<PoolInformationProps> = ({
             <span>{wsolVaultBalance} SOL</span>
           </div>
 
-          {poolAddress !== "" &&
+          {poolAddress !== "" && <div>
             <div className='grid gap-3'>
               <div className="flex justify-between">
                 <span>Pool Address:</span>
@@ -138,6 +146,8 @@ export const PoolInformation: FC<PoolInformationProps> = ({
                 <span>Vault LP Token:</span>
                 <span>{vaultLpTokenBalance} LP-{tokenData.tokenSymbol}-SOL</span>
               </div>
+            </div>
+            <DexStatusBar openTime={openTime} isDexOpen={isDexOpen} setIsDexOpen={setIsDexOpen}/>
             </div>}
         </div>
       </div>
@@ -145,6 +155,10 @@ export const PoolInformation: FC<PoolInformationProps> = ({
       <div>
         <AlertBox title="Alert" message="Raydium pool has not created! Please create a pool first." />
         <div className="mt-5"><a href={`/create-liquidity-pool/${tokenData.mint}`} className="text-blue-500 underline">Create pool</a></div>
+      </div>}
+      {poolAddress !== "" && !isDexOpen &&
+      <div>
+        <AlertBox title="Alert" message={`Raydium pool has been created but not opened! Please wait until ${new Date(openTime * 1000).toLocaleString()}`} />
       </div>}
       </div>
   );

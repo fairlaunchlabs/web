@@ -511,6 +511,7 @@ export type PoolData = {
     mintIsToken0?: boolean;
 }
 export type CpSwapPoolStateData = {
+    openTime: number;
     ammConfig: string;
     poolCreator: string;
     lpMint: string;
@@ -524,5 +525,11 @@ export type CpSwapPoolStateData = {
     lpAmount: number;
     token0Amount: number | null;
     token1Amount: number | null;
-  }
+}
   
+export type RemainingAccount = {
+    pubkey: PublicKey,
+    isWritable: boolean,
+    isSigner: boolean
+}
+

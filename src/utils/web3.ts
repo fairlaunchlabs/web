@@ -1,15 +1,20 @@
-import { 
-    Connection, 
+import {
+    AddressLookupTableAccount,
+    BlockhashWithExpiryBlockHeight,
+    ComputeBudgetProgram,
+    Connection,
     PublicKey,
     SystemProgram,
     SYSVAR_RENT_PUBKEY,
     Transaction,
+    TransactionMessage,
+    VersionedTransaction,
 } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
 // import transferHookIdl from '../idl/transfer_hook.json';
-import { CONFIG_DATA_SEED, MINT_SEED, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, UPLOAD_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT, IRYS_GATEWAY_URL, STORAGE } from '../config/constants';
-import { InitializeTokenConfig, InitiazlizedTokenData, MetadataAccouontData, MintExtentionData, ResponseData, TokenMetadata, TokenMetadataIPFS, TransferHookState } from '../types/types';
+import { CONFIG_DATA_SEED, MINT_SEED, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, UPLOAD_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT, IRYS_GATEWAY_URL, STORAGE, cpSwapProgram, cpSwapConfigAddress, createPoolFeeReceive, addressLookupTableAddress, slotsOfEstimatingInterval } from '../config/constants';
+import { InitializeTokenConfig, InitiazlizedTokenData, MetadataAccouontData, MintExtentionData, RemainingAccount, ResponseData, TokenMetadata, TokenMetadataIPFS, TransferHookState } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 // import { TransferHook } from '../types/transfer_hook';
@@ -17,7 +22,10 @@ import axios from 'axios';
 import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, NATIVE_MINT, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { fetchMetadataFromUrlOrCache } from './db';
 import { BN_LAMPORTS_PER_SOL, getFeeValue, numberStringToBN } from './format';
-import { calculateDepositAmounts, calculateWithdrawAmounts, getPoolData, poolBurnLpTokensInstructions, poolDepositInstructions, poolInitializeInstructions, poolSwapBaseInInstructions, poolSwapBaseOutInstructions, poolWithdrawInstructions,  } from './raydium_cpmm/instruction';
+import { calculateDepositAmounts, calculateWithdrawAmounts, getPoolData, poolBurnLpTokensInstructions, poolDepositInstructions, poolSwapBaseInInstructions, poolSwapBaseOutInstructions, poolWithdrawInstructions, } from './raydium_cpmm/instruction';
+import { getAuthAddress, getOrcleAccountAddress, getPoolAddress, getPoolLpMintAddress, getPoolVaultAddress } from './raydium_cpmm/pda';
+import { RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@raydium-io/raydium-sdk-v2';
+import { ASSOCIATED_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 
 const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     const provider = new AnchorProvider(
@@ -30,7 +38,7 @@ const getProgram = (wallet: AnchorWallet, connection: Connection) => {
         },
         { commitment: 'confirmed' }
     );
-    
+
     return new Program(fairMintTokenIdl as FairMintToken, provider);
 }
 
@@ -45,24 +53,24 @@ const getProgram = (wallet: AnchorWallet, connection: Connection) => {
 //         },
 //         { commitment: 'confirmed' }
 //     );
-    
+
 //     return new Program(transferHookIdl as TransferHook, provider);
 // }
 
 export const compareMints = (mintA: PublicKey, mintB: PublicKey): number => {
     const bufferA = mintA.toBuffer();
     const bufferB = mintB.toBuffer();
-    
+
     for (let i = 0; i < bufferA.length; i++) {
-      if (bufferA[i] !== bufferB[i]) {
-        return bufferA[i] - bufferB[i];
-      }
+        if (bufferA[i] !== bufferB[i]) {
+            return bufferA[i] - bufferB[i];
+        }
     }
     return 0;
-}  
+}
 
 export const createTokenOnChain = async (
-    metadata: TokenMetadata, 
+    metadata: TokenMetadata,
     wallet: AnchorWallet,
     connection: Connection,
     config: InitializeTokenConfig
@@ -70,7 +78,7 @@ export const createTokenOnChain = async (
     try {
         if (!wallet) {
             throw new Error('Please connect your wallet first');
-        }        
+        }
         const program = getProgram(wallet, connection);
         const [mintPda] = PublicKey.findProgramAddressSync(
             [
@@ -101,10 +109,10 @@ export const createTokenOnChain = async (
         const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
             [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
             program.programId,
-          );
+        );
         const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, configPda, true, TOKEN_PROGRAM_ID);
         const tokenVaultAta = await getAssociatedTokenAddress(mintPda, configPda, true, TOKEN_2022_PROGRAM_ID);
-        
+
         const contextInitializeTokenAccounts = {
             systemConfigAccount: systemConfigAccountPda,
             mint: mintPda,
@@ -122,12 +130,12 @@ export const createTokenOnChain = async (
             .initializeToken(metadata, config as any)
             .accounts(contextInitializeTokenAccounts)
             .instruction();
-        
+
         const tx = new Transaction().add(
             instructionInitializeToken,
         );
-        
-        return await processTransaction(tx, connection, wallet, "Create token successfully", {mintAddress: mintPda.toString()});
+
+        return await processTransaction(tx, connection, wallet, "Create token successfully", { mintAddress: mintPda.toString() });
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -140,7 +148,7 @@ export const createTokenOnChain = async (
 };
 
 export const getReferrerCodeHash = (
-    wallet: AnchorWallet | undefined, 
+    wallet: AnchorWallet | undefined,
     connection: Connection,
     code: string // without hashed
 ): ResponseData => {
@@ -154,7 +162,7 @@ export const getReferrerCodeHash = (
     const [codeHash] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFERRAL_CODE_SEED), Buffer.from(code)],
         program.programId,
-      );
+    );
 
     return {
         success: true,
@@ -184,6 +192,8 @@ export const getTokenBalance = async (ata: PublicKey, connection: Connection): P
 
 export const getTokenBalanceByMintAndOwner = async (mint: PublicKey, owner: PublicKey, connection: Connection, allowOwnerOffCurve: boolean = false, programId: PublicKey = TOKEN_2022_PROGRAM_ID): Promise<number | null> => {
     const ata = await getAssociatedTokenAddress(mint, owner, allowOwnerOffCurve, programId);
+    const ataInfo = await connection.getAccountInfo(ata);
+    if (!ataInfo) return 0;
     const account = await connection.getTokenAccountBalance(ata);
     return account.value.uiAmount;
 }
@@ -295,10 +305,10 @@ export const reactiveReferrerCode = async (
         // do the tranasaction
         const transaction = new Transaction();
         // If the referrer ata does not exist, create it
-        if(!referrerAtaInfo) transaction.add(instructionCreateReferrerAta);
+        if (!referrerAtaInfo) transaction.add(instructionCreateReferrerAta);
         transaction.add(instructionSetReferrerCode);
-        return await processTransaction(transaction, connection, wallet, "Reactive referrer code successfully", {referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58()});
-    } catch (error:any) {
+        return await processTransaction(transaction, connection, wallet, "Reactive referrer code successfully", { referralAccount: referralAccountPda.toBase58(), mint: mint.toBase58() });
+    } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
                 success: false,
@@ -361,7 +371,7 @@ export const setReferrerCode = async (
                     tx: "mine",
                     referralAccount: codeAccountData.referralAccount.toBase58(),
                 }
-            };    
+            };
         }
     }
 
@@ -418,9 +428,9 @@ export const setReferrerCode = async (
         // do the tranasaction
         const transaction = new Transaction();
         // If the referrer ata does not exist, create it
-        if(!referrerAtaInfo) transaction.add(instructionCreateReferrerAta);
+        if (!referrerAtaInfo) transaction.add(instructionCreateReferrerAta);
         transaction.add(instructionSetReferrerCode);
-        return await processTransaction(transaction, connection, wallet, "Set referrer code successfully", {referralAccount: referralAccountPda.toBase58()});
+        return await processTransaction(transaction, connection, wallet, "Set referrer code successfully", { referralAccount: referralAccountPda.toBase58() });
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -436,12 +446,12 @@ export const setReferrerCode = async (
 };
 
 export const getMyReferrerData = async (
-    wallet: AnchorWallet | undefined, 
-    connection: Connection, 
-    mint: PublicKey, 
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
+    mint: PublicKey,
     referrerCode: string
 ): Promise<ResponseData> => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -500,7 +510,7 @@ export const getSystemConfig = async (
     wallet: AnchorWallet | undefined,
     connection: Connection
 ): Promise<ResponseData> => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -517,7 +527,7 @@ export const getSystemConfig = async (
                 systemConfigData,
                 systemConfigAccountPda,
             }
-        }    
+        }
     } catch (error) {
         return {
             success: false,
@@ -527,7 +537,7 @@ export const getSystemConfig = async (
 }
 
 export const getRefundAccountData = async (wallet: AnchorWallet, connection: Connection, token: InitiazlizedTokenData) => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -543,7 +553,7 @@ export const getRefundAccountData = async (wallet: AnchorWallet, connection: Con
             success: true,
             message: 'Get refund data success',
             data: refundAccountData
-        };    
+        };
     } catch (error) {
         console.log("getRefundAccountData", error);
         return {
@@ -554,12 +564,11 @@ export const getRefundAccountData = async (wallet: AnchorWallet, connection: Con
 }
 
 export const refund = async (
-    wallet: AnchorWallet | undefined, 
+    wallet: AnchorWallet | undefined,
     connection: Connection,
     token: InitiazlizedTokenData,
-    protocolFeeAccount: PublicKey,
 ): Promise<ResponseData> => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -587,7 +596,7 @@ export const refund = async (
         false,
         TOKEN_2022_PROGRAM_ID
     )
-    
+
     const payerWsolAta = getAssociatedTokenAddressSync(
         NATIVE_MINT,
         wallet.publicKey,
@@ -597,7 +606,7 @@ export const refund = async (
 
     const protocolWsolAta = getAssociatedTokenAddressSync(
         NATIVE_MINT,
-        protocolFeeAccount,
+        new PublicKey(PROTOCOL_FEE_ACCOUNT),
         false,
         TOKEN_PROGRAM_ID,
     );
@@ -612,7 +621,7 @@ export const refund = async (
         tokenVault: new PublicKey(token.tokenVault),
         payerWsolVault: payerWsolAta,
         wsolVault: wsolVaultAta,
-        protocolFeeAccount,
+        protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
         protocolWsolVault: protocolWsolAta,
         systemConfigAccount: systemConfigAccountPda,
         tokenAta,
@@ -643,14 +652,14 @@ export const refund = async (
         if (!protocolWsolAtaData) tx.add(createAssociatedTokenAccountInstruction(
             wallet.publicKey,
             protocolWsolAta,
-            protocolFeeAccount,
+            new PublicKey(PROTOCOL_FEE_ACCOUNT),
             NATIVE_MINT,
             TOKEN_PROGRAM_ID
         ));
         // Add refund instruction
         tx.add(instructionRefund);
         // send transactions
-        return await processTransaction(tx, connection, wallet, "Refund successfully", {mint: token.mint});
+        return await processTransaction(tx, connection, wallet, "Refund successfully", { mint: token.mint });
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -669,8 +678,7 @@ export const isFrozen = async (
     connection: Connection,
     mint: PublicKey,
 ): Promise<ResponseData> => {
-    // console.log("authority", authority, "programId", programId);
-    const transferHookState  = await getTransferHookData(connection, mint);
+    const transferHookState = await getTransferHookData(connection, mint);
     if (!transferHookState.success) {
         return transferHookState;
     }
@@ -717,7 +725,7 @@ export const getExtensions = async (
 }
 
 export const mintToken = async (
-    wallet: AnchorWallet | undefined, 
+    wallet: AnchorWallet | undefined,
     connection: Connection,
     token: InitiazlizedTokenData,
     referralAccountPda: PublicKey,
@@ -725,7 +733,7 @@ export const mintToken = async (
     referrerAta: PublicKey,
     code: string,
 ): Promise<ResponseData> => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -743,20 +751,20 @@ export const mintToken = async (
     // get data from referral account, and check if it is correct
     const referrerData = await program.account.tokenReferralData.fetch(referralAccountPda);
 
-    if(referrerMain.toBase58() !== referrerData.referrerMain.toBase58()) {
+    if (referrerMain.toBase58() !== referrerData.referrerMain.toBase58()) {
         return {
             success: false,
             message: 'Wrong referrer account'
         }
     }
     const codeHash = getReferrerCodeHash(wallet, connection, code);
-    if(!codeHash.success) {
+    if (!codeHash.success) {
         return {
             success: false,
             message: codeHash.message
         }
     }
-    if(codeHash.data?.toBase58() !== referrerData.codeHash.toBase58()) {
+    if (codeHash.data?.toBase58() !== referrerData.codeHash.toBase58()) {
         return {
             success: false,
             message: 'Wrong referrer code'
@@ -764,12 +772,8 @@ export const mintToken = async (
     }
     // TODO: check if referrer code is exceed max usage
 
-    const destinationAta = await getAssociatedTokenAddress(
-        new PublicKey(token.mint),
-        wallet.publicKey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-    )
+    const destinationAta = await getAssociatedTokenAddress(new PublicKey(token.mint), wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
+    const destinationAtaInfo = await connection.getAccountInfo(destinationAta);
     const [refundAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
         program.programId,
@@ -781,7 +785,9 @@ export const mintToken = async (
 
     const configAccountPda = new PublicKey(token.configAccount);
     const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, configAccountPda, true, TOKEN_PROGRAM_ID);
-
+    const protocolWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, new PublicKey(PROTOCOL_FEE_ACCOUNT), false, TOKEN_PROGRAM_ID);
+    const destinationWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, false, TOKEN_PROGRAM_ID);
+    const destinationWsolInfo = await connection.getAccountInfo(destinationWsolAta);
     const mintAccounts = {
         mint: new PublicKey(token.mint),
         destination: destinationAta,
@@ -790,9 +796,13 @@ export const mintToken = async (
         configAccount: configAccountPda,
         tokenVault: new PublicKey(token.tokenVault),
         wsolVault: wsolVaultAta,
+        protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
+        protocolWsolVault: protocolWsolAta,
+        destinationWsolAta: destinationWsolAta,
+        wsolMint: NATIVE_MINT,
         systemConfigAccount: systemConfigAccountPda,
         referrerAta: referrerAta,
-        referrerMain,
+        referrerMain: referrerMain,
         referralAccount: referralAccountPda,
         rent: SYSVAR_RENT_PUBKEY,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
@@ -800,11 +810,222 @@ export const mintToken = async (
         associatedAddressProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     };
 
-    const tx = await program.methods
+    // console.log("=== mint accounts ===", Object.fromEntries(
+    //     Object.entries(mintAccounts).map(([key, value]) => [key, value.toString()])
+    // ));
+
+    const instructionSetComputerUnitLimit = ComputeBudgetProgram.setComputeUnitLimit({ units: 500000 }); // or use --compute-unit-limit 400000 to run solana-test-validator
+    const instructionCreateWSOLAta = createAssociatedTokenAccountInstruction( // Create WSOL for user if don't has
+        wallet.publicKey,
+        destinationWsolAta,
+        wallet.publicKey,
+        NATIVE_MINT,
+        TOKEN_PROGRAM_ID
+    );
+    const instructionCreateTokenAta = createAssociatedTokenAccountInstruction( // Create token for user if don't has
+        wallet.publicKey,
+        destinationAta,
+        wallet.publicKey,
+        new PublicKey(token.mint),
+        TOKEN_2022_PROGRAM_ID
+    );
+    const remainingAccounts = getRemainingAccountsForMintTokens(new PublicKey(token.mint), wallet.publicKey);
+    // Create versioned transaction with LUT
+    const accountInfo = await connection.getAccountInfo(addressLookupTableAddress);
+    const lookupTable = new AddressLookupTableAccount({
+        key: addressLookupTableAddress,
+        state: AddressLookupTableAccount.deserialize(accountInfo!.data),
+    });
+
+    // TODO: Judge if the target era almost arrive, if not, secondsPerSlot = null
+    // const epochInfo = await connection.getEpochInfo();
+    // const secondsPerSlot = await getCurrentSlopInterval(connection.rpcEndpoint, epochInfo.absoluteSlot - slotsOfEstimatingInterval, epochInfo.absoluteSlot);
+    // console.log("seconds per slot", secondsPerSlot);
+
+    const ix = await program.methods
         .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
         .accounts(mintAccounts)
-        .transaction();
-    return await processTransaction(tx, connection, wallet, "Mint successfully", {mint: token.mint});
+        .remainingAccounts(remainingAccounts)
+        .instruction();
+    const confirmLevel = "confirmed";
+    const latestBlockhash = await connection.getLatestBlockhash(confirmLevel);
+    const instructions = [instructionSetComputerUnitLimit];
+    if(destinationAtaInfo === null) instructions.push(instructionCreateTokenAta);
+    if(destinationWsolInfo === null) instructions.push(instructionCreateWSOLAta);
+    instructions.push(ix);
+    const versionedTx = new VersionedTransaction(
+        new TransactionMessage({
+            payerKey: wallet.publicKey,
+            recentBlockhash: latestBlockhash.blockhash,
+            instructions,
+        }).compileToV0Message([lookupTable])
+    );
+
+    try {
+        return processVersionedTransaction(versionedTx, connection, wallet, latestBlockhash, confirmLevel);
+    } catch (error) {
+        return {
+            success: false,
+            message: `Mint failed: ${error}`,
+        }
+    }
+}
+
+export const processVersionedTransaction = async (
+    versionedTx: VersionedTransaction,
+    connection: Connection,
+    wallet: AnchorWallet,
+    latestBlockhash: BlockhashWithExpiryBlockHeight,
+    confirmLevel: 'processed' | 'confirmed' | 'finalized' = 'confirmed'
+) => {
+    if (!wallet?.publicKey) return {
+        success: false,
+        message: 'Please connect wallet'
+    }
+    try {
+        versionedTx.message.recentBlockhash = latestBlockhash.blockhash;
+        const signedTx = await wallet.signTransaction(versionedTx);
+        const serializedTx = signedTx.serialize();
+        const signature = await connection.sendRawTransaction(serializedTx, {
+            skipPreflight: true,
+        });
+        const status = await connection.confirmTransaction({
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+        }, confirmLevel);
+
+        if(status.value.err) {
+            return {
+                success: false,
+                message: `Mint failed: ${JSON.stringify(status.value.err)}`,
+            }
+        }
+        return {
+            success: true,
+            message: `Mint succeeded`,
+            data: { 
+                tx: signature,
+            }
+        }
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: error.message,
+        }
+    }
+}
+
+const getRemainingAccountsForMintTokens = (
+    mint: PublicKey,
+    user: PublicKey
+): Array<RemainingAccount> => {
+    let token0 = mint;
+    let token0Program = TOKEN_2022_PROGRAM_ID;
+
+    let token1 = NATIVE_MINT;
+    let token1Program = TOKEN_PROGRAM_ID;
+
+    if (compareMints(token0, token1) > 0) {
+        [token0, token1] = [token1, token0];
+        [token0Program, token1Program] = [token1Program, token0Program];
+    }
+    const [authority] = getAuthAddress(cpSwapProgram);
+    const [poolAddress] = getPoolAddress(cpSwapConfigAddress, token0, token1, cpSwapProgram);
+    const [lpMintAddress] = getPoolLpMintAddress(poolAddress, cpSwapProgram);
+    const [vault0] = getPoolVaultAddress(poolAddress, token0, cpSwapProgram);
+    const [vault1] = getPoolVaultAddress(poolAddress, token1, cpSwapProgram);
+    const [observationAddress] = getOrcleAccountAddress(poolAddress, cpSwapProgram);
+    const creatorLpTokenAddress = getAssociatedTokenAddressSync(lpMintAddress, user, false, TOKEN_PROGRAM_ID);
+    const creatorToken0 = getAssociatedTokenAddressSync(token0, user, false, token0Program);
+    const creatorToken1 = getAssociatedTokenAddressSync(token1, user, false, token1Program);
+
+    return [{
+        pubkey: cpSwapProgram, // <- 1
+        isWritable: false,
+        isSigner: false,
+    }, {
+        pubkey: user, // <- 2
+        isWritable: true,
+        isSigner: true,
+    }, {
+        pubkey: cpSwapConfigAddress, // <- 3
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: authority, // <- 4
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: poolAddress, // <- 5
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: token0, // <- 6
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: token1, // <- 7
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: lpMintAddress, // <- 8
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: creatorToken0, // <- 9
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: creatorToken1, // <- 10
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: creatorLpTokenAddress, // <- 11
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: vault0, // <- 12
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: vault1, // <- 13
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: createPoolFeeReceive, // <- 14
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: observationAddress, // <- 15
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: TOKEN_PROGRAM_ID, // <- 16
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: token0Program, // <- 17
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: token1Program, // <- 18
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: ASSOCIATED_PROGRAM_ID, // <- 19
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: SYSTEM_PROGRAM_ID, // <- 20
+        isWritable: true,
+        isSigner: false,
+    }, {
+        pubkey: RENT_PROGRAM_ID, // <- 21
+        isWritable: true,
+        isSigner: false,
+    }]
 }
 
 export const getReferralDataByCodeHash = async (
@@ -812,7 +1033,7 @@ export const getReferralDataByCodeHash = async (
     connection: Connection,
     codeHash: PublicKey
 ) => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -825,7 +1046,7 @@ export const getReferralDataByCodeHash = async (
     );
 
     const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
-    if(!codeAccountInfo) {
+    if (!codeAccountInfo) {
         return {
             success: false,
             message: 'Code account does not exist'
@@ -835,7 +1056,7 @@ export const getReferralDataByCodeHash = async (
     const referralAccountPda = codeAccountData.referralAccount;
 
     const referralAccountInfo = await connection.getAccountInfo(referralAccountPda);
-    if(!referralAccountInfo) {
+    if (!referralAccountInfo) {
         return {
             success: false,
             message: 'Referral account does not exist'
@@ -852,11 +1073,11 @@ export const getReferralDataByCodeHash = async (
 }
 
 export const getReferrerDataByReferralAccount = async (
-    wallet: AnchorWallet | undefined, 
-    connection: Connection, 
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
     referralAccountPda: PublicKey
 ): Promise<ResponseData> => {
-    if(!wallet) return {
+    if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
     }
@@ -878,7 +1099,7 @@ export const checkAvailableIrysItemId = (id: string) => {
 
 export const extractArweaveHash = (url: string): string => {
     // 移除可能的末尾斜杠
-    if(url === undefined) return "";
+    if (url === undefined) return "";
     const cleanUrl = url.replace(/\/$/, '');
     // 从URL中提取最后一段作为hash
     const hash = cleanUrl.split('/').pop();
@@ -890,7 +1111,7 @@ export const extractArweaveHash = (url: string): string => {
 
 export const extractIrysHash = (url: string): string => {
     // 移除可能的末尾斜杠
-    if(url === undefined) return "";
+    if (url === undefined) return "";
     const cleanUrl = url.replace(/\/$/, '');
     // 从URL中提取最后一段作为hash
     const hash = cleanUrl.split('/').pop();
@@ -901,7 +1122,7 @@ export const extractIrysHash = (url: string): string => {
 };
 
 export const generateArweaveUrl = (updateTimestamp: number, id: string) => {
-    if(updateTimestamp + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
+    if (updateTimestamp + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
         return `${ARWEAVE_GATEWAY_URL}/${id}`; // 从arweave加载
     } else {
         return `${ARSEEDING_GATEWAY_URL}/${id}`; // 从arseeding加载
@@ -919,7 +1140,7 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
         if (token.tokenUri.includes(ARWEAVE_GATEWAY_URL) || token.tokenUri.includes("irys.xyz")) {
             return await fetchMetadataFromUrlOrCache(token.tokenUri, Number(token.metadataTimestamp));
         }
-        
+
         // Deprecated
         if (token.tokenUri.startsWith('ipfs://') || token.tokenUri.startsWith('https://gateway.pinata.cloud')) {
             // 忽略之前通过IPFS保存的metadata和图片
@@ -972,7 +1193,7 @@ export const closeToken = async (
         }
 
         const program = getProgram(wallet, connection);
-      
+
         const context = {
             mint: new PublicKey(token.mint),
             configAccount: new PublicKey(token.configAccount),
@@ -986,7 +1207,7 @@ export const closeToken = async (
             .closeToken(token.tokenName, token.tokenSymbol)
             .accounts(context)
             .transaction();
-        return await processTransaction(tx, connection, wallet, "Close token successfully", {mint: token.mint});
+        return await processTransaction(tx, connection, wallet, "Close token successfully", { mint: token.mint });
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -1025,7 +1246,7 @@ export const updateMetaData = async (
         //     ],
         //     TOKEN_METADATA_PROGRAM_ID,
         //   );
-        
+
         const systemConfig = await getSystemConfig(wallet, connection);
         if (!systemConfig.success) {
             return {
@@ -1034,7 +1255,7 @@ export const updateMetaData = async (
             };
         }
         const systemConfigData = systemConfig.data;
-  
+
         const context = {
             mint: new PublicKey(token.mint),
             configAccount: new PublicKey(token.configAccount),
@@ -1050,7 +1271,6 @@ export const updateMetaData = async (
         console.log("update metadata context", Object.fromEntries(
             Object.entries(context).map(([key, value]) => [key, value.toString()])
         ));
-
 
         // 判断新的metadata是否和原来的metadata一样
         if (token.tokenMetadata?.description === newMetadata.description &&
@@ -1087,12 +1307,12 @@ export const updateMetaData = async (
             // decimals: 9,
             uri: metadataUrl,
         }
-      
+
         const tx = await program.methods
             .updateTokenMetadata(metadata)
             .accounts(context)
             .transaction();
-        return await processTransaction(tx, connection, wallet, "Update token metadata successfully", {mint: token.mint});
+        return await processTransaction(tx, connection, wallet, "Update token metadata successfully", { mint: token.mint });
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
             return {
@@ -1125,7 +1345,7 @@ export const revokeMetadataUpdateAuthority = async (
             [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
             program.programId,
         );
-  
+
         const context = {
             mint: new PublicKey(token.mint),
             configAccount: new PublicKey(token.configAccount),
@@ -1139,7 +1359,7 @@ export const revokeMetadataUpdateAuthority = async (
             .revokeUpdateMetadataAuthority(token.tokenName as string, token.tokenSymbol as string)
             .accounts(context)
             .transaction();
-        return await processTransaction(tx, connection, wallet, "Drop metadata update authority successfully", {mint: token.mint});
+        return await processTransaction(tx, connection, wallet, "Drop metadata update authority successfully", { mint: token.mint });
     } catch (error: any) {
         return {
             success: false,
@@ -1187,7 +1407,7 @@ export const delegateValueManager = async (
     token: InitiazlizedTokenData,
     valueManagerAccount: string,
 ): Promise<ResponseData> => {
-    if(!wallet) {
+    if (!wallet) {
         return {
             success: false,
             message: 'Please connect your wallet first'
@@ -1215,7 +1435,7 @@ export const delegateValueManager = async (
             .delegateValueManager(token.tokenName as string, token.tokenSymbol as string, new PublicKey(valueManagerAccount))
             .accounts(context)
             .transaction();
-        return await processTransaction(tx, connection, wallet, "Delegate value manager successfully", {mint: token.mint});
+        return await processTransaction(tx, connection, wallet, "Delegate value manager successfully", { mint: token.mint });
     } catch (error: any) {
         return {
             success: false,
@@ -1239,8 +1459,8 @@ export const uploadToStorage = async (file: File, action: string = 'avatar', con
         });
 
         if (response.data.status === 'success') {
-            if(STORAGE === "arweave") return `${ARWEAVE_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
-            else if(STORAGE === "irys") return `${IRYS_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
+            if (STORAGE === "arweave") return `${ARWEAVE_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
+            else if (STORAGE === "irys") return `${IRYS_GATEWAY_URL}/${response.data.fileInfo.itemId}`;
         }
         throw new Error('Upload failed: ' + JSON.stringify(response.data));
     } catch (error) {
@@ -1259,7 +1479,7 @@ const processTransaction = async (
     try {
         // 获取最新的 blockhash
         const latestBlockhash = await connection.getLatestBlockhash();
-        
+
         // 获取正在处理的交易
         const processingTx = localStorage.getItem('processing_tx');
         const processingTimestamp = localStorage.getItem('processing_timestamp');
@@ -1278,12 +1498,12 @@ const processTransaction = async (
         tx.feePayer = wallet.publicKey;
 
         // 签名和序列化
-        const signedTx = await wallet.signTransaction(tx);   
+        const signedTx = await wallet.signTransaction(tx);
         const serializedTx = signedTx.serialize();
 
         // 先进行交易模拟
         const simulation = await connection.simulateTransaction(signedTx);
-        
+
         // 如果模拟出现错误，直接返回错误信息
         if (simulation.value.err) {
             return {
@@ -1300,7 +1520,7 @@ const processTransaction = async (
         const txHash = await connection.sendRawTransaction(serializedTx, {
             skipPreflight: true // 跳过预检，因为我们已经模拟过了
         });
-        
+
         // 等待交易确认
         const confirmation = await connection.confirmTransaction({
             signature: txHash,
@@ -1342,8 +1562,8 @@ const processTransaction = async (
 }
 
 export const getMintDiscount = async (
-    wallet: AnchorWallet | undefined, 
-    connection: Connection, 
+    wallet: AnchorWallet | undefined,
+    connection: Connection,
     token: InitiazlizedTokenData,
     inputCode?: string
 ) => {
@@ -1369,7 +1589,7 @@ export const getMintDiscount = async (
             message: result.message as string
         };
     }
-    if(result.data === null || result.data === undefined) {
+    if (result.data === null || result.data === undefined) {
         return {
             success: false,
             message: 'Referral data not found',
@@ -1378,7 +1598,7 @@ export const getMintDiscount = async (
 
     const ataBalance = await getTokenBalance(result.data.referrerAta, connection) as number;
 
-    const [acturalPay, ] = getFeeValue(
+    const [acturalPay,] = getFeeValue(
         numberStringToBN(token.feeRate),
         parseFloat(token.difficultyCoefficientEpoch),
         numberStringToBN(ataBalance.toString()).mul(BN_LAMPORTS_PER_SOL),
@@ -1393,110 +1613,110 @@ export const getMintDiscount = async (
 
 export async function getMetadataAccountData(connection: Connection, metadataAccountPda: PublicKey): Promise<ResponseData> {
     try {
-      const metadataAccountInfo = await connection.getAccountInfo(metadataAccountPda);
-      if (!metadataAccountInfo) {
-        throw new Error('Metadata account not found');
-      }
-  
-      const data = metadataAccountInfo.data;
-      
-      // Parse key (1 byte)
-      const key = data[0];
-      
-      // Parse update authority (32 bytes)
-      const updateAuthority = new PublicKey(data.slice(1, 33));
-      
-      // Parse mint (32 bytes)
-      const mint = new PublicKey(data.slice(33, 65));
-      
-      // Parse name
-      const nameLength = data.readUInt32LE(65);
-      let currentPos = 69;
-      const name = data.slice(currentPos, currentPos + nameLength).toString('utf8');
-      currentPos += nameLength;
-      
-      // Parse symbol
-      const symbolLength = data.readUInt32LE(currentPos);
-      currentPos += 4;
-      const symbol = data.slice(currentPos, currentPos + symbolLength).toString('utf8');
-      currentPos += symbolLength;
-      
-      // Parse uri
-      const uriLength = data.readUInt32LE(currentPos);
-      currentPos += 4;
-      const uri = data.slice(currentPos, currentPos + uriLength).toString('utf8');
-      currentPos += uriLength;
-      
-      // Parse seller fee basis points (2 bytes)
-      const sellerFeeBasisPoints = data.readUInt16LE(currentPos);
-      currentPos += 2;
-      
-      // Parse creators
-      const hasCreators = data[currentPos];
-      currentPos += 1;
-      
-      let creators = [];
-      if (hasCreators) {
-        const creatorsLength = data.readUInt32LE(currentPos);
-        currentPos += 4;
-        for (let i = 0; i < creatorsLength; i++) {
-          const creatorAddress = new PublicKey(data.slice(currentPos, currentPos + 32));
-          currentPos += 32;
-          const verified = data[currentPos] === 1;
-          currentPos += 1;
-          const share = data[currentPos];
-          currentPos += 1;
-          creators.push({ address: creatorAddress, verified, share });
+        const metadataAccountInfo = await connection.getAccountInfo(metadataAccountPda);
+        if (!metadataAccountInfo) {
+            throw new Error('Metadata account not found');
         }
-      }
-      
-      // Parse collection
-      const hasCollection = data[currentPos];
-      currentPos += 1;
-      let collection = null;
-      if (hasCollection) {
-        const collectionKey = new PublicKey(data.slice(currentPos, currentPos + 32));
-        currentPos += 32;
-        const verified = data[currentPos] === 1;
+
+        const data = metadataAccountInfo.data;
+
+        // Parse key (1 byte)
+        const key = data[0];
+
+        // Parse update authority (32 bytes)
+        const updateAuthority = new PublicKey(data.slice(1, 33));
+
+        // Parse mint (32 bytes)
+        const mint = new PublicKey(data.slice(33, 65));
+
+        // Parse name
+        const nameLength = data.readUInt32LE(65);
+        let currentPos = 69;
+        const name = data.slice(currentPos, currentPos + nameLength).toString('utf8');
+        currentPos += nameLength;
+
+        // Parse symbol
+        const symbolLength = data.readUInt32LE(currentPos);
+        currentPos += 4;
+        const symbol = data.slice(currentPos, currentPos + symbolLength).toString('utf8');
+        currentPos += symbolLength;
+
+        // Parse uri
+        const uriLength = data.readUInt32LE(currentPos);
+        currentPos += 4;
+        const uri = data.slice(currentPos, currentPos + uriLength).toString('utf8');
+        currentPos += uriLength;
+
+        // Parse seller fee basis points (2 bytes)
+        const sellerFeeBasisPoints = data.readUInt16LE(currentPos);
+        currentPos += 2;
+
+        // Parse creators
+        const hasCreators = data[currentPos];
         currentPos += 1;
-        collection = { key: collectionKey, verified };
-      }
-          
-      // Finally, parse isMutable
-      const isMutable = data[currentPos] === 1;
-      
-      const response = {
-        key,
-        updateAuthority,
-        mint: mint,
-        isMutable,
-        data: {
-          name,
-          symbol,
-          uri,
-          sellerFeeBasisPoints,
-          creators: creators.map(c => ({
-            address: c.address,
-            verified: c.verified,
-            share: c.share
-          })),
-        },
-        collection: collection ? {
-          key: collection.key.toBase58(),
-          verified: collection.verified
-        } : null,
-      } as MetadataAccouontData;
-      
-      return {
-        success: true,
-        data: response,
-      };
+
+        let creators = [];
+        if (hasCreators) {
+            const creatorsLength = data.readUInt32LE(currentPos);
+            currentPos += 4;
+            for (let i = 0; i < creatorsLength; i++) {
+                const creatorAddress = new PublicKey(data.slice(currentPos, currentPos + 32));
+                currentPos += 32;
+                const verified = data[currentPos] === 1;
+                currentPos += 1;
+                const share = data[currentPos];
+                currentPos += 1;
+                creators.push({ address: creatorAddress, verified, share });
+            }
+        }
+
+        // Parse collection
+        const hasCollection = data[currentPos];
+        currentPos += 1;
+        let collection = null;
+        if (hasCollection) {
+            const collectionKey = new PublicKey(data.slice(currentPos, currentPos + 32));
+            currentPos += 32;
+            const verified = data[currentPos] === 1;
+            currentPos += 1;
+            collection = { key: collectionKey, verified };
+        }
+
+        // Finally, parse isMutable
+        const isMutable = data[currentPos] === 1;
+
+        const response = {
+            key,
+            updateAuthority,
+            mint: mint,
+            isMutable,
+            data: {
+                name,
+                symbol,
+                uri,
+                sellerFeeBasisPoints,
+                creators: creators.map(c => ({
+                    address: c.address,
+                    verified: c.verified,
+                    share: c.share
+                })),
+            },
+            collection: collection ? {
+                key: collection.key.toBase58(),
+                verified: collection.verified
+            } : null,
+        } as MetadataAccouontData;
+
+        return {
+            success: true,
+            data: response,
+        };
     } catch (error: any) {
-      console.error('Error fetching metadata:', error);
-      return {
-        success: false,
-        message: error.message,
-      }
+        console.error('Error fetching metadata:', error);
+        return {
+            success: false,
+            message: error.message,
+        }
     }
 }
 
@@ -1555,90 +1775,18 @@ export const getMetadataAccountData2022 = async (
 
 export async function getBlockTimestamp(
     connection: Connection
-  ): Promise<number> {
+): Promise<number> {
     let slot = await connection.getSlot();
     return await connection.getBlockTime(slot) as number;
-  }
-  
-// =========== liquidity manager =============
-export async function proxyInitializePool (
-    wallet: AnchorWallet | undefined,
-    connection: Connection,
-    tokenData: InitiazlizedTokenData,
-    tokenVaultBalance: number,
-    wsolVaultBalance: number,
-  ): Promise<ResponseData> {
-    if (!wallet) {
-        return {
-            success: false,
-            message: 'Wallet not connected',
-        }
-    }
-    const initialPoolPercentage = 0.5; // ######
-    const program = getProgram(wallet, connection);
-
-    let token0 = new PublicKey(tokenData.mint);
-    let token0Amount = Math.floor(tokenVaultBalance * 10**9 * initialPoolPercentage);
-    let token0Program = TOKEN_2022_PROGRAM_ID;
-    let token0InitAmount = new BN(token0Amount);
-  
-    let token1 = NATIVE_MINT;
-    let token1Amount = Math.floor(wsolVaultBalance * 10**9 * initialPoolPercentage);
-    let token1Program = TOKEN_PROGRAM_ID;
-    let token1InitAmount = new BN(token1Amount);
-    
-    let pair = `${tokenData.tokenSymbol}/SOL`;
-    
-    if(compareMints(token0, token1) > 0) {
-      [token0, token1] = [token1, token0];
-      [token0Program, token1Program] = [token1Program, token0Program];
-      [token0InitAmount, token1InitAmount] = [token1InitAmount, token0InitAmount];
-      pair = `SOL/${tokenData.tokenSymbol}`;
-    }
-    console.log("Pair", pair);
-  
-    // Check if the pool has been created already
-    const poolData = await getPoolData(program, token0, token1);
-    if(poolData.poolAddress != null) {
-      console.log(poolData)
-      return {
-        success: false,
-        message: 'Pool has been created already',
-      }
-    } 
-  
-    // Create new pool
-    const initAmount = {
-      initAmount0: token0InitAmount,
-      initAmount1: token1InitAmount,
-    }
-    console.log(token0.toBase58(), token1.toBase58());
-    console.log(token0InitAmount.toNumber(), token1InitAmount.toNumber());
-    const ixs = await poolInitializeInstructions(
-      program,
-      wallet.publicKey, // creator
-      tokenData.tokenName,
-      tokenData.tokenSymbol,
-      token0, // -> token_0
-      token0Program,
-      token1, // -> token_1
-      token1Program,
-      initAmount,
-    );
-    const tx = new Transaction();
-    for (var i = 0; i < ixs.length; i++) {
-      tx.add(ixs[i]);
-    }
-    return await processTransaction(tx, connection, wallet, 'Pool created', {});
 }
 
-export async function proxyAddLiquidity (
+export async function proxyAddLiquidity(
     wallet: AnchorWallet | undefined,
     connection: Connection,
     tokenData: InitiazlizedTokenData,
     desiredToken0Amount: BN,
     desiredToken1Amount: BN,
-  ): Promise<ResponseData> {
+): Promise<ResponseData> {
     if (!wallet) {
         return {
             success: false,
@@ -1652,65 +1800,65 @@ export async function proxyAddLiquidity (
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
-    
+
     let pair = `${tokenData.tokenSymbol}/SOL`;
-    
-    if(compareMints(token0, token1) > 0) {
-      [token0, token1] = [token1, token0];
-      [token0Program, token1Program] = [token1Program, token0Program];
-      [desiredToken0Amount, desiredToken1Amount] = [desiredToken1Amount, desiredToken0Amount];
-      pair = `SOL/${tokenData.tokenSymbol}`;
+
+    if (compareMints(token0, token1) > 0) {
+        [token0, token1] = [token1, token0];
+        [token0Program, token1Program] = [token1Program, token0Program];
+        [desiredToken0Amount, desiredToken1Amount] = [desiredToken1Amount, desiredToken0Amount];
+        pair = `SOL/${tokenData.tokenSymbol}`;
     }
     console.log("Pair", pair);
 
     // Check if the pool has been created already
     const poolData = await getPoolData(program, token0, token1);
-    if(poolData === undefined) {
-      console.log("Pool has not been created yet");
-      return {
-        success: false,
-        message: 'Pool has not been created yet',
-      }
+    if (poolData === undefined) {
+        console.log("Pool has not been created yet");
+        return {
+            success: false,
+            message: 'Pool has not been created yet',
+        }
     }
 
     console.log("pool data", poolData);
     const depositAmount = await calculateDepositAmounts(program, token0, token1, desiredToken0Amount, desiredToken1Amount)
     console.log("deposit amount", {
-      lpTokenAmount: depositAmount.lpTokenAmount.toNumber(),
-      maxToken0Amount: depositAmount.maxToken0Amount.toNumber(),
-      maxToken1Amount: depositAmount.maxToken1Amount.toNumber(),
-      actualToken0Amount: depositAmount.actualToken0Amount.toNumber(),
-      actualToken1Amount: depositAmount.actualToken1Amount.toNumber(),
+        lpTokenAmount: depositAmount.lpTokenAmount.toNumber(),
+        maxToken0Amount: depositAmount.maxToken0Amount.toNumber(),
+        maxToken1Amount: depositAmount.maxToken1Amount.toNumber(),
+        actualToken0Amount: depositAmount.actualToken0Amount.toNumber(),
+        actualToken1Amount: depositAmount.actualToken1Amount.toNumber(),
     });
 
     // Add liquidity
     const ixs = await poolDepositInstructions(
-      program,
-      wallet.publicKey, // creator
-      tokenData.tokenName,
-      tokenData.tokenSymbol,
-      token0, // -> token_0
-      token0Program,
-      token1, // -> token_1
-      token1Program,
-      depositAmount.lpTokenAmount,
-      depositAmount.maxToken0Amount,
-      depositAmount.maxToken1Amount,
+        program,
+        wallet.publicKey, // creator
+        tokenData.tokenName,
+        tokenData.tokenSymbol,
+        token0, // -> token_0
+        token0Program,
+        token1, // -> token_1
+        token1Program,
+        depositAmount.lpTokenAmount,
+        depositAmount.maxToken0Amount,
+        depositAmount.maxToken1Amount,
     );
     const tx = new Transaction();
     for (var i = 0; i < ixs.length; i++) {
-      tx.add(ixs[i]);
+        tx.add(ixs[i]);
     }
     return await processTransaction(tx, connection, wallet, 'Pool deposited', {});
 }
 
-export async function proxyRemoveLiquidity (
+export async function proxyRemoveLiquidity(
     wallet: AnchorWallet | undefined,
     connection: Connection,
     tokenData: InitiazlizedTokenData,
     desiredToken0Amount: BN,
     desiredToken1Amount: BN,
-  ): Promise<ResponseData> {
+): Promise<ResponseData> {
     if (!wallet) {
         return {
             success: false,
@@ -1723,60 +1871,60 @@ export async function proxyRemoveLiquidity (
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
-    
+
     let pair = `${tokenData.tokenSymbol}/SOL`;
-    
-    if(compareMints(token0, token1) > 0) {
-      [token0, token1] = [token1, token0];
-      [token0Program, token1Program] = [token1Program, token0Program];
-      [desiredToken0Amount, desiredToken1Amount] = [desiredToken1Amount, desiredToken0Amount];
-      pair = `SOL/${tokenData.tokenSymbol}`;
+
+    if (compareMints(token0, token1) > 0) {
+        [token0, token1] = [token1, token0];
+        [token0Program, token1Program] = [token1Program, token0Program];
+        [desiredToken0Amount, desiredToken1Amount] = [desiredToken1Amount, desiredToken0Amount];
+        pair = `SOL/${tokenData.tokenSymbol}`;
     }
     console.log("Pair", pair);
 
     // Check if the pool has been created already
     const poolData = await getPoolData(program, token0, token1);
-    if(poolData === undefined) {
-      console.log("Pool has not been created yet");
-      return {
-        success: false,
-        message: 'Pool has not been created yet',
-      }
+    if (poolData === undefined) {
+        console.log("Pool has not been created yet");
+        return {
+            success: false,
+            message: 'Pool has not been created yet',
+        }
     }
 
     console.log("pool data", poolData);
     const withdrawAmount = await calculateWithdrawAmounts(program, token0, token1, desiredToken0Amount, desiredToken1Amount)
     console.log("withdraw amount", {
-      lpTokenAmount: withdrawAmount.lpTokenAmount.toNumber(),
-      minToken0Amount: withdrawAmount.minToken0Amount.toNumber(),
-      minToken1Amount: withdrawAmount.minToken1Amount.toNumber(),
-      actualToken0Amount: withdrawAmount.actualToken0Amount.toNumber(),
-      actualToken1Amount: withdrawAmount.actualToken1Amount.toNumber(),
+        lpTokenAmount: withdrawAmount.lpTokenAmount.toNumber(),
+        minToken0Amount: withdrawAmount.minToken0Amount.toNumber(),
+        minToken1Amount: withdrawAmount.minToken1Amount.toNumber(),
+        actualToken0Amount: withdrawAmount.actualToken0Amount.toNumber(),
+        actualToken1Amount: withdrawAmount.actualToken1Amount.toNumber(),
     });
 
     // Add liquidity
     const ixs = await poolWithdrawInstructions(
-      program,
-      wallet.publicKey, // creator
-      tokenData.tokenName,
-      tokenData.tokenSymbol,
-      token0, // -> token_0
-      token0Program,
-      token1, // -> token_1
-      token1Program,
-      withdrawAmount.lpTokenAmount,
-      withdrawAmount.minToken0Amount,
-      withdrawAmount.minToken1Amount,
+        program,
+        wallet.publicKey, // creator
+        tokenData.tokenName,
+        tokenData.tokenSymbol,
+        token0, // -> token_0
+        token0Program,
+        token1, // -> token_1
+        token1Program,
+        withdrawAmount.lpTokenAmount,
+        withdrawAmount.minToken0Amount,
+        withdrawAmount.minToken1Amount,
     );
     const tx = new Transaction();
     for (var i = 0; i < ixs.length; i++) {
-      tx.add(ixs[i]);
+        tx.add(ixs[i]);
     }
     return await processTransaction(tx, connection, wallet, 'Pool withdrawn', {});
 }
 
 // Sell token, get SOL
-export async function proxySwapBaseIn (
+export async function proxySwapBaseIn(
     wallet: AnchorWallet | undefined,
     connection: Connection,
     tokenData: InitiazlizedTokenData,
@@ -1800,35 +1948,35 @@ export async function proxySwapBaseIn (
 
     // Check if the pool has been created already
     const poolData = await getPoolData(program, tokenOut, tokenIn);
-    if(poolData === undefined) {
-      console.log("Pool has not been created yet");
-      return {
-        success: false,
-        message: 'Pool has not been created yet',
-      }
+    if (poolData === undefined) {
+        console.log("Pool has not been created yet");
+        return {
+            success: false,
+            message: 'Pool has not been created yet',
+        }
     }
-    
+
     const ixs = await poolSwapBaseInInstructions(
-      program,
-      wallet.publicKey, // creator
-      tokenData.tokenName,
-      tokenData.tokenSymbol,
-      tokenIn, // -> token_0
-      tokenInProgram,
-      tokenOut, // -> token_1
-      tokenOutProgram,
-      tokenInAmount,
-      minTokenOutAmount,
+        program,
+        wallet.publicKey, // creator
+        tokenData.tokenName,
+        tokenData.tokenSymbol,
+        tokenIn, // -> token_0
+        tokenInProgram,
+        tokenOut, // -> token_1
+        tokenOutProgram,
+        tokenInAmount,
+        minTokenOutAmount,
     );
     const tx = new Transaction();
     for (var i = 0; i < ixs.length; i++) {
-      tx.add(ixs[i]);
+        tx.add(ixs[i]);
     }
     return await processTransaction(tx, connection, wallet, 'Swap token to SOL', {});
 }
 
 // Buy token, sell SOL
-export async function proxySwapBaseOut (
+export async function proxySwapBaseOut(
     wallet: AnchorWallet | undefined,
     connection: Connection,
     tokenData: InitiazlizedTokenData,
@@ -1854,41 +2002,41 @@ export async function proxySwapBaseOut (
     const tokenOutProgram = token0Program;
     const tokenIn = token1;
     const tokenInProgram = token1Program;
-    
+
     let maxTokenInAmount = tokenInAmount.mul(new BN(10000).add(slippage)).div(new BN(10000));
     console.log("max token in", maxTokenInAmount.toNumber())
 
     // Check if the pool has been created already
     const poolData = await getPoolData(program, token0, token1);
-    if(poolData === undefined) {
-      console.log("Pool has not been created yet");
-      return {
-        success: false,
-        message: 'Pool has not been created yet',
-      }
+    if (poolData === undefined) {
+        console.log("Pool has not been created yet");
+        return {
+            success: false,
+            message: 'Pool has not been created yet',
+        }
     }
-    
+
     const ixs = await poolSwapBaseOutInstructions(
-      program,
-      wallet.publicKey, // creator
-      tokenData.tokenName,
-      tokenData.tokenSymbol,
-      tokenOut, // -> token_0
-      tokenOutProgram,
-      tokenIn, // -> token_1
-      tokenInProgram,
-      tokenOutAmount,
-      maxTokenInAmount,
+        program,
+        wallet.publicKey, // creator
+        tokenData.tokenName,
+        tokenData.tokenSymbol,
+        tokenOut, // -> token_0
+        tokenOutProgram,
+        tokenIn, // -> token_1
+        tokenInProgram,
+        tokenOutAmount,
+        maxTokenInAmount,
     );
     const tx = new Transaction();
     for (var i = 0; i < ixs.length; i++) {
-      tx.add(ixs[i]);
+        tx.add(ixs[i]);
     }
     return await processTransaction(tx, connection, wallet, 'Swap SOL to token', {});
 }
 
 // Burn LP token
-export async function proxyBurnLpToken (
+export async function proxyBurnLpToken(
     wallet: AnchorWallet | undefined,
     connection: Connection,
     tokenData: InitiazlizedTokenData,
@@ -1906,28 +2054,28 @@ export async function proxyBurnLpToken (
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
-    
+
     let pair = `${tokenData.tokenSymbol}/SOL`;
-    
-    if(compareMints(token0, token1) > 0) {
-      [token0, token1] = [token1, token0];
-      [token0Program, token1Program] = [token1Program, token0Program];
-      pair = `SOL/${tokenData.tokenSymbol}`;
+
+    if (compareMints(token0, token1) > 0) {
+        [token0, token1] = [token1, token0];
+        [token0Program, token1Program] = [token1Program, token0Program];
+        pair = `SOL/${tokenData.tokenSymbol}`;
     }
     console.log("Pair", pair);
     // check LP token balance of config account
     const ixs = await poolBurnLpTokensInstructions(
-        program, 
-        wallet.publicKey, 
+        program,
+        wallet.publicKey,
         tokenData.tokenName,
         tokenData.tokenSymbol,
-        token0, 
-        token1, 
+        token0,
+        token1,
         amount
     );
     const tx = new Transaction();
     for (var i = 0; i < ixs.length; i++) {
-      tx.add(ixs[i]);
+        tx.add(ixs[i]);
     }
     return await processTransaction(tx, connection, wallet, 'Burn LP token', {});
 }
@@ -1946,9 +2094,9 @@ export async function getLiquidityPoolData(
     let token0 = new PublicKey(tokenData.mint);
     let token1 = NATIVE_MINT;
     let mintIsToken0 = true;
-    if(compareMints(token0, token1) > 0) {
-      [token0, token1] = [token1, token0];
-      mintIsToken0 = false;
+    if (compareMints(token0, token1) > 0) {
+        [token0, token1] = [token1, token0];
+        mintIsToken0 = false;
     }
     const program = getProgram(wallet as AnchorWallet, connection);
     const data = await getPoolData(
@@ -1956,11 +2104,11 @@ export async function getLiquidityPoolData(
         token0,
         token1
     );
-    if(!data.poolAddress || !data.cpSwapPoolState) {
-      return {
-        success: false,
-        message: 'Pool has not been created yet',
-      }
+    if (!data.poolAddress || !data.cpSwapPoolState) {
+        return {
+            success: false,
+            message: 'Pool has not been created yet',
+        }
     }
     return {
         success: true,
@@ -1968,5 +2116,65 @@ export async function getLiquidityPoolData(
             mintIsToken0,
             ...data,
         }
+    };
+}
+
+export const getBlockTimestampBySlot = async (rpc: string, slot: number) => {
+    try {
+        const response = await axios.post(rpc, {
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBlockTime',
+            params: [slot],
+        });
+
+        if (response.data.error) {
+            throw new Error(`Failed to get block: ${JSON.stringify(response.data.error)}`);
+        }
+
+        return response.data.result;
+    } catch (error) {
+        console.error('Error fetching block:', error);
+        throw error;
+    }
+}
+
+export const getCurrentSlopInterval = async (rpc: string, startSlot: number, endSlot: number) => {
+    startSlot = startSlot < 0 ? 0 : startSlot;
+    const startSlotTimestamp = await getBlockTimestampBySlot(rpc, startSlot);
+    const endSlotTimestamp = await getBlockTimestampBySlot(rpc, endSlot);
+    return (endSlotTimestamp - startSlotTimestamp) / (endSlot - startSlot);
+}
+
+export type TargetTimestampData = {
+    currentTimestamp: number,
+    currentEpoch: number,
+    absoluteSlot: number,
+    slotsInEpoch: number,
+    slotIndex: number,
+    futureTimestamp: number;
+    wait: number;
+    secondsPerSlot: number;
+}
+export const getTargetTimestampAfterEpoches = async (
+    connection: Connection,
+    rpc: string,
+    epoches: number,
+    slotsOfEstimatingInterval: number = 250
+): Promise<TargetTimestampData> => {
+    const startTimestamp = Math.floor((new Date()).getTime() / 1000);
+    const epochInfo = await connection.getEpochInfo();
+    const currentEpoch = epochInfo.epoch;
+    const secondsPerSlot = await getCurrentSlopInterval(rpc, epochInfo.absoluteSlot - slotsOfEstimatingInterval, epochInfo.absoluteSlot);
+    const futureTimestamp = startTimestamp + ((currentEpoch + epoches) * epochInfo.slotsInEpoch - epochInfo.absoluteSlot) * secondsPerSlot;
+    return {
+        currentTimestamp: Math.floor((new Date()).getTime() / 1000),
+        currentEpoch,
+        slotIndex: epochInfo.slotIndex,
+        absoluteSlot: epochInfo.absoluteSlot,
+        slotsInEpoch: epochInfo.slotsInEpoch,
+        futureTimestamp,
+        wait: futureTimestamp - startTimestamp,
+        secondsPerSlot,
     };
 }

@@ -64,7 +64,6 @@ export const RefundModal: FC<RefundModalProps> = ({
                 wallet, 
                 connection, 
                 token.tokenData as InitiazlizedTokenData, 
-                protocolFeeAccount
             );
 
             if (result.success) {

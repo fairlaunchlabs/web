@@ -43,7 +43,8 @@ export const createPoolFeeReceive = new PublicKey("G11FKBRaAkHAKuLCgLM6K6NUc9rTj
 // export const createPoolFeeReceive = new PublicKey("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8"); // mainnet
 
 export const memoProgram = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
-
+export const addressLookupTableAddress = new PublicKey("EebRqpLtUgjX17pJJNNbd6ngtYa34VGa51oYsibwJRXy");
+export const slotsOfEstimatingInterval = 250; // localnet and devnet must be 250, mainnet suggest to be 3000000
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
 export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
 export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';

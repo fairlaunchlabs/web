@@ -33,6 +33,7 @@ export function ManageLiquidity({
   const [poolSOLBalance, setPoolSOLBalance] = useState(0);
   const [vaultLpTokenBalance, setVaultLpTokenBalance] = useState(0);
   const [totalLpToken, setTotalLpToken] = useState(0);
+  const [isDexOpen, setIsDexOpen] = useState(false);
 
   const initialFetchDone = useRef(false);
   const nonce = useRef(0);
@@ -191,10 +192,12 @@ export function ManageLiquidity({
               setVaultLpTokenBalance={setVaultLpTokenBalance}
               totalLpToken={totalLpToken}
               setTotalLpToken={setTotalLpToken}
+              isDexOpen={isDexOpen}
+              setIsDexOpen={setIsDexOpen}
             />
           )}
 
-          {poolData &&
+          {poolData && isDexOpen &&
             <div className="bg-base-200 p-6 rounded-lg">
               <div className="grid gap-8">
                 <div className="tabs tabs-boxed">

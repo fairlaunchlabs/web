@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { queryTokensByMints } from '../utils/graphql';
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import AlertBox from '../components/common/AlertBox';
-import { getLiquidityPoolData, getTokenBalance, proxyInitializePool } from '../utils/web3';
+import { getLiquidityPoolData, getTokenBalance } from '../utils/web3';
 import { InitiazlizedTokenData, PoolData, ResponseData } from '../types/types';
 import { useParams } from 'react-router-dom';
 
@@ -110,25 +110,25 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
 
   // 处理创建流动池
   const handleCreatePool = async () => {
-    if (!wallet) {
-      toast.error('Please connect your wallet');
-      return;
-    }
+    // if (!wallet) {
+    //   toast.error('Please connect your wallet');
+    //   return;
+    // }
 
-    setLoading(true);
-    try {
-      const result = await proxyInitializePool(wallet, connection, tokenData as InitiazlizedTokenData, tokenVaultBalance, wsolVaultBalance)
-      if (!result?.success) {
-        toast.error(result?.message as string);
-        return;
-      }
-      toast.success('Pool created successfully');
-    } catch (error) {
-      toast.error('Failed to create pool');
-      console.error('Error creating pool:', error);
-    } finally {
-      setLoading(false);
-    }
+    // setLoading(true);
+    // try {
+    //   const result = await proxyInitializePool(wallet, connection, tokenData as InitiazlizedTokenData, tokenVaultBalance, wsolVaultBalance)
+    //   if (!result?.success) {
+    //     toast.error(result?.message as string);
+    //     return;
+    //   }
+    //   toast.success('Pool created successfully');
+    // } catch (error) {
+    //   toast.error('Failed to create pool');
+    //   console.error('Error creating pool:', error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (

@@ -51,6 +51,7 @@ export async function getPoolData (
 
   // compare token0 and token1
   let cpSwapPoolState: CpSwapPoolStateData = {
+    openTime: poolState.openTime.toNumber(),
     ammConfig: poolState.configId.toBase58(),
     poolCreator: poolState.poolCreator.toBase58(),
     lpMint: poolState.mintLp.toBase58(),
@@ -144,127 +145,127 @@ export async function calculateWithdrawAmounts(
   };
 }
 
-export async function poolInitializeInstructions(
-  program: Program<FairMintToken>,
-  creator: PublicKey,
-  tokenName: string,
-  tokenSymbol: string,
-  token0: PublicKey,
-  token0Program: PublicKey,
-  token1: PublicKey,
-  token1Program: PublicKey,
-  initAmount: { initAmount0: BN; initAmount1: BN } = {
-    initAmount0: new BN(10000000000),
-    initAmount1: new BN(20000000000),
-  },
-  createPoolFee = createPoolFeeReceive
-): Promise<Array<TransactionInstruction>> {
-  const [auth] = getAuthAddress(cpSwapProgram);
-  const [poolAddress] = getPoolAddress(
-    cpSwapConfigAddress,
-    token0,
-    token1,
-    cpSwapProgram
-  );
-  const [lpMintAddress] = getPoolLpMintAddress(
-    poolAddress,
-    cpSwapProgram
-  );
-  const [vault0] = getPoolVaultAddress(
-    poolAddress,
-    token0,
-    cpSwapProgram
-  );
-  const [vault1] = getPoolVaultAddress(
-    poolAddress,
-    token1,
-    cpSwapProgram
-  );
+// export async function poolInitializeInstructions(
+//   program: Program<FairMintToken>,
+//   creator: PublicKey,
+//   tokenName: string,
+//   tokenSymbol: string,
+//   token0: PublicKey,
+//   token0Program: PublicKey,
+//   token1: PublicKey,
+//   token1Program: PublicKey,
+//   initAmount: { initAmount0: BN; initAmount1: BN } = {
+//     initAmount0: new BN(10000000000),
+//     initAmount1: new BN(20000000000),
+//   },
+//   createPoolFee = createPoolFeeReceive
+// ): Promise<Array<TransactionInstruction>> {
+//   const [auth] = getAuthAddress(cpSwapProgram);
+//   const [poolAddress] = getPoolAddress(
+//     cpSwapConfigAddress,
+//     token0,
+//     token1,
+//     cpSwapProgram
+//   );
+//   const [lpMintAddress] = getPoolLpMintAddress(
+//     poolAddress,
+//     cpSwapProgram
+//   );
+//   const [vault0] = getPoolVaultAddress(
+//     poolAddress,
+//     token0,
+//     cpSwapProgram
+//   );
+//   const [vault1] = getPoolVaultAddress(
+//     poolAddress,
+//     token1,
+//     cpSwapProgram
+//   );
 
-  const [creatorLpTokenAddress] = PublicKey.findProgramAddressSync( 
-    [
-      creator.toBuffer(),
-      TOKEN_PROGRAM_ID.toBuffer(),
-      lpMintAddress.toBuffer(),
-    ],
-    ASSOCIATED_PROGRAM_ID
-  );
+//   const [creatorLpTokenAddress] = PublicKey.findProgramAddressSync( 
+//     [
+//       creator.toBuffer(),
+//       TOKEN_PROGRAM_ID.toBuffer(),
+//       lpMintAddress.toBuffer(),
+//     ],
+//     ASSOCIATED_PROGRAM_ID
+//   );
 
-  const [observationAddress] = getOrcleAccountAddress(
-    poolAddress,
-    cpSwapProgram
-  );
+//   const [observationAddress] = getOrcleAccountAddress(
+//     poolAddress,
+//     cpSwapProgram
+//   );
 
-  const creatorToken0 = getAssociatedTokenAddressSync( 
-    token0,
-    creator,
-    false,
-    token0Program
-  );
-  const creatorToken1 = getAssociatedTokenAddressSync( 
-    token1,
-    creator,
-    false,
-    token1Program
-  );
+//   const creatorToken0 = getAssociatedTokenAddressSync( 
+//     token0,
+//     creator,
+//     false,
+//     token0Program
+//   );
+//   const creatorToken1 = getAssociatedTokenAddressSync( 
+//     token1,
+//     creator,
+//     false,
+//     token1Program
+//   );
 
-  const [mintAccount] = PublicKey.findProgramAddressSync(
-    [Buffer.from(MINT_SEED), Buffer.from(tokenName), Buffer.from(tokenSymbol.toLowerCase())],
-    program.programId,
-  );
+//   const [mintAccount] = PublicKey.findProgramAddressSync(
+//     [Buffer.from(MINT_SEED), Buffer.from(tokenName), Buffer.from(tokenSymbol.toLowerCase())],
+//     program.programId,
+//   );
 
-  const [configAccount] = PublicKey.findProgramAddressSync(
-    [Buffer.from(CONFIG_DATA_SEED), mintAccount.toBuffer()],
-    program.programId,
-  );
+//   const [configAccount] = PublicKey.findProgramAddressSync(
+//     [Buffer.from(CONFIG_DATA_SEED), mintAccount.toBuffer()],
+//     program.programId,
+//   );
   
-  const contextProxyInitialize = {
-    cpSwapProgram: cpSwapProgram,
-    creator: creator,
-    mint: mintAccount,
-    configAccount,
-    ammConfig: cpSwapConfigAddress,
-    authority: auth,
-    poolState: poolAddress,
-    token0Mint: token0,
-    token1Mint: token1,
-    lpMint: lpMintAddress,
-    creatorToken0,
-    creatorToken1,
-    creatorLpToken: creatorLpTokenAddress,
-    token0Vault: vault0,
-    token1Vault: vault1,
-    createPoolFee,
-    observationState: observationAddress,
-    tokenProgram: TOKEN_PROGRAM_ID,
-    token0Program: token0Program,
-    token1Program: token1Program,
-    associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
-    systemProgram: SystemProgram.programId,
-    rent: SYSVAR_RENT_PUBKEY,
-  };
+//   const contextProxyInitialize = {
+//     cpSwapProgram: cpSwapProgram,
+//     creator: creator,
+//     mint: mintAccount,
+//     configAccount,
+//     ammConfig: cpSwapConfigAddress,
+//     authority: auth,
+//     poolState: poolAddress,
+//     token0Mint: token0,
+//     token1Mint: token1,
+//     lpMint: lpMintAddress,
+//     creatorToken0,
+//     creatorToken1,
+//     creatorLpToken: creatorLpTokenAddress,
+//     token0Vault: vault0,
+//     token1Vault: vault1,
+//     createPoolFee,
+//     observationState: observationAddress,
+//     tokenProgram: TOKEN_PROGRAM_ID,
+//     token0Program: token0Program,
+//     token1Program: token1Program,
+//     associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+//     systemProgram: SystemProgram.programId,
+//     rent: SYSVAR_RENT_PUBKEY,
+//   };
 
-  console.log("Initialize pool context", Object.fromEntries(
-    Object.entries(contextProxyInitialize).map(([key, value]) => [key, value.toString()])
-  ));
+//   console.log("Initialize pool context", Object.fromEntries(
+//     Object.entries(contextProxyInitialize).map(([key, value]) => [key, value.toString()])
+//   ));
 
-  try {
-    const preIx = [
-      ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
-    ];
-    const ix = await program.methods
-      .proxyInitialize(
-        tokenName, tokenSymbol,
-        initAmount.initAmount0, initAmount.initAmount1, new BN(0))
-      .accounts(contextProxyInitialize)
-      .instruction();
+//   try {
+//     const preIx = [
+//       ComputeBudgetProgram.setComputeUnitLimit({ units: 400000 }),
+//     ];
+//     const ix = await program.methods
+//       .proxyInitialize(
+//         tokenName, tokenSymbol,
+//         initAmount.initAmount0, initAmount.initAmount1, new BN(0))
+//       .accounts(contextProxyInitialize)
+//       .instruction();
 
-    return [...preIx, ix];
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
-}
+//     return [...preIx, ix];
+//   } catch (error) {
+//     console.log(error);
+//     return [];
+//   }
+// }
 
 export async function poolDepositInstructions(
   program: Program<FairMintToken>,
