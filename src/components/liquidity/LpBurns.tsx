@@ -7,6 +7,7 @@ import { proxyBurnLpToken } from "../../utils/web3";
 import { BN } from "@coral-xyz/anchor";
 import { ToastBox } from "../common/ToastBox";
 import { NETWORK, SCANURL } from "../../config/constants";
+import { useDeviceType } from "../../utils/contexts";
 
 export type LpBurnsProps = {
   tokenData: InitiazlizedTokenData;
@@ -24,7 +25,7 @@ export const LpBurns: FC<LpBurnsProps> = ({
   const [burnLpAmount, setBurnLpAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [messageBurnLp, setMessageBurnLp] = useState('');
-
+  const { isMobile } = useDeviceType();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
@@ -115,7 +116,7 @@ export const LpBurns: FC<LpBurnsProps> = ({
                 <tr>
                   <th>Transaction</th>
                   <th>LP Amount</th>
-                  <th>Time</th>
+                  {!isMobile && <th>Time</th>}
                 </tr>
               </thead>
               <tbody>
@@ -123,7 +124,7 @@ export const LpBurns: FC<LpBurnsProps> = ({
                   <tr key={burn.id}>
                     <td><AddressDisplay address={burn.txId} type="tx" /></td>
                     <td>{(burn.lpAmount / 1e9).toFixed(4)} LP</td>
-                    <td>{new Date(parseInt(burn.blockTimestamp) * 1000).toLocaleString()}</td>
+                    {!isMobile && <td>{new Date(parseInt(burn.blockTimestamp) * 1000).toLocaleString()}</td>}
                   </tr>
                 ))}
               </tbody>

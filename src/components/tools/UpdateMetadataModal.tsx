@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { TokenImage } from '../mintTokens/TokenImage';
-import { InitiazlizedTokenData, TokenMetadata2022 } from '../../types/types';
+import { InitiazlizedTokenData } from '../../types/types';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import toast from 'react-hot-toast';
 import { AddressDisplay } from '../common/AddressDisplay';
-import { getMetadataAccountData2022, updateMetaData, uploadToStorage } from '../../utils/web3';
+import { getTokenMetadataMutable, updateMetaData, uploadToStorage } from '../../utils/web3';
 import { ToastBox } from '../common/ToastBox';
 import { NETWORK, SCANURL } from '../../config/constants';
-import { FaUpload } from 'react-icons/fa';
 import { HeaderImageUpload } from './HeaderImageUpload';
 import AlertBox from '../common/AlertBox';
 import { useDeviceType } from '../../utils/contexts';
@@ -52,17 +51,11 @@ export const UpdateMetadataModal: React.FC<UpdateMetadataModalProps> = ({
             setTelegram(token.tokenMetadata.extensions.telegram || '');
             setGithub(token.tokenMetadata.extensions.github || '');
             setMedium(token.tokenMetadata.extensions.medium || '');
-            // Reset header image preview when token changes
             setHeaderPreview('');
             setHeaderImage(null);
 
-            // get token mutable status
-            getMetadataAccountData2022(connection, new PublicKey(token.metadataAccount)).then((metadata) => {
-                if (!metadata.success) {
-                    toast.error(metadata.message as string);
-                }
-                const metadataData = metadata.data as TokenMetadata2022;
-                setMetadataMutable(metadataData.updateAuthority !== null);
+            getTokenMetadataMutable(connection, new PublicKey(token.mint)).then((isMutable: boolean) => {
+                setMetadataMutable(isMutable);
             })
         }
     }, [token, token?.tokenMetadata, token?.tokenMetadata?.extensions]);

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from
 import './App.css';
 import {
     ConnectionProvider,
+    useAnchorWallet,
     WalletProvider,
 } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -34,27 +35,48 @@ import { CheckURC } from './components/tools/CheckURC';
 import { MyUniqueReferralCode } from './components/tools/MyUniqueReferralCode';
 // import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
 import { ManageLiquidity } from './pages/ManageLiquidity';
-import { ClaimTokens } from './pages/ClaimTokens';
+// import { ClaimTokens } from './pages/ClaimTokens';
 import { DelegatedTokens } from './pages/DelegatedTokens';
 import { TradingBot } from './pages/TradingBot';
+import { useQuery } from '@apollo/client';
+import { queryMyDelegatedTokens } from './utils/graphql';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
 const AppContent = () => {
     const navigate = useNavigate();
     const [expanded, setExpanded] = useState(true);
+    const [hasDelegatedTokens, setHasDelegatedTokens] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedMenuItem, setSelectedMenuItem] = useState(() => {
         return localStorage.getItem('selectedMenuItem') || 'balance';
     });
     const {isMobile} = useDeviceType();
+    const wallet = useAnchorWallet();
 
+    const { loading: loadingDelegatedTokens, error, data: delegatedTokens } = useQuery(queryMyDelegatedTokens, {
+        variables: {
+          wallet: wallet?.publicKey.toString(),
+          skip: 0,
+          first: 10,
+        },
+        skip: !wallet,
+    });
+    
+    useEffect(() => {
+        if (delegatedTokens && delegatedTokens.initializeTokenEventEntities && delegatedTokens.initializeTokenEventEntities.length > 0) {
+            setHasDelegatedTokens(true);
+        } else {
+            setHasDelegatedTokens(false);
+        }
+    }, [delegatedTokens]);
+    
     useEffect(() => {
         localStorage.setItem('selectedMenuItem', selectedMenuItem);
     }, [selectedMenuItem]);
 
     const getActiveComponent = () => {
-        for (const item of menuItems(expanded)) {
+        for (const item of menuItems(expanded, hasDelegatedTokens)) {
             if (item.subItems) {
                 const subItem = item.subItems.find(sub => sub.id === selectedMenuItem);
                 if (subItem) return subItem.component;
@@ -90,7 +112,7 @@ const AppContent = () => {
                         md:translate-x-0 transition-transform duration-300 ease-in-out
                     `}>
                         <Sidebar
-                            menuItems={menuItems(expanded)}
+                            menuItems={menuItems(expanded, hasDelegatedTokens)}
                             activeMenuItem={selectedMenuItem}
                             onMenuItemClick={(id: string) => {
                                 setSelectedMenuItem(id);
@@ -125,7 +147,7 @@ const AppContent = () => {
                             <Route path="/social-value-manager" element={<SocialValueManager expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />
-                            <Route path="/claim-tokens" element={<ClaimTokens expanded={expanded} />} />
+                            {/* <Route path="/claim-tokens" element={<ClaimTokens expanded={expanded} />} /> */}
                         </Routes>
                     </div>
                 </div>

@@ -8,6 +8,7 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import toast from "react-hot-toast";
 import AlertBox from "../common/AlertBox";
 import { DexStatusBar } from "./DexStatusBar";
+import { formatPrice } from "../../utils/format";
 
 type PoolInformationProps = {
   tokenData: InitiazlizedTokenData;
@@ -84,13 +85,13 @@ export const PoolInformation: FC<PoolInformationProps> = ({
           setPoolSOLBalance(_poolTokenBalance)
           setCurrentPrice(_poolTokenBalance > 0 ? _poolTokenBalance / _poolSOLBalance : 0);
         }
-        console.log("pool address", poolData.poolAddress);
+        // console.log("pool address", poolData.poolAddress);
         setPoolAddress(poolData.poolAddress)
         setTotalLpToken(poolData.cpSwapPoolState.lpAmount)
         getTokenBalanceByMintAndOwner(new PublicKey(poolData.cpSwapPoolState.lpMint as string), new PublicKey(tokenData.configAccount), connection, true, TOKEN_PROGRAM_ID).then(balance => {
           setVaultLpTokenBalance(balance as number);
         })
-        console.log("open time", poolData.cpSwapPoolState.openTime);
+        // console.log("open time", poolData.cpSwapPoolState.openTime);
       } else {
         toast.error(res.message as string);
       }
@@ -99,9 +100,9 @@ export const PoolInformation: FC<PoolInformationProps> = ({
 
   return (
     <div>
-      <div className="bg-base-200 p-6 rounded-lg mb-8">
-        <h2 className="text-xl font-semibold mb-4">Pool Information</h2>
-        <div className="grid gap-3">
+      <div className="bg-base-200 md:p-6 p-3 rounded-lg mb-8">
+        <h2 className="md:text-xl text-lg font-semibold mb-4">Pool Information</h2>
+        <div className="grid md:gap-3 gap-2 md:text-md text-sm">
           <div className="flex justify-between">
             <span>Token Name:</span>
             <span>{tokenData.tokenName}</span>
@@ -113,11 +114,11 @@ export const PoolInformation: FC<PoolInformationProps> = ({
 
           <div className="flex justify-between">
             <span>Vault Token Balance:</span>
-            <span>{tokenVaultBalance} {tokenData.tokenSymbol}</span>
+            <span>{formatPrice(tokenVaultBalance, 3)} {tokenData.tokenSymbol}</span>
           </div>
           <div className="flex justify-between">
             <span>Vault SOL Balance:</span>
-            <span>{wsolVaultBalance} SOL</span>
+            <span>{formatPrice(wsolVaultBalance, 3)} SOL</span>
           </div>
 
           {poolAddress !== "" && <div>
@@ -128,23 +129,23 @@ export const PoolInformation: FC<PoolInformationProps> = ({
               </div>
               <div className="flex justify-between">
                 <span>Pool Token Balance:</span>
-                <span>{poolTokenBalance} {tokenData?.tokenSymbol}</span>
+                <span>{formatPrice(poolTokenBalance, 3)} {tokenData?.tokenSymbol}</span>
               </div>
               <div className="flex justify-between">
                 <span>Pool SOL Balance:</span>
-                <span>{poolSOLBalance} SOL</span>
+                <span>{formatPrice(poolSOLBalance, 3)} SOL</span>
               </div>
               <div className="flex justify-between">
                 <span>Current Token Price:</span>
-                <span>{currentPrice.toFixed(8)} SOL</span>
+                <span>{formatPrice(currentPrice, 3)} SOL</span>
               </div>
               <div className="flex justify-between">
                 <span>Total LP Token:</span>
-                <span>{totalLpToken} LP-{tokenData.tokenSymbol}-SOL</span>
+                <span>{formatPrice(totalLpToken, 3)} LP-{tokenData.tokenSymbol}-SOL</span>
               </div>
               <div className="flex justify-between">
                 <span>Vault LP Token:</span>
-                <span>{vaultLpTokenBalance} LP-{tokenData.tokenSymbol}-SOL</span>
+                <span>{formatPrice(vaultLpTokenBalance, 3)} LP-{tokenData.tokenSymbol}-SOL</span>
               </div>
             </div>
             <DexStatusBar openTime={openTime} isDexOpen={isDexOpen} setIsDexOpen={setIsDexOpen}/>

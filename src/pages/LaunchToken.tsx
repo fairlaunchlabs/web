@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
-import { createTokenOnChain, uploadToStorage } from '../utils/web3';
+import { initializeToken, uploadToStorage } from '../utils/web3';
 import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Metrics } from '../components/launchToken/Metrics';
@@ -175,10 +175,10 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         startTimestamp: numberStringToBN(startTimestamp.toString()),
       };
 
-      const result = await createTokenOnChain(tokenMetadata, wallet, connection, initConfigData);
+      const result = await initializeToken(tokenMetadata, wallet, connection, initConfigData);
 
       if (!result.success) {
-        toast.error(result.message, {
+        toast.error(result.message as string, {
           id: toastId,
         });
         setIsCreating(false);

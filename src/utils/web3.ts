@@ -13,13 +13,13 @@ import {
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
 // import transferHookIdl from '../idl/transfer_hook.json';
-import { CONFIG_DATA_SEED, MINT_SEED, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, UPLOAD_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT, IRYS_GATEWAY_URL, STORAGE, cpSwapProgram, cpSwapConfigAddress, createPoolFeeReceive, addressLookupTableAddress, slotsOfEstimatingInterval } from '../config/constants';
-import { InitializeTokenConfig, InitiazlizedTokenData, MetadataAccouontData, MintExtentionData, RemainingAccount, ResponseData, TokenMetadata, TokenMetadataIPFS, TransferHookState } from '../types/types';
+import { CONFIG_DATA_SEED, MINT_SEED, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, UPLOAD_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT, IRYS_GATEWAY_URL, STORAGE, cpSwapProgram, cpSwapConfigAddress, createPoolFeeReceive, addressLookupTableAddress, slotsOfEstimatingInterval, METADATA_SEED, TOKEN_METADATA_PROGRAM_ID } from '../config/constants';
+import { InitializeTokenConfig, InitiazlizedTokenData, MetadataAccouontData, MintExtentionData, RemainingAccount, ResponseData, TargetTimestampData, TokenMetadata, TokenMetadataIPFS, TransferHookState } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
 // import { TransferHook } from '../types/transfer_hook';
 import axios from 'axios';
-import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, NATIVE_MINT, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAssociatedTokenAddressSync } from '@solana/spl-token';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, NATIVE_MINT, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { fetchMetadataFromUrlOrCache } from './db';
 import { BN_LAMPORTS_PER_SOL, getFeeValue, numberStringToBN } from './format';
 import { calculateDepositAmounts, calculateWithdrawAmounts, getPoolData, poolBurnLpTokensInstructions, poolDepositInstructions, poolSwapBaseInInstructions, poolSwapBaseOutInstructions, poolWithdrawInstructions, } from './raydium_cpmm/instruction';
@@ -42,21 +42,6 @@ const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     return new Program(fairMintTokenIdl as FairMintToken, provider);
 }
 
-// const getTransferHookProgram = (wallet: AnchorWallet, connection: Connection) => {
-//     const provider = new AnchorProvider(
-//         connection,
-//         {
-//             ...wallet,
-//             signTransaction: wallet.signTransaction.bind(wallet),
-//             signAllTransactions: wallet.signAllTransactions.bind(wallet),
-//             publicKey: wallet.publicKey,
-//         },
-//         { commitment: 'confirmed' }
-//     );
-
-//     return new Program(transferHookIdl as TransferHook, provider);
-// }
-
 export const compareMints = (mintA: PublicKey, mintB: PublicKey): number => {
     const bufferA = mintA.toBuffer();
     const bufferB = mintB.toBuffer();
@@ -69,61 +54,79 @@ export const compareMints = (mintA: PublicKey, mintB: PublicKey): number => {
     return 0;
 }
 
-export const createTokenOnChain = async (
+export const initializeToken = async (
     metadata: TokenMetadata,
     wallet: AnchorWallet,
     connection: Connection,
     config: InitializeTokenConfig
-) => {
+): Promise<ResponseData> => {
     try {
         if (!wallet) {
-            throw new Error('Please connect your wallet first');
+            // throw new Error('Please connect your wallet first');
+            return {
+                success: false,
+                message: 'Please connect your wallet first',
+            }
         }
         const program = getProgram(wallet, connection);
         const [mintPda] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from(MINT_SEED),
-                Buffer.from(metadata.name),
-                Buffer.from(metadata.symbol.toLowerCase()),
-            ],
+            [Buffer.from(MINT_SEED), Buffer.from(metadata.name), Buffer.from(metadata.symbol.toLowerCase())],
             program.programId
         );
         const mintAccountInfo = await connection.getAccountInfo(mintPda);
         if (mintAccountInfo) {
-            throw new Error('Token already exists');
+            // throw new Error('Token already exists');
+            return {
+                success: false,
+                message: 'Token already exists',
+            }
         }
 
         const [configPda] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from(CONFIG_DATA_SEED),
-                mintPda.toBuffer()
-            ],
+            [Buffer.from(CONFIG_DATA_SEED), mintPda.toBuffer()],
             program.programId
         );
 
         const configAccountInfo = await connection.getAccountInfo(configPda);
         if (configAccountInfo) {
-            throw new Error('Config account already exists');
+            // throw new Error('Config account already exists');
+            return {
+                success: false,
+                message: 'Config account already exists',
+            }
         }
+        const [metadataAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from(METADATA_SEED), TOKEN_METADATA_PROGRAM_ID.toBuffer(), mintPda.toBuffer()],
+            TOKEN_METADATA_PROGRAM_ID,
+        );
+        const metadataAccountInfo = await connection.getAccountInfo(metadataAccountPda);
+        if (metadataAccountInfo) {
+            return {
+                success: false,
+                message: 'Metadata account already exists',
+            }
+        }  
 
         const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
             [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
             program.programId,
         );
         const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, configPda, true, TOKEN_PROGRAM_ID);
-        const tokenVaultAta = await getAssociatedTokenAddress(mintPda, configPda, true, TOKEN_2022_PROGRAM_ID);
-
+        const tokenVaultAta = await getAssociatedTokenAddress(mintPda, configPda, true, TOKEN_PROGRAM_ID);
+        const mintTokenVaultAta = await getAssociatedTokenAddress(mintPda, mintPda, true, TOKEN_PROGRAM_ID);
+        
         const contextInitializeTokenAccounts = {
-            systemConfigAccount: systemConfigAccountPda,
-            mint: mintPda,
+            metadata: metadataAccountPda,
             payer: wallet.publicKey,
+            mint: mintPda,
             configAccount: configPda,
+            mintTokenVault: mintTokenVaultAta,
             tokenVault: tokenVaultAta,
-            wsolVault: wsolVaultAta,
             wsolMint: NATIVE_MINT,
+            wsolVault: wsolVaultAta,
+            systemConfigAccount: systemConfigAccountPda,
             protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
-            legacyTokenProgram: TOKEN_PROGRAM_ID,
+            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         }
 
         const instructionInitializeToken = await program.methods
@@ -131,10 +134,7 @@ export const createTokenOnChain = async (
             .accounts(contextInitializeTokenAccounts)
             .instruction();
 
-        const tx = new Transaction().add(
-            instructionInitializeToken,
-        );
-
+        const tx = new Transaction().add(instructionInitializeToken);
         return await processTransaction(tx, connection, wallet, "Create token successfully", { mintAddress: mintPda.toString() });
     } catch (error: any) {
         if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
@@ -190,7 +190,7 @@ export const getTokenBalance = async (ata: PublicKey, connection: Connection): P
     return account.value.uiAmount;
 }
 
-export const getTokenBalanceByMintAndOwner = async (mint: PublicKey, owner: PublicKey, connection: Connection, allowOwnerOffCurve: boolean = false, programId: PublicKey = TOKEN_2022_PROGRAM_ID): Promise<number | null> => {
+export const getTokenBalanceByMintAndOwner = async (mint: PublicKey, owner: PublicKey, connection: Connection, allowOwnerOffCurve: boolean = false, programId: PublicKey = TOKEN_PROGRAM_ID): Promise<number | null> => {
     const ata = await getAssociatedTokenAddress(mint, owner, allowOwnerOffCurve, programId);
     const ataInfo = await connection.getAccountInfo(ata);
     if (!ataInfo) return 0;
@@ -261,7 +261,7 @@ export const reactiveReferrerCode = async (
         mint,
         wallet.publicKey, // 需要查询账户的公钥
         false,
-        TOKEN_2022_PROGRAM_ID
+        TOKEN_PROGRAM_ID
     )
     const referrerAtaInfo = await connection.getAccountInfo(referrerAta);
     const instructionCreateReferrerAta = createAssociatedTokenAccountInstruction(
@@ -269,7 +269,7 @@ export const reactiveReferrerCode = async (
         referrerAta,
         wallet.publicKey,
         mint,
-        TOKEN_2022_PROGRAM_ID
+        TOKEN_PROGRAM_ID
     )
 
     // get referral account pda
@@ -293,7 +293,7 @@ export const reactiveReferrerCode = async (
         systemConfigAccount: systemConfigAccountPda,
         payer: wallet.publicKey,
         systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID
     };
     const instructionSetReferrerCode = await program.methods
@@ -384,7 +384,7 @@ export const setReferrerCode = async (
         mint,
         wallet.publicKey,
         false,
-        TOKEN_2022_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
     )
 
     const referrerAtaInfo = await connection.getAccountInfo(referrerAta);
@@ -394,7 +394,7 @@ export const setReferrerCode = async (
         referrerAta,
         wallet.publicKey,
         mint,
-        TOKEN_2022_PROGRAM_ID
+        TOKEN_PROGRAM_ID
     )
 
     const [referralAccountPda] = PublicKey.findProgramAddressSync(
@@ -416,7 +416,7 @@ export const setReferrerCode = async (
         systemConfigAccount: systemConfigAccountPda,
         payer: wallet.publicKey,
         systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID
     };
     const instructionSetReferrerCode = await program.methods
@@ -460,7 +460,7 @@ export const getMyReferrerData = async (
         mint,
         wallet.publicKey, // 需要查询账户的公钥
         false,
-        TOKEN_2022_PROGRAM_ID
+        TOKEN_PROGRAM_ID
     )
 
     // Check if the referrer's ATA account exists
@@ -581,7 +581,6 @@ export const refund = async (
         [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
         program.programId,
     );
-
     const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
     if (refundAccountData.owner.toBase58() !== wallet.publicKey.toBase58()) {
         return {
@@ -589,45 +588,24 @@ export const refund = async (
             message: 'Only User Account Allowed'
         }
     }
-
-    const tokenAta = await getAssociatedTokenAddress(
-        new PublicKey(token.mint),
-        wallet.publicKey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-    )
-
-    const payerWsolAta = getAssociatedTokenAddressSync(
-        NATIVE_MINT,
-        wallet.publicKey,
-        false,
-        TOKEN_PROGRAM_ID,
-    );
-
-    const protocolWsolAta = getAssociatedTokenAddressSync(
-        NATIVE_MINT,
-        new PublicKey(PROTOCOL_FEE_ACCOUNT),
-        false,
-        TOKEN_PROGRAM_ID,
-    );
-
-    const configAccountPda = new PublicKey(token.configAccount);
-    const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, configAccountPda, true, TOKEN_PROGRAM_ID);
+    const tokenAta = await getAssociatedTokenAddress(new PublicKey(token.mint), wallet.publicKey, false, TOKEN_PROGRAM_ID);
+    const payerWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, false, TOKEN_PROGRAM_ID);
+    const protocolWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, new PublicKey(PROTOCOL_FEE_ACCOUNT), false, TOKEN_PROGRAM_ID);
+    const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, new PublicKey(token.configAccount), true, TOKEN_PROGRAM_ID);
 
     const refundAccounts = {
         mint: new PublicKey(token.mint),
         refundAccount: refundAccountPda,
-        configAccount: configAccountPda,
-        tokenVault: new PublicKey(token.tokenVault),
-        payerWsolVault: payerWsolAta,
-        wsolVault: wsolVaultAta,
-        protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
-        protocolWsolVault: protocolWsolAta,
-        systemConfigAccount: systemConfigAccountPda,
+        configAccount: new PublicKey(token.configAccount),
         tokenAta,
+        tokenVault: new PublicKey(token.tokenVault),
+        protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
+        systemConfigAccount: systemConfigAccountPda,
         payer: wallet.publicKey,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-        legacyTokenProgram: TOKEN_PROGRAM_ID,
+        wsolVault: wsolVaultAta,
+        payerWsolVault: payerWsolAta,
+        protocolWsolVault: protocolWsolAta,
+        tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
     };
     const instructionRefund = await program.methods
@@ -674,56 +652,6 @@ export const refund = async (
     }
 }
 
-export const isFrozen = async (
-    connection: Connection,
-    mint: PublicKey,
-): Promise<ResponseData> => {
-    const transferHookState = await getTransferHookData(connection, mint);
-    if (!transferHookState.success) {
-        return transferHookState;
-    }
-    const { authority, programId } = transferHookState.data;
-    return {
-        success: true,
-        data: !!authority && !!programId
-    }
-}
-
-export const getTransferHookData = async (
-    connection: Connection,
-    mint: PublicKey,
-): Promise<ResponseData> => {
-    const extentions = await getExtensions(connection, mint);
-    if (!extentions) {
-        return {
-            success: false,
-            message: 'Error getting extensions'
-        }
-    }
-    const transferHook = extentions.find((ext: MintExtentionData) => ext.extension === "transferHook");
-    if (!transferHook) {
-        return {
-            success: false,
-            message: 'Transfer hook not found'
-        }
-    }
-    return {
-        success: true,
-        data: transferHook.state as TransferHookState
-    }
-}
-
-export const getExtensions = async (
-    connection: Connection,
-    mint: PublicKey,
-): Promise<Array<MintExtentionData> | null> => {
-    const mintAccountInfo = await connection.getParsedAccountInfo(mint);
-    if (!mintAccountInfo) {
-        return null;
-    }
-    return (mintAccountInfo.value?.data as any)?.parsed?.info?.extensions;
-}
-
 export const mintToken = async (
     wallet: AnchorWallet | undefined,
     connection: Connection,
@@ -736,6 +664,11 @@ export const mintToken = async (
     if (!wallet) return {
         success: false,
         message: 'Please connect wallet'
+    }
+
+    if (referrerMain.toBase58() === wallet.publicKey.toBase58()) return {
+        success: false,
+        message: 'You cannot be your own referrer'
     }
 
     const program = getProgram(wallet, connection);
@@ -772,7 +705,7 @@ export const mintToken = async (
     }
     // TODO: check if referrer code is exceed max usage
 
-    const destinationAta = await getAssociatedTokenAddress(new PublicKey(token.mint), wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
+    const destinationAta = await getAssociatedTokenAddress(new PublicKey(token.mint), wallet.publicKey, false, TOKEN_PROGRAM_ID);
     const destinationAtaInfo = await connection.getAccountInfo(destinationAta);
     const [refundAccountPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
@@ -788,26 +721,37 @@ export const mintToken = async (
     const protocolWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, new PublicKey(PROTOCOL_FEE_ACCOUNT), false, TOKEN_PROGRAM_ID);
     const destinationWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, false, TOKEN_PROGRAM_ID);
     const destinationWsolInfo = await connection.getAccountInfo(destinationWsolAta);
+    const mintTokenVaultAta = await getAssociatedTokenAddress(new PublicKey(token.mint), new PublicKey(token.mint), true, TOKEN_PROGRAM_ID);
+
+    let token0Mint = new PublicKey(token.mint);
+    let token1Mint = NATIVE_MINT;
+    if(compareMints(token0Mint, token1Mint) > 0) {
+      [token0Mint, token1Mint] = [token1Mint, token0Mint];
+    }
+    const [poolAddress] = getPoolAddress(cpSwapConfigAddress, token0Mint, token1Mint, cpSwapProgram);
+
     const mintAccounts = {
         mint: new PublicKey(token.mint),
         destination: destinationAta,
+        destinationWsolAta: destinationWsolAta,
         refundAccount: refundAccountPda,
         user: wallet.publicKey,
         configAccount: configAccountPda,
+        systemConfigAccount: systemConfigAccountPda,
+        mintTokenVault: mintTokenVaultAta,
         tokenVault: new PublicKey(token.tokenVault),
         wsolVault: wsolVaultAta,
-        protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
-        protocolWsolVault: protocolWsolAta,
-        destinationWsolAta: destinationWsolAta,
         wsolMint: NATIVE_MINT,
-        systemConfigAccount: systemConfigAccountPda,
         referrerAta: referrerAta,
         referrerMain: referrerMain,
         referralAccount: referralAccountPda,
-        rent: SYSVAR_RENT_PUBKEY,
-        tokenProgram: TOKEN_2022_PROGRAM_ID,
-        legacyTokenProgram: TOKEN_PROGRAM_ID,
-        associatedAddressProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        protocolFeeAccount: new PublicKey(PROTOCOL_FEE_ACCOUNT),
+        protocolWsolVault: protocolWsolAta,
+        poolState: poolAddress,
+        ammConfig: cpSwapConfigAddress,
+        cpSwapProgram: cpSwapProgram,
+        token0Mint: token0Mint,
+        token1Mint: token1Mint,
     };
 
     // console.log("=== mint accounts ===", Object.fromEntries(
@@ -827,7 +771,7 @@ export const mintToken = async (
         destinationAta,
         wallet.publicKey,
         new PublicKey(token.mint),
-        TOKEN_2022_PROGRAM_ID
+        TOKEN_PROGRAM_ID
     );
     const remainingAccounts = getRemainingAccountsForMintTokens(new PublicKey(token.mint), wallet.publicKey);
     // Create versioned transaction with LUT
@@ -922,7 +866,7 @@ const getRemainingAccountsForMintTokens = (
     user: PublicKey
 ): Array<RemainingAccount> => {
     let token0 = mint;
-    let token0Program = TOKEN_2022_PROGRAM_ID;
+    let token0Program = TOKEN_PROGRAM_ID;
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
@@ -1193,14 +1137,16 @@ export const closeToken = async (
         }
 
         const program = getProgram(wallet, connection);
+        const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, new PublicKey(token.configAccount), true, TOKEN_PROGRAM_ID);
+        const mintTokenVaultAta = await getAssociatedTokenAddress(new PublicKey(token.mint), new PublicKey(token.mint), true, TOKEN_PROGRAM_ID);
 
         const context = {
             mint: new PublicKey(token.mint),
-            configAccount: new PublicKey(token.configAccount),
-            tokenVault: new PublicKey(token.tokenVault),
             payer: wallet.publicKey,
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
-            systemProgram: SystemProgram.programId,
+            tokenVault: new PublicKey(token.tokenVault),
+            wsolVault: wsolVaultAta,
+            mintTokenVault: mintTokenVaultAta,
+            configAccount: new PublicKey(token.configAccount),
         };
 
         const tx = await program.methods
@@ -1238,14 +1184,10 @@ export const updateMetaData = async (
 
         const program = getProgram(wallet, connection);
 
-        // const [metadataAccountPda] = PublicKey.findProgramAddressSync(
-        //     [
-        //       Buffer.from(METADATA_SEED),
-        //       TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-        //       new PublicKey(token.mint).toBuffer(),
-        //     ],
-        //     TOKEN_METADATA_PROGRAM_ID,
-        //   );
+        const [metadataAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from(METADATA_SEED), TOKEN_METADATA_PROGRAM_ID.toBuffer(), new PublicKey(token.mint).toBuffer()],
+            TOKEN_METADATA_PROGRAM_ID,
+        );
 
         const systemConfig = await getSystemConfig(wallet, connection);
         if (!systemConfig.success) {
@@ -1260,12 +1202,10 @@ export const updateMetaData = async (
             mint: new PublicKey(token.mint),
             configAccount: new PublicKey(token.configAccount),
             payer: wallet.publicKey,
-            metadata: new PublicKey(token.mint),
-            protocolFeeAccount: new PublicKey(systemConfigData.systemConfigData.protocolFeeAccount),
+            metadata: metadataAccountPda,
             systemConfigAccount: new PublicKey(systemConfigData.systemConfigAccountPda),
-            // systemProgram: SystemProgram.programId,
-            // tokenProgram: TOKEN_2022_PROGRAM_ID,
-            // tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+            protocolFeeAccount: new PublicKey(systemConfigData.systemConfigData.protocolFeeAccount),
+            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         };
 
         console.log("update metadata context", Object.fromEntries(
@@ -1341,22 +1281,25 @@ export const revokeMetadataUpdateAuthority = async (
         }
         const program = getProgram(wallet, connection);
 
-        const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
-            program.programId,
+        const [metadataAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from(METADATA_SEED), TOKEN_METADATA_PROGRAM_ID.toBuffer(), new PublicKey(token.mint).toBuffer()],
+            TOKEN_METADATA_PROGRAM_ID,
         );
-
+    
         const context = {
             mint: new PublicKey(token.mint),
-            configAccount: new PublicKey(token.configAccount),
-            metadata: new PublicKey(token.mint),
+            metadata: metadataAccountPda,
             payer: wallet.publicKey,
-            systemConfigAccount: systemConfigAccountPda,
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            configAccount: new PublicKey(token.configAccount),
+            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         };
-
+        const metadataParams = {
+            name: token.tokenName as string,
+            symbol: token.tokenSymbol as string,
+            uri: token.tokenUri as string,
+        }
         const tx = await program.methods
-            .revokeUpdateMetadataAuthority(token.tokenName as string, token.tokenSymbol as string)
+            .revokeUpdateMetadataAuthority(metadataParams)
             .accounts(context)
             .transaction();
         return await processTransaction(tx, connection, wallet, "Drop metadata update authority successfully", { mint: token.mint });
@@ -1367,39 +1310,6 @@ export const revokeMetadataUpdateAuthority = async (
         }
     }
 }
-
-// export const revokeTransferHook = async (
-//     wallet: AnchorWallet | undefined,
-//     connection: Connection,
-//     token: InitiazlizedTokenData,
-// ): Promise<ResponseData> => {
-//     try {
-//         if (!wallet) {
-//             return {
-//                 success: false,
-//                 message: 'Please connect your wallet first'
-//             };
-//         }
-//         const program = getProgram(wallet, connection);
-
-//         const context = {
-//             mint: new PublicKey(token.mint),
-//             configAccount: new PublicKey(token.configAccount),
-//             tokenProgram: TOKEN_2022_PROGRAM_ID,
-//         };
-
-//         const tx = await program.methods
-//             .revokeTransferHook(token.tokenName as string, token.tokenSymbol as string)
-//             .accounts(context)
-//             .transaction();
-//         return await processTransaction(tx, connection, wallet, "Drop transfer hook successfully", {mint: token.mint});
-//     } catch (error: any) {
-//         return {
-//             success: false,
-//             message: error.message
-//         }
-//     }
-// }
 
 export const delegateValueManager = async (
     wallet: AnchorWallet | undefined,
@@ -1611,7 +1521,7 @@ export const getMintDiscount = async (
     };
 };
 
-export async function getMetadataAccountData(connection: Connection, metadataAccountPda: PublicKey): Promise<ResponseData> {
+async function getLegacyTokenMetadataAccountData(connection: Connection, metadataAccountPda: PublicKey): Promise<ResponseData> {
     try {
         const metadataAccountInfo = await connection.getAccountInfo(metadataAccountPda);
         if (!metadataAccountInfo) {
@@ -1720,58 +1630,48 @@ export async function getMetadataAccountData(connection: Connection, metadataAcc
     }
 }
 
-// export async function getMetadataAccountData2022(connection: Connection, mint: PublicKey): Promise<ResponseData> {
-//     try {
-//         const updatedMetadata = await getTokenMetadata(
-//             connection,
-//             mint, // Mint Account address same as metadata for token 2022
-//         );
-//         return {
-//             success: true,
-//             data: updatedMetadata as unknown as TokenMetadata2022,
-//         };
-//     } catch (error: any) {
-//         console.error('Error fetching metadata:', error);
+export async function getTokenMetadataMutable(connection: Connection, mint: PublicKey): Promise<boolean> {
+    const metadataAccountPda = PublicKey.findProgramAddressSync(
+        [Buffer.from(METADATA_SEED), TOKEN_METADATA_PROGRAM_ID.toBuffer(), new PublicKey(mint).toBuffer()],
+        TOKEN_METADATA_PROGRAM_ID,
+    )[0];
+    const metadataAccouontData = (await getLegacyTokenMetadataAccountData(connection, metadataAccountPda)).data as MetadataAccouontData;
+    return metadataAccouontData.isMutable;
+}
+
+// export const getMetadataAccountData2022 = async (
+//     connection: Connection,
+//     mint: PublicKey,
+// ): Promise<ResponseData> => {
+//     const extentions = await getExtensions(connection, mint);
+//     if (!extentions) {
 //         return {
 //             success: false,
-//             message: error.message,
+//             message: 'Has no token extensions',
 //         }
 //     }
+//     const metadataPointer = extentions.find((ext: MintExtentionData) => ext.extension === "metadataPointer");
+//     if (!metadataPointer) {
+//         return {
+//             success: false,
+//             message: 'Has no metadata pointer',
+//         }
+//     }
+//     const tokenMetadata = extentions.find((ext: MintExtentionData) => ext.extension === "tokenMetadata");
+//     if (!tokenMetadata) {
+//         return {
+//             success: false,
+//             message: 'Has no token metadata',
+//         }
+//     }
+//     return {
+//         success: true,
+//         data: {
+//             ...metadataPointer.state,
+//             ...tokenMetadata.state,
+//         },
+//     }
 // }
-
-export const getMetadataAccountData2022 = async (
-    connection: Connection,
-    mint: PublicKey,
-): Promise<ResponseData> => {
-    const extentions = await getExtensions(connection, mint);
-    if (!extentions) {
-        return {
-            success: false,
-            message: 'Has no token extensions',
-        }
-    }
-    const metadataPointer = extentions.find((ext: MintExtentionData) => ext.extension === "metadataPointer");
-    if (!metadataPointer) {
-        return {
-            success: false,
-            message: 'Has no metadata pointer',
-        }
-    }
-    const tokenMetadata = extentions.find((ext: MintExtentionData) => ext.extension === "tokenMetadata");
-    if (!tokenMetadata) {
-        return {
-            success: false,
-            message: 'Has no token metadata',
-        }
-    }
-    return {
-        success: true,
-        data: {
-            ...metadataPointer.state,
-            ...tokenMetadata.state,
-        },
-    }
-}
 
 export async function getBlockTimestamp(
     connection: Connection
@@ -1796,7 +1696,7 @@ export async function proxyAddLiquidity(
     const program = getProgram(wallet, connection);
 
     let token0 = new PublicKey(tokenData.mint);
-    let token0Program = TOKEN_2022_PROGRAM_ID;
+    let token0Program = TOKEN_PROGRAM_ID;
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
@@ -1867,7 +1767,7 @@ export async function proxyRemoveLiquidity(
     }
     const program = getProgram(wallet, connection);
     let token0 = new PublicKey(tokenData.mint);
-    let token0Program = TOKEN_2022_PROGRAM_ID;
+    let token0Program = TOKEN_PROGRAM_ID;
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
@@ -1940,7 +1840,7 @@ export async function proxySwapBaseIn(
     }
     const program = getProgram(wallet, connection);
     let tokenIn = new PublicKey(tokenData.mint);
-    let tokenInProgram = TOKEN_2022_PROGRAM_ID;
+    let tokenInProgram = TOKEN_PROGRAM_ID;
 
     let tokenOut = NATIVE_MINT;
     let tokenOutProgram = TOKEN_PROGRAM_ID;
@@ -1993,7 +1893,7 @@ export async function proxySwapBaseOut(
     console.log("==>", tokenInAmount.toNumber(), tokenOutAmount.toNumber(), slippage.toNumber())
     const program = getProgram(wallet, connection);
     let token0 = new PublicKey(tokenData.mint);
-    let token0Program = TOKEN_2022_PROGRAM_ID;
+    let token0Program = TOKEN_PROGRAM_ID;
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
@@ -2050,7 +1950,7 @@ export async function proxyBurnLpToken(
     }
     const program = getProgram(wallet, connection);
     let token0 = new PublicKey(tokenData.mint);
-    let token0Program = TOKEN_2022_PROGRAM_ID;
+    let token0Program = TOKEN_PROGRAM_ID;
 
     let token1 = NATIVE_MINT;
     let token1Program = TOKEN_PROGRAM_ID;
@@ -2146,16 +2046,6 @@ export const getCurrentSlopInterval = async (rpc: string, startSlot: number, end
     return (endSlotTimestamp - startSlotTimestamp) / (endSlot - startSlot);
 }
 
-export type TargetTimestampData = {
-    currentTimestamp: number,
-    currentEpoch: number,
-    absoluteSlot: number,
-    slotsInEpoch: number,
-    slotIndex: number,
-    futureTimestamp: number;
-    wait: number;
-    secondsPerSlot: number;
-}
 export const getTargetTimestampAfterEpoches = async (
     connection: Connection,
     rpc: string,

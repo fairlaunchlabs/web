@@ -150,7 +150,7 @@ export function ManageLiquidity({
     <div className={`space-y-0 md:p-4 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
       {/* <PageHeader title="Manage Liquidity" bgImage='/bg/group1/8.jpg' /> */}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto md:px-4 px-1 py-8">
         <div className='max-w-4xl mx-auto'>
           <h1 className='text-2xl mb-6'>Manage Liquidity</h1>
           {!mint && (
@@ -198,26 +198,26 @@ export function ManageLiquidity({
           )}
 
           {poolData && isDexOpen &&
-            <div className="bg-base-200 p-6 rounded-lg">
+            <div className="bg-base-200 md:p-6 p-3 rounded-lg md:text-md text-sm">
               <div className="grid gap-8">
                 <div className="tabs tabs-boxed">
                   <a
-                    className={`tab px-8 h-12 ${activeTab === 'trades' ? 'bg-gray-700 text-white' : ''}`}
+                    className={`tab px-0 h-12 ${activeTab === 'trades' ? 'bg-gray-700 text-white' : ''}`}
                     onClick={() => setActiveTab('trades')}
                   >
-                    <div className='font-bold'>[Trades]</div>
+                    <div className='font-bold'>[Trade]</div>
                   </a>
                   <a
-                    className={`tab px-8 h-12 ${activeTab === 'liquidity' ? 'bg-gray-700 text-white' : ''}`}
+                    className={`tab px-0 h-12 ${activeTab === 'liquidity' ? 'bg-gray-700 text-white' : ''}`}
                     onClick={() => setActiveTab('liquidity')}
                   >
                     <div className='font-bold'>[Liquidity]</div>
                   </a>
                   <a
-                    className={`tab px-8 h-12 ${activeTab === 'burn' ? 'bg-gray-700 text-white' : ''}`}
+                    className={`tab px-0 h-12 ${activeTab === 'burn' ? 'bg-gray-700 text-white' : ''}`}
                     onClick={() => setActiveTab('burn')}
                   >
-                    <div className='font-bold'>[Burn LP]</div>
+                    <div className='font-bold'>[Burn]</div>
                   </a>
                 </div>
 

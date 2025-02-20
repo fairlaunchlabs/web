@@ -3,7 +3,7 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import toast from 'react-hot-toast';
 import { InitiazlizedTokenData, RefundModalProps, RefundTokenData } from '../../types/types';
-import { getRefundAccountData, getSystemConfig, refund } from '../../utils/web3';
+import { getRefundAccountData, getSystemConfig, getTokenBalanceByMintAndOwner, refund } from '../../utils/web3';
 import { ToastBox } from '../common/ToastBox';
 import { NETWORK, SCANURL } from '../../config/constants';
 import { formatPrice } from '../../utils/format';
@@ -22,6 +22,7 @@ export const RefundModal: FC<RefundModalProps> = ({
     const [protocolFeeAccount, setProtocolFeeAccount] = useState<PublicKey>(PublicKey.default);
     const [refundFeeRate, setRefundFeeRate] = useState(0);
     const [refundAccountData, setRefundAccountData] = useState<RefundTokenData>();
+    const [tokenBalance, setTokenBalance] = useState(0);
 
     const liquidityRatio = Number(token.tokenData?.liquidityTokensRatio) / 100;
     
@@ -38,6 +39,9 @@ export const RefundModal: FC<RefundModalProps> = ({
             getRefundAccountData(wallet, connection, token.tokenData as InitiazlizedTokenData).then((data) => {
                 if (data?.success) setRefundAccountData(data.data);
                 else toast.error(data.message as string);
+            });
+            getTokenBalanceByMintAndOwner(new PublicKey(token.mint), wallet.publicKey, connection).then((data) => {
+                setTokenBalance(data as number);
             });
         }
     }, []);
@@ -105,7 +109,7 @@ export const RefundModal: FC<RefundModalProps> = ({
                         <div className="pixel-box mt-4 space-y-2 bg-base-200 p-4">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-base-content/70">Total paid</span>
-                                <span className="font-medium text-primary">
+                                <span className="font-medium">
                                     {refundAccountData ? 
                                         formatPrice(refundAccountData.totalMintFee.toNumber() / LAMPORTS_PER_SOL, 3) : 
                                         '-'
@@ -131,12 +135,18 @@ export const RefundModal: FC<RefundModalProps> = ({
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-base-content/70">Token burned from your wallet</span>
+                                <span className="text-base-content/70">Total tokens you minted</span>
                                 <span className="font-medium text-error">
                                     {refundAccountData ? 
                                         formatPrice(refundAccountData.totalTokens.toNumber() / LAMPORTS_PER_SOL, 3) : 
                                         '-'
                                     } {token.tokenData?.tokenSymbol}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-base-content/70">Token balance in wallet</span>
+                                <span className="font-medium text-error">
+                                    {formatPrice(tokenBalance, 3)} {token.tokenData?.tokenSymbol}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
@@ -164,32 +174,40 @@ export const RefundModal: FC<RefundModalProps> = ({
                             </div>
                         </div>
 
-                        <AlertBox 
-                            title="Warning!"
-                            message={`You are about to refund your ${token.tokenData?.tokenSymbol} tokens. This action cannot be undone.`}
-                        />
-
-                        <div className="form-control">
-                            <label className="label cursor-pointer justify-start gap-2">
-                                <input 
-                                    type="checkbox" 
-                                    className="checkbox checkbox-warning" 
-                                    checked={confirmed}
-                                    onChange={(e) => setConfirmed(e.target.checked)}
+                        {refundAccountData && tokenBalance == refundAccountData?.totalTokens.toNumber() / LAMPORTS_PER_SOL ? (
+                            <div className="flex flex-col gap-2">
+                                <AlertBox 
+                                    title="Warning!"
+                                    message={`You are about to refund your ${token.tokenData?.tokenSymbol} tokens. This action cannot be undone.`}
                                 />
-                                <span className="label-text">I understand that this action is irreversible</span>
-                            </label>
-                        </div>
+                                <div className="form-control">
+                                    <label className="label cursor-pointer justify-start gap-2">
+                                        <input 
+                                            type="checkbox" 
+                                            className="checkbox checkbox-warning" 
+                                            checked={confirmed}
+                                            onChange={(e) => setConfirmed(e.target.checked)}
+                                        />
+                                        <span className="label-text">I understand that this action is irreversible</span>
+                                    </label>
+                                </div>
 
-                        <div className="space-y-2">
-                            <button
-                                className={`btn btn-error w-full`}
-                                onClick={handleRefund}
-                                disabled={!confirmed || !refundAccountData}
-                            >
-                                {loading ? 'Processing...' : 'Confirm Refund'}
-                            </button>
-                        </div>
+                                <div className="space-y-2">
+                                    <button
+                                        className={`btn btn-error w-full`}
+                                        onClick={handleRefund}
+                                        disabled={!confirmed || !refundAccountData}
+                                    >
+                                        {loading ? 'Processing...' : 'Confirm Refund'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <AlertBox 
+                                title="Warning!"
+                                message={`You balance is not equal to the total tokens you minted. This action cannot be undone.`}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

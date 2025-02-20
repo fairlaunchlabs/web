@@ -4,7 +4,7 @@ import { queryMyDeployments } from "../utils/graphql";
 import { ErrorBox } from "../components/common/ErrorBox";
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { InitiazlizedTokenData, TokenMetadataIPFS } from "../types/types";
-import { fetchTokenMetadataMap, getExtensions } from "../utils/web3";
+import { fetchTokenMetadataMap } from "../utils/web3";
 import { TokenImage } from "../components/mintTokens/TokenImage";
 import { AddressDisplay } from "../components/common/AddressDisplay";
 import { CloseTokenModal } from "../components/tools/CloseTokenModal";
@@ -81,7 +81,8 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
             <ErrorBox title={`Error loading tokens. Please try again later.`} message={initialError.message} />
           </div>
         ) : dataAfterFilter?.length > 0 ? (
-          !isMobile ? (<div>
+          !isMobile ? (
+          <div>
             <div className="flex justify-end mb-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-base-content">Rows per page:</span>

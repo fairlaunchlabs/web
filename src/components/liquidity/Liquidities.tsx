@@ -7,6 +7,7 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
 import { ToastBox } from "../common/ToastBox"
 import { NETWORK, SCANURL } from "../../config/constants"
 import { InitiazlizedTokenData } from "../../types/types"
+import { useDeviceType } from "../../utils/contexts"
 
 export type LiquiditiesProps = {
   onDone: () => void;
@@ -41,7 +42,7 @@ export const Liquidities: FC<LiquiditiesProps> = ({
   const [removeLiquidityAmount1, setRemoveLiquidityAmount1] = useState('0');
   const [messageAddLiquidity, setMessageAddLiquidity] = useState('');
   const [messageRemoveLiquidity, setMessageRemoveLiquidity] = useState('');
-
+  const { isMobile } = useDeviceType();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
@@ -289,22 +290,22 @@ export const Liquidities: FC<LiquiditiesProps> = ({
               <thead>
                 <tr>
                   <th>Transaction</th>
-                  <th>Action</th>
-                  <th>Amount0</th>
-                  <th>Amount1</th>
+                  {/* <th>Action</th> */}
+                  {!isMobile && <th>Amount0</th>}
+                  {!isMobile && <th>Amount1</th>}
                   <th>LP Amount</th>
-                  <th>Time</th>
+                  {!isMobile && <th>Time</th>}
                 </tr>
               </thead>
               <tbody>
                 {liquiditiesData.map((liquidity: any) => (
                   <tr key={liquidity.id} className={liquidity.action === 'withdraw' ? 'text-error' : 'text-[#009866]'}>
                     <td><AddressDisplay address={liquidity.txId} type='tx' /></td>
-                    <td>{liquidity.action === 'withdraw' ? 'Remove' : 'Add'}</td>
-                    <td>{(liquidity.token0Amount / 1e9).toFixed(4)} {liquidity.tokenSymbol}</td>
-                    <td>{(liquidity.token1Amount / 1e9).toFixed(4)} SOL</td>
+                    {/* <td>{liquidity.action === 'withdraw' ? 'Remove' : 'Add'}</td> */}
+                    {!isMobile && <td>{(liquidity.token0Amount / 1e9).toFixed(4)} {liquidity.tokenSymbol}</td>}
+                    {!isMobile && <td>{(liquidity.token1Amount / 1e9).toFixed(4)} SOL</td>}
                     <td>{(liquidity.lpAmount / 1e9).toFixed(4)}</td>
-                    <td>{new Date(parseInt(liquidity.blockTimestamp) * 1000).toLocaleString()}</td>
+                    {!isMobile && <td>{new Date(parseInt(liquidity.blockTimestamp) * 1000).toLocaleString()}</td>}
                   </tr>
                 ))}
               </tbody>

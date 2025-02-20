@@ -7,6 +7,7 @@ import { NETWORK, SCANURL } from "../../config/constants"
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
 import { BN } from "@coral-xyz/anchor"
 import { InitiazlizedTokenData } from "../../types/types"
+import { useDeviceType } from "../../utils/contexts"
 
 const SLIPPAGE_KEY = 'trade_slippage';
 const DEFAULT_SLIPPAGE = 0.5;
@@ -43,7 +44,7 @@ export const Trades: FC<TradesProps> = ({
   const [messageSell, setMessageSell] = useState('');
   const [slippageValue, setSlippageValue] = useState(DEFAULT_SLIPPAGE);
   const [showSlippageSettings, setShowSlippageSettings] = useState(false);
-
+  const { isMobile } = useDeviceType();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
@@ -279,20 +280,20 @@ export const Trades: FC<TradesProps> = ({
             <thead>
               <tr>
                 <th>Transaction</th>
-                <th>Action</th>
+                {/* <th>Action</th> */}
                 <th>Token Amount</th>
-                <th>SOL Amount</th>
-                <th>Time</th>
+                {!isMobile && <th>SOL Amount</th>}
+                {!isMobile && <th>Time</th>}
               </tr>
             </thead>
             <tbody>
               {tradesData.map((trade: any) => (
                 <tr key={trade.id} className={trade.action === 'in' ? 'text-error' : 'text-[#009866]'}>
                   <td><AddressDisplay address={trade.txId} type='tx' /></td>
-                  <td>{trade.action === 'in' ? 'Sell' : 'Buy'}</td>
+                  {/* <td>{trade.action === 'in' ? 'Sell' : 'Buy'}</td> */}
                   <td>{(trade.baseAmount / 1e9).toFixed(4)} {trade.tokenSymbol}</td>
-                  <td>{(trade.priceAmount / 1e9).toFixed(4)} SOL</td>
-                  <td>{new Date(parseInt(trade.blockTimestamp) * 1000).toLocaleString()}</td>
+                  {!isMobile && <td>{(trade.priceAmount / 1e9).toFixed(4)} SOL</td>}
+                  {!isMobile && <td>{new Date(parseInt(trade.blockTimestamp) * 1000).toLocaleString()}</td>}
                 </tr>
               ))}
             </tbody>

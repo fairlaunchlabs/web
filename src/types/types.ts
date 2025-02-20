@@ -186,6 +186,7 @@ export type MenuItem = {
     icon: React.ReactNode;
     component?: React.ReactNode;
     subItems?: MenuItem[];
+    visible?: boolean;
 };
 
 export type SidebarProps = {
@@ -483,17 +484,6 @@ export type MetadataAccouontData = {
     } | null;
   };
 
-export type TokenMetadata2022 = {
-    updateAuthority: string;
-    mint: string;
-    name: string;
-    symbol: string;
-    uri: string;
-    additionalMetadata: [];
-    authority: string;
-    metadataAddress: string;    
-}
-
 export type MintExtentionType = "transferHook" | "metadataPointer" | "tokenMetadata";
 export type MintExtentionData = {
     extension: MintExtentionType;
@@ -533,3 +523,13 @@ export type RemainingAccount = {
     isSigner: boolean
 }
 
+export type TargetTimestampData = {
+    currentTimestamp: number,
+    currentEpoch: number,
+    absoluteSlot: number,
+    slotsInEpoch: number,
+    slotIndex: number,
+    futureTimestamp: number;
+    wait: number;
+    secondsPerSlot: number;
+}

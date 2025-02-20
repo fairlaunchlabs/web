@@ -57,7 +57,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         const isSubMenuExpanded = expandedSubMenus.includes(item.id);
 
         return (
-            <li key={item.id}>
+            <div>
+            {item.visible && <li key={item.id}>
                 <a 
                     className={`mt-1 pt-3 pb-2
                         ${activeMenuItem === item.id ? 'active' : ''} 
@@ -93,7 +94,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         {item.subItems?.map(subItem => renderMenuItem(subItem, true))}
                     </ul>
                 )}
-            </li>
+            </li>}
+            </div>
         );
     };
 
