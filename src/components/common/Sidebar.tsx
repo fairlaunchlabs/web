@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }}
                     title={!isExpanded ? item.label : undefined}
                 >
-                    <div className={isExpanded ? 'w-6 h-6' : 'w-6 h-6'}>
+                    <div className={isExpanded ? 'w-6 h-3' : 'w-6 h-3'}>
                         {item.icon}
                     </div>
                     {(isExpanded || isMobile) && (
@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* Social icons */}
-            <div className="absolute bottom-20 left-5">
+            <div className="absolute bottom-5 left-5">
                 {socialIcons.map((social, index) => (
                     <a
                         key={index}

@@ -33,13 +33,16 @@ import { SocialValueManager } from './pages/SocialValueManager';
 import { LaunchTokenForm } from './pages/LaunchToken';
 import { CheckURC } from './components/tools/CheckURC';
 import { MyUniqueReferralCode } from './components/tools/MyUniqueReferralCode';
-// import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
+import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
 import { ManageLiquidity } from './pages/ManageLiquidity';
-// import { ClaimTokens } from './pages/ClaimTokens';
+import { ClaimTokens } from './pages/ClaimTokens';
 import { DelegatedTokens } from './pages/DelegatedTokens';
 import { TradingBot } from './pages/TradingBot';
 import { useQuery } from '@apollo/client';
 import { queryMyDelegatedTokens } from './utils/graphql';
+import { CopilotKit } from "@copilotkit/react-core"; 
+import { CopilotPopup } from "@copilotkit/react-ui";
+import "@copilotkit/react-ui/styles.css";
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -133,8 +136,8 @@ const AppContent = () => {
                             <Route path="/my-minted-tokens" element={<MyMintedTokens expanded={expanded} />} />
                             <Route path="/my-deployments" element={<MyDeployments expanded={expanded} />} />
                             <Route path="/my-delegated-tokens" element={<DelegatedTokens expanded={expanded} />} />
-                            {/* <Route path="/create-liquidity-pool" element={<CreateLiquidityPool expanded={expanded} />} />
-                            <Route path="/create-liquidity-pool/:mint" element={<CreateLiquidityPool expanded={expanded} />} /> */}
+                            <Route path="/create-liquidity-pool" element={<CreateLiquidityPool expanded={expanded} />} />
+                            <Route path="/create-liquidity-pool/:mint" element={<CreateLiquidityPool expanded={expanded} />} />
                             <Route path="/manage-liquidity/:mint" element={<ManageLiquidity expanded={expanded} />} />
                             <Route path="/manage-liquidity" element={<ManageLiquidity expanded={expanded} />} />
                             <Route path="/trading-bot" element={<TradingBot expanded={expanded} />} />
@@ -147,7 +150,7 @@ const AppContent = () => {
                             <Route path="/social-value-manager" element={<SocialValueManager expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
                             <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />
-                            {/* <Route path="/claim-tokens" element={<ClaimTokens expanded={expanded} />} /> */}
+                            <Route path="/claim-tokens" element={<ClaimTokens expanded={expanded} />} />
                         </Routes>
                     </div>
                 </div>
@@ -157,7 +160,14 @@ const AppContent = () => {
                         duration: 5000,
                     }}
                 />
-                <Footer />
+                {/* <Footer /> */}
+                <CopilotPopup
+                    labels={{
+                    title: "Popup Assistant",
+                    initial: "How can I help you today?"
+                    }}
+                    instructions="AI help that shows up right when you need it"
+                />
             </div>
         </Providers>
     );
@@ -177,7 +187,8 @@ function App() {
 
     return (
         <Router>
-            <ConnectionProvider endpoint={endpoint}>
+          <CopilotKit publicApiKey={process.env.REACT_APP_COPILOTKIT_API_KEY as string}> 
+              <ConnectionProvider endpoint={endpoint}>
                 <WalletProvider 
                     wallets={wallets} 
                     autoConnect
@@ -190,6 +201,7 @@ function App() {
                     </WalletModalProvider>
                 </WalletProvider>
             </ConnectionProvider>
+          </CopilotKit>
         </Router>
     );
 }

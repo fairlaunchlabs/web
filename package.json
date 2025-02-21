@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.11.10",
+    "@copilotkit/react-core": "^1.5.20",
+    "@copilotkit/react-ui": "^1.5.20",
     "@coral-xyz/anchor": "^0.30.1",
     "@irys/sdk": "^0.2.11",
     "@raydium-io/raydium-sdk-v2": "^0.1.111-alpha",
