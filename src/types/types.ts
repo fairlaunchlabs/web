@@ -5,531 +5,531 @@ export type Language = 'en-US' | 'zh-CN' | 'ja-JP' | 'ru-RU';
 export type Theme = 'light' | 'dark';
 
 export type TokenMetadata = {
-    name: string;
-    symbol: string;
-    uri: string;
-    decimals?: number;
-    sellerFeeBasisPoints?: number;
-    creators?: null;
-    collection?: null;
-    uses?: null;
+  name: string;
+  symbol: string;
+  uri: string;
+  decimals?: number;
+  sellerFeeBasisPoints?: number;
+  creators?: null;
+  collection?: null;
+  uses?: null;
 }
 
 export type TokenMetadataExtensions = {
-    twitter?: string;
-    discord?: string;
-    website?: string;
-    github?: string;
-    medium?: string;
-    telegram?: string;
+  twitter?: string;
+  discord?: string;
+  website?: string;
+  github?: string;
+  medium?: string;
+  telegram?: string;
 }
 
 export type TokenMetadataIPFS = {
-    name?: string;
-    symbol?: string;
-    image?: string;
-    header?: string;
-    description?: string;
-    extensions?: TokenMetadataExtensions;
-    attributes?: string[];
+  name?: string;
+  symbol?: string;
+  image?: string;
+  header?: string;
+  description?: string;
+  extensions?: TokenMetadataExtensions;
+  attributes?: string[];
 }
 
 export type InitializeTokenConfig = {
-    targetEras: BN;
-    epochesPerEra: BN;
-    targetSecondsPerEpoch: BN;
-    reduceRatio: BN;
-    initialMintSize: BN;
-    initialTargetMintSizePerEpoch: BN;
-    feeRate: BN;
-    liquidityTokensRatio: BN;
+  targetEras: BN;
+  epochesPerEra: BN;
+  targetSecondsPerEpoch: BN;
+  reduceRatio: BN;
+  initialMintSize: BN;
+  initialTargetMintSizePerEpoch: BN;
+  feeRate: BN;
+  liquidityTokensRatio: BN;
 }
 
 export type InitializeTokenAccounts = {
-    protocolFeeAccount: PublicKey;
-    mint: PublicKey;
-    metadata: PublicKey;
-    payer: PublicKey;
-    configAccount: PublicKey;
-    tokenVaultAta?: PublicKey;
-    rent: PublicKey;
-    systemProgram: PublicKey;
-    systemConfigAccount: PublicKey;
-    tokenProgram: PublicKey;
-    tokenMetadataProgram: PublicKey;
+  protocolFeeAccount: PublicKey;
+  mint: PublicKey;
+  metadata: PublicKey;
+  payer: PublicKey;
+  configAccount: PublicKey;
+  tokenVaultAta?: PublicKey;
+  rent: PublicKey;
+  systemProgram: PublicKey;
+  systemConfigAccount: PublicKey;
+  tokenProgram: PublicKey;
+  tokenMetadataProgram: PublicKey;
 }
 
 export type InitiazlizedTokenData = {
-    id: string;
-    txId: string;
-    admin: string;
-    tokenId: string;
-    mint: string;
-    configAccount: string;
-    metadataAccount: string;
-    tokenVault: string;
-    timestamp: string;
-    status: number;
-    metadataTimestamp: string;
-    valueManager: string;
-    wsolVault: string;
-    graduateEpoch: string;
+  id: string;
+  txId: string;
+  admin: string;
+  tokenId: string;
+  mint: string;
+  configAccount: string;
+  metadataAccount: string;
+  tokenVault: string;
+  timestamp: string;
+  status: number;
+  metadataTimestamp: string;
+  valueManager: string;
+  wsolVault: string;
+  graduateEpoch: string;
 
-    // TokenMetadata
-    tokenName: string;
-    tokenSymbol: string;
-    tokenUri: string;
+  // TokenMetadata
+  tokenName: string;
+  tokenSymbol: string;
+  tokenUri: string;
 
-    // TokenMintState
-    supply: string;
-    currentEra: string;
-    currentEpoch: string;
-    elapsedSecondsEpoch: string;
-    startTimestampEpoch: string;
-    lastDifficultyCoefficientEpoch: string;
-    difficultyCoefficientEpoch: string;
-    mintSizeEpoch: string;
-    quantityMintedEpoch: string;
-    targetMintSizeEpoch: string;
-    totalMintFee: string;
-    totalReferrerFee: string;
-    totalTokens: string;
+  // TokenMintState
+  supply: string;
+  currentEra: string;
+  currentEpoch: string;
+  elapsedSecondsEpoch: string;
+  startTimestampEpoch: string;
+  lastDifficultyCoefficientEpoch: string;
+  difficultyCoefficientEpoch: string;
+  mintSizeEpoch: string;
+  quantityMintedEpoch: string;
+  targetMintSizeEpoch: string;
+  totalMintFee: string;
+  totalReferrerFee: string;
+  totalTokens: string;
 
-    // InitializeTokenConfigData
-    targetEras: string;
-    epochesPerEra: string;
-    targetSecondsPerEpoch: string;
-    reduceRatio: string;
-    initialMintSize: string;
-    initialTargetMintSizePerEpoch: string;
-    feeRate: string;
-    liquidityTokensRatio: string;
-    startTimestamp: string;
+  // InitializeTokenConfigData
+  targetEras: string;
+  epochesPerEra: string;
+  targetSecondsPerEpoch: string;
+  reduceRatio: string;
+  initialMintSize: string;
+  initialTargetMintSizePerEpoch: string;
+  feeRate: string;
+  liquidityTokensRatio: string;
+  startTimestamp: string;
 
-    tokenMetadata?: TokenMetadataIPFS;
+  tokenMetadata?: TokenMetadataIPFS;
 }
 
 export type MintTokenData = {
-    id: string;
-    txId: string;
-    sender: string;
-    mint: string;
-    configAccount: string;
-    tokenVault: string;
-    referralAccount: string;
-    referrerMain: string;
-    referrerAta: string;
-    refundAccount: string;
-    timestamp: string;
+  id: string;
+  txId: string;
+  sender: string;
+  mint: string;
+  configAccount: string;
+  tokenVault: string;
+  referralAccount: string;
+  referrerMain: string;
+  referrerAta: string;
+  refundAccount: string;
+  timestamp: string;
 
-    // TokenMintState
-    supply: string;
-    currentEra: string;
-    currentEpoch: string;
-    elapsedSecondsEpoch: string;
-    startTimestampEpoch: string;
-    lastDifficultyCoefficientEpoch: string;
-    difficultyCoefficientEpoch: string;
-    mintSizeEpoch: string;
-    quantityMintedEpoch: string;
-    targetMintSizeEpoch: string;
-    totalMintFee: string;
-    totalReferrerFee: string;
-    totalTokens: string;
+  // TokenMintState
+  supply: string;
+  currentEra: string;
+  currentEpoch: string;
+  elapsedSecondsEpoch: string;
+  startTimestampEpoch: string;
+  lastDifficultyCoefficientEpoch: string;
+  difficultyCoefficientEpoch: string;
+  mintSizeEpoch: string;
+  quantityMintedEpoch: string;
+  targetMintSizeEpoch: string;
+  totalMintFee: string;
+  totalReferrerFee: string;
+  totalTokens: string;
 }
 
 export type RefundTokenData = {
-    owner: PublicKey;
-    totalTokens: BN;
-    totalMintFee: BN;
-    totalReferrerFee: BN;
+  owner: PublicKey;
+  totalTokens: BN;
+  totalMintFee: BN;
+  totalReferrerFee: BN;
 }
 
 export type TokenImageProps = {
-    imageUrl: string | null;
-    name: string;
-    metadataTimestamp: number;
-    size?: number;
-    className?: string;
-    round?: boolean;
+  imageUrl: string | null;
+  name: string;
+  metadataTimestamp: number;
+  size?: number;
+  className?: string;
+  round?: boolean;
 }
 
 export type AddressDisplayProps = {
-    address: string;
-    type?: string;
-    isDevnet?: boolean;
-    showCharacters?: number;
+  address: string;
+  type?: string;
+  isDevnet?: boolean;
+  showCharacters?: number;
 }
 
 export type MintTokensProps = {
-    expanded: boolean;
+  expanded: boolean;
 };
 
 export type TokenDetailProps = {
-    expanded: boolean;
+  expanded: boolean;
 };
 
 export type LanguageSelectorProps = {
-    currentLocale: Language;
-    onLocaleChange: (locale: Language) => void;
+  currentLocale: Language;
+  onLocaleChange: (locale: Language) => void;
 }
 
 export type NavbarProps = {
-    title?: string;
-    onMenuClick?: () => void;
-    isMenuOpen?: boolean;
+  title?: string;
+  onMenuClick?: () => void;
+  isMenuOpen?: boolean;
 }
 
 export type MenuItem = {
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-    component?: React.ReactNode;
-    subItems?: MenuItem[];
-    visible?: boolean;
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  component?: React.ReactNode;
+  subItems?: MenuItem[];
+  visible?: boolean;
 };
 
 export type SidebarProps = {
-    menuItems: MenuItem[];
-    activeMenuItem: string;
-    onMenuItemClick: (id: string) => void;
-    onExpandedChange?: (expanded: boolean) => void;
-    isMobileOpen?: boolean;
+  menuItems: MenuItem[];
+  activeMenuItem: string;
+  onMenuItemClick: (id: string) => void;
+  onExpandedChange?: (expanded: boolean) => void;
+  isMobileOpen?: boolean;
 }
 
 export type TokenCardProps = {
-    token: InitiazlizedTokenData;
+  token: InitiazlizedTokenData;
 }
 
 export type TokenCardMobileProps = {
-    token: InitiazlizedTokenData;
-    number?: number;
-    type?: "static" | "scroll";
+  token: InitiazlizedTokenData;
+  number?: number;
+  type?: "static" | "scroll";
 }
 
 export type TokenFormData = {
-    name: string;
-    symbol: string;
-    imageUrl: string;
-    imageCid: string;
-    description: string;
+  name: string;
+  symbol: string;
+  imageUrl: string;
+  imageCid: string;
+  description: string;
 }
 
 export type TokenAccount = {
-    mint: string;
-    amount: number;
-    decimals: number;
+  mint: string;
+  amount: number;
+  decimals: number;
 }
 
 export type MetricsProps = {
-    targetEras: string;
-    epochesPerEra: string;
-    targetSecondsPerEpoch: string;
-    reduceRatio: string;
-    displayInitialTargetMintSizePerEpoch: string;
-    initialMintSize: string;
-    feeRate: string;
-    liquidityTokensRatio: string;
-    symbol: string;
+  targetEras: string;
+  epochesPerEra: string;
+  targetSecondsPerEpoch: string;
+  reduceRatio: string;
+  displayInitialTargetMintSizePerEpoch: string;
+  initialMintSize: string;
+  feeRate: string;
+  liquidityTokensRatio: string;
+  symbol: string;
 }
 
 export type TokenImageUploadProps = {
-    onImageChange: (file: File | null) => void;
+  onImageChange: (file: File | null) => void;
 }
 
 export type MyAccountProps = {
-    expanded: boolean;
+  expanded: boolean;
 }
 
 export type TokenListItem = {
-    mint: string;
-    amount: string;
-    tokenData?: InitiazlizedTokenData;
-    metadata?: TokenMetadataIPFS | undefined;
+  mint: string;
+  amount: string;
+  tokenData?: InitiazlizedTokenData;
+  metadata?: TokenMetadataIPFS | undefined;
 }
 
 export type HolderData = {
-    owner: string;
-    amount: string;
+  owner: string;
+  amount: string;
 }
 
 export type MintTransactionData = {
-    id: string;
-    txId: string;
-    sender: string;
-    timestamp: string;
-    currentEra: string;
-    currentEpoch: string;
-    mintSizeEpoch: string;
+  id: string;
+  txId: string;
+  sender: string;
+  timestamp: string;
+  currentEra: string;
+  currentEpoch: string;
+  mintSizeEpoch: string;
 }
 
 export type RefundTransactionData = {
-    id: string;
-    txId: string;
-    sender: string;
-    timestamp: string;
-    burnAmountFromUser: string;
-    burnAmountFromVault: string;
-    refundFee: string;
-    refundAmountIncludingFee: string;
+  id: string;
+  txId: string;
+  sender: string;
+  timestamp: string;
+  burnAmountFromUser: string;
+  burnAmountFromVault: string;
+  refundFee: string;
+  refundAmountIncludingFee: string;
 }
 
 export type ReferralCodeModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    token: TokenListItem
+  isOpen: boolean;
+  onClose: () => void;
+  token: TokenListItem
 }
 
 export type ReferrerData = {
-    codeHash: PublicKey;
-    referrerMain: PublicKey;
-    referrerAta: PublicKey;
-    usageCount: number;
-    activeTimestamp: BN;
+  codeHash: PublicKey;
+  referrerMain: PublicKey;
+  referrerAta: PublicKey;
+  usageCount: number;
+  activeTimestamp: BN;
 }
 
 export type PaginationProps = {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-    pageSize: number;
-    onPageChange: (page: number) => void;
-    hasMore?: boolean;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  hasMore?: boolean;
 }
 
 export type ShareButtonProps = {
-    token: InitiazlizedTokenData;
-    metadata: TokenMetadataIPFS;
-    inputCode: string | undefined;
+  token: InitiazlizedTokenData;
+  metadata: TokenMetadataIPFS;
+  inputCode: string | undefined;
 }
 
 export type ToggleSwitchProps = {
-    id: string;
-    label: string;
-    checked: boolean;
-    onChange: () => void;
+  id: string;
+  label: string;
+  checked: boolean;
+  onChange: () => void;
 }
 
 export type AdvancedSettingsProps = {
-    targetEras: string;
-    epochesPerEra: string;
-    targetSecondsPerEpoch: string;
-    reduceRatio: string;
-    displayInitialMintSize: string;
-    displayInitialTargetMintSizePerEpoch: string;
-    displayFeeRate: string;
-    liquidityTokensRatio: string;
-    onTargetErasChange: (value: string) => void;
-    onEpochesPerEraChange: (value: string) => void;
-    onTargetSecondsPerEpochChange: (value: string) => void;
-    onReduceRatioChange: (value: string) => void;
-    onDisplayInitialMintSizeChange: (value: string, mintSize: string) => void;
-    onDisplayInitialTargetMintSizePerEpochChange: (value: string, targetMintSize: string) => void;
-    onDisplayFeeRateChange: (value: string, feeRate: string) => void;
-    onLiquidityTokensRatioChange: (value: string) => void;
+  targetEras: string;
+  epochesPerEra: string;
+  targetSecondsPerEpoch: string;
+  reduceRatio: string;
+  displayInitialMintSize: string;
+  displayInitialTargetMintSizePerEpoch: string;
+  displayFeeRate: string;
+  liquidityTokensRatio: string;
+  onTargetErasChange: (value: string) => void;
+  onEpochesPerEraChange: (value: string) => void;
+  onTargetSecondsPerEpochChange: (value: string) => void;
+  onReduceRatioChange: (value: string) => void;
+  onDisplayInitialMintSizeChange: (value: string, mintSize: string) => void;
+  onDisplayInitialTargetMintSizePerEpochChange: (value: string, targetMintSize: string) => void;
+  onDisplayFeeRateChange: (value: string, feeRate: string) => void;
+  onLiquidityTokensRatioChange: (value: string) => void;
 }
 
 export type SocialInformationProps = {
-    description: string;
-    website: string;
-    twitter: string;
-    discord: string;
-    telegram: string;
-    github: string;
-    medium: string;
-    onDescriptionChange: (value: string) => void;
-    onWebsiteChange: (value: string) => void;
-    onTwitterChange: (value: string) => void;
-    onDiscordChange: (value: string) => void;
-    onTelegramChange: (value: string) => void;
-    onGithubChange: (value: string) => void;
-    onMediumChange: (value: string) => void;
+  description: string;
+  website: string;
+  twitter: string;
+  discord: string;
+  telegram: string;
+  github: string;
+  medium: string;
+  onDescriptionChange: (value: string) => void;
+  onWebsiteChange: (value: string) => void;
+  onTwitterChange: (value: string) => void;
+  onDiscordChange: (value: string) => void;
+  onTelegramChange: (value: string) => void;
+  onGithubChange: (value: string) => void;
+  onMediumChange: (value: string) => void;
 }
 
 export type RefundModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    token: TokenListItem;
+  isOpen: boolean;
+  onClose: () => void;
+  token: TokenListItem;
 }
 
 export type TokenChartsProps = {
-    token: InitiazlizedTokenData;
-    height: number;
+  token: InitiazlizedTokenData;
+  height: number;
 }
 
 export type TokenHoldersProps = {
-    token: InitiazlizedTokenData;
+  token: InitiazlizedTokenData;
 }
 
 export type TokenInfoProps = {
-    token: InitiazlizedTokenData;
-    referrerCode: string | undefined;
+  token: InitiazlizedTokenData;
+  referrerCode: string | undefined;
 }
 
 export type TokenMintTransactionsProps = {
-    token: InitiazlizedTokenData;
+  token: InitiazlizedTokenData;
 }
 
 export type TokenRefundTransactionsProps = {
-    token: InitiazlizedTokenData;
+  token: InitiazlizedTokenData;
 }
 
 export type SocialLink = {
-    name: string;
-    url: string;
+  name: string;
+  url: string;
 }
 
 export type LaunchTokenFormProps = {
-    expanded: boolean;
+  expanded: boolean;
 }
 
 export type ToastBoxProps = {
-    title: string
-    url: string
-    urlText: string
+  title: string
+  url: string
+  urlText: string
 }
 
 export type RenderSocialIconsProps = {
-    metadata: TokenMetadataIPFS;
+  metadata: TokenMetadataIPFS;
 }
 
 export type DataBlockProps = {
-    label: string;
-    value: any;
-    tooltip?: string;
+  label: string;
+  value: any;
+  tooltip?: string;
 }
 
 export type MyUniqueReferralCodeProps = {
-    expanded: boolean;
+  expanded: boolean;
 }
 
 
 export type CheckURCProps = {
-    expanded: boolean;
+  expanded: boolean;
 }
 
 export type CommonPageProps = {
-    expanded: boolean;
+  expanded: boolean;
 }
 
 export type SetRefererCodeEntity = {
-    id?: string;
-    mint: string;
-    referralAccount: string;
-    referrerAta: string;
-    referrerMain: string;
-    activeTimestamp: number;
-    usageCount?: number;
-    codeHash?: string;
-    tokenBalance?: number | null;
-    isProcessing?: boolean;
+  id?: string;
+  mint: string;
+  referralAccount: string;
+  referrerAta: string;
+  referrerMain: string;
+  activeTimestamp: number;
+  usageCount?: number;
+  codeHash?: string;
+  tokenBalance?: number | null;
+  isProcessing?: boolean;
 }
 
 export type OnChainReferralData = {
-    codeHash: string;
-    usageCount: number;
-    activeTimestamp: number;
-    tokenBalance: number | null;
+  codeHash: string;
+  usageCount: number;
+  activeTimestamp: number;
+  tokenBalance: number | null;
 }
 
 export type ResponseData = {
-    success: boolean;
-    message?: string;
-    data?: any;
+  success: boolean;
+  message?: string;
+  data?: any;
 }
 
 export type MintData = {
-    timestamp: string;
-    mintSizeEpoch: string;
+  timestamp: string;
+  mintSizeEpoch: string;
 };
 
 export type ReferralData = {
-    referralAccount: PublicKey;
-    mint: PublicKey;
-    codeHash: PublicKey;
-    referrerMain: PublicKey;
-    referrerAta: PublicKey;
-    usageCount: number;
-    activeTimestamp: BN;
-    tokenBalance?: number | null;
-    acturalPay?: BN;
-    urcProviderBonus?: BN;
+  referralAccount: PublicKey;
+  mint: PublicKey;
+  codeHash: PublicKey;
+  referrerMain: PublicKey;
+  referrerAta: PublicKey;
+  usageCount: number;
+  activeTimestamp: BN;
+  tokenBalance?: number | null;
+  acturalPay?: BN;
+  urcProviderBonus?: BN;
 }
 
 export type TokenHeroProps = {
-    token: InitiazlizedTokenData;
-    metadata: TokenMetadataIPFS;
-    referrerCode: string | undefined;
+  token: InitiazlizedTokenData;
+  metadata: TokenMetadataIPFS;
+  referrerCode: string | undefined;
 }
 
 export type MetadataAccouontData = {
-    key: number;
-    updateAuthority: PublicKey;
-    mint: PublicKey;
-    data: {
-      name: string;
-      symbol: string;
-      uri: string;
-      sellerFeeBasisPoints: number;
-      creators: {
-        address: PublicKey;
-        verified: boolean;
-        share: number;
-      }[];
-    };
-    isMutable: boolean;
-    collection: {
-      key: string;
+  key: number;
+  updateAuthority: PublicKey;
+  mint: PublicKey;
+  data: {
+    name: string;
+    symbol: string;
+    uri: string;
+    sellerFeeBasisPoints: number;
+    creators: {
+      address: PublicKey;
       verified: boolean;
-    } | null;
+      share: number;
+    }[];
   };
+  isMutable: boolean;
+  collection: {
+    key: string;
+    verified: boolean;
+  } | null;
+};
 
 export type MintExtentionType = "transferHook" | "metadataPointer" | "tokenMetadata";
 export type MintExtentionData = {
-    extension: MintExtentionType;
-    state: any;
+  extension: MintExtentionType;
+  state: any;
 }
 
 export type TransferHookState = {
-    authority: string | null;
-    programId: string | null;
+  authority: string | null;
+  programId: string | null;
 }
 
 export type PoolData = {
-    poolAddress: string;
-    cpSwapPoolState: CpSwapPoolStateData;
-    mintIsToken0?: boolean;
+  poolAddress: string;
+  cpSwapPoolState: CpSwapPoolStateData;
+  mintIsToken0?: boolean;
 }
 export type CpSwapPoolStateData = {
-    openTime: number;
-    ammConfig: string;
-    poolCreator: string;
-    lpMint: string;
-    token0Vault: string;
-    token1Vault: string;
-    token0Mint: string;
-    token0Program: string;
-    token1Mint: string;
-    token1Program: string;
-    status: number;
-    lpAmount: number;
-    token0Amount: number | null;
-    token1Amount: number | null;
+  openTime: number;
+  ammConfig: string;
+  poolCreator: string;
+  lpMint: string;
+  token0Vault: string;
+  token1Vault: string;
+  token0Mint: string;
+  token0Program: string;
+  token1Mint: string;
+  token1Program: string;
+  status: number;
+  lpAmount: number;
+  token0Amount: number | null;
+  token1Amount: number | null;
 }
-  
+
 export type RemainingAccount = {
-    pubkey: PublicKey,
-    isWritable: boolean,
-    isSigner: boolean
+  pubkey: PublicKey,
+  isWritable: boolean,
+  isSigner: boolean
 }
 
 export type TargetTimestampData = {
-    currentTimestamp: number,
-    currentEpoch: number,
-    absoluteSlot: number,
-    slotsInEpoch: number,
-    slotIndex: number,
-    futureTimestamp: number;
-    wait: number;
-    secondsPerSlot: number;
+  currentTimestamp: number,
+  currentEpoch: number,
+  absoluteSlot: number,
+  slotsInEpoch: number,
+  slotIndex: number,
+  futureTimestamp: number;
+  wait: number;
+  secondsPerSlot: number;
 }

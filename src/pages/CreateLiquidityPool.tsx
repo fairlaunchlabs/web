@@ -29,7 +29,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
   const { mint } = useParams();
 
   useEffect(() => {
-    if(mint) {
+    if (mint) {
       setMintAddress(mint);
       handleFetch(mint);
     }
@@ -138,25 +138,25 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-2xl mb-6">Token Mint Address</h1>
-          {!mint && 
+          {!mint &&
             <div className="mb-6">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={mintAddress}
-                onChange={(e) => setMintAddress(e.target.value)}
-                placeholder="Enter mint address"
-                className="input input-bordered flex-1"
-              />
-              <button
-                onClick={() => handleFetch(mintAddress as string)}
-                disabled={queryLoading}
-                className="btn btn-primary"
-              >
-                {queryLoading ? 'Loading...' : 'Get Info'}
-              </button>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={mintAddress}
+                  onChange={(e) => setMintAddress(e.target.value)}
+                  placeholder="Enter mint address"
+                  className="input input-bordered flex-1"
+                />
+                <button
+                  onClick={() => handleFetch(mintAddress as string)}
+                  disabled={queryLoading}
+                  className="btn btn-primary"
+                >
+                  {queryLoading ? 'Loading...' : 'Get Info'}
+                </button>
+              </div>
             </div>
-          </div>
           }
 
           {/* 代币信息显示 */}

@@ -3,49 +3,49 @@ import { Logo } from './Logo';
 import { useDeviceType } from '../../utils/contexts';
 
 export const Footer: React.FC = () => {
-    const { isMobile } = useDeviceType();
-    const [isVisible, setIsVisible] = useState(false);
+  const { isMobile } = useDeviceType();
+  const [isVisible, setIsVisible] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            if (isMobile) {
-                const windowHeight = window.innerHeight;
-                const documentHeight = document.documentElement.scrollHeight;
-                const scrollTop = window.scrollY;
-                
-                // 当滚动到距离底部300px时显示Footer
-                const showThreshold = documentHeight - windowHeight - 300;
-                setIsVisible(scrollTop >= showThreshold);
-            } else {
-                setIsVisible(true);
-            }
-        };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isMobile) {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrollTop = window.scrollY;
 
-        window.addEventListener('scroll', handleScroll);
-        // 初始检查
-        handleScroll();
+        // 当滚动到距离底部300px时显示Footer
+        const showThreshold = documentHeight - windowHeight - 300;
+        setIsVisible(scrollTop >= showThreshold);
+      } else {
+        setIsVisible(true);
+      }
+    };
 
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [isMobile]);
+    window.addEventListener('scroll', handleScroll);
+    // 初始检查
+    handleScroll();
 
-    if (!isVisible) {
-        return null;
-    }
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isMobile]);
 
-    return (
-        <div className="footer footer-center p-3 border-t-2 border-primary-content md:p-4 bg-base-300 fixed bottom-0 z-40">
-            <a 
-                href="/" 
-                className={`btn`}
-                onClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = '/discover';
-                }}
-            >
-                <Logo />
-            </a>
-        </div>
-    );
+  if (!isVisible) {
+    return null;
+  }
+
+  return (
+    <div className="footer footer-center p-3 border-t-2 border-primary-content md:p-4 bg-base-300 fixed bottom-0 z-40">
+      <a
+        href="/"
+        className={`btn`}
+        onClick={(e) => {
+          e.preventDefault();
+          window.location.href = '/discover';
+        }}
+      >
+        <Logo />
+      </a>
+    </div>
+  );
 };
