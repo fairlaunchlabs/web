@@ -68,12 +68,12 @@ export const MyCopilotKit = () => {
   const CustomAssistantMessage = (props: AssistantMessageProps) => {
     const { icons } = useChatContext();
     const { message, isLoading, subComponent } = props;
-    const avatar = <div className={"pixel-avatar-round p-1"}><RiRobot2Line className="h-6 w-6" /></div>
+    // const avatar = <div className={"pixel-avatar-round p-1"}><RiRobot2Line className="h-6 w-6" /></div>
 
     return (
       <div className="py-2">
         <div className="flex items-start">
-          <div className="mr-2">{!subComponent && avatar}</div>
+          {/* <div className="mr-2">{!subComponent && avatar}</div> */}
           <div className="bg-gray-100 px-4 rounded-xl py-2 text-sm md:text-md">
             {message && <Markdown content={message || ""} /> }
             {/* {message && <MarkdownWithMath content={message || ""} />} */}
@@ -111,7 +111,7 @@ export const MyCopilotKit = () => {
     const modeButtonStyle = "py-2 px-3 text-white rounded-md text-sm cursor-pointer";
     return (
       <div>
-        <div className="flex ml-8 gap-2 mb-4">
+        <div className="flex ml-8 gap-2 my-2">
           <div className={modeButtonStyle + (isDeepthink ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsDeepthink(!isDeepthink)}>Deep think</div>
           <div className={modeButtonStyle + (isResearch ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsResearch(!isResearch)}>Search web</div>
         </div>
@@ -153,7 +153,7 @@ export const MyCopilotKit = () => {
         instructions="AI help that shows up right when you need it"
         UserMessage={CustomUserMessage}
         AssistantMessage={CustomAssistantMessage}
-        Header={Header}
+        // Header={Header}
         Input={CustomInput}
       />
   );
