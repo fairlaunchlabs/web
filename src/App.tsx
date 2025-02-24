@@ -42,7 +42,7 @@ import { useQuery } from '@apollo/client';
 import { queryMyDelegatedTokens } from './utils/graphql';
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
-import { MyCopilotKit } from './components/tools/MyCopilotKit';
+import { MyCopilotKit } from './components/agent/MyCopilotKit';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
