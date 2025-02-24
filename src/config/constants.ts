@@ -69,7 +69,8 @@ export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image
 export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
 export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
-export const COPILOTKIT_RUNTIME_URL = "http://localhost:8000/gpt/copilotkit";
+// export const COPILOTKIT_RUNTIME_URL = "http://127.0.0.1:8000/gpt/copilotkit";
+export const COPILOTKIT_RUNTIME_URL = "https://flipflop-api.vercel.app/gpt/copilotkit";
 
 export const tooltip = {
     currentEra: "The current milestone in the token's lifecycle",

@@ -161,7 +161,7 @@ const AppContent = () => {
           }}
         />
         {/* <Footer /> */}
-        {/* <MyCopilotKit /> */}
+        <MyCopilotKit />
       </div>
     </Providers>
   );
@@ -181,7 +181,7 @@ function App() {
 
   return (
     <Router>
-      {/* <CopilotKit runtimeUrl={COPILOTKIT_RUNTIME_URL}> */}
+      <CopilotKit runtimeUrl={COPILOTKIT_RUNTIME_URL}>
         <ConnectionProvider endpoint={endpoint}>
           <WalletProvider
             wallets={wallets}
@@ -195,7 +195,7 @@ function App() {
             </WalletModalProvider>
           </WalletProvider>
         </ConnectionProvider>
-      {/* </CopilotKit> */}
+      </CopilotKit>
     </Router>
   );
 }
