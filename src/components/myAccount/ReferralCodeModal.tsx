@@ -3,16 +3,18 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { getMyReferrerData, getReferrerDataByReferralAccount, getSystemConfig, reactiveReferrerCode, setReferrerCode } from '../../utils/web3';
 import toast from 'react-hot-toast';
-import { ReferralCodeModalProps, ReferrerData } from '../../types/types';
+import { InitiazlizedTokenData, ReferralCodeModalProps, ReferrerData } from '../../types/types';
 import { LOCAL_STORAGE_MY_REFERRAL_CODE, NETWORK, SCANURL } from '../../config/constants';
 import { ToastBox } from '../common/ToastBox';
 import AlertBox from '../common/AlertBox';
 import { ModalTopBar } from '../common/ModalTopBar';
+import { ShareButton } from '../common/ShareButton';
 
 export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
   isOpen,
   onClose,
   token,
+  metadata
 }) => {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -151,9 +153,14 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
           <div className="space-y-4">
             {referralData ? (
               <div className="space-y-2">
-                <p className="">
-                  Here's your URC for {token.tokenData?.tokenSymbol}
-                </p>
+                <div className="flex justify-between">
+                  <p>Here's your URC for {token.tokenData?.tokenSymbol}</p>
+                  <ShareButton
+                    token={token.tokenData as InitiazlizedTokenData}
+                    metadata={metadata}
+                    inputCode={myReferrerCode}
+                  />
+                </div>
                 <div className="flex justify-between items-center">
                   <input
                     type="text"

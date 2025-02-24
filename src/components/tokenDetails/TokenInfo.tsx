@@ -81,6 +81,7 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
           amount: '',
           tokenData: token
         }}
+        metadata={metadata as TokenMetadataIPFS}
       />
     </div>
   );

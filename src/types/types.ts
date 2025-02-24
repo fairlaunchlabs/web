@@ -278,6 +278,7 @@ export type ReferralCodeModalProps = {
   isOpen: boolean;
   onClose: () => void;
   token: TokenListItem
+  metadata: TokenMetadataIPFS;
 }
 
 export type ReferrerData = {

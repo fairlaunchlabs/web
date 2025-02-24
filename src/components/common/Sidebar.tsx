@@ -52,12 +52,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onExpandedChange?.(expanded);
   };
 
-  const renderMenuItem = (item: MenuItem, isSubItem: boolean = false) => {
+  const renderMenuItem = (item: MenuItem, index: number, isSubItem: boolean = false) => {
     const hasSubItems = item.subItems && item.subItems.length > 0;
     const isSubMenuExpanded = expandedSubMenus.includes(item.id);
 
     return (
-      <div>
+      <div key={index}>
         {item.visible && <li key={item.id}>
           <a
             className={`mt-1 pt-3 pb-2
@@ -91,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </a>
           {hasSubItems && isExpanded && isSubMenuExpanded && (
             <ul className="menu">
-              {item.subItems?.map(subItem => renderMenuItem(subItem, true))}
+              {item.subItems?.map((subItem, index) => renderMenuItem(subItem, index, true))}
             </ul>
           )}
         </li>}
@@ -121,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Menu items */}
       <div className={`h-full overflow-y-auto ${isMobile ? 'mt-16' : 'mt-6'}`}>
         <ul className="menu bg-base-300 w-full p-2 rounded-box">
-          {menuItems.map(item => renderMenuItem(item))}
+          {menuItems.map((item, index) => renderMenuItem(item, index))}
         </ul>
       </div>
 

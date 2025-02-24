@@ -1110,7 +1110,7 @@ export const fetchTokenMetadataMap = async (tokenData: Array<InitiazlizedTokenDa
   try {
     await Promise.all(tokenData.map(async (token) => {
       try {
-        const tokenMetadata = await fetchMetadata(token);
+        const tokenMetadata: TokenMetadataIPFS = await fetchMetadata(token) as TokenMetadataIPFS;
         updatedMap[token.mint] = tokenMetadata ? { ...token, tokenMetadata } : token;
       } catch (error) {
         console.error(`Error fetching metadata for token ${token.mint}:`, error);
@@ -1636,42 +1636,8 @@ export async function getTokenMetadataMutable(connection: Connection, mint: Publ
     TOKEN_METADATA_PROGRAM_ID,
   )[0];
   const metadataAccouontData = (await getLegacyTokenMetadataAccountData(connection, metadataAccountPda)).data as MetadataAccouontData;
-  return metadataAccouontData.isMutable;
+  return metadataAccouontData !== undefined ? metadataAccouontData.isMutable : false;
 }
-
-// export const getMetadataAccountData2022 = async (
-//     connection: Connection,
-//     mint: PublicKey,
-// ): Promise<ResponseData> => {
-//     const extentions = await getExtensions(connection, mint);
-//     if (!extentions) {
-//         return {
-//             success: false,
-//             message: 'Has no token extensions',
-//         }
-//     }
-//     const metadataPointer = extentions.find((ext: MintExtentionData) => ext.extension === "metadataPointer");
-//     if (!metadataPointer) {
-//         return {
-//             success: false,
-//             message: 'Has no metadata pointer',
-//         }
-//     }
-//     const tokenMetadata = extentions.find((ext: MintExtentionData) => ext.extension === "tokenMetadata");
-//     if (!tokenMetadata) {
-//         return {
-//             success: false,
-//             message: 'Has no token metadata',
-//         }
-//     }
-//     return {
-//         success: true,
-//         data: {
-//             ...metadataPointer.state,
-//             ...tokenMetadata.state,
-//         },
-//     }
-// }
 
 export async function getBlockTimestamp(
   connection: Connection

@@ -20,7 +20,7 @@ export const TokenBackgroundImage: React.FC<TokenBackgroundImageProps> = ({
     if (imageUrl) {
       setIsLoading(true);
       fetchImageFromUrlOrCache(imageUrl, metadataTimestamp).then((imageData) => {
-        console.log('fetchImageFromUrlOrCache', imageData);
+        // console.log('fetchImageFromUrlOrCache', imageData);
         setImageData(imageData.blobUrl as string);
         setIsLoading(false);
         setRetryCount(0);

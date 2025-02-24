@@ -289,6 +289,7 @@ export const MyMintedTokens: FC<MyAccountProps> = ({ expanded }) => {
             setSelectedTokenForReferral(null);
           }}
           token={selectedTokenForReferral}
+          metadata={tokenList.find((token: TokenListItem) => token.mint === selectedTokenForReferral.mint)?.metadata as TokenMetadataIPFS}
         />
       )}
       {selectedTokenForRefund && (

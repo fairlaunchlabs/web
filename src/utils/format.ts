@@ -312,7 +312,7 @@ export const filterTokenListItem = (data: TokenListItem[]) => {
   );
 };
 
-export const filterRefererCode = (data: SetRefererCodeEntity[]) => {
+export const filterRefererCode = (data: SetRefererCodeEntity[]):SetRefererCodeEntity[] => {
   if (!data) return [];
   return data.filter(
     (code: SetRefererCodeEntity) => !DEPRECATED_MINTS.includes(code.mint)

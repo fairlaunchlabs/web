@@ -13,7 +13,7 @@ import { SEARCH_CACHE_ITEMS } from '../config/constants';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
   const { tokenMintAddress, referrerCode } = useParams();
-  console.log('referrerCode', referrerCode);
+  // console.log('referrerCode', referrerCode);
   const { loading, error, data } = useQuery(queryInitializeTokenEventBySearch, {
     variables: {
       skip: 0,

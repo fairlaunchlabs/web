@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { useQuery } from '@apollo/client';
 import { querySetRefererCodeEntitiesByOwner, queryTokensByMints, queryTotalReferrerBonusSum } from '../../utils/graphql';
-import { InitiazlizedTokenData, MyUniqueReferralCodeProps, TokenMetadataIPFS } from '../../types/types';
+import { InitiazlizedTokenData, MyUniqueReferralCodeProps, SetRefererCodeEntity, TokenMetadataIPFS } from '../../types/types';
 import { ReferralCodeModal } from '../myAccount/ReferralCodeModal';
 import { useNavigate } from 'react-router-dom';
 import { TokenImage } from '../mintTokens/TokenImage';
@@ -17,6 +17,7 @@ import { useDeviceType } from '../../utils/contexts';
 import { MyUniqueReferralCodeCard } from './MyUniqueReferralCodeCard';
 import { filterRefererCode } from '../../utils/format';
 import { PageHeader } from '../common/PageHeader';
+import { token } from '@coral-xyz/anchor/dist/cjs/utils';
 
 export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }) => {
   const wallet = useAnchorWallet();
@@ -24,7 +25,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-  const [selectedToken, setSelectedToken] = useState<any>(null);
+  const [selectedToken, setSelectedToken] = useState<{ mint: string, amount: string, tokenData: InitiazlizedTokenData } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bonusByMint, setBonusByMint] = useState<Record<string, string>>({});
   const [selectedBonusMint, setSelectedBonusMint] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     }
   });
 
-  const mints = filterRefererCode(urcData?.setRefererCodeEventEntities).map((token: any) => token.mint);
+  const mints = filterRefererCode(urcData?.setRefererCodeEventEntities).map((token: SetRefererCodeEntity) => token.mint);
   const { loading: tokenLoading, error: tokenError, data: tokenData } = useQuery(queryTokensByMints, {
     variables: {
       mints: mints,
@@ -61,7 +62,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
     },
   });
 
-  const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, any>>({});
+  const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, InitiazlizedTokenData>>({});
 
   useEffect(() => {
     setLoadingMetadata(true);
@@ -274,6 +275,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           token={selectedToken}
+          metadata={tokenMetadataMap[selectedToken.mint]?.tokenMetadata as TokenMetadataIPFS}
         />
       )}
 

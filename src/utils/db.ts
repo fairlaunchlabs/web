@@ -155,7 +155,7 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
 
     if (cachedImage) {
       // console.log('Using cached image', itemId);
-      const cachedImageType = detectImageType(cachedImage as Buffer);
+      const cachedImageType = detectImageType(cachedImage as unknown as Buffer);
       if (!cachedImageType) {
         throw new Error('Invalid cached image format');
       }
@@ -187,7 +187,7 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
     await setCachedData(itemId, imageBuffer);
 
     // Create blob URL with detected image type
-    const blobUrl = createBlobUrl(imageBuffer, imageType);
+    const blobUrl = createBlobUrl(imageBuffer as unknown as ArrayBuffer, imageType);
     return { blobUrl, imageType };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : 'Unknown error');
@@ -208,7 +208,7 @@ export const fetchMetadataFromUrlOrCache = async (tokenUri: string, metadataTime
     const cachedMetadata = await getCachedData(itemId);
     if (cachedMetadata) {
       const blobUrl = cachedMetadata as TokenMetadataIPFS;
-      console.log('Using cached metadata', itemId);
+      // console.log('Using cached metadata', itemId);
       return blobUrl;
     }
 

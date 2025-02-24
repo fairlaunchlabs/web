@@ -251,7 +251,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 验证表单数据
     const validation = validateFormData();
     if (!validation.isValid) {
       setError(validation.error);
@@ -319,7 +318,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
             onImageChange={handleImageChange}
           />
 
-          {/* 启动时间选择 */}
+          {/* Launch time */}
           <div className="">
             <ToggleSwitch
               id="toggleStartTime"
@@ -372,8 +371,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
             )}
           </div>
 
-          {/* 高级设置按钮 */}
-          <div className="mt-6">
+          {/* Advanced setting */}
+          {/* <div className="mt-6">
             <ToggleSwitch
               id="toggleAdvanced"
               label="Advanced Settings(Optional)"
@@ -401,7 +400,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 onDisplayInitialTargetMintSizePerEpochChange={setDisplayInitialTargetMintSizePerEpoch}
               />
             )}
-          </div>
+          </div> */}
           {error && (
             <div className="text-error text-sm mt-1">{error}</div>
           )}
