@@ -14,6 +14,110 @@ export type FairMintToken = {
   },
   "instructions": [
     {
+      "name": "burnMintTokenVault",
+      "discriminator": [
+        255,
+        254,
+        39,
+        14,
+        229,
+        37,
+        89,
+        240
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenName"
+              },
+              {
+                "kind": "arg",
+                "path": "tokenSymbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "configAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mintTokenVault",
+          "writable": true
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenName",
+          "type": "string"
+        },
+        {
+          "name": "tokenSymbol",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "closeToken",
       "docs": [
         "Close token"
@@ -675,7 +779,8 @@ export type FairMintToken = {
           "name": "ammConfig"
         },
         {
-          "name": "cpSwapProgram"
+          "name": "cpSwapProgram",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
         },
         {
           "name": "token0Mint"
@@ -824,6 +929,168 @@ export type FairMintToken = {
         {
           "name": "amount",
           "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "proxyCreatePool",
+      "docs": [
+        "Initiazlize a swap pool"
+      ],
+      "discriminator": [
+        250,
+        151,
+        238,
+        168,
+        5,
+        240,
+        236,
+        243
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creatorTokenVault",
+          "writable": true
+        },
+        {
+          "name": "creatorWsolVault",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenName"
+              },
+              {
+                "kind": "arg",
+                "path": "tokenSymbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "configAccount",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenVault",
+          "writable": true
+        },
+        {
+          "name": "wsolVault",
+          "writable": true
+        },
+        {
+          "name": "wsolMint"
+        },
+        {
+          "name": "poolState",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "ammConfig"
+              },
+              {
+                "kind": "account",
+                "path": "token0Mint"
+              },
+              {
+                "kind": "account",
+                "path": "token1Mint"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "cpSwapProgram"
+            }
+          }
+        },
+        {
+          "name": "ammConfig"
+        },
+        {
+          "name": "cpSwapProgram",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+        },
+        {
+          "name": "token0Mint"
+        },
+        {
+          "name": "token1Mint"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenName",
+          "type": "string"
+        },
+        {
+          "name": "tokenSymbol",
+          "type": "string"
         }
       ]
     },
@@ -3173,6 +3440,26 @@ export type FairMintToken = {
       "code": 6083,
       "name": "vaultBalanceNotEqualToRefund",
       "msg": "Vault balance not equal to refund"
+    },
+    {
+      "code": 6084,
+      "name": "insufficientMintTokenVaultBalance",
+      "msg": "Insufficient mint token vault balance"
+    },
+    {
+      "code": 6085,
+      "name": "poolAlreadyCreated",
+      "msg": "Pool already created"
+    },
+    {
+      "code": 6086,
+      "name": "invalidVaultBalance",
+      "msg": "Vault balance not equal to refund"
+    },
+    {
+      "code": 6087,
+      "name": "invalidMintTokenVault",
+      "msg": "Invalid mint token vault"
     }
   ],
   "types": [

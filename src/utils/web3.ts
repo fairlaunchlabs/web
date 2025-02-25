@@ -781,11 +781,6 @@ export const mintToken = async (
     state: AddressLookupTableAccount.deserialize(accountInfo!.data),
   });
 
-  // TODO: Judge if the target era almost arrive, if not, secondsPerSlot = null
-  // const epochInfo = await connection.getEpochInfo();
-  // const secondsPerSlot = await getCurrentSlopInterval(connection.rpcEndpoint, epochInfo.absoluteSlot - slotsOfEstimatingInterval, epochInfo.absoluteSlot);
-  // console.log("seconds per slot", secondsPerSlot);
-
   const ix = await program.methods
     .mintTokens(token.tokenName, token.tokenSymbol, codeHash.data.toBuffer())
     .accounts(mintAccounts)
@@ -1644,6 +1639,100 @@ export async function getBlockTimestamp(
 ): Promise<number> {
   let slot = await connection.getSlot();
   return await connection.getBlockTime(slot) as number;
+}
+
+export async function proxyCreatePool(
+  wallet: AnchorWallet | undefined,
+  connection: Connection,
+  token: InitiazlizedTokenData,
+): Promise<ResponseData> {
+  if (!wallet) return {
+    success: false,
+    message: 'Please connect wallet'
+  }
+  const program = getProgram(wallet, connection);
+  const destinationAta = await getAssociatedTokenAddress(new PublicKey(token.mint), wallet.publicKey, false, TOKEN_PROGRAM_ID);
+
+  const destinationAtaInfo = await connection.getAccountInfo(destinationAta);
+  const [refundAccountPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from(REFUND_SEEDS), new PublicKey(token.mint).toBuffer(), wallet.publicKey.toBuffer()],
+    program.programId,
+  );
+  const [systemConfigAccountPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from(SYSTEM_CONFIG_SEEDS), new PublicKey(SYSTEM_DEPLOYER).toBuffer()],
+    program.programId,
+  );
+
+  const configAccountPda = new PublicKey(token.configAccount);
+  const wsolVaultAta = await getAssociatedTokenAddress(NATIVE_MINT, configAccountPda, true, TOKEN_PROGRAM_ID);
+  const creatorWsolVault = getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, false, TOKEN_PROGRAM_ID);
+  const creatorTokenVault = getAssociatedTokenAddressSync(new PublicKey(token.mint), wallet.publicKey, false, TOKEN_PROGRAM_ID);
+  const destinationWsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, false, TOKEN_PROGRAM_ID);
+  const destinationWsolInfo = await connection.getAccountInfo(destinationWsolAta);
+
+  let token0Mint = new PublicKey(token.mint);
+  let token1Mint = NATIVE_MINT;
+  if (compareMints(token0Mint, token1Mint) > 0) {
+    [token0Mint, token1Mint] = [token1Mint, token0Mint];
+  }
+  const [poolAddress] = getPoolAddress(cpSwapConfigAddress, token0Mint, token1Mint, cpSwapProgram);
+
+  const contextProxyInitialize = {
+    creator: wallet.publicKey,
+    creatorTokenVault: creatorTokenVault,
+    creatorWsolVault: creatorWsolVault,
+    mint: new PublicKey(token.mint),
+    configAccount: configAccountPda,
+    tokenVault: new PublicKey(token.tokenVault),
+    wsolVault: wsolVaultAta,
+    wsolMint: NATIVE_MINT,
+    poolState: poolAddress,
+    ammConfig: cpSwapConfigAddress,
+    cpSwapProgram: cpSwapProgram,
+    token0Mint: token0Mint,
+    token1Mint: token1Mint,
+    tokenProgram: TOKEN_PROGRAM_ID,
+    systemProgram: SystemProgram.programId,
+  };
+
+  const instructionSetComputerUnitLimit = ComputeBudgetProgram.setComputeUnitLimit({ units: 500000 }); // or use --compute-unit-limit 400000 to run solana-test-validator
+  const instructionCreateWSOLAta = createAssociatedTokenAccountInstruction(wallet.publicKey, destinationWsolAta, wallet.publicKey, NATIVE_MINT, TOKEN_PROGRAM_ID);
+  const instructionCreateTokenAta = createAssociatedTokenAccountInstruction(wallet.publicKey, destinationAta, wallet.publicKey, new PublicKey(token.mint), TOKEN_PROGRAM_ID);
+  const remainingAccounts = getRemainingAccountsForMintTokens(new PublicKey(token.mint), wallet.publicKey);
+
+  const accountInfo = await connection.getAccountInfo(addressLookupTableAddress);
+  const lookupTable = new AddressLookupTableAccount({
+    key: addressLookupTableAddress,
+    state: AddressLookupTableAccount.deserialize(accountInfo!.data),
+  });
+
+  const ix = await program.methods
+    .proxyCreatePool(token.tokenName, token.tokenSymbol)
+    .accounts(contextProxyInitialize)
+    .remainingAccounts(remainingAccounts)
+    .instruction();
+  const confirmLevel = "confirmed";
+  const latestBlockhash = await connection.getLatestBlockhash(confirmLevel);
+  const instructions = [instructionSetComputerUnitLimit];
+  if (destinationAtaInfo === null) instructions.push(instructionCreateTokenAta);
+  if (destinationWsolInfo === null) instructions.push(instructionCreateWSOLAta);
+  instructions.push(ix);
+  const versionedTx = new VersionedTransaction(
+    new TransactionMessage({
+      payerKey: wallet.publicKey,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions,
+    }).compileToV0Message([lookupTable])
+  );
+  // ######
+  try {
+    return processVersionedTransaction(versionedTx, connection, wallet, latestBlockhash, confirmLevel);
+  } catch (error) {
+    return {
+      success: false,
+      message: `Create pool failed: ${error}`,
+    }
+  }
 }
 
 export async function proxyAddLiquidity(

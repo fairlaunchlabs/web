@@ -8,6 +8,110 @@
   },
   "instructions": [
     {
+      "name": "burn_mint_token_vault",
+      "discriminator": [
+        255,
+        254,
+        39,
+        14,
+        229,
+        37,
+        89,
+        240
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint_token_vault",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "close_token",
       "docs": [
         "Close token"
@@ -669,7 +773,8 @@
           "name": "amm_config"
         },
         {
-          "name": "cp_swap_program"
+          "name": "cp_swap_program",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
         },
         {
           "name": "token_0_mint"
@@ -818,6 +923,168 @@
         {
           "name": "amount",
           "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "proxy_create_pool",
+      "docs": [
+        "Initiazlize a swap pool"
+      ],
+      "discriminator": [
+        250,
+        151,
+        238,
+        168,
+        5,
+        240,
+        236,
+        243
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator_token_vault",
+          "writable": true
+        },
+        {
+          "name": "creator_wsol_vault",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  105,
+                  114,
+                  95,
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_name"
+              },
+              {
+                "kind": "arg",
+                "path": "token_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "config_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  95,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_vault",
+          "writable": true
+        },
+        {
+          "name": "wsol_vault",
+          "writable": true
+        },
+        {
+          "name": "wsol_mint"
+        },
+        {
+          "name": "pool_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "amm_config"
+              },
+              {
+                "kind": "account",
+                "path": "token_0_mint"
+              },
+              {
+                "kind": "account",
+                "path": "token_1_mint"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "cp_swap_program"
+            }
+          }
+        },
+        {
+          "name": "amm_config"
+        },
+        {
+          "name": "cp_swap_program",
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+        },
+        {
+          "name": "token_0_mint"
+        },
+        {
+          "name": "token_1_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_name",
+          "type": "string"
+        },
+        {
+          "name": "token_symbol",
+          "type": "string"
         }
       ]
     },
@@ -3167,6 +3434,26 @@
       "code": 6083,
       "name": "VaultBalanceNotEqualToRefund",
       "msg": "Vault balance not equal to refund"
+    },
+    {
+      "code": 6084,
+      "name": "InsufficientMintTokenVaultBalance",
+      "msg": "Insufficient mint token vault balance"
+    },
+    {
+      "code": 6085,
+      "name": "PoolAlreadyCreated",
+      "msg": "Pool already created"
+    },
+    {
+      "code": 6086,
+      "name": "InvalidVaultBalance",
+      "msg": "Vault balance not equal to refund"
+    },
+    {
+      "code": 6087,
+      "name": "InvalidMintTokenVault",
+      "msg": "Invalid mint token vault"
     }
   ],
   "types": [

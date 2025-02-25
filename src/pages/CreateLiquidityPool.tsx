@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { queryTokensByMints } from '../utils/graphql';
 import { AddressDisplay } from '../components/common/AddressDisplay';
 import AlertBox from '../components/common/AlertBox';
-import { getLiquidityPoolData, getTokenBalance } from '../utils/web3';
+import { getLiquidityPoolData, getTokenBalance, proxyCreatePool } from '../utils/web3';
 import { InitiazlizedTokenData, PoolData, ResponseData } from '../types/types';
 import { useParams } from 'react-router-dom';
 
@@ -99,36 +99,22 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
     }
   };
 
-  // 检查是否可以创建流动池
-  const canCreatePool = () => {
-    if (!tokenData || currentEpoch === null) return false;
-    return (
-      currentEpoch > (parseInt(tokenData.graduateEpoch) + 2) &&
-      parseInt(tokenData.currentEra) > parseInt(tokenData.targetEras)
-    );
-  };
-
   // 处理创建流动池
   const handleCreatePool = async () => {
-    // if (!wallet) {
-    //   toast.error('Please connect your wallet');
-    //   return;
-    // }
-
-    // setLoading(true);
-    // try {
-    //   const result = await proxyInitializePool(wallet, connection, tokenData as InitiazlizedTokenData, tokenVaultBalance, wsolVaultBalance)
-    //   if (!result?.success) {
-    //     toast.error(result?.message as string);
-    //     return;
-    //   }
-    //   toast.success('Pool created successfully');
-    // } catch (error) {
-    //   toast.error('Failed to create pool');
-    //   console.error('Error creating pool:', error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    setLoading(true);
+    try {
+      const result = await proxyCreatePool(wallet, connection, tokenData as InitiazlizedTokenData)
+      if (!result?.success) {
+        toast.error(result?.message as string);
+        return;
+      }
+      toast.success('Pool created successfully');
+    } catch (error) {
+      toast.error('Failed to create pool');
+      console.error('Error creating pool:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -229,16 +215,10 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
           {/* 创建流动池按钮 */}
           {tokenData && poolAddress === "" && (
             <div className="text-center">
-              {!canCreatePool() && (
-                <div className='text-left'>
-                  <AlertBox title="Alert" message="Cannot create pool: Current epoch must be greater than graduate epoch + 2 and current era must be greater than target era" />
-                </div>
-              )}
               <button
                 onClick={handleCreatePool}
-                // disabled={!canCreatePool() || loading}
-                // className={`btn btn-primary mt-5 ${!canCreatePool() ? 'btn-disabled' : ''}`} // ###### 开发时不使用Transfer fee限制
-                className={`btn btn-primary mt-5`}
+                disabled={!tokenData || loading}
+                className={`btn btn-primary mt-5 ${!tokenData ? 'btn-disabled' : ''}`}
               >
                 {loading ? 'Creating...' : 'Create Pool'}
               </button>
