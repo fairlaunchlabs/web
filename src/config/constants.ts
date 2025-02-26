@@ -1,15 +1,40 @@
 import { PublicKey } from '@solana/web3.js';
 
-export const DEFAULT_PARAMS = { // must be same as program default params
-    targetEras: '1',
-    epochesPerEra: '250',
-    targetSecondsPerEpoch: '2000',
-    reduceRatio: '50',
-    initialMintSize: '10000000000000',
-    initialTargetMintSizePerEpoch: '200000000000000',
-    feeRate: '200000000',
-    liquidityTokensRatio: '20',
-}
+type TokenParams = {
+    targetEras: string;
+    epochesPerEra: string;
+    targetSecondsPerEpoch: string;
+    reduceRatio: string;
+    initialMintSize: string;
+    initialTargetMintSizePerEpoch: string;
+    feeRate: string;
+    liquidityTokensRatio: string;
+};
+
+export const DEFAULT_PARAMS = {
+    "standard": { // must be same as program default params
+        targetEras: '1',
+        epochesPerEra: '250',
+        targetSecondsPerEpoch: '2000',
+        reduceRatio: '50',
+        initialMintSize: '10000000000000',
+        initialTargetMintSizePerEpoch: '200000000000000',
+        feeRate: '200000000',
+        liquidityTokensRatio: '20',
+    },
+    "meme": {
+        targetEras: '1',
+        epochesPerEra: '250',
+        targetSecondsPerEpoch: '2000',
+        reduceRatio: '75',
+        initialMintSize: '10000000000000',
+        initialTargetMintSizePerEpoch: '1000000000000000',
+        feeRate: '10000000',
+        liquidityTokensRatio: '20',
+    },
+} as Record<string, TokenParams>;
+
+
 export const STORAGE = "irys" as "irys" | "arweave";
 // export const FAIR_MINT_PROGRAM_ID = '3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv';
 export const FAIR_MINT_PROGRAM_ID = '8GM2N7qQjzMyhqewu8jpDgzUh2BJbtBxSY1WzSFeFm6U';

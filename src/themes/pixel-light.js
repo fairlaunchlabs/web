@@ -185,11 +185,24 @@ const pixelLight = {
       "background-color": "#FDF8EF",
       "border-radius": "8px",
       "padding": "0.75rem 1rem",
-      "transition": "transform 0.2s, box-shadow 0.2s",
-      "&:hover": {
-        "transform": "translate(1px, 1px)",
-        "box-shadow": "2px 2px 0 0 #000000"
-      }
+      // "transition": "transform 0.2s, box-shadow 0.2s",
+      // "&:hover": {
+      //   "transform": "translate(1px, 1px)",
+      //   "box-shadow": "2px 2px 0 0 #000000"
+      // }
+    },
+    ".pixel-box-primary": {
+      "border": "2px solid #000000",
+      "box-shadow": "3px 3px 0 0 #000000",
+      "background-color": "#FF00F5",
+      "color": "#ffffff",
+      "border-radius": "8px",
+      "padding": "0.75rem 1rem",
+      // "transition": "transform 0.2s, box-shadow 0.2s",
+      // "&:hover": {
+      //   "transform": "translate(1px, 1px)",
+      //   "box-shadow": "2px 2px 0 0 #000000"
+      // }
     },
 
     // Pixel Switch
@@ -300,11 +313,11 @@ const pixelLight = {
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
       "color": "#FFFFFF",
-      "transition": "transform 0.2s, box-shadow 0.2s",
-      "&:hover": {
-        "transform": "translate(1px, 1px)",
-        "box-shadow": "2px 2px 0 0 #000000"
-      }
+      // "transition": "transform 0.2s, box-shadow 0.2s",
+      // "&:hover": {
+      //   "transform": "translate(1px, 1px)",
+      //   "box-shadow": "2px 2px 0 0 #000000"
+      // }
     },
 
     ".pixel-card-header": {

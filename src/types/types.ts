@@ -222,11 +222,12 @@ export type TokenAccount = {
 }
 
 export type MetricsProps = {
+  mode: string;
   targetEras: string;
   epochesPerEra: string;
   targetSecondsPerEpoch: string;
   reduceRatio: string;
-  displayInitialTargetMintSizePerEpoch: string;
+  initialTargetMintSizePerEpoch: string;
   initialMintSize: string;
   feeRate: string;
   liquidityTokensRatio: string;

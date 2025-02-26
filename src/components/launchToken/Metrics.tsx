@@ -1,25 +1,27 @@
 import React from 'react';
 import { MetricsProps } from '../../types/types';
+import { formatSeconds } from '../../utils/format';
 
 export const Metrics: React.FC<MetricsProps> = ({
+  mode,
   targetEras,
   epochesPerEra,
   targetSecondsPerEpoch,
   reduceRatio,
-  displayInitialTargetMintSizePerEpoch,
+  initialTargetMintSizePerEpoch,
   initialMintSize,
   feeRate,
   liquidityTokensRatio,
   symbol,
 }) => {
+  const epochesPerEraNum = parseFloat(epochesPerEra) || 0;
+  const initialTargetMintSizePerEpochNum = parseFloat(initialTargetMintSizePerEpoch) || 0;
+  const reduceRatioNum = parseFloat(reduceRatio) || 0;
+  const targetErasNum = parseFloat(targetEras) || 0;
+  const targetSecondsPerEpochNum = parseFloat(targetSecondsPerEpoch) || 0;
+  const initialMintSizeNum = parseFloat(initialMintSize) || 0;
+  const feeRateNum = parseFloat(feeRate) || 0;
   const calculateMetrics = () => {
-    const epochesPerEraNum = parseFloat(epochesPerEra) || 0;
-    const initialTargetMintSizePerEpochNum = parseFloat(displayInitialTargetMintSizePerEpoch) || 0;
-    const reduceRatioNum = parseFloat(reduceRatio) || 0;
-    const targetErasNum = parseFloat(targetEras) || 0;
-    const targetSecondsPerEpochNum = parseFloat(targetSecondsPerEpoch) || 0;
-    const initialMintSizeNum = parseFloat(initialMintSize) || 0;
-    const feeRateNum = parseFloat(feeRate) || 0;
 
     // 计算最大供应量
     const maxSupply = epochesPerEraNum * initialTargetMintSizePerEpochNum / (1 - reduceRatioNum / 100);
@@ -61,45 +63,50 @@ export const Metrics: React.FC<MetricsProps> = ({
       maxSupply: maxSupply.toLocaleString(undefined, { maximumFractionDigits: 2 }),
       estimatedDays: estimatedDays.toLocaleString(undefined, { maximumFractionDigits: 2 }),
       percentToTargetEras: (percentToTargetEras * 100).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-      minTotalFee: minTotalFee.toLocaleString(undefined, { maximumFractionDigits: 4 }),
-      maxTotalFee: maxTotalFee.toLocaleString(undefined, { maximumFractionDigits: 4 }),
+      minTotalFee: minTotalFee.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+      maxTotalFee: maxTotalFee.toLocaleString(undefined, { maximumFractionDigits: 0 }),
       isFeeTooHigh,
       initialLiquidityToTargetEra: initialLiquidityToTargetEra.toLocaleString(undefined, { maximumFractionDigits: 4 }),
       totalsupplyToTargetEras: totalsupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }),
       initialLiquidityToTargetEraPercent: (initialLiquidityToTargetEraPercent).toLocaleString(undefined, { maximumFractionDigits: 2 }),
       minLaunchPrice: minLaunchPrice.toLocaleString(undefined, { maximumFractionDigits: 6 }),
       maxLaunchPrice: maxLaunchPrice.toLocaleString(undefined, { maximumFractionDigits: 6 }),
-      isLaunchPriceTooHigh
+      isLaunchPriceTooHigh,
     };
   };
 
 
   return (
     <div className="pixel-box space-y-4 w-full lg:w-[480px] p-6 mt-4" style={{}}>
+      <div className='text-xl font-bold'>{`Cool! You choosed ${mode} launch`}</div>
+      <div>
+        <p className="text-sm text-base-content/70 mb-1">Target Milestone</p>
+        <p className="font-medium text-base-content">{targetEras}</p>
+      </div>
+      <div>
+        <p className="text-sm text-base-content/70 mb-1">Checkpoints per Milestone(min)</p>
+        <p className="font-medium text-base-content">{epochesPerEraNum}</p>
+      </div>
+      <div>
+        <p className="text-sm text-base-content/70 mb-1">Estimated Mint Time to target</p>
+        <p className="font-medium text-base-content">{calculateMetrics().estimatedDays} days</p>
+      </div>
       <div>
         <p className="text-sm text-base-content/70 mb-1">Max Supply</p>
         <p className="font-medium text-base-content">{calculateMetrics().maxSupply} {symbol}</p>
       </div>
       <div>
-        <p className="text-sm text-base-content/70 mb-1">Total Supply to Target Milestone</p>
-        <p className="font-medium text-base-content">{calculateMetrics().totalsupplyToTargetEras} {symbol}</p>
+        <p className="text-sm text-base-content/70 mb-1">Supply to Target Milestone</p>
+        <p className="font-medium text-base-content">{calculateMetrics().totalsupplyToTargetEras} {symbol} ({calculateMetrics().percentToTargetEras}%)</p>
       </div>
       <div>
-        <p className="text-sm text-base-content/70 mb-1">Percent of Max Supply to Target Milestone</p>
-        <p className="font-medium text-base-content">{calculateMetrics().percentToTargetEras}%</p>
+        <p className="text-sm text-base-content/70 mb-1">Target Mint Time per Checkpoint</p>
+        <p className="font-medium text-base-content">{formatSeconds(targetSecondsPerEpochNum)} (avg. {formatSeconds(targetSecondsPerEpochNum / (initialTargetMintSizePerEpochNum / (initialMintSizeNum / 1000000000)))}/mint)</p>
       </div>
       <div>
-        <p className="text-sm text-base-content/70 mb-1">Estimated Minting Time</p>
-        <p className="font-medium text-base-content">{calculateMetrics().estimatedDays} days</p>
-      </div>
-      <div>
-        <p className="text-sm text-base-content/70 mb-1">Minimum Total Fee</p>
-        <p className="font-medium text-base-content">{calculateMetrics().minTotalFee} SOL</p>
-      </div>
-      <div>
-        <p className="text-sm text-base-content/70 mb-1">Maximum Total Fee</p>
+        <p className="text-sm text-base-content/70 mb-1">Total Mint Fee(min)</p>
         <div className="flex items-center gap-2">
-          <p className="font-medium text-base-content">{calculateMetrics().maxTotalFee} SOL</p>
+          <p className="font-medium text-base-content">{calculateMetrics().minTotalFee} to {calculateMetrics().maxTotalFee} SOL</p>
           {calculateMetrics().isFeeTooHigh && (
             <span className="text-error">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -109,18 +116,14 @@ export const Metrics: React.FC<MetricsProps> = ({
           )}
         </div>
       </div>
-      <div>
+      {/* <div>
         <p className="text-sm text-base-content/70 mb-1">Initial Liquidity to Target Milestone</p>
         <p className="font-medium text-base-content">{calculateMetrics().initialLiquidityToTargetEra} {symbol} ({calculateMetrics().initialLiquidityToTargetEraPercent}%)</p>
-      </div>
+      </div> */}
       <div>
-        <p className="text-sm text-base-content/70 mb-1">Minimum Launch Price</p>
-        <p className="font-medium text-base-content">{calculateMetrics().minLaunchPrice} SOL/{symbol}</p>
-      </div>
-      <div>
-        <p className="text-sm text-base-content/70 mb-1">Maximum Launch Price</p>
+        <p className="text-sm text-base-content/70 mb-1">Launch Price</p>
         <div className="flex items-center gap-2">
-          <p className="font-medium text-base-content">{calculateMetrics().maxLaunchPrice} SOL/{symbol}</p>
+          <p className="font-medium text-base-content">{calculateMetrics().minLaunchPrice} to {calculateMetrics().maxLaunchPrice} SOL/{symbol}</p>
           {calculateMetrics().isLaunchPriceTooHigh && (
             <span className="text-error">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

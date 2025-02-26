@@ -25,7 +25,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  // const [showAdvanced, setShowAdvanced] = useState(false);
   const [decimals, setDecimals] = useState(9);
 
   // 社交信息状态
@@ -38,23 +38,35 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
   const [medium, setMedium] = useState('');
 
   // 高级设置状态
-  const [targetEras, setTargetEras] = useState(DEFAULT_PARAMS.targetEras);
-  const [epochesPerEra, setEpochesPerEra] = useState(DEFAULT_PARAMS.epochesPerEra);
-  const [targetSecondsPerEpoch, setTargetSecondsPerEpoch] = useState(DEFAULT_PARAMS.targetSecondsPerEpoch);
-  const [reduceRatio, setReduceRatio] = useState(DEFAULT_PARAMS.reduceRatio);
+  const [mode, setMode] = useState('standard');
+  const [targetEras, setTargetEras] = useState(DEFAULT_PARAMS[mode].targetEras);
+  const [epochesPerEra, setEpochesPerEra] = useState(DEFAULT_PARAMS[mode].epochesPerEra);
+  const [targetSecondsPerEpoch, setTargetSecondsPerEpoch] = useState(DEFAULT_PARAMS[mode].targetSecondsPerEpoch);
+  const [reduceRatio, setReduceRatio] = useState(DEFAULT_PARAMS[mode].reduceRatio);
   const [displayInitialMintSize, setDisplayInitialMintSize] = useState(
-    (new BN(DEFAULT_PARAMS.initialMintSize)).div(BN_LAMPORTS_PER_SOL).toString()
+    (new BN(DEFAULT_PARAMS[mode].initialMintSize)).div(BN_LAMPORTS_PER_SOL).toString()
   );
   const [displayInitialTargetMintSizePerEpoch, setDisplayInitialTargetMintSizePerEpoch] = useState(
-    (new BN(DEFAULT_PARAMS.initialTargetMintSizePerEpoch)).div(BN_LAMPORTS_PER_SOL).toString()
+    (new BN(DEFAULT_PARAMS[mode].initialTargetMintSizePerEpoch)).div(BN_LAMPORTS_PER_SOL).toString()
   );
-  const [displayFeeRate, setDisplayFeeRate] = useState((Number(DEFAULT_PARAMS.feeRate) / LAMPORTS_PER_SOL).toString());
-  const [liquidityTokensRatio, setLiquidityTokensRatio] = useState(DEFAULT_PARAMS.liquidityTokensRatio);
+  const [displayFeeRate, setDisplayFeeRate] = useState((Number(DEFAULT_PARAMS[mode].feeRate) / LAMPORTS_PER_SOL).toString());
+  const [liquidityTokensRatio, setLiquidityTokensRatio] = useState(DEFAULT_PARAMS[mode].liquidityTokensRatio);
 
   const [startImmediately, setStartImmediately] = useState(true);
   const [startTime, setStartTime] = useState<string>('');
 
   const { connection } = useConnection();
+
+  useEffect(() => {
+    setTargetEras(DEFAULT_PARAMS[mode].targetEras);
+    setEpochesPerEra(DEFAULT_PARAMS[mode].epochesPerEra);
+    setTargetSecondsPerEpoch(DEFAULT_PARAMS[mode].targetSecondsPerEpoch);
+    setReduceRatio(DEFAULT_PARAMS[mode].reduceRatio);
+    setDisplayInitialMintSize((new BN(DEFAULT_PARAMS[mode].initialMintSize)).div(BN_LAMPORTS_PER_SOL).toString());
+    setDisplayInitialTargetMintSizePerEpoch((new BN(DEFAULT_PARAMS[mode].initialTargetMintSizePerEpoch)).div(BN_LAMPORTS_PER_SOL).toString());
+    setDisplayFeeRate((Number(DEFAULT_PARAMS[mode].feeRate) / LAMPORTS_PER_SOL).toString());
+    setLiquidityTokensRatio(DEFAULT_PARAMS[mode].liquidityTokensRatio);
+  }, [mode])
 
   useEffect(() => {
     if (startImmediately) {
@@ -175,6 +187,10 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         startTimestamp: numberStringToBN(startTimestamp.toString()),
       };
 
+      console.log('initConfigData', Object.fromEntries(
+        Object.entries(initConfigData).map(([key, value]) => [key, value.toString()])
+      ));
+    
       const result = await initializeToken(tokenMetadata, wallet, connection, initConfigData);
 
       if (!result.success) {
@@ -371,8 +387,21 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
             )}
           </div>
 
+          {/* Select Tier */}
+          <div className='flex justify-between gap-3 mt-6'>
+            <div className={`py-4 w-full text-center cursor-pointer bg-primary ${mode === 'standard' ? 'pixel-box-primary' : 'pixel-box'}`} onClick={() => setMode('standard')}>
+              <div className='text-lg font-bold mb-2'>Standard Launch</div>
+              <div className='text-xs'>Hard cap 100 million</div>
+              <div className='text-xs'>mint fee 0.2 SOL</div>
+            </div>
+            <div className={`py-4 w-full text-center cursor-pointer bg-primary ${mode === 'meme' ? 'pixel-box-primary' : 'pixel-box'}`} onClick={() => setMode('meme')}>
+              <div className='text-lg font-bold mb-2'>Meme Launch</div>
+              <div className='text-xs'>Hard cap 1 billion</div>
+              <div className='text-xs'>mint fee 0.01 SOL</div>
+            </div>
+          </div>
           {/* Advanced setting ###### */}
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <ToggleSwitch
               id="toggleAdvanced"
               label="Advanced Settings(Optional)"
@@ -400,7 +429,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 onDisplayInitialTargetMintSizePerEpochChange={setDisplayInitialTargetMintSizePerEpoch}
               />
             )}
-          </div>
+          </div> */}
           {error && (
             <div className="text-error text-sm mt-1">{error}</div>
           )}
@@ -421,11 +450,12 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
         {/* 计算结果显示框 */}
         <div className="md:mt-6">
           <Metrics
+            mode={mode}
             targetEras={targetEras}
             epochesPerEra={epochesPerEra}
             targetSecondsPerEpoch={targetSecondsPerEpoch}
             reduceRatio={reduceRatio}
-            displayInitialTargetMintSizePerEpoch={displayInitialTargetMintSizePerEpoch}
+            initialTargetMintSizePerEpoch={displayInitialTargetMintSizePerEpoch}
             initialMintSize={(new BN(displayInitialMintSize)).mul(BN_LAMPORTS_PER_SOL).toString()}
             feeRate={(Number(displayFeeRate) * LAMPORTS_PER_SOL).toString()}
             liquidityTokensRatio={liquidityTokensRatio}
