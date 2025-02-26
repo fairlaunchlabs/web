@@ -4,11 +4,13 @@ import { AddressDisplay } from "../common/AddressDisplay";
 import { getLiquidityPoolData, getTokenBalance, getTokenBalanceByMintAndOwner } from "../../utils/web3";
 import { PublicKey } from "@solana/web3.js";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import toast from "react-hot-toast";
 import AlertBox from "../common/AlertBox";
 import { DexStatusBar } from "./DexStatusBar";
 import { formatPrice } from "../../utils/format";
+import { BurnSystemVaultTokensModal } from "./BurnSystemVaultTokensModal";
+import { U64_MAX } from "../../config/constants";
 
 type PoolInformationProps = {
   tokenData: InitiazlizedTokenData;
@@ -55,6 +57,8 @@ export const PoolInformation: FC<PoolInformationProps> = ({
 }) => {
   const [poolAddress, setPoolAddress] = useState('');
   const [openTime, setOpenTime] = useState(0);
+  const [mintTokenVaultBalance, setMintTokenVaultBalance] = useState(0);
+  const [showBurnSystemVaultTokensModel, setShowBurnSystemVaultTokensModel] = useState(false);
 
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -90,6 +94,9 @@ export const PoolInformation: FC<PoolInformationProps> = ({
         setTotalLpToken(poolData.cpSwapPoolState.lpAmount)
         getTokenBalanceByMintAndOwner(new PublicKey(poolData.cpSwapPoolState.lpMint as string), new PublicKey(tokenData.configAccount), connection, true, TOKEN_PROGRAM_ID).then(balance => {
           setVaultLpTokenBalance(balance as number);
+        })
+        getTokenBalanceByMintAndOwner(new PublicKey(tokenData.mint), new PublicKey(tokenData.mint), connection, true, TOKEN_PROGRAM_ID).then(balance => {
+          setMintTokenVaultBalance(balance as number);
         })
         // console.log("open time", poolData.cpSwapPoolState.openTime);
       } else {
@@ -148,19 +155,45 @@ export const PoolInformation: FC<PoolInformationProps> = ({
                 <span>{formatPrice(vaultLpTokenBalance, 3)} LP-{tokenData.tokenSymbol}-SOL</span>
               </div>
             </div>
-            <DexStatusBar openTime={openTime} isDexOpen={isDexOpen} setIsDexOpen={setIsDexOpen}/>
-            </div>}
+            <DexStatusBar openTime={openTime} isDexOpen={isDexOpen} setIsDexOpen={setIsDexOpen} />
+          </div>}
         </div>
       </div>
-      {poolAddress === "" && 
+      {parseInt(tokenData.graduateEpoch) < U64_MAX &&
+        <div className="bg-base-200 md:p-6 p-3 rounded-lg mb-8">
+          <div className="flex justify-between">
+            <span>Tokens in System vault:</span>
+            <span>{formatPrice(mintTokenVaultBalance, 3)} {tokenData?.tokenSymbol}</span>
+          </div>
+          <div className="flex justify-between">
+            <span></span>
+            <span>
+              <button 
+                className="btn btn-secondary btn-sm mt-2"
+                onClick={() => setShowBurnSystemVaultTokensModel(true)}
+              >
+                Burn the system vault tokens
+              </button>
+            </span>
+            <span>{tokenData.graduateEpoch}</span>
+          </div>
+        </div>}
+      {/* {poolAddress === "" && 
       <div>
         <AlertBox title="Alert" message="Raydium pool has not created! Please create a pool first." />
         <div className="mt-5"><a href={`/create-liquidity-pool/${tokenData.mint}`} className="text-blue-500 underline">Create pool</a></div>
-      </div>}
+      </div>} */}
       {poolAddress !== "" && !isDexOpen &&
-      <div>
-        <AlertBox title="Alert" message={`Raydium pool has been created but not opened! Please wait until ${new Date(openTime * 1000).toLocaleString()}`} />
-      </div>}
-      </div>
+        <div>
+          <AlertBox title="Alert" message={`Raydium pool has been created but not opened! Please wait until ${new Date(openTime * 1000).toLocaleString()}`} />
+        </div>}
+      {showBurnSystemVaultTokensModel && mintTokenVaultBalance > 0 &&
+      <BurnSystemVaultTokensModal 
+        token={tokenData} 
+        isOpen={showBurnSystemVaultTokensModel} 
+        onClose={() => setShowBurnSystemVaultTokensModel(false)} 
+        totalBalance={mintTokenVaultBalance}
+      />}
+    </div>
   );
 };

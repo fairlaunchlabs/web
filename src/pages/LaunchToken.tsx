@@ -371,8 +371,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
             )}
           </div>
 
-          {/* Advanced setting */}
-          {/* <div className="mt-6">
+          {/* Advanced setting ###### */}
+          <div className="mt-6">
             <ToggleSwitch
               id="toggleAdvanced"
               label="Advanced Settings(Optional)"
@@ -400,7 +400,7 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
                 onDisplayInitialTargetMintSizePerEpochChange={setDisplayInitialTargetMintSizePerEpoch}
               />
             )}
-          </div> */}
+          </div>
           {error && (
             <div className="text-error text-sm mt-1">{error}</div>
           )}

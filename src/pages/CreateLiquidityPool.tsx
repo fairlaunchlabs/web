@@ -213,7 +213,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
           )}
 
           {/* 创建流动池按钮 */}
-          {tokenData && poolAddress === "" && (
+          {/* {tokenData && poolAddress === "" && (
             <div className="text-center">
               <button
                 onClick={handleCreatePool}
@@ -223,7 +223,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
                 {loading ? 'Creating...' : 'Create Pool'}
               </button>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

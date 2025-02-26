@@ -1641,6 +1641,51 @@ export async function getBlockTimestamp(
   return await connection.getBlockTime(slot) as number;
 }
 
+export const burnTokensFromMintTokenVault = async (
+  wallet: AnchorWallet | undefined,
+  connection: Connection,
+  token: InitiazlizedTokenData,
+  amount: BN,
+): Promise<ResponseData> => {
+  if (!wallet) return {
+    success: false,
+    message: 'Please connect wallet'
+  }
+  const program = getProgram(wallet, connection);
+  const mintTokenVaultAta = await getAssociatedTokenAddress(new PublicKey(token.mint), new PublicKey(token.mint), true, TOKEN_PROGRAM_ID);
+
+  const context = {
+    mint: new PublicKey(token.mint),
+    configAccount: new PublicKey(token.configAccount),
+    payer: wallet.publicKey,
+    mintTokenVault: mintTokenVaultAta,
+  }
+  
+  // ######
+  const ix = await program.methods
+  .burnMintTokenVault(token.tokenName, token.tokenSymbol, amount)
+  .accounts(context)
+  .instruction();
+
+  try {
+    const tx = new Transaction();
+    tx.add(ix);
+    // send transactions
+    return await processTransaction(tx, connection, wallet, "Burn system tokens successfully", { mint: token.mint });
+  } catch (error: any) {
+    if (error.message.includes('Transaction simulation failed: This transaction has already been processed')) {
+      return {
+        success: false,
+        message: 'Something went wrong but you have burn successfully',
+      }
+    }
+    return {
+      success: false,
+      message: 'Error burning' + error
+    }
+  }
+}
+
 export async function proxyCreatePool(
   wallet: AnchorWallet | undefined,
   connection: Connection,
@@ -1724,7 +1769,7 @@ export async function proxyCreatePool(
       instructions,
     }).compileToV0Message([lookupTable])
   );
-  // ######
+
   try {
     return processVersionedTransaction(versionedTx, connection, wallet, latestBlockhash, confirmLevel);
   } catch (error) {
