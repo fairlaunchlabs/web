@@ -21,6 +21,7 @@ export const Metrics: React.FC<MetricsProps> = ({
   const targetSecondsPerEpochNum = parseFloat(targetSecondsPerEpoch) || 0;
   const initialMintSizeNum = parseFloat(initialMintSize) || 0;
   const feeRateNum = parseFloat(feeRate) || 0;
+
   const calculateMetrics = () => {
 
     // 计算最大供应量
@@ -63,8 +64,8 @@ export const Metrics: React.FC<MetricsProps> = ({
       maxSupply: maxSupply.toLocaleString(undefined, { maximumFractionDigits: 2 }),
       estimatedDays: estimatedDays.toLocaleString(undefined, { maximumFractionDigits: 2 }),
       percentToTargetEras: (percentToTargetEras * 100).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-      minTotalFee: minTotalFee.toLocaleString(undefined, { maximumFractionDigits: 0 }),
-      maxTotalFee: maxTotalFee.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+      minTotalFee: minTotalFee.toLocaleString(undefined, { maximumFractionDigits: 4 }),
+      maxTotalFee: maxTotalFee.toLocaleString(undefined, { maximumFractionDigits: 4 }),
       isFeeTooHigh,
       initialLiquidityToTargetEra: initialLiquidityToTargetEra.toLocaleString(undefined, { maximumFractionDigits: 4 }),
       totalsupplyToTargetEras: totalsupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 }),
@@ -72,9 +73,10 @@ export const Metrics: React.FC<MetricsProps> = ({
       minLaunchPrice: minLaunchPrice.toLocaleString(undefined, { maximumFractionDigits: 6 }),
       maxLaunchPrice: maxLaunchPrice.toLocaleString(undefined, { maximumFractionDigits: 6 }),
       isLaunchPriceTooHigh,
+      mintTimesToTarget: epochesPerEraNum * initialTargetMintSizePerEpochNum / (initialMintSizeNum / 1000000000),
+      mintSecondsToTarget: targetSecondsPerEpochNum / (initialTargetMintSizePerEpochNum / (initialMintSizeNum / 1000000000)),
     };
   };
-
 
   return (
     <div className="pixel-box space-y-4 w-full lg:w-[480px] p-6 mt-4" style={{}}>
@@ -89,7 +91,7 @@ export const Metrics: React.FC<MetricsProps> = ({
       </div>
       <div>
         <p className="text-sm text-base-content/70 mb-1">Estimated Mint Time to target</p>
-        <p className="font-medium text-base-content">{calculateMetrics().estimatedDays} days</p>
+        <p className="font-medium text-base-content">{calculateMetrics().estimatedDays} days (est.{calculateMetrics().mintTimesToTarget})</p>
       </div>
       <div>
         <p className="text-sm text-base-content/70 mb-1">Max Supply</p>
@@ -101,7 +103,7 @@ export const Metrics: React.FC<MetricsProps> = ({
       </div>
       <div>
         <p className="text-sm text-base-content/70 mb-1">Target Mint Time per Checkpoint</p>
-        <p className="font-medium text-base-content">{formatSeconds(targetSecondsPerEpochNum)} (avg. {formatSeconds(targetSecondsPerEpochNum / (initialTargetMintSizePerEpochNum / (initialMintSizeNum / 1000000000)))}/mint)</p>
+        <p className="font-medium text-base-content">{formatSeconds(targetSecondsPerEpochNum)} (avg. {formatSeconds(calculateMetrics().mintSecondsToTarget)})/mint)</p>
       </div>
       <div>
         <p className="text-sm text-base-content/70 mb-1">Total Mint Fee(min)</p>

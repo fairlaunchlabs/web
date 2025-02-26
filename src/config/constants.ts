@@ -22,13 +22,24 @@ export const DEFAULT_PARAMS = {
         feeRate: '200000000',
         liquidityTokensRatio: '20',
     },
-    "meme": {
+    // TODO: remove it when mainnet launch ######
+    // "meme": { // config for mainnet 
+    //     targetEras: '1',
+    //     epochesPerEra: '250',
+    //     targetSecondsPerEpoch: '2000',
+    //     reduceRatio: '75',
+    //     initialMintSize: '10000000000000',
+    //     initialTargetMintSizePerEpoch: '1000000000000000',
+    //     feeRate: '10000000',
+    //     liquidityTokensRatio: '20',
+    // },
+    "meme": { // config for dev
         targetEras: '1',
-        epochesPerEra: '250',
-        targetSecondsPerEpoch: '2000',
+        epochesPerEra: '2',
+        targetSecondsPerEpoch: '60',
         reduceRatio: '75',
-        initialMintSize: '10000000000000',
-        initialTargetMintSizePerEpoch: '1000000000000000',
+        initialMintSize: '1000000000000',
+        initialTargetMintSizePerEpoch: '10000000000000',
         feeRate: '10000000',
         liquidityTokensRatio: '20',
     },
@@ -96,7 +107,7 @@ export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
 // export const COPILOTKIT_RUNTIME_URL = "http://127.0.0.1:8000/gpt/copilotkit";
 export const COPILOTKIT_RUNTIME_URL = "https://flipflop-api.vercel.app/gpt/copilotkit";
-export const U64_MAX = 4294967295;
+export const U32_MAX = 4294967295;
 
 export const tooltip = {
     currentEra: "The current milestone in the token's lifecycle",

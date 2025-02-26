@@ -1661,7 +1661,6 @@ export const burnTokensFromMintTokenVault = async (
     mintTokenVault: mintTokenVaultAta,
   }
   
-  // ######
   const ix = await program.methods
   .burnMintTokenVault(token.tokenName, token.tokenSymbol, amount)
   .accounts(context)

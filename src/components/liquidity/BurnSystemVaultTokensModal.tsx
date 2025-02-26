@@ -30,7 +30,7 @@ export const BurnSystemVaultTokensModal: FC<BurnSystemVaultTokensModalProps> = (
   if (!isOpen) return null;
 
   const handleBurn = async () => {
-    const burnAmount = new BN(amount).mul(new BN(10**9));
+    const burnAmount = new BN(parseInt(amount)).mul(new BN(10**9));
     if (burnAmount.eq(new BN(0))) {
       toast.error('Wrong amount');
       return;

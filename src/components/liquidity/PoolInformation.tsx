@@ -10,7 +10,7 @@ import AlertBox from "../common/AlertBox";
 import { DexStatusBar } from "./DexStatusBar";
 import { formatPrice } from "../../utils/format";
 import { BurnSystemVaultTokensModal } from "./BurnSystemVaultTokensModal";
-import { U64_MAX } from "../../config/constants";
+import { U32_MAX } from "../../config/constants";
 
 type PoolInformationProps = {
   tokenData: InitiazlizedTokenData;
@@ -159,8 +159,8 @@ export const PoolInformation: FC<PoolInformationProps> = ({
           </div>}
         </div>
       </div>
-      {parseInt(tokenData.graduateEpoch) < U64_MAX &&
-        <div className="bg-base-200 md:p-6 p-3 rounded-lg mb-8">
+      {parseInt(tokenData.graduateEpoch) < U32_MAX &&
+        <div className="bg-base-200 md:p-6 p-3 rounded-lg mb-8 md:text-md text-sm">
           <div className="flex justify-between">
             <span>Tokens in System vault:</span>
             <span>{formatPrice(mintTokenVaultBalance, 3)} {tokenData?.tokenSymbol}</span>
@@ -169,20 +169,19 @@ export const PoolInformation: FC<PoolInformationProps> = ({
             <span></span>
             <span>
               <button 
-                className="btn btn-secondary btn-sm mt-2"
+                className="btn btn-secondary btn-sm my-2"
                 onClick={() => setShowBurnSystemVaultTokensModel(true)}
               >
                 Burn the system vault tokens
               </button>
             </span>
-            <span>{tokenData.graduateEpoch}</span>
           </div>
         </div>}
-      {/* {poolAddress === "" && 
+      {poolAddress === "" && 
       <div>
-        <AlertBox title="Alert" message="Raydium pool has not created! Please create a pool first." />
-        <div className="mt-5"><a href={`/create-liquidity-pool/${tokenData.mint}`} className="text-blue-500 underline">Create pool</a></div>
-      </div>} */}
+        <AlertBox title="Alert" message="Raydium pool has not created! Probably the target milestone is not reached." />
+        {/* <div className="mt-5"><a href={`/create-liquidity-pool/${tokenData.mint}`} className="text-blue-500 underline">Create pool</a></div> */}
+      </div>}
       {poolAddress !== "" && !isDexOpen &&
         <div>
           <AlertBox title="Alert" message={`Raydium pool has been created but not opened! Please wait until ${new Date(openTime * 1000).toLocaleString()}`} />
