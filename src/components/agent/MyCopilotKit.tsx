@@ -1,12 +1,10 @@
 "use client"
-import { CopilotSidebar, useChatContext, HeaderProps, InputProps } from "@copilotkit/react-ui";
+import { CopilotSidebar, useChatContext, HeaderProps, InputProps, Markdown } from "@copilotkit/react-ui";
 import { useEffect, useState } from "react";
 import { useCopilotMessagesContext } from "@copilotkit/react-core";
 import { ActionExecutionMessage, ResultMessage, TextMessage } from "@copilotkit/runtime-client-gql";
 import { UserMessageProps } from "@copilotkit/react-ui";
 import { AssistantMessageProps } from "@copilotkit/react-ui";
-import { RiRobot2Line } from "react-icons/ri";
-import { Markdown } from "@copilotkit/react-ui";
 import MarkdownWithMath from "./MarkdownWithMath";
 
 export const MyCopilotKit = () => {
@@ -69,14 +67,12 @@ export const MyCopilotKit = () => {
     const { icons } = useChatContext();
     const { message, isLoading, subComponent } = props;
     // const avatar = <div className={"pixel-avatar-round p-1"}><RiRobot2Line className="h-6 w-6" /></div>
-
     return (
       <div className="py-2">
         <div className="flex items-start">
           {/* <div className="mr-2">{!subComponent && avatar}</div> */}
           <div className="bg-gray-100 px-4 rounded-xl py-2 text-sm md:text-md">
-            {message && <Markdown content={message || ""} /> }
-            {/* {message && <MarkdownWithMath content={message || ""} />} */}
+            {message && <MarkdownWithMath content={message || ""} />}
             {isLoading && icons.spinnerIcon}
           </div>
         </div>
