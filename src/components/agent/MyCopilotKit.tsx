@@ -1,23 +1,28 @@
 "use client"
 import { CopilotSidebar, useChatContext, HeaderProps, InputProps, Markdown } from "@copilotkit/react-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCopilotMessagesContext } from "@copilotkit/react-core";
-import { ActionExecutionMessage, ResultMessage, TextMessage } from "@copilotkit/runtime-client-gql";
+import { ActionExecutionMessage, MessageRole, ResultMessage, TextMessage } from "@copilotkit/runtime-client-gql";
 import { UserMessageProps } from "@copilotkit/react-ui";
 import { AssistantMessageProps } from "@copilotkit/react-ui";
 import MarkdownWithMath from "./MarkdownWithMath";
+import { LuLightbulb, LuLightbulbOff, LuSend } from "react-icons/lu";
+import { FAQSelector } from "./FAQSelector";
 
 export const MyCopilotKit = () => {
   const { messages, setMessages } = useCopilotMessagesContext();
-  const [isDeepthink, setIsDeepthink] = useState(false);
-  const [isResearch, setIsResearch] = useState(false);
+  // const [isDeepthink, setIsDeepthink] = useState(false);
+  // const [isResearch, setIsResearch] = useState(false);
+  const [isFAQOpen, setIsFAQOpen] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [activeTab, setActiveTab] = useState(0);
+
   // save to local storage when messages change
   useEffect(() => {
     if (messages.length !== 0) {
       localStorage.setItem("flipflop-copilotkit-messages", JSON.stringify(messages));
     }
   }, [JSON.stringify(messages)]);
-
 
   // initially load from local storage
   useEffect(() => {
@@ -98,21 +103,42 @@ export const MyCopilotKit = () => {
 
   function CustomInput({ inProgress, onSend, isVisible }: InputProps) {
     const handleSubmit = (value: string) => {
-      if (value.trim()) onSend(value);
+      if (value.trim()) {
+        onSend(value);
+        setPrompt("");
+        if (inputRef.current) inputRef.current.value = "";
+      }
     };
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+      if (inputRef.current && prompt !== inputRef.current.value) {
+        inputRef.current.value = prompt;
+        handleSubmit(prompt);
+        setIsFAQOpen(false);
+      }
+    }, [prompt]);
 
     const wrapperStyle = "flex gap-2 p-4 border-t";
     const inputStyle = "text-sm flex-1 p-2 rounded-md border border-gray-300 focus:outline-none focus:border-green-500 disabled:bg-gray-100";
-    const buttonStyle = "text-sm px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed";
-    const modeButtonStyle = "py-2 px-3 text-white rounded-md text-sm cursor-pointer";
+
     return (
       <div>
         <div className="flex ml-8 gap-2 my-2">
-          <div className={modeButtonStyle + (isDeepthink ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsDeepthink(!isDeepthink)}>Deep think</div>
-          <div className={modeButtonStyle + (isResearch ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsResearch(!isResearch)}>Search web</div>
+          {/* <div className={modeButtonStyle + (isDeepthink ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsDeepthink(!isDeepthink)}>Deep think</div>
+          <div className={modeButtonStyle + (isResearch ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsResearch(!isResearch)}>Search web</div> */}
+          {isFAQOpen && <FAQSelector activeTab={activeTab} setActiveTab={setActiveTab} setPrompt={setPrompt} />}
         </div>
         <div className={wrapperStyle}>
+          <button
+            disabled={inProgress}
+            className={`text-sm px-3 py-2 bg-gray-300 text-white rounded-md ${isFAQOpen ? "bg-green-500 text-white" : "bg-white border-[1px] border-gray-200"}`}
+            onClick={() => setIsFAQOpen(!isFAQOpen)}
+          >
+            {isFAQOpen ? <LuLightbulbOff  className={`w-4 h-4 ${isFAQOpen ? "text-white" : "text-black"}`}/> : <LuLightbulb  className={`w-4 h-4 ${isFAQOpen ? "text-white" : "text-black"}`}/>}
+          </button>
+  
           <input
+            ref={inputRef}
             disabled={inProgress}
             type="text"
             placeholder="Ask your question here..."
@@ -124,16 +150,17 @@ export const MyCopilotKit = () => {
               }
             }}
           />
+
           <button
             disabled={inProgress}
-            className={buttonStyle}
+            className="text-sm px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={(e) => {
               const input = e.currentTarget.previousElementSibling as HTMLInputElement;
               handleSubmit(input.value);
               input.value = '';
             }}
           >
-            Ask
+            <LuSend className="w-4 h-4"/>
           </button>
         </div>
       </div>
