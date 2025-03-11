@@ -1,7 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { DARK_THEME, LIGHT_THEME, LOCAL_STORAGE_KEY_THEME } from '../config/constants';
+import { getFollowing, isRegistered, login, register } from './user';
+import { getWalletAddressFromToken, signMessageWithWallet } from './web3';
+import { User } from '../types/types';
+import { UsernameModal } from '../components/common/UsernameModal';
+import { generateDefaultUsername } from './format';
 
-// Theme Context
+// ===========================================
+// ============= Theme Context ==============
+// ===========================================
 interface ThemeContextType {
   isDarkMode: boolean;
   toggleTheme: () => void;
@@ -11,12 +18,12 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // 从localStorage获取主题设置
+    // Get theme from localStorage
     const savedTheme = localStorage.getItem(LOCAL_STORAGE_KEY_THEME);
     const prefersDark = savedTheme === 'dark' ||
       (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-    // 初始化时确保 HTML 类名与状态一致
+    // Initialize with HTML class and state
     if (prefersDark) {
       document.documentElement.classList.add('dark');
       document.documentElement.setAttribute('data-theme', DARK_THEME);
@@ -35,7 +42,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const root = document.documentElement;
     const newTheme = isDarkMode ? DARK_THEME : LIGHT_THEME;
 
-    // 更新DOM
+    // Update DOM
     if (isDarkMode) {
       root.classList.add('dark');
     } else {
@@ -43,7 +50,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     root.setAttribute('data-theme', newTheme);
 
-    // 保存到localStorage
+    // Save to localStorage
     localStorage.setItem(LOCAL_STORAGE_KEY_THEME, newTheme);
   }, [isDarkMode]);
 
@@ -62,40 +69,27 @@ export const useTheme = () => {
   return context;
 };
 
-// 组合所有Providers
-interface ProvidersProps {
-  children: React.ReactNode;
-}
-
-export const Providers: React.FC<ProvidersProps> = ({ children }) => {
-  return (
-    <ThemeProvider>
-      {children}
-    </ThemeProvider>
-  );
-};
-
-
-// 定义设备类型枚举
+// ==========================================
+// ============ Device Type Hook ============
+// ==========================================
 export enum DeviceType {
   Mobile = 'mobile',
   Desktop = 'desktop'
 }
 
-// 定义断点
-const MOBILE_BREAKPOINT = 768; // 小于这个宽度认为是移动设备
+// Define breakpoint
+const MOBILE_BREAKPOINT = 768; // Define breakpoint
 
 export const useDeviceType = () => {
-  // 初始化设备类型状态
+  // Initialize device type state
   const [deviceType, setDeviceType] = useState<DeviceType>(() => {
-    // 初始化时判断窗口宽度
     return window.innerWidth < MOBILE_BREAKPOINT
       ? DeviceType.Mobile
       : DeviceType.Desktop;
   });
 
   useEffect(() => {
-    // 创建处理窗口大小变化的函数
+    // Create function to handle window resize
     const handleResize = () => {
       const width = window.innerWidth;
       const newDeviceType = width < MOBILE_BREAKPOINT
@@ -105,19 +99,271 @@ export const useDeviceType = () => {
       setDeviceType(newDeviceType);
     };
 
-    // 添加事件监听器
+    // Add event listener
     window.addEventListener('resize', handleResize);
 
-    // 清理函数
+    // Clean up event listener on unmount
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []); // 空依赖数组，只在组件挂载时运行
+  }, []);
 
-  // 返回当前设备类型和一些辅助函数
+  // Return current device type and some helper functions
   return {
     deviceType,
     isMobile: deviceType === DeviceType.Mobile,
     isDesktop: deviceType === DeviceType.Desktop
   };
+};
+
+// ==========================================
+// ============ Auth Context ===============
+// ==========================================
+interface AuthContextType {
+  token: string | null;
+  walletAddress: string | null;
+  handleLogin: () => Promise<void>;
+  logout: () => void;
+  following: User[];
+  refreshFollowing: () => Promise<void>;
+  isUsernameModalOpen: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const hasWalletListener = { current: false }; // Use this as signal to prevent multiple listeners being registered
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(localStorage.getItem('flipflop_token'));
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [following, setFollowing] = useState<User[]>([]);
+  const [isUsernameModalOpen, setIsUsernameModalOpen] = useState(false);
+  const [pendingRegistration, setPendingRegistration] = useState<{
+    publicKey: string;
+    signatureBase58: string;
+    message: string;
+  } | null>(null);
+  const initialLoginAttemptedRef = React.useRef(false); // Use this as signal to prevent multiple login attempts
+  const handledLoginRef = React.useRef(false); // Use this as signal to prevent multiple login attempts
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Define callback functions first
+  const refreshFollowing = async () => {
+    if (token) {
+      try {
+        const followees = await getFollowing(token);
+        setFollowing(followees);
+      } catch (error) {
+        console.error('Failed to fetch following:', error);
+      }
+    }
+  };
+
+  const logout = () => {
+    setToken(null);
+    setWalletAddress(null);
+    setFollowing([]);
+    localStorage.removeItem('flipflop_token');
+  };
+
+  const handleLogin = async () => {
+    // Prevent multiple login attempts
+    if (isLoggingIn || isUsernameModalOpen || pendingRegistration) {
+      return;
+    }
+    setIsLoggingIn(true);
+    
+    try {
+      const provider = (window as any).solana;
+      if (!provider) {
+        alert('Please install Solana wallet');
+        return;
+      }
+      
+      if (!provider.publicKey) {
+        try {
+          await provider.connect();
+        } catch (error) {
+          console.error('Failed to connect wallet:', error);
+          return;
+        }
+      }
+
+      try {
+        // Wait until sign the message
+        const { publicKey, signatureBase58, message } = await signMessageWithWallet();
+
+        try {
+          const result = await login(publicKey, signatureBase58, message);
+          if (result.success) {
+            const token = result.token;
+            setToken(token);
+            setWalletAddress(publicKey);
+            localStorage.setItem('flipflop_token', token);
+            await refreshFollowing();
+          }
+        } catch (loginError: any) {
+          if (loginError.response?.status === 404) {
+            // Open register box if not registered
+            setPendingRegistration({ publicKey, signatureBase58, message });
+            setIsUsernameModalOpen(true);
+          } else {
+            throw loginError;
+          }
+        }
+      } catch (error) {
+        console.error('Login failed:', error);
+        alert('Login failed. Please try again.');
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  // Handle username submission from modal
+  const handleUsernameSubmit = async (username: string) => {
+    setIsUsernameModalOpen(false);
+    if (!pendingRegistration) return;
+    try {
+      const { publicKey, signatureBase58, message } = pendingRegistration;
+      const roles = 'issuer,participant,promoter'; // roles: participant, promoter, manager, issuer
+      const result = await register(publicKey, username, roles, signatureBase58, message);
+      if (result.success) {
+        const token = result.token;
+        setToken(token);
+        setWalletAddress(publicKey);
+        localStorage.setItem('flipflop_token', token);
+        await refreshFollowing();
+      }
+      // Clear pending registration
+      setPendingRegistration(null);
+    } catch (error) {
+      alert('Registration failed. Please try again.');
+    }
+  };
+
+  const tryLoadLocalToken = (provider: any) => {
+    if (provider.publicKey) {
+      const storedToken = localStorage.getItem('flipflop_token');
+      if (storedToken) {
+        setToken(storedToken);
+        const walletAddressFromToken = getWalletAddressFromToken(storedToken);
+        if (walletAddressFromToken == provider.publicKey.toString()) {
+          setWalletAddress(walletAddressFromToken);          
+          refreshFollowing();
+        } else {
+          logout();
+          handleLogin();
+        }
+      } else {
+        if (!isLoggingIn && !isUsernameModalOpen && !pendingRegistration && !handledLoginRef.current) {
+          handledLoginRef.current = true;
+          handleLogin();
+        }
+      }
+    }
+  };
+
+  const setupWalletListeners = () => {
+    const provider = (window as any).solana; // Phantom wallet
+    if (!provider) {
+      alert('Please install Solana wallet');
+      return;
+    }
+    // Initial setup - only runs once
+    if (!initialLoginAttemptedRef.current) {
+      initialLoginAttemptedRef.current = true;
+      tryLoadLocalToken(provider);
+    }
+    
+    // Add event listeners for wallet connection and disconnection
+    const handleWalletChange = async () => {
+      const currentProvider = (window as any).solana;
+      if (currentProvider && currentProvider.publicKey) {
+        const currentAddress = currentProvider.publicKey.toString();
+        const registered = await isRegistered(currentAddress as string);
+        if (registered) {
+          tryLoadLocalToken(currentProvider);
+        } else if (walletAddress !== currentAddress) {
+          if (!isLoggingIn && !isUsernameModalOpen && !pendingRegistration && !handledLoginRef.current) {
+            handledLoginRef.current = true;
+            handleLogin();
+          }
+        }
+      } else {
+        logout();
+      }
+    };
+    
+    // Listen for wallet connection events
+    if (provider && !hasWalletListener.current) {
+      provider.on('connect', handleWalletChange);
+      provider.on('disconnect', handleWalletChange);
+      provider.on('accountChanged', handleWalletChange);
+      hasWalletListener.current = true;
+    }
+    
+    return () => {
+      // Clean up event listeners
+      if (provider && hasWalletListener.current) {
+        provider.off('connect', handleWalletChange);
+        provider.off('disconnect', handleWalletChange);
+        provider.off('accountChanged', handleWalletChange);
+        hasWalletListener.current = false;
+      }
+    };
+  }
+  
+  useEffect(() => {
+    const cleanup = setupWalletListeners();
+    return cleanup;
+  }, [walletAddress, handleLogin, logout, refreshFollowing, isLoggingIn, isUsernameModalOpen, pendingRegistration]);
+
+  return (
+    <AuthContext.Provider value={{ 
+      token, 
+      walletAddress, 
+      handleLogin, 
+      logout, 
+      following, 
+      refreshFollowing,
+      isUsernameModalOpen
+    }}>
+      {children}
+      {pendingRegistration && (
+        <UsernameModal
+          isOpen={isUsernameModalOpen}
+          onClose={() => {
+            setIsUsernameModalOpen(false);
+            setPendingRegistration(null);
+          }}
+          onSubmit={handleUsernameSubmit}
+          defaultUsername={generateDefaultUsername(pendingRegistration.publicKey)}
+        />
+      )}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  return context;
+};
+
+// ==========================================
+// ============ Root Provider ==============
+// ==========================================
+
+interface ProvidersProps {
+  children: React.ReactNode;
+}
+
+export const Providers: React.FC<ProvidersProps> = ({ children }) => {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </ThemeProvider>
+  );
 };

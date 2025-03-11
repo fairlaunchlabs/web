@@ -9,7 +9,6 @@ import { BN } from "@coral-xyz/anchor";
 
 const BOX_WIDTH = 6;
 
-// 加载像素字体
 const loadPixelFonts = async () => {
   const normalFont = new FontFace('RetroPixel', 'url(/fonts/retro-pixel-cute-mono.ttf)');
   const thickFont = new FontFace('RetroPixelThick', 'url(/fonts/retro-pixel-thick.ttf)');
@@ -20,22 +19,22 @@ const loadPixelFonts = async () => {
   return { normalFont, thickFont };
 };
 
-// 绘制像素风格的矩形
+// Draw rectangle in pixel style
 const drawPixelRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, color: string = '#FFFFFF', borderWidth: number = 6) => {
-  // 绘制阴影
+  // Draw shadow
   ctx.fillStyle = '#000000';
   ctx.fillRect(x + borderWidth, y + borderWidth, width, height);
 
-  // 绘制主体矩形
+  // Draw body
   ctx.fillStyle = color;
   ctx.fillRect(x, y, width, height);
 
-  // 绘制边框
+  // Draw border
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = borderWidth;
   ctx.strokeRect(x, y, width, height);
 
-  // 绘制右边和下边的像素点
+  // Draw right and bottom pixels
   ctx.fillStyle = '#000000';
   for (let i = 0; i <= width; i += borderWidth) {
     ctx.fillRect(x + i, y + height, borderWidth, borderWidth);
@@ -45,7 +44,7 @@ const drawPixelRect = (ctx: CanvasRenderingContext2D, x: number, y: number, widt
   }
 };
 
-// 绘制多行文本，处理溢出
+// Draw multi line text, handle overflow
 const drawMultiLineText = (
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -57,13 +56,12 @@ const drawMultiLineText = (
   padding: number = 4
 ) => {
   ctx.font = '20px RetroPixel';
-  // 移除 fillStyle 设置，由外部控制
 
   const words = text.split(' ');
   let line = '';
   let lines: string[] = [];
 
-  // 分行处理
+  // Draw multi line text, handle overflow
   for (let n = 0; n < words.length; n++) {
     const testLine = line + words[n] + ' ';
     const metrics = ctx.measureText(testLine);
@@ -78,19 +76,19 @@ const drawMultiLineText = (
   }
   lines.push(line);
 
-  // 限制最大行数
+  // Limit max lines
   lines = lines.slice(0, maxLines);
 
-  // 绘制每一行
+  // Draw each line
   lines.forEach((line, i) => {
     ctx.fillText(line.trim(), x + padding + 10, y + padding + ((i + 1) * lineHeight));
   });
 
-  // 返回实际使用的行数
+  // Return actual lines
   return lines.length;
 };
 
-// 处理动态图片，只获取第一帧
+// Handle dynamic images, only get the first frame
 const getFirstFrameFromImage = async (image: HTMLImageElement, type: string): Promise<ImageBitmap | HTMLImageElement> => {
   if (type === 'image/gif' || type === 'image/webp') {
     const tempCanvas = document.createElement('canvas');
@@ -103,7 +101,7 @@ const getFirstFrameFromImage = async (image: HTMLImageElement, type: string): Pr
   return image;
 };
 
-// 绘制上涨走势折线图
+// Draw price line
 const drawTrendLine = (
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -114,24 +112,24 @@ const drawTrendLine = (
   shadowColor: string = '#000000'
 ) => {
   const shadowLength = 4;
-  // 定义控制点
+  // Define control points
   const points = [
-    { x: x, y: y + height - 5 },              // 起点
-    { x: x + 30, y: y + height - 10 },        // 第一个波动
-    { x: x + 60, y: y + height - 35 },        // 开始上升
-    // { x: x + 90, y: y + 25 },                 // 急速上升
-    { x: x + width - 30, y: y + 15 },         // 继续上升
-    { x: x + width, y: y }                    // 终点
+    { x: x, y: y + height - 5 },              // Start point
+    { x: x + 30, y: y + height - 10 },        // First wave
+    { x: x + 60, y: y + height - 35 },        // Start rising
+    // { x: x + 90, y: y + 25 },                 // Rapid rise
+    { x: x + width - 30, y: y + 15 },         // Continue rising
+    { x: x + width, y: y }                    // End point
   ];
 
-  // 绘制阴影
+  // Draw shadow
   ctx.fillStyle = shadowColor;
   ctx.beginPath();
   ctx.moveTo(points[0].x + shadowLength, points[0].y);
   for (let i = 1; i < points.length; i++) {
     ctx.lineTo(points[i].x + shadowLength, points[i].y);
   }
-  // 阴影偏移
+  // Shadow offset
   ctx.lineTo(points[points.length - 1].x + shadowLength, points[points.length - 1].y + shadowLength);
   for (let i = points.length - 1; i >= 0; i--) {
     ctx.lineTo(points[i].x + shadowLength, points[i].y + shadowLength);
@@ -139,7 +137,7 @@ const drawTrendLine = (
   ctx.closePath();
   ctx.fill();
 
-  // 绘制主线
+  // Draw main line
   ctx.strokeStyle = lineColor;
   ctx.lineWidth = shadowLength;
   ctx.beginPath();
@@ -149,12 +147,12 @@ const drawTrendLine = (
   }
   ctx.stroke();
 
-  // 箭头参数
+  // Arrow parameters
   const arrowTipX = x + width + 15;
   const arrowBaseX = x + width - 5;
   const arrowOffset = 8;
 
-  // 绘制箭头阴影
+  // Draw arrow shadow
   ctx.fillStyle = shadowColor;
   ctx.beginPath();
   ctx.moveTo(arrowTipX + shadowLength, y + shadowLength);
@@ -162,7 +160,7 @@ const drawTrendLine = (
   ctx.lineTo(arrowBaseX + shadowLength, y + arrowOffset + shadowLength);
   ctx.fill();
 
-  // 绘制箭头
+  // Draw arrow
   ctx.fillStyle = lineColor;
   ctx.beginPath();
   ctx.moveTo(arrowTipX, y);
@@ -170,7 +168,7 @@ const drawTrendLine = (
   ctx.lineTo(arrowBaseX, y + arrowOffset);
   ctx.fill();
 
-  // 返回箭头结束位置，方便定位后续文字
+  // Return arrow end X and center Y
   return {
     arrowEndX: arrowTipX + shadowLength,
     centerY: y + height / 2
@@ -190,26 +188,26 @@ const originalCost = (token: InitiazlizedTokenData) => {
 };
 
 export const drawShareImage = async (token: InitiazlizedTokenData, metadata: TokenMetadataIPFS, discount: string, inputCode: string, currentUrl: string) => {
-  // 加载字体
+  // Load pixel fonts
   await loadPixelFonts();
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
 
-  // 设置画布大小
+  // Set canvas size
   canvas.width = 600;
   canvas.height = 1100;
 
-  // 加载背景图片
+  // Load background image
   const bgImage = new Image();
   bgImage.src = '/images/share_image_bg.png';
 
-  // 等待背景图片加载完成
+  // Wait for background image to load
   await new Promise((resolve) => {
     bgImage.onload = resolve;
   });
 
-  // 绘制背景图片
+  // Draw background image
   ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
 
   // Logo in top-right corner
@@ -222,18 +220,18 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
     logoImage.onload = resolve;
   });
 
-  // 绘制 Logo 图片
-  const logoX = canvas.width - logoWidth - 40; // 距离右边界40像素
-  const logoY = 40; // 距离上边界40像素
+  // Draw Logo image
+  const logoX = canvas.width - logoWidth - 40; // Distance from right edge 40 pixels
+  const logoY = 40; // Distance from top edge 40 pixels
   ctx.drawImage(logoImage, logoX, logoY, logoHeight, logoWidth);
 
-  // 绘制应用名称
+  // Draw application name
   ctx.font = 'bold 24px RetroPixel';
   ctx.fillStyle = '#000000';
-  const textX = logoX - 110; // Logo左侧100像素
+  const textX = logoX - 110; // leave 100 pixels left of logo
   ctx.fillText(APP_NAME, textX, logoY + 24);
 
-  // Token Symbol 和 Name
+  // Token Symbol and Name
   ctx.font = '52px RetroPixelThick';
   ctx.fillText(token.tokenSymbol || 'MOCK', 40, 70);
   ctx.font = '24px RetroPixel';
@@ -251,19 +249,19 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
         tokenImage.onload = resolve;
       });
 
-      // 处理动态图片（GIF/WebP）
+      // For GIF/WebP
       const imageSource = await getFirstFrameFromImage(tokenImage, imageData.imageType);
 
-      // 使用与之前相同的位置和大小
+      // Use the same position and size as before
       const x = 40;
       const y = 120;
       const width = 520;
       const height = 520;
 
-      // 先绘制背景和边框，使用12像素的边框宽度（原来的3倍）
+      // Draw background and border, using 12 pixel border width (original 3x)
       drawPixelRect(ctx, x, y, width, height, '#ffffff', BOX_WIDTH);
 
-      // 在白色背景上居中绘制图片
+      // In the white background, center draw the image
       const scale = Math.min(width / imageSource.width, height / imageSource.height);
       const scaledWidth = imageSource.width * scale - BOX_WIDTH;
       const scaledHeight = imageSource.height * scale - BOX_WIDTH;
@@ -274,13 +272,13 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
 
     } catch (error) {
       console.error('Error loading token image:', error);
-      // 如果图片加载失败，显示默认的空白框
+      // If the image fails to load, show a default blank box
       drawPixelRect(ctx, 40, 120, 520, 520, '#ffffff', BOX_WIDTH);
       ctx.font = '24px RetroPixel';
       ctx.fillText('Token Image', 220, 380);
     }
   } else {
-    // 如果没有图片，显示默认的空白框
+    // If no image, show a default blank box
     drawPixelRect(ctx, 40, 120, 520, 520, '#ffffff', BOX_WIDTH);
     ctx.font = '24px RetroPixel';
     ctx.fillText('Token Image', 220, 380);
@@ -293,14 +291,14 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
   const lineHeight = 24;
   const maxLines = 4;
   const padding = 8;
-  const totalHeight = lineHeight * maxLines + padding * 2; // 8 是上下 padding 的总和
+  const totalHeight = lineHeight * maxLines + padding * 2; // 8 is sum of padding
 
-  // 绘制描述框
+  // Draw description box
   drawPixelRect(ctx, descriptionX, descriptionY, descriptionWidth, totalHeight, '#009866', BOX_WIDTH);
 
-  // 绘制描述文本
+  // Draw description text
   if (metadata?.description) {
-    ctx.fillStyle = '#FFFFFF'; // 设置白色字体
+    ctx.fillStyle = '#FFFFFF'; // Set white text
     drawMultiLineText(
       ctx,
       metadata.description,
@@ -311,10 +309,10 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
       maxLines,
       padding
     );
-    ctx.fillStyle = '#000000'; // 恢复黑色字体，用于后续文字
+    ctx.fillStyle = '#000000'; // Restore black text, for future text
   }
 
-  // 信息区域
+  // Information area
   const infoY = 790;
   // Max supply
   const maxSupply = calculateMaxSupply(token.epochesPerEra, token.initialTargetMintSizePerEpoch, token.reduceRatio);
@@ -340,10 +338,10 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
   ctx.font = 'bold 24px RetroPixel';
   ctx.fillText(formatSeconds(mintSpeed), 400, infoY + 45);
 
-  // 价格信息
+  // Price information
   const priceY = 920;
 
-  // 绘制走势图
+  // Draw trend line
   const chartX = 40;
   const chartY = priceY - 20;
   const chartWidth = 120;
@@ -351,23 +349,23 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
 
   const { arrowEndX } = drawTrendLine(ctx, chartX, chartY, chartWidth, chartHeight);
 
-  // 绘制难度涨幅
+  // Draw difficulty change
   const difficultyChange = ((currentCost(token) / originalCost(token) - 1) * 100).toFixed(1);
   ctx.font = 'bold 32px RetroPixel';
   ctx.fillStyle = '#000000';
   ctx.fillText(`+${difficultyChange}%`, arrowEndX + 15, priceY);
 
-  // 添加难度说明
+  // Draw difficulty description
   ctx.font = '18px RetroPixel';
   ctx.fillStyle = '#333333';
   ctx.fillText('Mint cost increased', arrowEndX + 15, priceY + 20);
 
-  // 绘制URC折扣
+  // Draw URC discount
   ctx.font = 'bold 28px RetroPixel';
   ctx.fillStyle = '#ff0000';
   ctx.fillText(`-${discount}%`, arrowEndX + 15, priceY + 60);
 
-  // 添加URC说明
+  // Draw URC description
   ctx.font = '18px RetroPixel';
   ctx.fillStyle = '#333333';
   ctx.fillText('URC discount', arrowEndX + 15, priceY + 80);
@@ -377,13 +375,13 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
   ctx.fillStyle = '#000000';
   ctx.fillText(`${Number(token.feeRate) / LAMPORTS_PER_SOL} SOL to get ${(new BN(token.mintSizeEpoch)).div(BN_LAMPORTS_PER_SOL).toString()} ${token.tokenSymbol}s`, 40, priceY + 110);
 
-  // 时间戳
+  // Time stamp
   const now = new Date();
   ctx.font = '16px RetroPixel';
   ctx.fillStyle = '#333333';
   ctx.fillText(`@ ${now.toLocaleString()}`, 40, priceY + 140);
 
-  // 二维码
+  // Bar code
   const qrWrapper = document.createElement('div');
   ReactDOM.render(
     React.createElement(QRCodeSVG, {
@@ -404,7 +402,7 @@ export const drawShareImage = async (token: InitiazlizedTokenData, metadata: Tok
       img.onload = resolve;
     });
 
-    // 绘制二维码容器
+    // Draw bar code container
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(420, priceY - 30, 140, 140);
     drawPixelRect(ctx, 420, priceY - 30, 140, 140, '#ffffff');

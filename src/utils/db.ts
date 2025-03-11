@@ -13,7 +13,7 @@ export const createBlobUrl = (data: ArrayBuffer | Blob, type: string = 'image/pn
 };
 
 export const detectImageType = (buffer: Buffer): string | null => {
-  // 检查文件头部字节来判断图片类型
+  // Check image format based on the first 12 bytes
   const header = buffer.slice(0, 12);
 
   // JPEG signature: FF D8 FF
@@ -54,7 +54,7 @@ export const detectImageType = (buffer: Buffer): string | null => {
     return 'image/avif';
   }
 
-  // 如果无法识别，返回null
+  // return null if image data not recognized
   return null;
 }
 
@@ -68,7 +68,6 @@ export const openDB = (): Promise<IDBDatabase> => {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      // 创建所有需要的stores
       if (!db.objectStoreNames.contains(STORE_NAME_IMAGE)) {
         const objectStore = db.createObjectStore(STORE_NAME_IMAGE, { keyPath: 'url' });
         objectStore.createIndex('timestamp', 'timestamp', { unique: false });
@@ -165,7 +164,7 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
 
     let url = STORAGE === "arweave" ? generateArweaveUrl(metadataTimestamp, itemId) : generateIrysUrl(metadataTimestamp, itemId);
 
-    // 获取二进制图片数据
+    // Get image data in binary
     const imageResponse = await axios.get(url, {
       responseType: 'arraybuffer'
     });
@@ -174,10 +173,10 @@ export const fetchImageFromUrlOrCache = async (imageUrl: string, metadataTimesta
       throw new Error('Failed to fetch image');
     }
 
-    // 将arraybuffer转换为Buffer
+    // Convert response data to Buffer
     const imageBuffer = Buffer.from(imageResponse.data);
 
-    // 检测图片格式
+    // Check image format
     const imageType = detectImageType(imageBuffer);
     if (!imageType) {
       throw new Error('Invalid image format');

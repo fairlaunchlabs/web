@@ -34,7 +34,7 @@ export const ReferralCodeModal: FC<ReferralCodeModalProps> = ({
       if (myReferrerCode !== "" && myReferrerCode !== null) {
         getMyReferrerData(wallet, connection, new PublicKey(token.mint), myReferrerCode).then((data) => {
           if (data?.success) setReferralData(data.data);
-          else toast.error(data.message as string);
+          // else toast.error(data.message as string);
         });
       }
       getSystemConfig(wallet, connection).then((data) => {

@@ -125,7 +125,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
   const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newPageSize = Number(event.target.value);
     setPageSize(newPageSize);
-    setCurrentPage(1); // 切换页面大小时重置到第一页
+    setCurrentPage(1); 
   };
 
   const totalPages = Math.ceil(totalCount / pageSize);

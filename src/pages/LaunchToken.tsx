@@ -4,7 +4,6 @@ import { LaunchTokenFormProps, TokenMetadata } from '../types/types';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Metrics } from '../components/launchToken/Metrics';
 import { SocialInformation } from '../components/launchToken/SocialInformation';
-import { AdvancedSettings } from '../components/launchToken/AdvancedSettings';
 import { ToggleSwitch } from '../components/common/ToggleSwitch';
 import { TokenImageUpload } from '../components/launchToken/TokenImageUpload';
 import toast from 'react-hot-toast';
@@ -25,10 +24,8 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  // const [showAdvanced, setShowAdvanced] = useState(false);
   const [decimals, setDecimals] = useState(9);
 
-  // 社交信息状态
   const [showSocial, setShowSocial] = useState(false);
   const [website, setWebsite] = useState('');
   const [twitter, setTwitter] = useState('');
@@ -37,7 +34,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
   const [github, setGithub] = useState('');
   const [medium, setMedium] = useState('');
 
-  // 高级设置状态
   const [mode, setMode] = useState('standard');
   const [targetEras, setTargetEras] = useState(DEFAULT_PARAMS[mode].targetEras);
   const [epochesPerEra, setEpochesPerEra] = useState(DEFAULT_PARAMS[mode].epochesPerEra);
@@ -133,7 +129,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
     });
 
     try {
-      // 调用合约创建代币
       if (!wallet) {
         throw new Error('Please connect your wallet first');
       }
@@ -221,7 +216,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
   };
 
   const validateFormData = (): { isValid: boolean; error: string } => {
-    // 转换为数字进行比较
     const liquidityRatio = parseFloat(liquidityTokensRatio);
     const reduceRatioNum = parseFloat(reduceRatio);
     const epochesPerEraNum = parseFloat(epochesPerEra);
@@ -400,7 +394,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
               <div className='text-xs'>mint fee 0.01 SOL</div>
             </div>
           </div>
-          {/* Advanced setting ###### */}
           {/* <div className="mt-6">
             <ToggleSwitch
               id="toggleAdvanced"
@@ -447,7 +440,6 @@ export const LaunchTokenForm: FC<LaunchTokenFormProps> = ({ expanded }) => {
           <div className='h-8'></div>
         </form>
 
-        {/* 计算结果显示框 */}
         <div className="md:mt-6">
           <Metrics
             mode={mode}

@@ -375,7 +375,10 @@ export type FairMintToken = {
                   110,
                   102,
                   105,
-                  103
+                  103,
+                  95,
+                  118,
+                  49
                 ]
               },
               {
@@ -1016,6 +1019,9 @@ export type FairMintToken = {
               }
             ]
           }
+        },
+        {
+          "name": "systemConfigAccount"
         },
         {
           "name": "tokenVault",
@@ -2616,7 +2622,10 @@ export type FairMintToken = {
                   110,
                   102,
                   105,
-                  103
+                  103,
+                  95,
+                  118,
+                  49
                 ]
               },
               {
@@ -2659,6 +2668,30 @@ export type FairMintToken = {
         {
           "name": "customizedDeployFee",
           "type": "u64"
+        },
+        {
+          "name": "initPoolWsolAmount",
+          "type": "u64"
+        },
+        {
+          "name": "graduateFeeRate",
+          "type": "u64"
+        },
+        {
+          "name": "maxGraduateFee",
+          "type": "u64"
+        },
+        {
+          "name": "raydiumCpmmCreateFee",
+          "type": "u64"
+        },
+        {
+          "name": "transferFeeBasisPoints",
+          "type": "u16"
+        },
+        {
+          "name": "isPause",
+          "type": "bool"
         }
       ]
     },
@@ -3460,6 +3493,11 @@ export type FairMintToken = {
       "code": 6087,
       "name": "invalidMintTokenVault",
       "msg": "Invalid mint token vault"
+    },
+    {
+      "code": 6088,
+      "name": "launchTokenPaused",
+      "msg": "Launch token paused"
     }
   ],
   "types": [
@@ -4167,6 +4205,30 @@ export type FairMintToken = {
           {
             "name": "customizedDeployFee",
             "type": "u64"
+          },
+          {
+            "name": "initPoolWsolAmount",
+            "type": "u64"
+          },
+          {
+            "name": "graduateFeeRate",
+            "type": "u64"
+          },
+          {
+            "name": "maxGraduateFee",
+            "type": "u64"
+          },
+          {
+            "name": "raydiumCpmmCreateFee",
+            "type": "u64"
+          },
+          {
+            "name": "transferFeeBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "isPause",
+            "type": "bool"
           }
         ]
       }

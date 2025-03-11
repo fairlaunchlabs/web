@@ -36,10 +36,8 @@ export const DexStatusBar:FC<DexStatusBarProps> = ({
       }
     };
 
-    // 初始获取数据
     fetchEpochInfo();
 
-    // 每分钟更新一次
     const interval = setInterval(fetchEpochInfo, 60000);
     return () => clearInterval(interval);
   }, [connection, openTime]);

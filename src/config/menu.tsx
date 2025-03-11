@@ -12,15 +12,14 @@ import { MenuItem } from '../types/types';
 import { CheckURC } from '../components/tools/CheckURC';
 import { MyUniqueReferralCode } from '../components/tools/MyUniqueReferralCode';
 import { AskAI } from '../pages/AskAI';
-import { SocialDeveloper } from '../pages/SocialDeveloper';
-import { SocialURCProvider } from '../pages/SocialURCProvider';
-import { SocialValueManager } from '../pages/SocialValueManager';
 import { MyDeployments } from '../pages/MyDeployments';
 import { CreateLiquidityPool } from '../pages/CreateLiquidityPool';
 import { ManageLiquidity } from '../pages/ManageLiquidity';
-import { ClaimTokens } from '../pages/ClaimTokens';
 import { DelegatedTokens } from '../pages/DelegatedTokens';
 import { TradingBot } from '../pages/TradingBot';
+import { SocialFeed } from '../pages/SocialFeed';
+import { SocialProfile } from '../pages/SocialProfile';
+import { SocialExplore } from '../pages/SocialExplore';
 
 export const menuItems = (expended: boolean, hasDelegatedTokens: boolean): MenuItem[] => [
   {
@@ -72,13 +71,6 @@ export const menuItems = (expended: boolean, hasDelegatedTokens: boolean): MenuI
         icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 4h6v8H2V4h2zm4 6V6H4v4h4zm14-4H12v2h10V6zm0 4H12v2h10v-2zm0 4v2H2v-2h20zm0 6v-2H2v2h20z" fill="currentColor" /> </svg>,
         component: <MyDeployments expanded={expended} />
       },
-      {
-        id: 'claim-tokens',
-        label: 'Claim Tokens',
-        visible: false,
-        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M11 1H9v2h2v2H5v2H3v10h2v2h2v-2H5V7h6v2H9v2h2V9h2V7h2V5h-2V3h-2V1zm8 4h-2v2h2v10h-6v-2h2v-2h-2v2h-2v2H9v2h2v2h2v2h2v-2h-2v-2h6v-2h2V7h-2V5z" fill="currentColor" /> </svg>,
-        component: <ClaimTokens expanded={expended} />
-      }
     ]
   },
   {
@@ -126,26 +118,47 @@ export const menuItems = (expended: boolean, hasDelegatedTokens: boolean): MenuI
     component: null,
     subItems: [
       {
-        id: 'social-developer',
-        label: 'Developer', // here you can find and follow developers who launch tokens
-        visible: true,
-        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M11 4h2v2h-2V4zM9 8V6h2v2H9zm0 0v2H7V8h2zm6 0h-2V6h2v2zm0 0h2v2h-2V8zm-6 8H7v-2h2v2zm2 2H9v-2h2v2zm2 0v2h-2v-2h2zm2-2h-2v2h2v-2zm0 0v-2h2v2h-2z" fill="currentColor" /> </svg>,
-        component: <SocialDeveloper expanded={expended} />
-      },
-      {
-        id: 'social-urc-provider',
-        label: 'URC provider', // here you can find URC providers
-        visible: true,
-        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M6 4h14v2h2v6h-8v2h6v2h-4v2h-2v2H2V8h2V6h2V4zm2 6h2V8H8v2z" fill="currentColor" /> </svg>,
-        component: <SocialURCProvider expanded={expended} />
-      },
-      {
-        id: 'social-value-manager',
-        label: 'Value Manager', // here you can find Value manager to manage the token value
+        id: 'social-feed',
+        label: 'Activities', // here you can find and follow developers who launch tokens
         visible: true,
         icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2H2v8h2V2zm16 0h2v8h-2V2zm-6 6h-4V2H4v2h4v4H4v2h4v4H4v2h4v4H4v2h6v-6h4v6h2v-6h4v-2h-4v-4h4V8h-4V2h-2v6zm-4 6v-4h4v4h-4zM20 2h-4v2h4V2zM2 14h2v8H2v-8zm14 6h4v2h-4v-2zm6-6h-2v8h2v-8z" fill="currentColor" /> </svg>,
-        component: <SocialValueManager expanded={expended} />
+        component: <SocialFeed expanded={expended} />
+      },
+      {
+        id: 'social-explore',
+        label: 'Explore', // here you can find and follow developers who launch tokens
+        visible: true,
+        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M6 4h14v2h2v6h-8v2h6v2h-4v2h-2v2H2V8h2V6h2V4zm2 6h2V8H8v2z" fill="currentColor" /> </svg>,
+        component: <SocialExplore expanded={expended} />
+      },
+      {
+        id: 'social-profile',
+        label: 'Profile', // here you can find and follow developers who launch tokens
+        visible: true,
+        icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M11 4h2v2h-2V4zM9 8V6h2v2H9zm0 0v2H7V8h2zm6 0h-2V6h2v2zm0 0h2v2h-2V8zm-6 8H7v-2h2v2zm2 2H9v-2h2v2zm2 0v2h-2v-2h2zm2-2h-2v2h2v-2zm0 0v-2h2v2h-2z" fill="currentColor" /> </svg>,
+        component: <SocialProfile expanded={expended} />
       }
+      // {
+      //   id: 'social-developer',
+      //   label: 'Developer', // here you can find and follow developers who launch tokens
+      //   visible: true,
+      //   icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M11 4h2v2h-2V4zM9 8V6h2v2H9zm0 0v2H7V8h2zm6 0h-2V6h2v2zm0 0h2v2h-2V8zm-6 8H7v-2h2v2zm2 2H9v-2h2v2zm2 0v2h-2v-2h2zm2-2h-2v2h2v-2zm0 0v-2h2v2h-2z" fill="currentColor" /> </svg>,
+      //   component: <SocialDeveloper expanded={expended} />
+      // },
+      // {
+      //   id: 'social-urc-provider',
+      //   label: 'URC provider', // here you can find URC providers
+      //   visible: true,
+      //   icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M6 4h14v2h2v6h-8v2h6v2h-4v2h-2v2H2V8h2V6h2V4zm2 6h2V8H8v2z" fill="currentColor" /> </svg>,
+      //   component: <SocialURCProvider expanded={expended} />
+      // },
+      // {
+      //   id: 'social-value-manager',
+      //   label: 'Value Manager', // here you can find Value manager to manage the token value
+      //   visible: true,
+      //   icon: <svg className='w-5 h-5' fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M4 2H2v8h2V2zm16 0h2v8h-2V2zm-6 6h-4V2H4v2h4v4H4v2h4v4H4v2h4v4H4v2h6v-6h4v6h2v-6h4v-2h-4v-4h4V8h-4V2h-2v6zm-4 6v-4h4v4h-4zM20 2h-4v2h4V2zM2 14h2v8H2v-8zm14 6h4v2h-4v-2zm6-6h-2v8h2v-8z" fill="currentColor" /> </svg>,
+      //   component: <SocialValueManager expanded={expended} />
+      // }
     ]
   },
   {

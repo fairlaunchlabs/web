@@ -1,18 +1,27 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { queryInitializeTokenEventBySearch } from '../utils/graphql';
-import { InitiazlizedTokenData, TokenDetailProps } from '../types/types';
+import { InitiazlizedTokenData, TokenDetailProps, OrderedToken } from '../types/types';
 import { TokenInfo } from '../components/tokenDetails/TokenInfo';
+import { useAuth } from '../utils/contexts';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
 import { TokenMintTransactions } from '../components/tokenDetails/TokenMintTransactions';
 import { TokenHolders } from '../components/tokenDetails/TokenHolders';
 import { TokenRefundTransactions } from '../components/tokenDetails/TokenRefundTransactions';
 import { ErrorBox } from '../components/common/ErrorBox'; import { useDeviceType } from '../utils/contexts';
 import { SEARCH_CACHE_ITEMS } from '../config/constants';
+import { useState } from 'react';
+import { CommentBox } from '../components/social/CommentBox';
+import { getTokenDataByMint } from '../utils/user';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
   const { tokenMintAddress, referrerCode } = useParams();
+  const [tokenData, setTokenData] = useState<OrderedToken | null>(null);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [mint, setMint] = useState<string | null>(null);
+  const { token: userToken } = useAuth();
+
   // console.log('referrerCode', referrerCode);
   const { loading, error, data } = useQuery(queryInitializeTokenEventBySearch, {
     variables: {
@@ -25,6 +34,11 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
 
   const { isMobile } = useDeviceType();
 
+  const fetchTokenData = async () => {
+    const tokenData = await getTokenDataByMint(userToken as string, mint as string);
+    setTokenData(tokenData);
+  }
+
   const saveToHistory = (term: string) => {
     const history = localStorage.getItem('search_history');
     if (history) {
@@ -33,6 +47,16 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
       localStorage.setItem('search_history', JSON.stringify(newHistory));
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      const _mint = (data?.initializeTokenEventEntities as InitiazlizedTokenData[])[0].mint;
+      setMint(_mint);
+      getTokenDataByMint(userToken as string, _mint).then((_tokenData: OrderedToken) => {
+        setTokenData(_tokenData);
+      })
+    }
+  }, [data])
 
   if (loading) {
     return (
@@ -89,19 +113,39 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
   }
 
   saveToHistory((token as InitiazlizedTokenData).tokenSymbol as string);
+  // if(!fetchedTokenData.current) fetchTokenData();
 
   return (
     <div className={`container mx-auto py-6 md:mb-20 ${expanded ? 'md:ml-64' : 'md:ml-20'}`}>
       <div className="md:max-w-6xl mx-auto space-y-6">
-        <TokenInfo token={token as InitiazlizedTokenData} referrerCode={referrerCode} />
+        <TokenInfo 
+          token={token as InitiazlizedTokenData} 
+          referrerCode={referrerCode} 
+          tokenData={tokenData} 
+          fetchTokenData={fetchTokenData} 
+          isCommentOpen={isCommentOpen} 
+          setIsCommentOpen={setIsCommentOpen} 
+        />
         {hasStarted && (
           <div>
             <TokenCharts token={token as InitiazlizedTokenData} height={isMobile ? 360 : 560} />
             <TokenHolders token={token as InitiazlizedTokenData} />
             <TokenMintTransactions token={token as InitiazlizedTokenData} />
             <TokenRefundTransactions token={token as InitiazlizedTokenData} />
-          </div>)}
+          </div>
+        )}
       </div>
+      {/* Comments */}
+      {isCommentOpen &&
+        <div className="bg-white">
+          <CommentBox
+            setIsOpen={setIsCommentOpen}
+            token={userToken as string}
+            orderedData={tokenData as OrderedToken}
+            type={'token'}
+            expanded={expanded}
+          />
+        </div>}
     </div>
   );
 };

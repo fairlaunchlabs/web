@@ -110,7 +110,7 @@ export function ManageLiquidity({
     console.log("fetch all data...");
 
     try {
-      // 先等待2秒，确保链上数据已更新
+      // Waiting 2 seconds for chain data sync
       await sleep(2000);
       
       const queryParams = {

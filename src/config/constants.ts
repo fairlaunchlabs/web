@@ -46,7 +46,6 @@ export const DEFAULT_PARAMS = {
 } as Record<string, TokenParams>;
 
 
-export const STORAGE = "irys" as "irys" | "arweave";
 // export const FAIR_MINT_PROGRAM_ID = '3Jx2Y5q4Jgc9fWEwVdyDSSw5vKFCN7a6MVwbNKvcLNZv';
 export const FAIR_MINT_PROGRAM_ID = '8GM2N7qQjzMyhqewu8jpDgzUh2BJbtBxSY1WzSFeFm6U';
 export const SYSTEM_DEPLOYER = 'CXzddeiDgbTTxNnd1apeUGE7E1UAdvBoysf7c271AA79';
@@ -61,7 +60,7 @@ export const FREEZE_SEED = "freeze";
 export const MINT_STATE_SEED = "mint_state";
 export const REFERRAL_SEED = "referral";
 export const REFUND_SEEDS = "refund";
-export const SYSTEM_CONFIG_SEEDS = "system_config";
+export const SYSTEM_CONFIG_SEEDS = "system_config_v1.1";
 export const REFERRAL_CODE_SEED = "referral_code";
 export const CODE_ACCOUNT_SEEDS = "code_account";
 export const MINT_VAULT_OWNER_SEEDS = "mint-vault-owner";
@@ -82,19 +81,28 @@ export const memoProgram = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLG
 export const addressLookupTableAddress = new PublicKey("EebRqpLtUgjX17pJJNNbd6ngtYa34VGa51oYsibwJRXy");
 export const slotsOfEstimatingInterval = 250; // localnet and devnet must be 250, mainnet suggest to be 3000000
 export const subgraphUrl = 'https://api.studio.thegraph.com/query/61629/proof_of_mint/version/latest'
-export const LOCAL_STORAGE_KEY_EXPANDED = 'sidebar_expanded_menus';
-export const LOCAL_STORAGE_KEY_THEME = 'pom-theme';
-export const LOCAL_STORAGE_MY_REFERRAL_CODE = 'my_referral_code';
+
+export const LOCAL_STORAGE_KEY_EXPANDED = 'flipflop_sidebar_expanded_menus';
+export const LOCAL_STORAGE_KEY_THEME = 'flipflop_theme';
+export const LOCAL_STORAGE_MY_REFERRAL_CODE = 'flipflop_my_referral_code';
+export const LOCAL_STORAGE_AUTH_TOKEN = 'flipflop_token';
+export const LOCAL_STORAGE_HISTORY_CACHE_PREFIX = 'flipflop_mint_history_';
+export const LOCAL_STORAGE_HISTORY_CACHE_EXPIRY = 24 * 60 * 60 * 1000;
+export const DEFAULT_IMAGE = "/images/flip-flops-outline.png";
+export const COMMENT_MIN_BALANCE = 0.2;
+
 export const NETWORK = 'devnet';
 export const IRYS_NETWORK = 'devnet';
 // export const SCANURL = 'https://solscan.io';
 export const SCANURL = 'https://explorer.solana.com';
-export const LOCAL_STORAGE_HISTORY_CACHE_PREFIX = 'mint_history_';
-export const LOCAL_STORAGE_HISTORY_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24小时的缓存时间
 
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
-// export const UPLOAD_API_URL = "http://localhost:8000/arweave"; // DEVELOPMENT
-export const UPLOAD_API_URL = STORAGE === "arweave" ? "https://flipflop-api.vercel.app/arweave" : "https://flipflop-api.vercel.app/irys"; // PRODUCTION
+export const API_BASE_URI = "http://64.7.198.109:8000"; // https://flipflop-api.vercel.app
+export const STORAGE = "irys" as "irys" | "arweave";
+export const UPLOAD_API_URL = STORAGE === "arweave" ? `${API_BASE_URI}/arweave` : `${API_BASE_URI}/irys`; // PRODUCTION
+export const COPILOTKIT_RUNTIME_URL = `${API_BASE_URI}/gpt/copilotkit`;
+export const API_URL = `${API_BASE_URI}/api`;
+
 export const ARWEAVE_GATEWAY_URL = "https://arweave.net";
 export const ARSEEDING_GATEWAY_URL = "https://arseed.web3infra.dev";
 export const ARWEAVE_DEFAULT_SYNC_TIME = 2 * 60 * 60;
@@ -105,9 +113,8 @@ export const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image
 export const MAX_AVATAR_FILE_SIZE = 0.25 * 1024 * 1024; // 1MB
 export const MAX_HEADER_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
-// export const COPILOTKIT_RUNTIME_URL = "http://127.0.0.1:8000/gpt/copilotkit";
-export const COPILOTKIT_RUNTIME_URL = "https://flipflop-api.vercel.app/gpt/copilotkit";
 export const U32_MAX = 4294967295;
+export const WALLET_SIGN_MESSAGE = 'Welcome to flipflop!';
 
 export const tooltip = {
     currentEra: "The current milestone in the token's lifecycle",

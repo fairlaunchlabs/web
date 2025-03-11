@@ -22,20 +22,16 @@ import { Footer } from './components/common/Footer';
 import { menuItems } from './config/menu';
 import { TokenDetail } from './pages/TokenDetail';
 import { APP_NAME, COPILOTKIT_RUNTIME_URL } from './config/constants';
-import { Providers, useDeviceType } from './utils/contexts';
+import { AuthProvider, Providers, useDeviceType } from './utils/contexts';
 import { Discover } from './pages/Discover';
 import { MyMintedTokens } from './pages/MyMintedTokens';
 import { MyDeployments } from './pages/MyDeployments';
 import { AskAI } from './pages/AskAI';
-import { SocialDeveloper } from './pages/SocialDeveloper';
-import { SocialURCProvider } from './pages/SocialURCProvider';
-import { SocialValueManager } from './pages/SocialValueManager';
 import { LaunchTokenForm } from './pages/LaunchToken';
 import { CheckURC } from './components/tools/CheckURC';
 import { MyUniqueReferralCode } from './components/tools/MyUniqueReferralCode';
 import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
 import { ManageLiquidity } from './pages/ManageLiquidity';
-import { ClaimTokens } from './pages/ClaimTokens';
 import { DelegatedTokens } from './pages/DelegatedTokens';
 import { TradingBot } from './pages/TradingBot';
 import { useQuery } from '@apollo/client';
@@ -43,6 +39,10 @@ import { queryMyDelegatedTokens } from './utils/graphql';
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
 import { MyCopilotKit } from './components/agent/MyCopilotKit';
+import { SocialFeed } from './pages/SocialFeed';
+import { SocialProfile } from './pages/SocialProfile';
+import { SocialExplore } from './pages/SocialExplore';
+import { SocialUserDetails } from './pages/SocialUserDetails';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -98,9 +98,7 @@ const AppContent = () => {
           isMenuOpen={isSidebarOpen}
         />
 
-        {/* 主要内容区域 */}
         <div className="flex-1 flex flex-col md:flex-row mt-16">
-          {/* 移动端遮罩层 */}
           {isSidebarOpen && (
             <div
               className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
@@ -108,7 +106,6 @@ const AppContent = () => {
             />
           )}
 
-          {/* 侧边栏容器 */}
           <div className={`
                         fixed md:top-16 inset-y-0 left-0 z-30
                         transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -127,7 +124,6 @@ const AppContent = () => {
             />
           </div>
 
-          {/* 内容区域 */}
           <div className="flex-1 p-4 md:p-8 pb-20">
             <Routes>
               <Route path="/" element={<Discover expanded={expanded} />} />
@@ -145,12 +141,12 @@ const AppContent = () => {
               <Route path="/check-urc" element={<CheckURC expanded={expanded} />} />
               <Route path="/my-urc" element={<MyUniqueReferralCode expanded={expanded} />} />
               <Route path="/ask-ai" element={<AskAI expanded={expanded} />} />
-              <Route path="/social-developer" element={<SocialDeveloper expanded={expanded} />} />
-              <Route path="/social-urc-provider" element={<SocialURCProvider expanded={expanded} />} />
-              <Route path="/social-value-manager" element={<SocialValueManager expanded={expanded} />} />
+              <Route path="/social-explore" element={<SocialExplore expanded={expanded} />} />
               <Route path="/token/:tokenMintAddress" element={<TokenDetail expanded={expanded} />} />
               <Route path="/token/:tokenMintAddress/:referrerCode" element={<TokenDetail expanded={expanded} />} />
-              <Route path="/claim-tokens" element={<ClaimTokens expanded={expanded} />} />
+              <Route path="/social-feed" element={<SocialFeed expanded={expanded} />} />
+              <Route path="/social-profile" element={<SocialProfile expanded={expanded} />} />
+              <Route path="/social-user-details/:address" element={<SocialUserDetails expanded={expanded} />} />
             </Routes>
           </div>
         </div>
@@ -167,7 +163,6 @@ const AppContent = () => {
   );
 };
 
-// 主 App 组件
 function App() {
   const network = process.env.REACT_APP_SOLANA_NETWORK as WalletAdapterNetwork;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
@@ -180,23 +175,25 @@ function App() {
   );
 
   return (
-    <Router>
-      <CopilotKit runtimeUrl={COPILOTKIT_RUNTIME_URL}>
-        <ConnectionProvider endpoint={endpoint}>
-          <WalletProvider
-            wallets={wallets}
-            autoConnect
-            onError={(error: Error) => {
-              console.error('Wallet error:', error);
-            }}
-          >
-            <WalletModalProvider>
-              <AppContent />
-            </WalletModalProvider>
-          </WalletProvider>
-        </ConnectionProvider>
-      </CopilotKit>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <CopilotKit runtimeUrl={COPILOTKIT_RUNTIME_URL}>
+          <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider
+              wallets={wallets}
+              autoConnect
+              onError={(error: Error) => {
+                console.error('Wallet error:', error);
+              }}
+            >
+              <WalletModalProvider>
+                <AppContent />
+              </WalletModalProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        </CopilotKit>
+      </Router>
+    </AuthProvider>
   );
 }
 

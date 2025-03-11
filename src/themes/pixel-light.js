@@ -1,37 +1,37 @@
 const pixelLight = {
-    // 主色调
-    "primary": "#FFD43B",        // 主按钮黄色
+    // Primary color
+    "primary": "#FFD43B",
     "primary-focus": "#FCC419",
-    "primary-content": "#000000", // 黑色文字
+    "primary-content": "#000000",
 
-    // 次要颜色
-    "secondary": "#FF00F5",      // 次要颜色背景
+    // Secondary color
+    "secondary": "#FF00F5",
     "secondary-focus": "#D303CC",
     "secondary-content": "#FFFFFF",
 
-    // 强调色
-    "accent": "#FF4911",        // 橙色强调
+    // Accent color
+    "accent": "#FF4911",
     "accent-focus": "#FA4007",
     "accent-content": "#FFFFFF",
 
-    // 中性色
-    "neutral": "#F5F0E6",       // 浅米色
+    // Neutral color
+    "neutral": "#F5F0E6",
     "neutral-focus": "#EBE6DC",
     "neutral-content": "#000000",
 
-    // 基础颜色 - 使用浅米黄色系列
-    "base-100": "#FDF8EF",      // 主背景色（最浅米黄）
-    "base-200": "#F5F0E6",      // 次背景色（浅米黄）
-    "base-300": "#EBE6DC",      // 深背景色（中等米黄）
-    "base-content": "#000000",   // 文本颜色
+    // Base color - use light yellow
+    "base-100": "#FDF8EF",
+    "base-200": "#F5F0E6",
+    "base-300": "#EBE6DC",
+    "base-content": "#000000",
 
-    // 功能色
+    // Functions colors
     "info": "#7DF9FF",
     "success": "#2FFF2F",
     "warning": "#FFD43B",
     "error": "#FF4911",
     
-    // 按钮
+    // Button
     ".btn": {
       "border": "2px solid #000000",
       "box-shadow": "3px 3px 0 0 #000000",
@@ -58,6 +58,15 @@ const pixelLight = {
       "&:hover": {
         "background-color": "#D303CC",
         "color": "#FFFFFF",
+      }
+    },
+
+    ".btn-outline": {
+      "background-color": "#FFFFFF",
+      "color": "#000000",
+      "&:hover": {
+        "background-color": "#ffffff",
+        "color": "#000000",
       }
     },
 
@@ -282,17 +291,17 @@ const pixelLight = {
         }
       },
 
-      // 紧凑模式
+      // Compact mode
       "&.pixel-table-compact": {
         "& th, & td": {
           "padding": "0.25rem"
         }
       },
-      // 斑马条纹
+      // Zebra
       "&.pixel-table-zebra tbody tr:nth-child(even)": {
         "background-color": "#F8F9FA"
       },
-      // 边框模式
+      // Border mode
       "&.pixel-table-bordered": {
         "& th, & td": {
           "border": "2px solid #000000"
@@ -374,7 +383,7 @@ const pixelLight = {
       "color": "#FFFFFF",
     },
 
-    // 卡片标题
+    // Card title
     ".pixel-card-title": {
       "font-size": "1.25rem",
       "font-weight": "600",
@@ -382,7 +391,7 @@ const pixelLight = {
       "margin-bottom": "0.5rem"
     },
 
-    // RetroUI 特色样式设置
+    // RetroUI
     "--rounded-box": "0px",
     "--rounded-btn": "0px",
     "--rounded-badge": "0px",
@@ -394,7 +403,7 @@ const pixelLight = {
     "--tab-border": "3px",
     "--tab-radius": "0",
 
-    // 进度条样式
+    // Progress
     ".pixel-progress": {
       "height": "1.5rem",
       "border": "2px solid #000000",

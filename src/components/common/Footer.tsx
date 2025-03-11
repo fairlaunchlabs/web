@@ -12,8 +12,6 @@ export const Footer: React.FC = () => {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         const scrollTop = window.scrollY;
-
-        // 当滚动到距离底部300px时显示Footer
         const showThreshold = documentHeight - windowHeight - 300;
         setIsVisible(scrollTop >= showThreshold);
       } else {
@@ -22,7 +20,6 @@ export const Footer: React.FC = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    // 初始检查
     handleScroll();
 
     return () => {

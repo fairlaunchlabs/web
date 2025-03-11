@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { InitiazlizedTokenData, TokenMetadataIPFS } from "../../types/types";
+import { InitiazlizedTokenData, OrderedToken, TokenMetadataIPFS } from "../../types/types";
 import { DataBlock } from "./TokenInfo";
 import { tooltip } from "../../config/constants";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -9,12 +9,12 @@ import { AddressDisplay } from "../common/AddressDisplay";
 export type TokenInfoDataProps = {
   token: InitiazlizedTokenData,
   metadata: TokenMetadataIPFS,
-  hasStarted: boolean
+  hasStarted: boolean,
 }
 export const TokenInfoData: FC<TokenInfoDataProps> = ({
   token,
   metadata,
-  hasStarted
+  hasStarted,
 }) => {
   const mintedSupply = useMemo(() => {
     return getMintedSupply(token.supply, token.liquidityTokensRatio);
@@ -179,7 +179,6 @@ export const TokenInfoData: FC<TokenInfoDataProps> = ({
 
       {hasStarted &&
         <div>
-          {/* 进度条 */}
           <div className="mt-8">
             <h3 className="text-xl mb-4 text-base-content">Progress for minted to target supply</h3>
             <div className="text-sm font-medium mb-1 text-base-content">

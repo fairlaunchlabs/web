@@ -83,11 +83,9 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
     } catch (error: any) {
       console.error('Error fetching referral data:', error);
       setIsValidCode(false);
-      // 不显示toast，因为这是在输入过程中的验证
     }
   };
 
-  // 监听code变化
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
       if (code) {
@@ -95,7 +93,7 @@ const MintModal: FC<MintModalProps> = ({ isOpen, onClose, token, referrerCode })
       } else {
         setIsValidCode(false);
       }
-    }, 500); // 500ms防抖
+    }, 500); // 500ms 
 
     return () => clearTimeout(debounceTimeout);
   }, [code, wallet, connection]);

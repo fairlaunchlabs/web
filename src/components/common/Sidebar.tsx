@@ -36,7 +36,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   }, []);
 
-  // 保存展开状态到 localStorage
   const toggleSubMenu = (id: string) => {
     const newExpandedMenus = expandedSubMenus.includes(id)
       ? expandedSubMenus.filter(item => item !== id)
@@ -46,7 +45,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     localStorage.setItem(LOCAL_STORAGE_KEY_EXPANDED, JSON.stringify(newExpandedMenus));
   };
 
-  // 处理展开/收起状态变化
   const handleExpandedChange = (expanded: boolean) => {
     setIsExpanded(expanded);
     onExpandedChange?.(expanded);

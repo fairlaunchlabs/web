@@ -48,7 +48,7 @@ export const Trades: FC<TradesProps> = ({
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
-  // 从localStorage加载slippage
+  // Get slippage from localStorage
   useEffect(() => {
     const savedSlippage = localStorage.getItem(SLIPPAGE_KEY);
     if (savedSlippage) {
@@ -59,7 +59,7 @@ export const Trades: FC<TradesProps> = ({
     }
   }, []);
 
-  // 保存slippage到localStorage
+  // Store slippage into localStorage
   const handleSlippageChange = (value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= MIN_SLIPPAGE && numValue <= MAX_SLIPPAGE) {
@@ -117,7 +117,7 @@ export const Trades: FC<TradesProps> = ({
     }
   };
   
-    // Sell 操作处理
+    // Sell
     const handleSell = async () => {
       if (!tokenData) return;
       setLoading(true);

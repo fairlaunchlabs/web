@@ -55,7 +55,6 @@ query QueryHotInitializeTokenEvent($orderBy: String!) {
     initializeTokenEventEntities(
         where: { status: 1 }
         first: 100 
-        # 需要优化 ######
         orderBy: $orderBy
         orderDirection: desc
     ) {
@@ -222,6 +221,56 @@ query GetInitializedTokenEvents($skip: Int!, $first: Int!, $searchQuery: String!
             ]
         }
         orderBy: difficultyCoefficientEpoch
+        orderDirection: desc
+    ) {
+        id
+        txId
+        admin
+        tokenId
+        mint
+        configAccount
+        metadataAccount
+        tokenVault
+        timestamp
+        tokenName
+        tokenSymbol
+        tokenUri
+        supply
+        currentEra
+        currentEpoch
+        elapsedSecondsEpoch
+        startTimestampEpoch
+        lastDifficultyCoefficientEpoch
+        difficultyCoefficientEpoch
+        mintSizeEpoch
+        quantityMintedEpoch
+        targetMintSizeEpoch
+        totalMintFee
+        totalReferrerFee
+        totalTokens
+        targetEras
+        epochesPerEra
+        targetSecondsPerEpoch
+        reduceRatio
+        initialMintSize
+        initialTargetMintSizePerEpoch
+        feeRate
+        liquidityTokensRatio
+        startTimestamp
+        status
+        metadataTimestamp
+        valueManager
+        wsolVault
+        graduateEpoch
+    }
+}`;
+
+export const queryInitializeTokenEventByMints = gql`
+query GetInitializedTokenEvents($orderBy: String!, $mints: [String!]) {
+    initializeTokenEventEntities(
+        where: { mint_in: $mints, status: 1 }
+        first: 50
+        orderBy: $orderBy
         orderDirection: desc
     ) {
         id

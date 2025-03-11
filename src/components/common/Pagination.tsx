@@ -7,7 +7,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   totalCount,
   pageSize,
   onPageChange,
-  hasMore = true, // 默认为 true
+  hasMore = true,
 }) => {
   return (
     <div className="flex justify-between items-center mt-4">

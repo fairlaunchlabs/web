@@ -366,6 +366,10 @@ export type TokenHoldersProps = {
 export type TokenInfoProps = {
   token: InitiazlizedTokenData;
   referrerCode: string | undefined;
+  tokenData: OrderedToken | null;
+  fetchTokenData: () => void;
+  isCommentOpen: boolean;
+  setIsCommentOpen: (bl: boolean) => void;
 }
 
 export type TokenMintTransactionsProps = {
@@ -462,6 +466,10 @@ export type TokenHeroProps = {
   token: InitiazlizedTokenData;
   metadata: TokenMetadataIPFS;
   referrerCode: string | undefined;
+  tokenData: OrderedToken | null;
+  fetchTokenData: () => void;
+  isCommentOpen: boolean;
+  setIsCommentOpen: (isCommentOpen: boolean) => void;
 }
 
 export type MetadataAccouontData = {
@@ -535,3 +543,87 @@ export type TargetTimestampData = {
   wait: number;
   secondsPerSlot: number;
 }
+
+export type User = {
+  id: number;
+  wallet_address: string;
+  username: string;
+  avatar: string | null;
+  roles: string;
+  email: string | null;
+  bio: string | null;
+  social_links: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Activity = {
+  id: number;
+  userId: number;
+  activityType: 'issue_token' | 'promote' | 'manage' | 'mint' | 'comment' | 'like_comment' | 'unlike_comment' | 'rate' | 'like' | 'unlike' | 'follow' | 'unfollow' | 'join' | 'delete_comment',
+  targetId: string | null;
+  avatar: string | null;
+  targetType: 'token' | 'user' | null;
+  createdAt: string;
+  targetUsername: string | null;
+  targetWalletAddress: string | null;
+  userUsername: string | null;
+  userWalletAddress: string | null;
+  content: string | null;
+};
+
+export enum Role {
+  ISSUER = "issuer", // developer
+  PROMOTER = "promoter", // urc provider
+  MANAGER = "manager", // value manager
+}
+
+export type OrderedUser = {
+  admin: string;
+  role: Role[] | Role;
+  tokenCount: number[] | number;
+  userId: number | null;
+  username?: string | null;
+  email?: string | null;
+  bio?: string | null;
+  socialLinks?: string | null;
+  totalLike: number;
+  totalComments: number;
+  avatar?: string | null;
+  totalFollower: number;
+  totalFollowee: number;
+  isFollowedByMe: boolean;
+  isFollowingMe: boolean;
+  isLikedByMe: boolean;
+  isLikingMe: boolean;
+};
+
+export type OrderedToken = {
+  mint: string,
+  admin: string,
+  userId: number,
+  isFollowedByMe: boolean,
+  isLikedByMe: boolean,
+  tokenName: string,
+  tokenSymbol: string,
+  tokenUri: string,
+  timestamp: string,
+  totalFollowee: number,
+  totalLike: number,
+  totalComments: number,
+  valueManager: string,
+}
+
+export type Comment = {
+  id: number;
+  userId: number;
+  username: string;
+  walletAddress: string;
+  avatar: string;
+  content: string;
+  likes: number;
+  liked: boolean;
+  totalReplies: number;
+  createdAt: string;
+  replies?: Comment[];
+};

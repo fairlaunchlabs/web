@@ -29,7 +29,7 @@ export const LpBurns: FC<LpBurnsProps> = ({
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
-  // Burn LP Token 操作处理
+  // Burn LP Token
   const handleBurnLpToken = async () => {
     if (!tokenData) return;
     setLoading(true);

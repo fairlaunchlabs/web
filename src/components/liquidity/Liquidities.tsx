@@ -46,7 +46,7 @@ export const Liquidities: FC<LiquiditiesProps> = ({
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
 
-  // Add Liquidity 操作处理
+  // Add Liquidity
   const handleAddLiquidity = async () => {
     if (!tokenData) return;
     setLoading(true);
@@ -96,7 +96,7 @@ export const Liquidities: FC<LiquiditiesProps> = ({
     }
   };
 
-  // Remove Liquidity 操作处理
+  // Remove Liquidity
   const handleRemoveLiquidity = async () => {
     if (!tokenData) return;
     setLoading(true);

@@ -23,13 +23,10 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
     },
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
-      // 如果返回的数据少于页面大小，说明没有更多数据
       if (data?.refundEventEntities?.length < pageSize) {
         setHasMore(false);
-        // 计算总数
         setTotalCount((currentPage - 1) * pageSize + data.refundEventEntities.length);
       } else {
-        // 如果有更多数据，至少保证总数大于当前页
         setHasMore(true);
         setTotalCount(Math.max(totalCount, currentPage * pageSize + 1));
       }
@@ -37,7 +34,6 @@ export const TokenRefundTransactions: React.FC<TokenRefundTransactionsProps> = (
   });
 
   useEffect(() => {
-    // 当页面或页面大小变化时重新获取数据
     refetch({
       mint: token.mint,
       skip: (currentPage - 1) * pageSize,

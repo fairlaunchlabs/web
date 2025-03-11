@@ -5,7 +5,6 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  SYSVAR_RENT_PUBKEY,
   Transaction,
   TransactionMessage,
   VersionedTransaction,
@@ -13,7 +12,7 @@ import {
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import fairMintTokenIdl from '../idl/fair_mint_token.json';
 // import transferHookIdl from '../idl/transfer_hook.json';
-import { CONFIG_DATA_SEED, MINT_SEED, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, UPLOAD_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT, IRYS_GATEWAY_URL, STORAGE, cpSwapProgram, cpSwapConfigAddress, createPoolFeeReceive, addressLookupTableAddress, slotsOfEstimatingInterval, METADATA_SEED, TOKEN_METADATA_PROGRAM_ID } from '../config/constants';
+import { CONFIG_DATA_SEED, MINT_SEED, SYSTEM_CONFIG_SEEDS, SYSTEM_DEPLOYER, REFERRAL_SEED, REFUND_SEEDS, REFERRAL_CODE_SEED, CODE_ACCOUNT_SEEDS, ARSEEDING_GATEWAY_URL, UPLOAD_API_URL, ARWEAVE_GATEWAY_URL, ARWEAVE_DEFAULT_SYNC_TIME, PROTOCOL_FEE_ACCOUNT, IRYS_GATEWAY_URL, STORAGE, cpSwapProgram, cpSwapConfigAddress, createPoolFeeReceive, addressLookupTableAddress, slotsOfEstimatingInterval, METADATA_SEED, TOKEN_METADATA_PROGRAM_ID, WALLET_SIGN_MESSAGE } from '../config/constants';
 import { InitializeTokenConfig, InitiazlizedTokenData, MetadataAccouontData, MintExtentionData, RemainingAccount, ResponseData, TargetTimestampData, TokenMetadata, TokenMetadataIPFS, TransferHookState } from '../types/types';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { FairMintToken } from '../types/fair_mint_token';
@@ -26,9 +25,11 @@ import { calculateDepositAmounts, calculateWithdrawAmounts, getPoolData, poolBur
 import { getAuthAddress, getOrcleAccountAddress, getPoolAddress, getPoolLpMintAddress, getPoolVaultAddress } from './raydium_cpmm/pda';
 import { RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@raydium-io/raydium-sdk-v2';
 import { ASSOCIATED_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
+import bs58 from 'bs58';
+import jwt from 'jsonwebtoken';
 
-const getProgram = (wallet: AnchorWallet, connection: Connection) => {
-  const provider = new AnchorProvider(
+const getProvider = (wallet: AnchorWallet, connection: Connection) => {
+  return new AnchorProvider(
     connection,
     {
       ...wallet,
@@ -38,7 +39,10 @@ const getProgram = (wallet: AnchorWallet, connection: Connection) => {
     },
     { commitment: 'confirmed' }
   );
+}
 
+const getProgram = (wallet: AnchorWallet, connection: Connection) => {
+  const provider = getProvider(wallet, connection);
   return new Program(fairMintTokenIdl as FairMintToken, provider);
 }
 
@@ -171,7 +175,6 @@ export const getReferrerCodeHash = (
   };
 }
 
-// 获取钱包余额
 export const getBalance = async (
   connection: Connection,
   publicKey: string
@@ -259,7 +262,7 @@ export const reactiveReferrerCode = async (
   // get referrer ata
   const referrerAta = await getAssociatedTokenAddress(
     mint,
-    wallet.publicKey, // 需要查询账户的公钥
+    wallet.publicKey,
     false,
     TOKEN_PROGRAM_ID
   )
@@ -353,8 +356,6 @@ export const setReferrerCode = async (
   );
   const codeAccountInfo = await connection.getAccountInfo(codeAccountPda);
   if (codeAccountInfo) {
-    // 如果codeAccountInfo存在，说明code已经被使用
-    // 检查该code的所有者是不是自己，以及mint是不是相符，如果是的话，则显示referral的数据，否则提示code已经存在，重新输入
     const codeAccountData = await program.account.codeAccountData.fetch(codeAccountPda);
     const referralAccountPda = codeAccountData.referralAccount;
     const referralAccountData = await program.account.tokenReferralData.fetch(referralAccountPda);
@@ -458,7 +459,7 @@ export const getMyReferrerData = async (
 
   const referrerAta = await getAssociatedTokenAddress(
     mint,
-    wallet.publicKey, // 需要查询账户的公钥
+    wallet.publicKey,
     false,
     TOKEN_PROGRAM_ID
   )
@@ -529,6 +530,7 @@ export const getSystemConfig = async (
       }
     }
   } catch (error) {
+    console.log(error);
     return {
       success: false,
       message: 'Error getting system config'
@@ -548,14 +550,14 @@ export const getRefundAccountData = async (wallet: AnchorWallet, connection: Con
       program.programId,
     );
     const refundAccountData = await program.account.tokenRefundData.fetch(refundAccountPda);
-    console.log("refundAccountData", refundAccountData);
+    // console.log("refundAccountData", refundAccountData);
     return {
       success: true,
       message: 'Get refund data success',
       data: refundAccountData
     };
   } catch (error) {
-    console.log("getRefundAccountData", error);
+    // console.log("getRefundAccountData", error);
     return {
       success: false,
       message: 'Error getting refund account data'
@@ -1037,10 +1039,8 @@ export const checkAvailableIrysItemId = (id: string) => {
 };
 
 export const extractArweaveHash = (url: string): string => {
-  // 移除可能的末尾斜杠
   if (url === undefined) return "";
   const cleanUrl = url.replace(/\/$/, '');
-  // 从URL中提取最后一段作为hash
   const hash = cleanUrl.split('/').pop();
   if (!hash) {
     throw new Error('Invalid Arweave URL format');
@@ -1049,10 +1049,8 @@ export const extractArweaveHash = (url: string): string => {
 };
 
 export const extractIrysHash = (url: string): string => {
-  // 移除可能的末尾斜杠
   if (url === undefined) return "";
   const cleanUrl = url.replace(/\/$/, '');
-  // 从URL中提取最后一段作为hash
   const hash = cleanUrl.split('/').pop();
   if (!hash) {
     throw new Error('Invalid Irys URL format');
@@ -1062,9 +1060,9 @@ export const extractIrysHash = (url: string): string => {
 
 export const generateArweaveUrl = (updateTimestamp: number, id: string) => {
   if (updateTimestamp + ARWEAVE_DEFAULT_SYNC_TIME < Date.now() / 1000) {
-    return `${ARWEAVE_GATEWAY_URL}/${id}`; // 从arweave加载
+    return `${ARWEAVE_GATEWAY_URL}/${id}`; // Load from arweave
   } else {
-    return `${ARSEEDING_GATEWAY_URL}/${id}`; // 从arseeding加载
+    return `${ARSEEDING_GATEWAY_URL}/${id}`; // Load from arseeding
   }
 };
 
@@ -1082,7 +1080,6 @@ export const fetchMetadata = async (token: InitiazlizedTokenData): Promise<Token
 
     // Deprecated
     if (token.tokenUri.startsWith('ipfs://') || token.tokenUri.startsWith('https://gateway.pinata.cloud')) {
-      // 忽略之前通过IPFS保存的metadata和图片
       // const response = await pinata.gateways.get(extractIPFSHash(token.tokenUri) as string);
       // return response.data as TokenMetadataIPFS;
       return {
@@ -1203,11 +1200,10 @@ export const updateMetaData = async (
       tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
     };
 
-    console.log("update metadata context", Object.fromEntries(
-      Object.entries(context).map(([key, value]) => [key, value.toString()])
-    ));
+    // console.log("update metadata context", Object.fromEntries(
+    //   Object.entries(context).map(([key, value]) => [key, value.toString()])
+    // ));
 
-    // 判断新的metadata是否和原来的metadata一样
     if (token.tokenMetadata?.description === newMetadata.description &&
       token.tokenMetadata?.image === newMetadata.image &&
       token.tokenMetadata?.header === newMetadata.header &&
@@ -1235,7 +1231,6 @@ export const updateMetaData = async (
 
     // const metadataUrl = "https://arweave.net/WGCxn2nvHIo2WwhH2wx_wQXWXlnQsLoGNaT4IZXs9D4";
     const metadataUrl = await uploadToStorage(metadataFile, 'metadata');
-    console.log("metadataUrl", metadataUrl);
     const metadata: TokenMetadata = {
       symbol: token.tokenSymbol,
       name: token.tokenName,
@@ -1382,15 +1377,15 @@ const processTransaction = async (
   extraData: {}
 ) => {
   try {
-    // 获取最新的 blockhash
+    // Get latest blockhash
     const latestBlockhash = await connection.getLatestBlockhash();
 
-    // 获取正在处理的交易
+    // Get processing tx
     const processingTx = localStorage.getItem('processing_tx');
     const processingTimestamp = localStorage.getItem('processing_timestamp');
     const now = Date.now();
 
-    // 检查是否有正在处理的交易（2秒内的交易视为处理中）
+    // Check if there is a processing transaction (transaction within 2 seconds is considered as processing)
     if (processingTx && processingTimestamp && (now - parseInt(processingTimestamp)) < 2000) {
       return {
         success: false,
@@ -1398,45 +1393,50 @@ const processTransaction = async (
       }
     }
 
-    // 设置交易参数
+    // Set transaction parameters
     tx.recentBlockhash = latestBlockhash.blockhash;
     tx.feePayer = wallet.publicKey;
 
-    // 签名和序列化
+    // Sign and serialize
     const signedTx = await wallet.signTransaction(tx);
     const serializedTx = signedTx.serialize();
 
-    // 先进行交易模拟
+    // Simulate the transaction
     const simulation = await connection.simulateTransaction(signedTx);
 
-    // 如果模拟出现错误，直接返回错误信息
+    // If simulation fails, return error
     if (simulation.value.err) {
       return {
         success: false,
-        message: `Transaction simulation failed: ${simulation.value.err.toString()}`
+        message: `Transaction simulation failed: ${parseAnchorError(simulation.value.logs as string[])}`
       };
     }
 
-    // 标记交易开始处理
+    // Mark the transaction as processing
     localStorage.setItem('processing_tx', 'true');
     localStorage.setItem('processing_timestamp', now.toString());
 
-    // 发送交易
+    // Send the transaction
     const txHash = await connection.sendRawTransaction(serializedTx, {
-      skipPreflight: true // 跳过预检，因为我们已经模拟过了
+      skipPreflight: true 
     });
 
-    // 等待交易确认
+    // Wait for the transaction confirmation
     const confirmation = await connection.confirmTransaction({
       signature: txHash,
       blockhash: latestBlockhash.blockhash,
       lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-    });
+    }, 'confirmed');
 
     if (confirmation.value.err) {
+      const txDetails = await connection.getTransaction(txHash, {
+        commitment: "confirmed",
+        maxSupportedTransactionVersion: 0,
+      });
+      const errorMessage = parseAnchorError(txDetails?.meta?.logMessages || []);
       return {
         success: false,
-        message: 'Transaction failed: ' + confirmation.value.err.toString()
+        message: 'Transaction failed: ' + errorMessage
       }
     }
 
@@ -1460,12 +1460,29 @@ const processTransaction = async (
       message: 'Error: ' + error.message,
     };
   } finally {
-    // 清除处理状态
     localStorage.removeItem('processing_tx');
     localStorage.removeItem('processing_timestamp');
   }
 }
 
+// 解析 Anchor 错误的辅助函数
+function parseAnchorError(logs: string[]): string {
+  console.log("parseAnchorError logs", logs);
+  // TODO:
+  // for (const log of logs) {
+  //   const anchorErrorMatch = log.match(/Error Code: (\d+)\. Error Message: (.+)/);
+  //   if (anchorErrorMatch) {
+  //     const errorCode = parseInt(anchorErrorMatch[1], 10);
+  //     const errorMsg = ANCHOR_ERROR_MAP[errorCode] || "Unknown Anchor error";
+  //     return `${errorMsg} (Code: ${errorCode})`;
+  //   }
+  //   // 如果是自定义错误但没有详细消息
+  //   if (log.includes("Program failed to complete")) {
+  //     return "Transaction failed due to program error";
+  //   }
+  // }
+  return logs.toString();
+}
 export const getMintDiscount = async (
   wallet: AnchorWallet | undefined,
   connection: Connection,
@@ -1728,6 +1745,7 @@ export async function proxyCreatePool(
     mint: new PublicKey(token.mint),
     configAccount: configAccountPda,
     tokenVault: new PublicKey(token.tokenVault),
+    systemConfigAccount: systemConfigAccountPda,
     wsolVault: wsolVaultAta,
     wsolMint: NATIVE_MINT,
     poolState: poolAddress,
@@ -1808,27 +1826,17 @@ export async function proxyAddLiquidity(
     [desiredToken0Amount, desiredToken1Amount] = [desiredToken1Amount, desiredToken0Amount];
     pair = `SOL/${tokenData.tokenSymbol}`;
   }
-  console.log("Pair", pair);
 
   // Check if the pool has been created already
   const poolData = await getPoolData(program, token0, token1);
   if (poolData === undefined) {
-    console.log("Pool has not been created yet");
     return {
       success: false,
       message: 'Pool has not been created yet',
     }
   }
 
-  console.log("pool data", poolData);
   const depositAmount = await calculateDepositAmounts(program, token0, token1, desiredToken0Amount, desiredToken1Amount)
-  console.log("deposit amount", {
-    lpTokenAmount: depositAmount.lpTokenAmount.toNumber(),
-    maxToken0Amount: depositAmount.maxToken0Amount.toNumber(),
-    maxToken1Amount: depositAmount.maxToken1Amount.toNumber(),
-    actualToken0Amount: depositAmount.actualToken0Amount.toNumber(),
-    actualToken1Amount: depositAmount.actualToken1Amount.toNumber(),
-  });
 
   // Add liquidity
   const ixs = await poolDepositInstructions(
@@ -1879,27 +1887,17 @@ export async function proxyRemoveLiquidity(
     [desiredToken0Amount, desiredToken1Amount] = [desiredToken1Amount, desiredToken0Amount];
     pair = `SOL/${tokenData.tokenSymbol}`;
   }
-  console.log("Pair", pair);
 
   // Check if the pool has been created already
   const poolData = await getPoolData(program, token0, token1);
   if (poolData === undefined) {
-    console.log("Pool has not been created yet");
     return {
       success: false,
       message: 'Pool has not been created yet',
     }
   }
 
-  console.log("pool data", poolData);
   const withdrawAmount = await calculateWithdrawAmounts(program, token0, token1, desiredToken0Amount, desiredToken1Amount)
-  console.log("withdraw amount", {
-    lpTokenAmount: withdrawAmount.lpTokenAmount.toNumber(),
-    minToken0Amount: withdrawAmount.minToken0Amount.toNumber(),
-    minToken1Amount: withdrawAmount.minToken1Amount.toNumber(),
-    actualToken0Amount: withdrawAmount.actualToken0Amount.toNumber(),
-    actualToken1Amount: withdrawAmount.actualToken1Amount.toNumber(),
-  });
 
   // Add liquidity
   const ixs = await poolWithdrawInstructions(
@@ -1948,7 +1946,6 @@ export async function proxySwapBaseIn(
   // Check if the pool has been created already
   const poolData = await getPoolData(program, tokenOut, tokenIn);
   if (poolData === undefined) {
-    console.log("Pool has not been created yet");
     return {
       success: false,
       message: 'Pool has not been created yet',
@@ -1989,7 +1986,6 @@ export async function proxySwapBaseOut(
       message: 'Wallet not connected',
     }
   }
-  console.log("==>", tokenInAmount.toNumber(), tokenOutAmount.toNumber(), slippage.toNumber())
   const program = getProgram(wallet, connection);
   let token0 = new PublicKey(tokenData.mint);
   let token0Program = TOKEN_PROGRAM_ID;
@@ -2003,12 +1999,10 @@ export async function proxySwapBaseOut(
   const tokenInProgram = token1Program;
 
   let maxTokenInAmount = tokenInAmount.mul(new BN(10000).add(slippage)).div(new BN(10000));
-  console.log("max token in", maxTokenInAmount.toNumber())
 
   // Check if the pool has been created already
   const poolData = await getPoolData(program, token0, token1);
   if (poolData === undefined) {
-    console.log("Pool has not been created yet");
     return {
       success: false,
       message: 'Pool has not been created yet',
@@ -2061,7 +2055,6 @@ export async function proxyBurnLpToken(
     [token0Program, token1Program] = [token1Program, token0Program];
     pair = `SOL/${tokenData.tokenSymbol}`;
   }
-  console.log("Pair", pair);
   // check LP token balance of config account
   const ixs = await poolBurnLpTokensInstructions(
     program,
@@ -2166,4 +2159,32 @@ export const getTargetTimestampAfterEpoches = async (
     wait: futureTimestamp - startTimestamp,
     secondsPerSlot,
   };
+}
+
+type Signature = {
+  publicKey: BN,
+  signature: Uint8Array,
+}
+
+export const signMessageWithWallet = async () => {
+  const provider = window.solana;
+  if (!provider) throw new Error('Wallet not found');
+  await provider.connect();
+  const message = WALLET_SIGN_MESSAGE;
+  const encodedMessage = new TextEncoder().encode(message);
+  const signature: Signature = await provider.signMessage(encodedMessage, 'utf8');
+  const publicKey: string = provider.publicKey.toString();
+  const signatureBase58: string = bs58.encode(signature.signature);
+  return { publicKey, signatureBase58, message };
+}
+
+
+export const getWalletAddressFromToken = (token: string): string | null => {
+  try {
+    const decoded = jwt.decode(token) as { id: number; wallet_address: string } | null;
+    return decoded?.wallet_address || null;
+  } catch (error) {
+    console.error('Failed to decode JWT:', error);
+    return null;
+  }
 }

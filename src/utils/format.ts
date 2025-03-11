@@ -18,6 +18,12 @@ export const formatTimestamp = (timestamp: number): string => {
   return date.toLocaleString();
 };
 
+// Generate default username from wallet address
+export const generateDefaultUsername = (address: string) => {
+  if (!address || address.length < 8) return `user_${Date.now()}`;
+  return `${address.substring(0, 4)}${address.substring(address.length - 4)}`;
+};
+
 export const formatSeconds = (totalSeconds: number): string => {
   if (isNaN(totalSeconds) || totalSeconds <= 0) return 'arrived';
 
@@ -130,15 +136,15 @@ export const formatPrice = (price: number, digitalsAfterZero: number = 5): strin
   if (price === 0) return '0';
   digitalsAfterZero = digitalsAfterZero - 1;
   const priceStr = price.toString();
-  // 如果是科学计数法表示，先转换为普通数字字符串
+  // If it is a scientific notation representation, first convert it to a normal number string
   if (priceStr.includes('e')) {
     const [base, exponent] = priceStr.split('e');
     const exp = parseInt(exponent);
     if (exp < 0) {
-      // 处理小于1的数
+      // Handle numbers less than 1
       const absExp = Math.abs(exp);
       const baseNum = parseFloat(base);
-      const fullNumber = baseNum.toFixed(absExp + digitalsAfterZero); // 保留5位有效数字
+      const fullNumber = baseNum.toFixed(absExp + digitalsAfterZero); // keep 5 digitals
       const zeroCount = fullNumber.slice(2, fullNumber.length - digitalsAfterZero).length - 1;
       if (zeroCount > 2) { // if 0.00012345 does not need to be formatted
         const result = `0.0{${zeroCount}}${(baseNum * Math.pow(10, digitalsAfterZero)).toFixed(0)}`;
@@ -149,7 +155,7 @@ export const formatPrice = (price: number, digitalsAfterZero: number = 5): strin
     }
   }
 
-  // 处理普通小数
+  // Handle normal decimal numbers
   const parts = priceStr.split('.');
   if (parts.length === 2) {
     const decimals = parts[1];
@@ -167,30 +173,30 @@ export const formatPrice = (price: number, digitalsAfterZero: number = 5): strin
     }
   }
 
-  // 如果不需要特殊处理，保留5位小数
+  // If not special processing, keep 5 digitals
   return price.toLocaleString(undefined, { minimumFractionDigits: digitalsAfterZero });
 };
 
 export const processRawData = (data: MintData[], feeRate: number) => {
   if (!data || data.length === 0) return [];
 
-  // 按时间戳排序
+  // Sort by timestamp
   const sortedData = [...data].sort((a, b) => parseInt(a.timestamp) - parseInt(b.timestamp));
 
-  // 按分钟聚合数据
+  // Group by minute
   const minuteData = new Map<number, {
     prices: number[];
     volumes: number[];
     timestamp: number;
   }>();
 
-  // 遍历所有数据点，按分钟分组
+  // Iterate through all data points, group by minute
   sortedData.forEach(item => {
     const timestamp = parseInt(item.timestamp);
     const mintSize = parseFloat(item.mintSizeEpoch);
     const price = feeRate / mintSize;
 
-    // 将时间戳转换为分钟级别（去掉秒数）
+    // Convert timestamp to minute level (remove seconds)
     const minuteTimestamp = Math.floor(timestamp / 60) * 60;
 
     if (!minuteData.has(minuteTimestamp)) {
@@ -203,21 +209,21 @@ export const processRawData = (data: MintData[], feeRate: number) => {
 
     const minute = minuteData.get(minuteTimestamp)!;
     minute.prices.push(price);
-    minute.volumes.push(mintSize / 1000000000); // 转换为标准单位
+    minute.volumes.push(mintSize / 1000000000); // Convert to standard units
   });
 
-  // 转换为K线数据
+  // Convert to K-line data
   return Array.from(minuteData.values()).map(minute => {
     const prices = minute.prices;
     const volumes = minute.volumes;
 
     return {
       time: minute.timestamp as UTCTimestamp,
-      open: prices[0], // 这一分钟内的第一个价格
-      high: Math.max(...prices), // 最高价
-      low: Math.min(...prices), // 最低价
-      close: prices[prices.length - 1], // 这一分钟内的最后一个价格
-      volume: volumes.reduce((a, b) => a + b, 0) // 总交易量
+      open: prices[0], // This minute's first price
+      high: Math.max(...prices), // Highest price in this minute
+      low: Math.min(...prices), // Lowest price in this minute
+      close: prices[prices.length - 1], // This minute's last price
+      volume: volumes.reduce((a, b) => a + b, 0) // Total volume
     };
   });
 };
@@ -228,7 +234,7 @@ export function getFeeValue(
   referrerAtaBalance: BN,
   totalSupply: BN
 ): [BN, BN] {
-  // 为了在BN中进行小数计算，我们将比例放大1000000倍
+  // For special processing in BN, we scale by 1000000
   const SCALE = BN_MILLION; // new BN(1000000);
 
   // Calculate balance ratio with scale

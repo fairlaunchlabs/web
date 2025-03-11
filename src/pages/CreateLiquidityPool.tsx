@@ -35,7 +35,6 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
     }
   }, [mint])
 
-  // 使用 useLazyQuery 替代 useQuery
   const [getTokenData, { loading: queryLoading }] = useLazyQuery(queryTokensByMints, {
     onCompleted: (data) => {
       const _tokenData = data.initializeTokenEventEntities[0];
@@ -64,7 +63,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
     }
   });
 
-  // 获取当前 Epoch
+  // Get current Epoch
   const fetchCurrentEpoch = async () => {
     try {
       const epochInfo = await connection.getEpochInfo();
@@ -75,17 +74,14 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
     }
   };
 
-  // 处理获取按钮点击
   const handleFetch = async (mint: string) => {
     if (!mint.trim()) {
       toast.error('Please enter a mint address');
       return;
     }
     try {
-      // 验证地址格式
-      new PublicKey(mint);
+      new PublicKey(mint); // Verify address
       await fetchCurrentEpoch();
-      // 执行查询
       await getTokenData({
         variables: {
           mints: [mint],
@@ -99,7 +95,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
     }
   };
 
-  // 处理创建流动池
+  // Create Pool, deprecated
   const handleCreatePool = async () => {
     setLoading(true);
     try {
@@ -145,7 +141,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
             </div>
           }
 
-          {/* 代币信息显示 */}
+          {/* show token information */}
           {tokenData && (
             <div className="bg-base-200 p-4 rounded-lg mb-6">
               <h2 className="text-xl font-semibold mb-4">Token Information</h2>
@@ -212,7 +208,7 @@ export const CreateLiquidityPool: FC<CreateLiquidityPoolProps> = ({ expanded }) 
             </div>
           )}
 
-          {/* 创建流动池按钮 */}
+          {/* Create Pool button */}
           {/* {tokenData && poolAddress === "" && (
             <div className="text-center">
               <button

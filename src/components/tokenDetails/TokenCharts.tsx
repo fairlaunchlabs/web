@@ -5,12 +5,11 @@ import { queryAllTokenMintForChart } from '../../utils/graphql';
 import { formatPrice, processRawData } from '../../utils/format';
 import { TokenChartsProps } from '../../types/types';
 import { useTheme } from '../../utils/contexts';
-import { ErrorBox } from '../common/ErrorBox';
 import { LOCAL_STORAGE_HISTORY_CACHE_EXPIRY, LOCAL_STORAGE_HISTORY_CACHE_PREFIX } from '../../config/constants';
 
 type TimeFrame = '1min' | '5min' | '15min' | '30min' | '1hour' | '2hour' | '4hour' | 'day';
 
-const USE_CACHE = false; // TODO: 先都从GraphQL加载，以后再优化Cache
+const USE_CACHE = false;
 
 const timeFrameDatas = {
   "1min": {

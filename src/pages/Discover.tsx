@@ -35,7 +35,6 @@ export const Discover: React.FC<MintTokensProps> = ({
     localStorage.setItem('search_history', JSON.stringify(newHistory));
   };
 
-  // 初始加载数据
   const { loading: initialLoading, error: initialError, data: latestData } = useQuery(queryInitializeTokenEvent, {
     variables: {
       orderBy: 'timestamp',
@@ -61,9 +60,9 @@ export const Discover: React.FC<MintTokensProps> = ({
     return result;
   }, [hotData]);
 
-  // 搜索查询
+  // Search tokens by lazy query
   const [searchTokens, { loading: searchLoading, error: searchError, data: searchData }] = useLazyQuery(queryInitializeTokenEventBySearch, {
-    fetchPolicy: 'network-only' // 确保每次都从网络获取最新数据
+    fetchPolicy: 'network-only' // Ensure each time it fetches the latest data
   });
 
   const handleSearch = () => {
@@ -108,7 +107,7 @@ export const Discover: React.FC<MintTokensProps> = ({
     initializeTokenEventEntities: filterTokens(latestData?.initializeTokenEventEntities || []),
   };
 
-  // 合并错误和加载状态
+  // Merge errors and loading states
   const loading = searchLoading || initialLoading || hotLoading;
   const error = searchError || initialError || hotError;
 

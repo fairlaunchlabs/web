@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
 import { ARSEEDING_GATEWAY_URL, ARWEAVE_GATEWAY_URL, IRYS_GATEWAY_URL, STORAGE } from "../../config/constants";
-import { TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
+import { OrderedToken, TokenHeroProps, TokenMetadataIPFS } from "../../types/types";
 import { fetchImageFromUrlOrCache } from "../../utils/db";
 import { addressToColor } from "../../utils/format";
 import { ShareButton } from "../common/ShareButton";
 import { RenderSocialIcons } from "../mintTokens/RenderSocialIcons";
 import { TokenImage } from "../mintTokens/TokenImage";
+import { useAuth } from "../../utils/contexts";
+import { SocialButtonsToken } from "../social/SocialButtonsToken";
 
 export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
   token,
   metadata,
   referrerCode,
+  tokenData,
+  fetchTokenData,
+  isCommentOpen,
+  setIsCommentOpen,
 }) => {
   const [retryCount, setRetryCount] = useState(0);
   const [imageData, setImageData] = useState("");
+  const { token: userToken } = useAuth();
 
   useEffect(() => {
     let isMounted = true;
@@ -69,7 +76,7 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
         {/* <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40" /> */}
       </div>
 
-      {/* Content Overlay - 左对齐布局 */}
+      {/* Content Overlay */}
       <div className="absolute inset-0">
         <div className="h-full flex flex-col justify-between">
           <div className="p-6 space-y-4">
@@ -87,12 +94,14 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
               </div>
 
               {/* Token Basic Info */}
-              <div>
-                <div className="badge badge-lg text-xl badge-secondary">
-                  {metadata?.symbol}
-                </div>
-                <div className="text-white text-md mt-2 [text-shadow:2px_2px_0_#000000] bg-black/60 px-3 rounded-md">
-                  {metadata?.name}
+              <div className="flex space-x-4">
+                <div>
+                  <div className="badge badge-lg text-xl badge-secondary">
+                    {metadata?.symbol}
+                  </div>
+                  <div className="text-white text-md mt-2 [text-shadow:2px_2px_0_#000000] bg-black/60 px-3 rounded-md">
+                    {metadata?.name}
+                  </div>
                 </div>
               </div>
             </div>
@@ -110,6 +119,17 @@ export const TokenHeroMobile: React.FC<TokenHeroProps> = ({
               </p>
             </div>
           )}
+
+          <div className="bg-black/60 px-3 py-2 w-full">
+            <SocialButtonsToken 
+              tokenData={tokenData} 
+              mint={token.mint as string} 
+              token={userToken} 
+              isCommentOpen={isCommentOpen} 
+              setIsCommentOpen={setIsCommentOpen} 
+              fetchTokenData={fetchTokenData}
+            />
+          </div>
         </div>
       </div>
     </div>

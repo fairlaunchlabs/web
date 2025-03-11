@@ -24,40 +24,42 @@ export const Metrics: React.FC<MetricsProps> = ({
 
   const calculateMetrics = () => {
 
-    // 计算最大供应量
+    // Calculate max supply
     const maxSupply = epochesPerEraNum * initialTargetMintSizePerEpochNum / (1 - reduceRatioNum / 100);
 
-    // 计算预估铸造时间（天）
+    // Calculate estimated days
     const estimatedDays = (targetErasNum * epochesPerEraNum * targetSecondsPerEpochNum) / 86400;
 
-    // 计算目标时代的最大供应量百分比
+    // Calculate percent to target eras
     const f = reduceRatioNum / 100;
     const percentToTargetEras = 1 - Math.pow(f, targetErasNum);
 
     const totalsupplyToTargetEras = percentToTargetEras * maxSupply;
 
-    // 计算最小总费用
+    // Calculate min total fee
     const minTotalFee = initialTargetMintSizePerEpochNum * feeRateNum * (targetErasNum * epochesPerEraNum + 1) / initialMintSizeNum;
 
-    // 计算最大总费用
+    // Calculate max total fee
     const maxTotalFee = initialTargetMintSizePerEpochNum * feeRateNum / initialMintSizeNum * 100 *
       (Math.pow(1.01, targetErasNum * epochesPerEraNum + 1) - 1);
 
-    // 检查是否费用过高（例如超过1000 SOL）
+    // Check if fee is too high (e.g., greater than 1000 SOL)
     const isFeeTooHigh = maxTotalFee > 1000;
 
-    // 计算Initial liquidity to target milestone
+    // Calculate Initial liquidity to target milestone
     const liquidityTokensRatioNum = parseFloat(liquidityTokensRatio) || 0;
     const initialLiquidityToTargetEra = epochesPerEraNum * initialTargetMintSizePerEpochNum * liquidityTokensRatioNum / 100 * (1 - Math.pow(reduceRatioNum / 100, targetErasNum)) /
       (1 - reduceRatioNum / 100) / (1 - liquidityTokensRatioNum / 100);
 
     const initialLiquidityToTargetEraPercent = (initialLiquidityToTargetEra / maxSupply) * 100;
 
-    // 计算最小和最大启动价格
+    // Calculate min launch price
     const minLaunchPrice = minTotalFee / initialLiquidityToTargetEra;
+
+    // Calculate max launch price
     const maxLaunchPrice = maxTotalFee / initialLiquidityToTargetEra;
 
-    // 检查最大启动价格是否过高（例如超过0.1 SOL/token）
+    // Check if launch price is too high (e.g., greater than 0.1 SOL/token)
     const isLaunchPriceTooHigh = maxLaunchPrice > 0.1;
 
     return {

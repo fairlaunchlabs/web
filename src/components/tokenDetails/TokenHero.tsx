@@ -6,14 +6,21 @@ import { ShareButton } from "../common/ShareButton";
 import { RenderSocialIcons } from "../mintTokens/RenderSocialIcons";
 import { TokenImage } from "../mintTokens/TokenImage";
 import { fetchImageFromUrlOrCache } from "../../utils/db";
+import { SocialButtonsToken } from "../social/SocialButtonsToken";
+import { useAuth } from "../../utils/contexts";
 
 export const TokenHero: React.FC<TokenHeroProps> = ({
   token,
   metadata,
-  referrerCode
+  referrerCode,
+  tokenData,
+  fetchTokenData,
+  isCommentOpen,
+  setIsCommentOpen,
 }) => {
   const [retryCount, setRetryCount] = useState(0);
   const [imageData, setImageData] = useState("");
+  const { token: userToken } = useAuth();
 
   useEffect(() => {
     let isMounted = true;
@@ -97,6 +104,16 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
                 {metadata?.description}
               </p>
             </div>)}
+            <div className="bg-black/60 px-3 py-2 w-full">
+              <SocialButtonsToken 
+                tokenData={tokenData} 
+                mint={token.mint as string} 
+                token={userToken} 
+                isCommentOpen={isCommentOpen} 
+                setIsCommentOpen={setIsCommentOpen} 
+                fetchTokenData={fetchTokenData}
+              />
+          </div>
         </div>
       </div>
     </div>

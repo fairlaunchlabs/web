@@ -75,12 +75,12 @@ export async function calculateDepositAmounts(
   token1: PublicKey,
   desiredToken0Amount: BN,
   desiredToken1Amount: BN,
-  slippageTolerance: number = 0.05 // 5% 滑点容忍度
+  slippageTolerance: number = 0.05
 ) {
   const poolInfo = await getPoolData(program, token0, token1);
   if (!poolInfo.poolAddress || !poolInfo.cpSwapPoolState) throw new Error("Pool not found");
 
-  // 计算 LP token 数量
+  // LP token
   const lpSupply = new BN(poolInfo.cpSwapPoolState.lpAmount as number * LAMPORTS_PER_SOL);
   const token0Reserve = new BN(poolInfo.cpSwapPoolState.token0Amount as number * LAMPORTS_PER_SOL);
   const token1Reserve = new BN(poolInfo.cpSwapPoolState.token1Amount as number * LAMPORTS_PER_SOL);
@@ -90,11 +90,9 @@ export async function calculateDepositAmounts(
       desiredToken1Amount.mul(lpSupply).div(token1Reserve)
   );
 
-  // 计算实际需要的代币数量
   const actualToken0Amount = lpTokenAmount.mul(token0Reserve).div(lpSupply);
   const actualToken1Amount = lpTokenAmount.mul(token1Reserve).div(lpSupply);
 
-  // 添加滑点容忍度
   const maxToken0Amount = actualToken0Amount.mul(new BN(100 + slippageTolerance * 100)).div(new BN(100));
   const maxToken1Amount = actualToken1Amount.mul(new BN(100 + slippageTolerance * 100)).div(new BN(100));
 
@@ -113,12 +111,11 @@ export async function calculateWithdrawAmounts(
   token1: PublicKey,
   desiredToken0Amount: BN,
   desiredToken1Amount: BN,
-  slippageTolerance: number = 0.05 // 5% 滑点容忍度
+  slippageTolerance: number = 0.05
 ) {
   const poolInfo = await getPoolData(program, token0, token1);
   if (!poolInfo.poolAddress || !poolInfo.cpSwapPoolState) throw new Error("Pool not found");
 
-  // 计算需要燃烧的 LP token 数量
   const lpSupply = new BN(poolInfo.cpSwapPoolState.lpAmount as number * LAMPORTS_PER_SOL);
   const token0Reserve = new BN(poolInfo.cpSwapPoolState.token0Amount as number * LAMPORTS_PER_SOL);
   const token1Reserve = new BN(poolInfo.cpSwapPoolState.token1Amount as number * LAMPORTS_PER_SOL);
@@ -128,11 +125,9 @@ export async function calculateWithdrawAmounts(
       desiredToken1Amount.mul(lpSupply).div(token1Reserve)
   );
 
-  // 计算实际可获得的代币数量
   const actualToken0Amount = lpTokenAmount.mul(token0Reserve).div(lpSupply);
   const actualToken1Amount = lpTokenAmount.mul(token1Reserve).div(lpSupply);
 
-  // 添加滑点容忍度
   const minToken0Amount = actualToken0Amount.mul(new BN(100 - slippageTolerance * 100)).div(new BN(100));
   const minToken1Amount = actualToken1Amount.mul(new BN(100 - slippageTolerance * 100)).div(new BN(100));
 

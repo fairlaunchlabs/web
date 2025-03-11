@@ -1,4 +1,3 @@
-/* 定义字体 */
 @font-face {
   font-family: 'Retro Pixel Cute Mono';
   src: url('../public/fonts/retro-pixel-cute-mono.ttf') format('truetype');
@@ -24,7 +23,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 基础样式 */
 @layer base {
   h1, h2, h3, h4, h5, h6 {
     font-family: "Retro Pixel Thick", cursive;
@@ -39,7 +37,6 @@
   }
 };
 
-/* 通用字体类 */
 @layer components {
   .text-label {
     font-size: 0.875rem;
@@ -66,7 +63,6 @@
   }
 }
 
-/* 滚动动画 */
 .scroll-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -94,7 +90,6 @@
   }
 }
 
-/* 隐藏滚动条 */
 .scroll-wrapper::-webkit-scrollbar {
   display: none;
 }

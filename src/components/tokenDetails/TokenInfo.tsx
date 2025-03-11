@@ -9,7 +9,14 @@ import { TokenHeroMobile } from './TokenHeroMobile';
 import { TokenInfoData } from './TokenInfoData';
 import { TokenInfoDataMobile } from './TokenInfoDataMobile';
 
-export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => {
+export const TokenInfo: React.FC<TokenInfoProps> = ({ 
+  token, 
+  referrerCode, 
+  tokenData, 
+  fetchTokenData,
+  isCommentOpen,
+  setIsCommentOpen,
+ }) => {
   const [metadata, setMetadata] = useState<TokenMetadataIPFS | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,8 +40,8 @@ export const TokenInfo: React.FC<TokenInfoProps> = ({ token, referrerCode }) => 
     <div className="w-full space-y-0">
       <div className='mb-4'>
         {isMobile ?
-          <TokenHeroMobile token={token} metadata={metadata as TokenMetadataIPFS} referrerCode={referrerCode} />
-          : <TokenHero token={token} metadata={metadata as TokenMetadataIPFS} referrerCode={referrerCode} />}
+          <TokenHeroMobile token={token} metadata={metadata as TokenMetadataIPFS} referrerCode={referrerCode} tokenData={tokenData} fetchTokenData={fetchTokenData} isCommentOpen={isCommentOpen} setIsCommentOpen={setIsCommentOpen} />
+          : <TokenHero token={token} metadata={metadata as TokenMetadataIPFS} referrerCode={referrerCode} tokenData={tokenData} fetchTokenData={fetchTokenData} isCommentOpen={isCommentOpen} setIsCommentOpen={setIsCommentOpen} />}
       </div>
       <div className="pixel-box">
         {isMobile ?
