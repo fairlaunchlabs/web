@@ -6,6 +6,7 @@ import { getActivities } from '../utils/user';
 import { formatAddress } from '../utils/format';
 import { AiFillLike, AiFillStar, AiFillHeart, AiFillBell, AiOutlineLike, AiOutlineHeart } from "react-icons/ai";
 import { MdRocketLaunch } from "react-icons/md";
+import { API_URL } from '../config/constants';
 
 export type SocialFeedProps = {
   expanded: boolean;
@@ -129,6 +130,7 @@ export const SocialFeed: React.FC<SocialFeedProps> = ({ expanded }) => {
       {!token && (
         <div className="text-center mt-10">
           <p className="text-gray-300 mb-4">Please log in to view your feed.</p>
+          <p className="text-gray-300 mb-4">{API_URL}</p>
           <button
             onClick={handleLogin}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"

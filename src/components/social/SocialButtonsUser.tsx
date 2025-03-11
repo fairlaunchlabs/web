@@ -19,7 +19,7 @@ export const SocialButtonsUser: FC<SocialButtonsUserProps> = ({ setIsCommentOpen
     }
     const response = await followUser(token as string, user?.userId);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchUserData();
     } else {
       toast.error(response.message as string);
@@ -33,7 +33,7 @@ export const SocialButtonsUser: FC<SocialButtonsUserProps> = ({ setIsCommentOpen
     }
     const response = await unfollowUser(token as string, user?.userId);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchUserData();
     } else {
       toast.error(response.message as string);
@@ -48,7 +48,7 @@ export const SocialButtonsUser: FC<SocialButtonsUserProps> = ({ setIsCommentOpen
     }
     const response = await likeUser(token as string, user?.userId);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchUserData();
     } else {
       toast.error(response.message as string);
@@ -63,7 +63,7 @@ export const SocialButtonsUser: FC<SocialButtonsUserProps> = ({ setIsCommentOpen
     }
     const response = await unlikeUser(token as string, user?.userId);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchUserData();
     } else {
       toast.error(response.message as string);

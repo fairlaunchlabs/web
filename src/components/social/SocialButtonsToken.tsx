@@ -23,7 +23,7 @@ export const SocialButtonsToken: FC<SocialButtonsTokenProps> = ({
   const follow = async () => {
     const response = await followToken(token as string, mint);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchTokenData();
     } else {
       toast.error(response.message as string);
@@ -33,7 +33,7 @@ export const SocialButtonsToken: FC<SocialButtonsTokenProps> = ({
   const unfollow = async () => {
     const response = await unfollowToken(token as string, mint);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchTokenData();
     } else {
       toast.error(response.message as string);
@@ -43,7 +43,7 @@ export const SocialButtonsToken: FC<SocialButtonsTokenProps> = ({
   const like = async () => {
     const response = await likeToken(token as string, mint);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchTokenData();
     } else {
       toast.error(response.message as string);
@@ -53,7 +53,7 @@ export const SocialButtonsToken: FC<SocialButtonsTokenProps> = ({
   const unlike = async () => {
     const response = await unlikeToken(token as string, mint);
     if (response.success) {
-      toast.success(response.message as string);
+      // toast.success(response.message as string);
       fetchTokenData();
     } else {
       toast.error(response.message as string);
