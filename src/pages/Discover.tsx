@@ -38,13 +38,15 @@ export const Discover: React.FC<MintTokensProps> = ({
   const { loading: initialLoading, error: initialError, data: latestData } = useQuery(queryInitializeTokenEvent, {
     variables: {
       orderBy: 'timestamp',
-    }
+    },
+    fetchPolicy: 'network-only',
   });
 
   const { loading: hotLoading, error: hotError, data: hotData } = useQuery(queryHotInitializeTokenEvent, {
     variables: {
       orderBy: 'difficultyCoefficientEpoch',
-    }
+    },
+    fetchPolicy: 'network-only',
   });
 
   const filteredHotTokens = useMemo(() => {

@@ -208,20 +208,20 @@ export const SocialUserDetails: FC<SocialUserDetailsProps> = ({ expanded }) => {
       {/* Role and Token */}
       <div className="space-y-2">
         {roles.map((role, index) => (
-          <div key={role} className="">
+          <div key={index} className="">
             <div className="">{titles[role]}</div>
 
             {tokensByAdmin.length > 0 && role === Role.ISSUER && 
               (isMobile ? (
                 <div className="grid grid-cols-2 gap-4 p-1">
                   {tokensByAdmin.map((token: InitiazlizedTokenData, index: number) =>
-                    <TokenCardSimple key={token.tokenId} token={token} number={index + 1} type="static" />
+                    <TokenCardSimple key={index} token={token} number={index + 1} type="static" />
                   )}
                 </div> 
               ) : (
                 <div className="grid grid-cols-3 gap-4 p-1">
                   {tokensByAdmin.map((token: InitiazlizedTokenData, index: number) =>
-                    <TokenCardMobile key={token.tokenId} token={token} number={index + 1} type="static" />
+                    <TokenCardMobile key={index} token={token} number={index + 1} type="static" />
                   )}
                 </div>
               ))}
@@ -230,13 +230,13 @@ export const SocialUserDetails: FC<SocialUserDetailsProps> = ({ expanded }) => {
               (isMobile ? (
                 <div className="grid grid-cols-2 gap-4 p-1">
                   {tokensByValueManager.map((token: InitiazlizedTokenData, index: number) =>
-                    <TokenCardSimple key={token.tokenId} token={token} number={index + 1} type="static" />
+                    <TokenCardSimple key={index} token={token} number={index + 1} type="static" />
                   )}
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-4 p-1">
                   {tokensByValueManager.map((token: InitiazlizedTokenData, index: number) =>
-                    <TokenCardMobile key={token.tokenId} token={token} number={index + 1} type="static" />
+                    <TokenCardMobile key={index} token={token} number={index + 1} type="static" />
                   )}
                 </div>
               ))}
@@ -245,13 +245,13 @@ export const SocialUserDetails: FC<SocialUserDetailsProps> = ({ expanded }) => {
               (isMobile ? (
                 <div className="grid grid-cols-2 gap-4 p-1">
                   {tokensByPromoter.map((token: InitiazlizedTokenData, index: number) =>
-                    <TokenCardSimple key={token.tokenId} token={token} number={index + 1} type="static" />
+                    <TokenCardSimple key={index} token={token} number={index + 1} type="static" />
                   )}
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-4 p-1">
                   {tokensByPromoter.map((token: InitiazlizedTokenData, index: number) =>
-                    <TokenCardMobile key={token.tokenId} token={token} number={index + 1} type="static" />
+                    <TokenCardMobile key={index} token={token} number={index + 1} type="static" />
                   )}
                 </div>
               ))}

@@ -32,7 +32,8 @@ export const ReferralBonusDetailModal: React.FC<ReferralBonusDetailModalProps> =
       mint,
       referrerMain
     },
-    skip: !isOpen
+    skip: !isOpen,
+    fetchPolicy: 'network-only',
   });
 
   if (!isOpen) return null;

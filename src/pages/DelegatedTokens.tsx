@@ -38,6 +38,7 @@ export const DelegatedTokens: FC<DelegatedTokensProps> = ({
       first: 10,
     },
     skip: !wallet,
+    fetchPolicy: 'network-only',
   });
 
   const handleClick = (mint: string) => {

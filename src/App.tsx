@@ -180,7 +180,6 @@ function App() {
   );
 
   return (
-    <AuthProvider>
       <Router>
         <CopilotKit runtimeUrl={COPILOTKIT_RUNTIME_URL}>
           <ConnectionProvider endpoint={endpoint}>
@@ -192,13 +191,14 @@ function App() {
               }}
             >
               <WalletModalProvider>
-                <AppContent />
+                <AuthProvider>
+                  <AppContent />
+                </AuthProvider>
               </WalletModalProvider>
             </WalletProvider>
           </ConnectionProvider>
         </CopilotKit>
       </Router>
-    </AuthProvider>
   );
 }
 

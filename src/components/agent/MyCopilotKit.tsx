@@ -73,7 +73,7 @@ export const MyCopilotKit = () => {
           toast.error(result.message as string);
           return;
         }
-        setFaqs(result.data as FAQ[]);
+        setFaqs(result.data.data as FAQ[]);
       })
     }
   }, [token]);

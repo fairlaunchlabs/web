@@ -40,6 +40,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
       first: pageSize,
     },
     skip: !wallet,
+    fetchPolicy: 'network-only',
     onCompleted: (data) => {
       setTotalCount(Math.max(totalCount, (currentPage - 1) * pageSize + (data.setRefererCodeEventEntities?.length ?? 0)));
     }
@@ -53,6 +54,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
       first: mints?.length || 1,
     },
     skip: !mints?.length || !wallet,
+    fetchPolicy: 'network-only',
   });
 
   const { loading: referralBonusLoading, error: referralBonusError, data: referralBonusData } = useQuery(queryTotalReferrerBonusSum, {
@@ -61,6 +63,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
       referrerMain: wallet?.publicKey.toBase58(),
     },
     skip: !mints?.length || !wallet,
+    fetchPolicy: 'network-only',
   });
 
   const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, InitiazlizedTokenData>>({});

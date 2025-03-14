@@ -8,13 +8,14 @@ type AuthResponse = {
 }
 
 export const loadFAQs = async (token: string): Promise<UserAPIResponse> => {
-  // TODO: load faqs from server
-  console.log("loading faqs from server");
   try {
     const response = await axios.get(`${USER_API_URL}/faqs`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return {
+      success: true,
+      data: response.data,
+    }
   } catch (error: any) {
     return {
       success: false,

@@ -23,9 +23,9 @@ export const ScrollCards: FC<ScrollCardsProps> = ({ tokens }) => {
           // 164 is the width of (TokenCardMobile - 2)* 4 + 20px, for example: TokenCardMobile width is 38, here should be (38-2)*4 + 20px = 164px
           // Why should add 20px? Because the gap is 20px (5*4)
         }}>
-          {tokens.map((token: InitiazlizedTokenData) =>
+          {tokens.map((token: InitiazlizedTokenData, index: number) =>
             // with should be TokenCardSimple width - 2, for example: TokenCardSimple width is 38, here should be 36
-            <div key={token.tokenId} className="flex-none w-36">
+            <div key={index} className="flex-none w-36">
               <TokenCardSimple token={token} type="scroll" />
             </div>
           )}
@@ -33,8 +33,8 @@ export const ScrollCards: FC<ScrollCardsProps> = ({ tokens }) => {
         <div className="flex gap-5 px-4" style={{
           width: `${tokens.length * 164}px`
         }}>
-          {tokens.map((token: InitiazlizedTokenData) =>
-            <div key={`dup-${token.tokenId}`} className="flex-none w-36">
+          {tokens.map((token: InitiazlizedTokenData, index: number) =>
+            <div key={index} className="flex-none w-36">
               <TokenCardSimple token={token} />
             </div>
           )}

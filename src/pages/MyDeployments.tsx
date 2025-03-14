@@ -46,6 +46,7 @@ export const MyDeployments: React.FC<MyDeploymentsProps> = ({ expanded }) => {
       first: pageSize,
     },
     skip: !wallet,
+    fetchPolicy: 'network-only',
   });
 
   useEffect(() => {

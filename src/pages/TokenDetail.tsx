@@ -23,7 +23,6 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
   const [mint, setMint] = useState<string | null>(null);
   const { token: userToken } = useAuth();
 
-  // console.log('referrerCode', referrerCode);
   const { loading, error, data } = useQuery(queryInitializeTokenEventBySearch, {
     variables: {
       skip: 0,
@@ -44,6 +43,10 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
       toast.error(result.message as string);
     }
   }
+
+  useEffect(() => {
+    if (mint) fetchTokenData();
+  }, [mint]);
 
   const saveToHistory = (term: string) => {
     const history = localStorage.getItem('search_history');

@@ -57,11 +57,11 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
   };
 
   useEffect(() => {
-    if(!initialLoaded.current) {
+    if(!initialLoaded.current && orderedData) {
       initialLoaded.current = true;
       loadMoreComments();
     }
-  }, [])
+  }, [orderedData])
 
   // Listen scrolling
   useEffect(() => {
