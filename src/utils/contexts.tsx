@@ -188,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // const { connection } = useConnection();
       // const provider = getProvider(wallet as AnchorWallet, connection);
       const provider = (window as any).solana;
-      console.log("provider", provider);
+      // console.log("provider", provider);
       if (!provider) {
         alert('Please install Solana wallet');
         return;
@@ -279,7 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setupWalletListeners = () => {
     const provider = (window as any).solana; // Phantom wallet
-    console.log("provider", provider);
+    // console.log("provider", provider);
     if (!provider) {
       alert('Please install Solana wallet');
       return;

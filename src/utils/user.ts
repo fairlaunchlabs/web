@@ -291,7 +291,7 @@ export const updateUserProfile = async (token: string, data: any): Promise<UserA
 
 export const getUserProfileByWalletAddress = async (token: string, walletAddress: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${USER_API_URL}`, {
+    const response = await axios.get(`${USER_API_URL}/user`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { wallet_address: walletAddress },
     });
@@ -309,7 +309,7 @@ export const getUserProfileByWalletAddress = async (token: string, walletAddress
 
 export const getUserProfileByUserId = async (token: string, id: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${USER_API_URL}`, {
+    const response = await axios.get(`${USER_API_URL}/user`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { id },
     });

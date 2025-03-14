@@ -34,7 +34,7 @@ import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
 import { ManageLiquidity } from './pages/ManageLiquidity';
 import { DelegatedTokens } from './pages/DelegatedTokens';
 import { TradingBot } from './pages/TradingBot';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { queryMyDelegatedTokens } from './utils/graphql';
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";

@@ -52,7 +52,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
       skip: 0,
       first: mints?.length || 1,
     },
-    skip: !mints?.length,
+    skip: !mints?.length || !wallet,
   });
 
   const { loading: referralBonusLoading, error: referralBonusError, data: referralBonusData } = useQuery(queryTotalReferrerBonusSum, {
@@ -60,6 +60,7 @@ export const MyUniqueReferralCode: FC<MyUniqueReferralCodeProps> = ({ expanded }
       mints: mints,
       referrerMain: wallet?.publicKey.toBase58(),
     },
+    skip: !mints?.length || !wallet,
   });
 
   const [tokenMetadataMap, setTokenMetadataMap] = useState<Record<string, InitiazlizedTokenData>>({});
