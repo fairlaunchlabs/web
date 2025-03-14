@@ -1,13 +1,17 @@
 "use client"
-import { CopilotSidebar, useChatContext, HeaderProps, InputProps, Markdown } from "@copilotkit/react-ui";
+import { CopilotSidebar, useChatContext, HeaderProps, InputProps } from "@copilotkit/react-ui";
 import { useEffect, useRef, useState } from "react";
 import { useCopilotMessagesContext } from "@copilotkit/react-core";
-import { ActionExecutionMessage, MessageRole, ResultMessage, TextMessage } from "@copilotkit/runtime-client-gql";
+import { ActionExecutionMessage, ResultMessage, TextMessage } from "@copilotkit/runtime-client-gql";
 import { UserMessageProps } from "@copilotkit/react-ui";
 import { AssistantMessageProps } from "@copilotkit/react-ui";
 import MarkdownWithMath from "./MarkdownWithMath";
 import { LuLightbulb, LuLightbulbOff, LuSend } from "react-icons/lu";
 import { FAQSelector } from "./FAQSelector";
+import { loadFAQs } from "../../utils/user";
+import { useAuth } from "../../utils/contexts";
+import toast from "react-hot-toast";
+import { FAQ } from "../../types/types";
 
 export const MyCopilotKit = () => {
   const { messages, setMessages } = useCopilotMessagesContext();
@@ -16,7 +20,9 @@ export const MyCopilotKit = () => {
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [activeTab, setActiveTab] = useState(0);
-
+  const [faqs, setFaqs] = useState<FAQ[] | null>(null);
+  const { token } = useAuth();
+  
   // save to local storage when messages change
   useEffect(() => {
     if (messages.length !== 0) {
@@ -59,6 +65,18 @@ export const MyCopilotKit = () => {
       setMessages(parsedMessages);
     }
   }, []);
+
+  useEffect(() => {
+    if(token) {
+      loadFAQs(token as string).then(result => {
+        if(!result.success) {
+          toast.error(result.message as string);
+          return;
+        }
+        setFaqs(result.data as FAQ[]);
+      })
+    }
+  }, [token]);
 
   const CustomUserMessage = (props: UserMessageProps) => {
     return (
@@ -126,7 +144,12 @@ export const MyCopilotKit = () => {
         <div className="flex ml-8 gap-2 my-2">
           {/* <div className={modeButtonStyle + (isDeepthink ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsDeepthink(!isDeepthink)}>Deep think</div>
           <div className={modeButtonStyle + (isResearch ? " bg-green-500" : " bg-gray-300")} onClick={() => setIsResearch(!isResearch)}>Search web</div> */}
-          {isFAQOpen && <FAQSelector activeTab={activeTab} setActiveTab={setActiveTab} setPrompt={setPrompt} />}
+          {isFAQOpen && faqs && <FAQSelector 
+            faqs={faqs}
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            setPrompt={setPrompt} 
+          />}
         </div>
         <div className={wrapperStyle}>
           <button

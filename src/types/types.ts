@@ -627,3 +627,15 @@ export type Comment = {
   createdAt: string;
   replies?: Comment[];
 };
+
+export type UserAPIResponse = {
+  success: boolean;
+  data?: any;
+  message?: string;
+}
+
+export type FAQ = {
+  id: number;
+  label: string;
+  questions: string[];
+}

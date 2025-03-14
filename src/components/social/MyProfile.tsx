@@ -5,7 +5,7 @@ import { User } from '../../types/types';
 import toast from 'react-hot-toast';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { FaTelegramPlane, FaDiscord, FaTwitter, FaGithub, FaFacebook, FaInternetExplorer } from "react-icons/fa";
-import { API_URL } from '../../config/constants';
+import { API_BASE_URI, API_URL } from '../../config/constants';
 
 export const socialNames = ['website', 'twitter', 'telegram', 'discord', 'github', 'facebook']
 export const socialIcons = {
@@ -41,20 +41,33 @@ export const MyProfile: React.FC = () => {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      const data = await getUserProfileByWalletAddress(token as string, walletAddress as string);
-      setUser(data);
+      const result = await getUserProfileByWalletAddress(token as string, walletAddress as string);
+      if(!result.success) {
+        toast.error(result.message as string);
+        return;
+      }
+      const socialLinks = result.data.social_links ? 
+      Object.fromEntries(
+        Object.entries(result.data.social_links).filter(([_, value]) => value !== "")
+      ) as Record<string, string> : {};
+
+      setUser({
+        ...result.data,
+        social_links: socialLinks,
+      });
+
       const _formData = {
-        username: data.username,
-        email: data.email || '',
-        bio: data.bio || '',
-        socialLinks: data.social_links ? data.social_links : {},
-        roles: data.roles ? data.roles.split(',') : [],
-        avatarFile: data.avatar ? new File([], data.avatar) : null,
-        avatarPreview: null,
+        username: result.data.username,
+        email: result.data.email || '',
+        bio: result.data.bio || '',
+        socialLinks: socialLinks,
+        roles: result.data.roles ? result.data.roles.split(',') : [],
+        avatarFile: result.data.avatar ? new File([], result.data.avatar) : null,
+        avatarPreview: result.data.avatar ? result.data.avatar : null,
       };
       setFormData(_formData);
-    } catch (error) {
-      toast.error('Failed to fetch user data');
+    } catch (error: any) {
+      toast.error(error.message as string);
     } finally {
       setLoading(false);
     }
@@ -85,24 +98,29 @@ export const MyProfile: React.FC = () => {
     if (!token) return;
 
     setLoading(true);
+    console.log("formData", formData.avatarFile?.name);
     try {
-      if (formData.avatarFile) {
-        const result = await uploadAvatar(token, formData.avatarFile);
+      if (!formData.avatarFile?.name.startsWith(API_BASE_URI)) {
+        const result = await uploadAvatar(token, formData.avatarFile as File);
         if (result.success) {
-          console.log("avatar url: ", result.url);
+          console.log("avatar url: ", result.data.url);
         } else {
-          toast.error(result.message);
+          toast.error(result.message as string);
           return;
         }
       }
 
-      await updateUserProfile(token, {
+      const result = await updateUserProfile(token, {
         username: formData.username,
         email: formData.email || null,
         bio: formData.bio || null,
         social_links: formData.socialLinks,
         roles: formData.roles.join(','),
       });
+      if(!result.success) {
+        toast.error(result.message as string);
+        return;
+      }
       if (formData.avatarPreview) {
         URL.revokeObjectURL(formData.avatarPreview);
       }
@@ -172,8 +190,8 @@ export const MyProfile: React.FC = () => {
         {!isEditing && (
           <div className="space-y-4">
             {/* <p><span className="font-semibold">Roles:</span> {user.roles ? user.roles.split(',').join(', ') : 'Not set'}</p> */}
-            <p><span className="font-semibold">Email:</span> {user.email || 'Not set'}</p>
-            <p><span className="font-semibold">Bio:</span> {user.bio || 'Not set'}</p>
+            <div><span className="font-semibold">Email:</span> {user.email || 'Not set'}</div>
+            <div><span className="font-semibold">Bio:</span> {user.bio || 'Not set'}</div>
             <div>
               <span className="font-semibold">Social Links:</span>
               {user.social_links && Object.keys(user.social_links).length > 0 ? (
@@ -186,11 +204,11 @@ export const MyProfile: React.FC = () => {
                   ))}
                 </ul>
               ) : (
-                'Not set'
+                ' Not set'
               )}
             </div>
-            <p><span className="font-semibold">Created:</span> {new Date(user.created_at).toLocaleString()}</p>
-            <p><span className="font-semibold">Updated:</span> {new Date(user.updated_at).toLocaleString()}</p>
+            <p><span className="font-semibold">Joined at:</span> {new Date(user.created_at).toLocaleString()}</p>
+            {/* <p><span className="font-semibold">Updated:</span> {new Date(user.updated_at).toLocaleString()}</p> */}
           </div>
         )}
 

@@ -64,9 +64,18 @@ export const SocialExplore: React.FC<SocialExploreProps> = ({ expanded }) => {
     const getData = async () => {
       setLoading(true);
       let results = new Array<OrderedUser>;
-      if (developerRoleSelected) results = results.concat(await getDevelopers(token as string, 10));
-      if (urcProviderRoleSelected) results = results.concat(await getReferrals(token as string, 10));
-      if (valueManagerRoleSelected) results = results.concat(await getValueManagers(token as string, 10));
+      if (developerRoleSelected) {
+        const result = await getDevelopers(token as string, 10);
+        if (result.success) results = results.concat(result.data);
+      }
+      if (urcProviderRoleSelected) {
+        const result = await getReferrals(token as string, 10);
+        if (result.success) results = results.concat(result.data);
+      }
+      if (valueManagerRoleSelected) {
+        const result = await getValueManagers(token as string, 10);
+        if (result.success) results = results.concat(result.data);
+      }
       results = mergeUserData(results);
       console.log(results)
       setFilteredUsers(results);  
@@ -85,10 +94,15 @@ export const SocialExplore: React.FC<SocialExploreProps> = ({ expanded }) => {
       return;
     }
     setLoading(true);
-    let results = await getSearchByKey(token as string, searchTerm);
-    results = mergeUserData(results);
-    setFilteredUsers(results);  
-    setLoading(false);
+    let result = await getSearchByKey(token as string, searchTerm);
+    if (result.success) {
+      let orderedUsers = mergeUserData(result.data as OrderedUser[]);
+      setFilteredUsers(orderedUsers);  
+      setLoading(false);  
+    } else {
+      toast.error(result.message as string);
+      setLoading(false);
+    }
   }
   
   return (

@@ -51,12 +51,12 @@ export const SocialButtonsToken: FC<SocialButtonsTokenProps> = ({
   }
 
   const unlike = async () => {
-    const response = await unlikeToken(token as string, mint);
-    if (response.success) {
+    const result = await unlikeToken(token as string, mint);
+    if (result.success) {
       // toast.success(response.message as string);
       fetchTokenData();
     } else {
-      toast.error(response.message as string);
+      toast.error(result.message as string);
     }
   }
 

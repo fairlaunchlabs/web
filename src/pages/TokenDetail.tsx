@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { queryInitializeTokenEventBySearch } from '../utils/graphql';
-import { InitiazlizedTokenData, TokenDetailProps, OrderedToken } from '../types/types';
+import { InitiazlizedTokenData, TokenDetailProps, OrderedToken, UserAPIResponse } from '../types/types';
 import { TokenInfo } from '../components/tokenDetails/TokenInfo';
 import { useAuth } from '../utils/contexts';
 import { TokenCharts } from '../components/tokenDetails/TokenCharts';
@@ -14,6 +14,7 @@ import { SEARCH_CACHE_ITEMS } from '../config/constants';
 import { useState } from 'react';
 import { CommentBox } from '../components/social/CommentBox';
 import { getTokenDataByMint } from '../utils/user';
+import toast from 'react-hot-toast';
 
 export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
   const { tokenMintAddress, referrerCode } = useParams();
@@ -35,8 +36,13 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
   const { isMobile } = useDeviceType();
 
   const fetchTokenData = async () => {
-    const tokenData = await getTokenDataByMint(userToken as string, mint as string);
-    setTokenData(tokenData);
+    const result = await getTokenDataByMint(userToken as string, mint as string);
+    if (result.success) {
+      setTokenData(result.data);
+    } else {
+      setTokenData(null);
+      toast.error(result.message as string);
+    }
   }
 
   const saveToHistory = (term: string) => {
@@ -52,8 +58,13 @@ export const TokenDetail: React.FC<TokenDetailProps> = ({ expanded }) => {
     if (data) {
       const _mint = (data?.initializeTokenEventEntities as InitiazlizedTokenData[])[0].mint;
       setMint(_mint);
-      getTokenDataByMint(userToken as string, _mint).then((_tokenData: OrderedToken) => {
-        setTokenData(_tokenData);
+      getTokenDataByMint(userToken as string, _mint).then((result: UserAPIResponse) => {
+        if (result.success) {
+          setTokenData(result.data);
+        } else {
+          setTokenData(null);
+          toast.error(result.message as string);
+        }
       })
     }
   }, [data])

@@ -24,19 +24,24 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<number | null>(null);
   const [newReply, setNewReply] = useState("");
+  const [sendCommentLoading, setSendCommentLoading] = useState(false);
+  const [sendReplyLoading, setSendReplyLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const initialLoaded = useRef(false);
   const { walletAddress } = useAuth();
-  const { isMobile } = useDeviceType();
 
   const loadMoreComments = async () => {
     console.log("nextPage", page)
-    const newComments = type === "user" ? 
+    const result = type === "user" ? 
       await getCommentsUser(token, (orderedData as OrderedUser).userId as number, null, 10, page * 10) : 
       await getCommentsToken(token, (orderedData as OrderedToken).mint as string, null, 10, page * 10);
-    setComments((prev) => [...prev, ...newComments]);
+    if(!result.success) {
+      toast.error(result.message as string);
+      return;
+    }
+    setComments((prev) => [...prev, ...result.data as Comment[]]);
     const nextPage = page + 1;
     setPage(nextPage);
     if (nextPage >= 5) setHasMore(false); // TODO: handle loading more
@@ -117,20 +122,21 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
     if (!newComment.trim()) {
       return;
     }
-
+    setSendCommentLoading(true);
     const result = type === 'user' ? 
       await commentUser(token, (orderedData as OrderedUser).userId as number, newComment, null):
       await commentToken(token, (orderedData as OrderedToken).mint as string, newComment, null);
+    setSendCommentLoading(false);
     if(!result.success) {
-      toast.error(result.message);
+      toast.error(result.message as string);
       setNewComment("");
       return;
     }
 
-    const currentUser = result.user;
+    const currentUser = result.data.user;
     setComments((prev) => [
       {
-        id: parseInt(result.comment_id),
+        id: parseInt(result.data.comment_id),
         userId: currentUser.user_id as number,
         username: currentUser.username as string,
         walletAddress: currentUser.wallet_address as string,
@@ -154,16 +160,18 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
       return;
     }
 
+    setSendReplyLoading(true);
     const result = type === 'user' ? 
       await commentUser(token, (orderedData as OrderedUser).userId as number, newReply, commentId):
       await commentToken(token, (orderedData as OrderedToken).mint as string, newReply, commentId);
+    setSendReplyLoading(false);
     if(!result.success) {
-      toast.error(result.message);
+      toast.error(result.message as string);
       setReplyTo(null);
       setNewReply("");
       return;
     }
-    const currentUser = result.user;
+    const currentUser = result.data.user;
     setComments((prev) =>
       prev.map((comment) =>
         comment.id === commentId
@@ -171,9 +179,8 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
               ...comment,
               totalReplies: comment.totalReplies + 1,
               replies: [
-                ...(comment.replies || []),
                 {
-                  id: parseInt(result.comment_id),
+                  id: parseInt(result.data.comment_id),
                   userId: currentUser.user_id as number,
                   username: currentUser.username as string,
                   walletAddress: currentUser.wallet_address as string,
@@ -184,6 +191,7 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
                   totalReplies: 0,
                   liked: false,
                 },
+                ...(comment.replies || []),
               ],
             }
           : comment
@@ -198,7 +206,7 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
       await deleteCommentUser(token, commentId, replyId, (orderedData as OrderedUser).userId as number):
       await deleteCommentToken(token, commentId, replyId, (orderedData as OrderedToken).mint as string);
     if(!result.success) {
-      toast.error(result.message);
+      toast.error(result.message as string);
       return;
     }
 
@@ -220,17 +228,21 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
   }
 
   const openReply = async (commentId: number) => {
-    const replies = type === 'user' ? 
+    const result = type === 'user' ? 
       await getCommentsUser(token, (orderedData as OrderedUser).userId as number, commentId, 0, 0): // return all records
       await getCommentsToken(token, (orderedData as OrderedToken).mint as string, commentId, 0, 0);
+    if(!result.success) {
+      toast.error(result.message as string);
+      return;
+    }
     setComments((prev) =>
       prev.map((comment) =>
         comment.id === commentId
           ? {
               ...comment,
               replies: [
-                ...(comment.replies || []),
-                ...replies,
+                ...comment.replies || [],
+                ...result.data as Comment[],
               ],
             }
           : comment
@@ -266,6 +278,7 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
           <button
             type="submit"
             className="mt-2 btn btn-secondary join-item"
+            disabled={sendCommentLoading}
           >
             Send
           </button>
@@ -338,6 +351,28 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
               </div>
             </div>
 
+            {/* Reply input */}
+            {replyTo === comment.id && (
+              <form
+                onSubmit={(e) => handleReplySubmit(e, comment.id as number)}
+                className="join flex pl-12"
+              >
+                <input
+                  value={newReply}
+                  onChange={(e) => setNewReply(e.target.value)}
+                  placeholder={`Reply to ${comment.username}...`}
+                  className="w-full input join-item mb-3"
+                />
+                <button
+                  type="submit"
+                  className="btn btn-secondary join-item"
+                  disabled={sendReplyLoading}
+                >
+                  Reply
+                </button>
+              </form>
+            )}
+
             {/* Reply */}
             {comment.replies?.map((reply) => (
               <div key={reply.id} className="flex space-x-3 pl-12">
@@ -384,27 +419,6 @@ export const CommentBox: React.FC<CommentBoxProps> = ({
                 </div>
               </div>
             ))}
-
-            {/* Reply input */}
-            {replyTo === comment.id && (
-              <form
-                onSubmit={(e) => handleReplySubmit(e, comment.id as number)}
-                className="join flex pl-12"
-              >
-                <input
-                  value={newReply}
-                  onChange={(e) => setNewReply(e.target.value)}
-                  placeholder={`Reply to ${comment.username}...`}
-                  className="w-full input join-item"
-                />
-                <button
-                  type="submit"
-                  className="btn btn-secondary join-item"
-                >
-                  Send
-                </button>
-              </form>
-            )}
           </div>
         ))}
         {hasMore && (

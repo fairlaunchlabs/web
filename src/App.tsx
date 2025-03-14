@@ -34,7 +34,7 @@ import { CreateLiquidityPool } from './pages/CreateLiquidityPool';
 import { ManageLiquidity } from './pages/ManageLiquidity';
 import { DelegatedTokens } from './pages/DelegatedTokens';
 import { TradingBot } from './pages/TradingBot';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { queryMyDelegatedTokens } from './utils/graphql';
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
@@ -57,14 +57,19 @@ const AppContent = () => {
   const { isMobile } = useDeviceType();
   const wallet = useAnchorWallet();
 
-  const { loading: loadingDelegatedTokens, error, data: delegatedTokens } = useQuery(queryMyDelegatedTokens, {
-    variables: {
-      wallet: wallet?.publicKey.toString(),
-      skip: 0,
-      first: 10,
-    },
-    skip: !wallet,
-  });
+  const [getDelegatedTokens, { loading: loadingDelegatedTokens, error, data: delegatedTokens }] = useLazyQuery(queryMyDelegatedTokens);
+
+  useEffect(() => {
+    if(wallet) {
+      getDelegatedTokens({
+        variables: {
+          wallet: wallet?.publicKey.toString(),
+          skip: 0,
+          first: 10,
+        },    
+      });
+    }
+  }, [wallet]);
 
   useEffect(() => {
     if (delegatedTokens && delegatedTokens.initializeTokenEventEntities && delegatedTokens.initializeTokenEventEntities.length > 0) {

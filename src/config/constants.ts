@@ -97,7 +97,8 @@ export const IRYS_NETWORK = 'devnet';
 export const SCANURL = 'https://explorer.solana.com';
 
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
-export const API_BASE_URI = "http://64.7.198.109:8000"; // https://flipflop-api.vercel.app
+export const API_BASE_URI = "https://api.flipflop.fun";
+// export const API_BASE_URI = "http://127.0.0.1:8000";
 export const STORAGE = "irys" as "irys" | "arweave";
 export const UPLOAD_API_URL = STORAGE === "arweave" ? `${API_BASE_URI}/arweave` : `${API_BASE_URI}/irys`; // PRODUCTION
 export const COPILOTKIT_RUNTIME_URL = `${API_BASE_URI}/gpt/copilotkit`;

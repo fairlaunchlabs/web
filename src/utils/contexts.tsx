@@ -5,6 +5,7 @@ import { getWalletAddressFromToken, signMessageWithWallet } from './web3';
 import { User } from '../types/types';
 import { UsernameModal } from '../components/common/UsernameModal';
 import { generateDefaultUsername } from './format';
+import toast from 'react-hot-toast';
 
 // ===========================================
 // ============= Theme Context ==============
@@ -150,8 +151,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshFollowing = async () => {
     if (token) {
       try {
-        const followees = await getFollowing(token);
-        setFollowing(followees);
+        const result = await getFollowing(token);
+        if (!result.success) {
+          toast.error(result.message as string);
+          return;
+        }
+        setFollowing(result.data);
       } catch (error) {
         console.error('Failed to fetch following:', error);
       }
@@ -280,14 +285,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentProvider = (window as any).solana;
       if (currentProvider && currentProvider.publicKey) {
         const currentAddress = currentProvider.publicKey.toString();
-        const registered = await isRegistered(currentAddress as string);
-        if (registered) {
-          tryLoadLocalToken(currentProvider);
-        } else if (walletAddress !== currentAddress) {
-          if (!isLoggingIn && !isUsernameModalOpen && !pendingRegistration && !handledLoginRef.current) {
-            handledLoginRef.current = true;
-            handleLogin();
+        const result = await isRegistered(currentAddress as string);
+
+        if (result.success) {
+          if(result.data.isRegistered) tryLoadLocalToken(currentProvider);
+          else if (walletAddress !== currentAddress) {
+            if (!isLoggingIn && !isUsernameModalOpen && !pendingRegistration && !handledLoginRef.current) {
+              handledLoginRef.current = true;
+              handleLogin();
+            }
           }
+        } else {
+          toast.error(result.message as string);
         }
       } else {
         logout();

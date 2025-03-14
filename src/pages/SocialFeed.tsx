@@ -7,6 +7,7 @@ import { formatAddress } from '../utils/format';
 import { AiFillLike, AiFillStar, AiFillHeart, AiFillBell, AiOutlineLike, AiOutlineHeart } from "react-icons/ai";
 import { MdRocketLaunch } from "react-icons/md";
 import { API_URL } from '../config/constants';
+import toast from 'react-hot-toast';
 
 export type SocialFeedProps = {
   expanded: boolean;
@@ -23,8 +24,12 @@ export const SocialFeed: React.FC<SocialFeedProps> = ({ expanded }) => {
 
     setLoading(true);
     try {
-      const newActivities = await getActivities(token, 20);
-      setActivities(newActivities);
+      const result = await getActivities(token, 20);
+      if (!result.success) {
+        toast.error(result.message as string);
+        return;
+      }
+      setActivities(result.data);
     } catch (error) {
       console.error('Failed to fetch activities:', error);
     } finally {

@@ -15,6 +15,7 @@ import { queryInitializeTokenEventByMints, queryMyDelegatedTokens, queryMyDeploy
 import { TokenCardSimple } from "../components/mintTokens/TokenCardSimple";
 import { TokenCardMobile } from "../components/mintTokens/TokenCardMobile";
 import { SocialButtonsUser } from "../components/social/SocialButtonsUser";
+import toast from "react-hot-toast";
 
 type SocialUserDetailsProps = {
   expanded: boolean;
@@ -45,8 +46,12 @@ export const SocialUserDetails: FC<SocialUserDetailsProps> = ({ expanded }) => {
   const [searchTokensByMints, { loading: searchLoadingByMints, error: searchErrorByMints, data: searchDataByMints }] = useLazyQuery(queryInitializeTokenEventByMints);
 
   const fetchUserData = async () => {
-    let users = await getSearchByKey(token as string, address as string);
-    users = mergeUserData(users);
+    const result = await getSearchByKey(token as string, address as string);
+    if (!result.success) {
+      toast.error(result.message as string);
+      return;
+    }
+    const users = mergeUserData(result.data as OrderedUser[]);
     setUser(users[0] as OrderedUser);
   }
 
