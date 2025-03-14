@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL } from '../config/constants';
+import { USER_API_URL } from '../config/constants';
 import { Activity, OrderedUser, User, Comment, OrderedToken, UserAPIResponse, FAQ } from '../types/types';
 
 type AuthResponse = {
@@ -11,7 +11,7 @@ export const loadFAQs = async (token: string): Promise<UserAPIResponse> => {
   // TODO: load faqs from server
   console.log("loading faqs from server");
   try {
-    const response = await axios.get(`${API_URL}/user/faqs`, {
+    const response = await axios.get(`${USER_API_URL}/faqs`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -24,7 +24,7 @@ export const loadFAQs = async (token: string): Promise<UserAPIResponse> => {
 }
 
 export const login = async (walletAddress: string, signature: string, message: string): Promise<AuthResponse> => {
-  const response = await axios.post(`${API_URL}/user/login`, {
+  const response = await axios.post(`${USER_API_URL}/login`, {
     wallet_address: walletAddress,
     signature,
     message,
@@ -39,7 +39,7 @@ export const register = async (
   signature: string,
   message: string
 ): Promise<AuthResponse> => {
-  const response = await axios.post(`${API_URL}/user/register`, {
+  const response = await axios.post(`${USER_API_URL}/register`, {
     wallet_address: walletAddress,
     username,
     roles,
@@ -52,7 +52,7 @@ export const register = async (
 export const followUser = async (token: string, followeeId: number): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/follow`,
+      `${USER_API_URL}/follow`,
       { target_id: followeeId.toString(), target_type: 'user' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -71,7 +71,7 @@ export const followUser = async (token: string, followeeId: number): Promise<Use
 export const followToken = async (token: string, followeeId: string): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/follow`,
+      `${USER_API_URL}/follow`,
       { target_id: followeeId, target_type: 'token' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -90,7 +90,7 @@ export const followToken = async (token: string, followeeId: string): Promise<Us
 export const unfollowUser = async (token: string, followeeId: number): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/unfollow`,
+      `${USER_API_URL}/unfollow`,
       { target_id: followeeId.toString(), target_type: 'user' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -109,7 +109,7 @@ export const unfollowUser = async (token: string, followeeId: number): Promise<U
 export const unfollowToken = async (token: string, followeeId: string): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/unfollow`,
+      `${USER_API_URL}/unfollow`,
       { target_id: followeeId, target_type: 'token' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -128,7 +128,7 @@ export const unfollowToken = async (token: string, followeeId: string): Promise<
 export const likeUser = async (token: string, likeeId: number): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/like`,
+      `${USER_API_URL}/like`,
       { target_id: likeeId.toString(), target_type: 'user' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -147,7 +147,7 @@ export const likeUser = async (token: string, likeeId: number): Promise<UserAPIR
 export const likeToken = async (token: string, likeeId: string): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/like`,
+      `${USER_API_URL}/like`,
       { target_id: likeeId, target_type: 'token' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -166,7 +166,7 @@ export const likeToken = async (token: string, likeeId: string): Promise<UserAPI
 export const unlikeUser = async (token: string, unlikeeId: number): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/unlike`,
+      `${USER_API_URL}/unlike`,
       { target_id: unlikeeId.toString(), target_type: 'user' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -185,7 +185,7 @@ export const unlikeUser = async (token: string, unlikeeId: number): Promise<User
 export const unlikeToken = async (token: string, unlikeeId: string): Promise<UserAPIResponse> => {
   try {
     const response = await axios.post(
-      `${API_URL}/user/unlike`,
+      `${USER_API_URL}/unlike`,
       { target_id: unlikeeId, target_type: 'token' },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -203,7 +203,7 @@ export const unlikeToken = async (token: string, unlikeeId: string): Promise<Use
 
 export const getFollowing = async (token: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/following`, {
+    const response = await axios.get(`${USER_API_URL}/following`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return {
@@ -220,7 +220,7 @@ export const getFollowing = async (token: string): Promise<UserAPIResponse> => {
 
 export const isRegistered = async (walletAddress: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/isregistered`, {
+    const response = await axios.get(`${USER_API_URL}/isregistered`, {
       params: { wallet_address: walletAddress },
     });
     return {
@@ -239,7 +239,7 @@ export const isRegistered = async (walletAddress: string): Promise<UserAPIRespon
 
 export const getActivities = async (token: string, max: number = 20): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/activities`, {
+    const response = await axios.get(`${USER_API_URL}/activities`, {
       params: { max },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -274,7 +274,7 @@ export const getActivities = async (token: string, max: number = 20): Promise<Us
 
 export const updateUserProfile = async (token: string, data: any): Promise<UserAPIResponse> => {
   try {
-    await axios.post(`${API_URL}/user/update-profile`, data, {
+    await axios.post(`${USER_API_URL}/update-profile`, data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return {
@@ -291,7 +291,7 @@ export const updateUserProfile = async (token: string, data: any): Promise<UserA
 
 export const getUserProfileByWalletAddress = async (token: string, walletAddress: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/user`, {
+    const response = await axios.get(`${USER_API_URL}`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { wallet_address: walletAddress },
     });
@@ -309,7 +309,7 @@ export const getUserProfileByWalletAddress = async (token: string, walletAddress
 
 export const getUserProfileByUserId = async (token: string, id: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/user`, {
+    const response = await axios.get(`${USER_API_URL}`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { id },
     });
@@ -329,7 +329,7 @@ export const uploadAvatar = async (token: string, file: File): Promise<UserAPIRe
   try {
     const formData = new FormData();
     formData.append('avatar', file);
-    const response = await axios.post(`${API_URL}/user/upload-avatar`, formData, {
+    const response = await axios.post(`${USER_API_URL}/upload-avatar`, formData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return {
@@ -347,7 +347,7 @@ export const uploadAvatar = async (token: string, file: File): Promise<UserAPIRe
 // ============== Users list API ==================
 export const getDevelopers = async (token: string, limit: number = 20): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/get-developers`, {
+    const response = await axios.get(`${USER_API_URL}/get-developers`, {
       params: { limit },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -365,7 +365,7 @@ export const getDevelopers = async (token: string, limit: number = 20): Promise<
 
 export const getReferrals = async (token: string, limit: number = 20): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/get-referrers`, {
+    const response = await axios.get(`${USER_API_URL}/get-referrers`, {
       params: { limit },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -383,7 +383,7 @@ export const getReferrals = async (token: string, limit: number = 20): Promise<U
 
 export const getValueManagers = async (token: string, limit: number = 20): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/get-value-managers`, {
+    const response = await axios.get(`${USER_API_URL}/get-value-managers`, {
       params: { limit },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -401,7 +401,7 @@ export const getValueManagers = async (token: string, limit: number = 20): Promi
 
 export const getSearchByKey = async (token: string, key: string, limit: number = 20): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/search-by`, {
+    const response = await axios.get(`${USER_API_URL}/search-by`, {
       params: { key, limit },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -420,7 +420,7 @@ export const getSearchByKey = async (token: string, key: string, limit: number =
 // ============== Token API ================
 export const getTokenDataByMint = async (token: string, mint: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/token`, {
+    const response = await axios.get(`${USER_API_URL}/token`, {
       params: { mint },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -455,7 +455,7 @@ export const getTokenDataByMint = async (token: string, mint: string): Promise<U
 // ============== Comment API ==================
 export const commentUser = async (token: string, targetId: number, content: string,  parentId: number | null): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/comment`, 
+    const response = await axios.post(`${USER_API_URL}/comment`, 
       { target_id: targetId.toString(), target_type: 'user', content, parent_id: parentId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -473,7 +473,7 @@ export const commentUser = async (token: string, targetId: number, content: stri
 
 export const commentToken = async (token: string, targetId: string, content: string,  parentId: number | null): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/comment`, 
+    const response = await axios.post(`${USER_API_URL}/comment`, 
       { target_id: targetId, target_type: 'token', content, parent_id: parentId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -491,7 +491,7 @@ export const commentToken = async (token: string, targetId: string, content: str
 
 export const deleteCommentUser = async (token: string, commentId: number, replyId: number | null, targetId: number): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/delete_comment`, 
+    const response = await axios.post(`${USER_API_URL}/delete_comment`, 
       { comment_id: commentId, target_type: 'user', reply_id: replyId, target_id: targetId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -509,7 +509,7 @@ export const deleteCommentUser = async (token: string, commentId: number, replyI
 
 export const deleteCommentToken = async (token: string, commentId: number, replyId: number | null, targetId: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/delete_comment`, 
+    const response = await axios.post(`${USER_API_URL}/delete_comment`, 
     { comment_id: commentId, target_type: 'token', reply_id: replyId, target_id: targetId },
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -527,7 +527,7 @@ export const deleteCommentToken = async (token: string, commentId: number, reply
 
 export const getCommentsUser = async (token: string, targetId: number, parentId: number | null, limit: number = 10, offset: number = 0): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/get_comments`, {
+    const response = await axios.get(`${USER_API_URL}/get_comments`, {
       params: { target_id: targetId.toString(), target_type: 'user', parent_id: parentId, limit, offset },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -561,7 +561,7 @@ export const getCommentsUser = async (token: string, targetId: number, parentId:
 
 export const getCommentsToken = async (token: string, targetId: string, parentId: number | null, limit: number = 10, offset: number = 0): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/user/get_comments`, {
+    const response = await axios.get(`${USER_API_URL}/get_comments`, {
       params: { target_id: targetId, target_type: 'token', parent_id: parentId, limit, offset },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -595,7 +595,7 @@ export const getCommentsToken = async (token: string, targetId: string, parentId
 
 export const likeCommentUser = async (token: string, commentId: number, targetId: number) : Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/like_comment`, 
+    const response = await axios.post(`${USER_API_URL}/like_comment`, 
       { comment_id: commentId, target_type: "user", target_id: targetId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -613,7 +613,7 @@ export const likeCommentUser = async (token: string, commentId: number, targetId
 
 export const likeCommentToken = async (token: string, commentId: number, targetId: string) : Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/like_comment`, 
+    const response = await axios.post(`${USER_API_URL}/like_comment`, 
       { comment_id: commentId, target_type: 'token', target_id: targetId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -631,7 +631,7 @@ export const likeCommentToken = async (token: string, commentId: number, targetI
 
 export const unlikeCommentUser = async (token: string, commentId: number, targetId: number) : Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/unlike_comment`, 
+    const response = await axios.post(`${USER_API_URL}/unlike_comment`, 
       { comment_id: commentId, target_type: "user", target_id: targetId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -649,7 +649,7 @@ export const unlikeCommentUser = async (token: string, commentId: number, target
 
 export const unlikeCommentToken = async (token: string, commentId: number, targetId: string): Promise<UserAPIResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/user/unlike_comment`, 
+    const response = await axios.post(`${USER_API_URL}/unlike_comment`, 
       { comment_id: commentId, target_type: 'token', target_id: targetId },
       { headers: { Authorization: `Bearer ${token}` } }
     );

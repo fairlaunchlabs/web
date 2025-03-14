@@ -6,6 +6,8 @@ import { User } from '../types/types';
 import { UsernameModal } from '../components/common/UsernameModal';
 import { generateDefaultUsername } from './format';
 import toast from 'react-hot-toast';
+import { AnchorWallet, useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
+import { getProvider } from '../utils/web3';
 
 // ===========================================
 // ============= Theme Context ==============
@@ -178,12 +180,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoggingIn(true);
     
     try {
+      // const wallet = useAnchorWallet();
+      // if(!wallet) {
+      //   alert("Please connect your wallet first");
+      //   return;
+      // }
+      // const { connection } = useConnection();
+      // const provider = getProvider(wallet as AnchorWallet, connection);
       const provider = (window as any).solana;
+      console.log("provider", provider);
       if (!provider) {
         alert('Please install Solana wallet');
         return;
       }
-      
       if (!provider.publicKey) {
         try {
           await provider.connect();
@@ -270,6 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setupWalletListeners = () => {
     const provider = (window as any).solana; // Phantom wallet
+    console.log("provider", provider);
     if (!provider) {
       alert('Please install Solana wallet');
       return;

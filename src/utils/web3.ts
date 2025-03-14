@@ -28,7 +28,7 @@ import { ASSOCIATED_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import bs58 from 'bs58';
 import jwt from 'jsonwebtoken';
 
-const getProvider = (wallet: AnchorWallet, connection: Connection) => {
+export const getProvider = (wallet: AnchorWallet, connection: Connection) => {
   return new AnchorProvider(
     connection,
     {

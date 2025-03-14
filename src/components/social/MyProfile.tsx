@@ -5,7 +5,7 @@ import { User } from '../../types/types';
 import toast from 'react-hot-toast';
 import { AddressDisplay } from '../common/AddressDisplay';
 import { FaTelegramPlane, FaDiscord, FaTwitter, FaGithub, FaFacebook, FaInternetExplorer } from "react-icons/fa";
-import { API_BASE_URI, API_URL } from '../../config/constants';
+import { API_BASE_URI, USER_API_URL } from '../../config/constants';
 
 export const socialNames = ['website', 'twitter', 'telegram', 'discord', 'github', 'facebook']
 export const socialIcons = {
@@ -147,7 +147,7 @@ export const MyProfile: React.FC = () => {
       {!token && (
         <div className="text-center mt-10">
           <p className="text-gray-300 mb-4">Please log in to view your feed.</p>
-          <p className="text-gray-300 mb-4">{API_URL}</p>
+          {/* <p className="text-gray-300 mb-4">{USER_API_URL}</p> */}
           <button
             onClick={handleLogin}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"

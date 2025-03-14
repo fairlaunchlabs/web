@@ -8,7 +8,7 @@ import { OrderedUser, Role } from '../types/types';
 import { getDevelopers, getReferrals, getSearchByKey, getValueManagers } from '../utils/user';
 import toast from 'react-hot-toast';
 import { generateDefaultUsername } from "../utils/format";
-import { API_URL, DEFAULT_IMAGE } from '../config/constants';
+import { USER_API_URL, DEFAULT_IMAGE } from '../config/constants';
 
 export type SocialExploreProps = {
   expanded: boolean;
@@ -111,7 +111,7 @@ export const SocialExplore: React.FC<SocialExploreProps> = ({ expanded }) => {
       {!token || !walletAddress && (
         <div className="text-center mt-10">
           <p className="text-gray-300 mb-4">Please log in to view your feed.</p>
-          <p className="text-gray-300 mb-4">{API_URL}</p>
+          {/* <p className="text-gray-300 mb-4">{USER_API_URL}</p> */}
           <button
             onClick={handleLogin}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
