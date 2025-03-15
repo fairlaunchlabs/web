@@ -24,7 +24,7 @@ export const loadFAQs = async (token: string): Promise<UserAPIResponse> => {
   }
 }
 
-export const login = async (walletAddress: string, signature: string, message: string): Promise<AuthResponse> => {
+export const login = async (walletAddress: string, signature: string, message: string): Promise<UserAPIResponse> => {
   const response = await axios.post(`${USER_API_URL}/login`, {
     wallet_address: walletAddress,
     signature,
@@ -39,7 +39,7 @@ export const register = async (
   roles: string,
   signature: string,
   message: string
-): Promise<AuthResponse> => {
+): Promise<UserAPIResponse> => {
   const response = await axios.post(`${USER_API_URL}/register`, {
     wallet_address: walletAddress,
     username,
