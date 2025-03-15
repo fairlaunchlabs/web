@@ -66,7 +66,7 @@ export const TokenCardMobile: React.FC<TokenCardMobileProps> = ({ token }) => {
       onClick={handleCardClick}
     >
       {metadata?.header && <TokenBackgroundImage imageUrl={metadata.header} metadataTimestamp={Number(token.metadataTimestamp)} />}
-      <div className="relative z-10 flex items-start gap-4">
+      <div className="relative flex items-start gap-4">
         <div className="flex flex-col items-center">
           <TokenImage
             imageUrl={metadata?.image as string}

@@ -63,9 +63,9 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
           tooltip={tooltip.mintFee}
         />
         <DataBlock
-          label="Target Speed"
-          value={`${formatSeconds(mintSpeed)}/mint`}
-          tooltip={tooltip.mintSpeed}
+          label="Token Address"
+          value={<AddressDisplay address={token.mint} />}
+          tooltip={tooltip.tokenAddress}
         />
       </div>
 
@@ -89,6 +89,11 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
             tooltip={tooltip.currentMintSize}
           />
           <DataBlock
+            label="Target Speed"
+            value={`${formatSeconds(mintSpeed)}/mint`}
+            tooltip={tooltip.mintSpeed}
+          />
+          <DataBlock
             label={`Target Supply (MS:${token.targetEras})`}
             value={`${totalSupplyToTargetEras.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${metadata?.symbol}`}
             tooltip={tooltip.targetSupply}
@@ -107,11 +112,6 @@ export const TokenInfoDataMobile: FC<TokenInfoDataMobileProps> = ({
             label="Developer"
             value={<AddressDisplay address={token.admin} />}
             tooltip={tooltip.deployer}
-          />
-          <DataBlock
-            label="Token Address"
-            value={<AddressDisplay address={token.mint} />}
-            tooltip={tooltip.tokenAddress}
           />
           <DataBlock
             label="Liquidity Vault (SOL)"

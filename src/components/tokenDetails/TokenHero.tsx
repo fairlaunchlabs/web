@@ -73,7 +73,7 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-6 flex gap-6 items-end">
         {/* Token Image */}
-        <div className="w-24 h-24 relative z-10">
+        <div className="w-24 h-24 relative">
           <TokenImage
             imageUrl={metadata?.image as string}
             name={metadata?.name as string}
@@ -104,7 +104,7 @@ export const TokenHero: React.FC<TokenHeroProps> = ({
                 {metadata?.description}
               </p>
             </div>)}
-            <div className="bg-black/60 px-3 py-2 w-full">
+            <div className="bg-black/60 px-3 py-2 w-full mt-3">
               <SocialButtonsToken 
                 tokenData={tokenData} 
                 mint={token.mint as string} 

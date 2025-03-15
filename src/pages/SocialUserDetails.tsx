@@ -15,6 +15,7 @@ import { queryInitializeTokenEventByMints, queryMyDelegatedTokens, queryMyDeploy
 import { TokenCardSimple } from "../components/mintTokens/TokenCardSimple";
 import { TokenCardMobile } from "../components/mintTokens/TokenCardMobile";
 import { SocialButtonsUser } from "../components/social/SocialButtonsUser";
+import { FaAngleDoubleDown } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 type SocialUserDetailsProps = {
@@ -209,8 +210,10 @@ export const SocialUserDetails: FC<SocialUserDetailsProps> = ({ expanded }) => {
       <div className="space-y-2">
         {roles.map((role, index) => (
           <div key={index} className="">
-            <div className="">{titles[role]}</div>
-
+            <div className="flex font-semibold mb-2 ml-2">
+              <div>{titles[role]}</div>
+              <FaAngleDoubleDown className="mt-1 ml-1"/>
+            </div>
             {tokensByAdmin.length > 0 && role === Role.ISSUER && 
               (isMobile ? (
                 <div className="grid grid-cols-2 gap-4 p-1">
@@ -262,13 +265,15 @@ export const SocialUserDetails: FC<SocialUserDetailsProps> = ({ expanded }) => {
 
       {/* Comments */}
       {isCommentOpen && 
-      <CommentBox 
-        setIsOpen={(bl) => setIsCommentOpen(bl)} 
-        token={token as string} 
-        orderedData={user as OrderedUser}
-        type={'user'}
-        expanded={expanded}
-      />}
+        <div className="">
+          <CommentBox 
+            setIsOpen={(bl) => setIsCommentOpen(bl)} 
+            token={token as string} 
+            orderedData={user as OrderedUser}
+            type={'user'}
+            expanded={expanded}
+          />
+        </div>}
     </div>
   );
 };
